@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Vista Tree/List del Reporte de Notas de Crédito -->
+    <record id="view_sng_credit_note_report_tree" model="ir.ui.view">
+        <field name="name">sng.credit.note.report.tree</field>
+        <field name="model">sng.credit.note.report</field>
+        <field name="arch" type="xml">
+            <list string="Reporte de Notas de Crédito"
+                  create="false"
+                  edit="false"
+                  delete="false"
+                  sample="1"
+                  export_xlsx="1">
+
+                <!-- Información del Cliente -->
+                <field name="partner_unique_id" string="ID Cliente"/>
+                <field name="partner_name" string="Cliente"/>
+
+                <!-- Información de Nota de Crédito -->
+                <field name="credit_note_number" string="Número NC"/>
+                <field name="credit_note_date" string="Fecha NC"/>
+                <field name="credit_note_amount" string="Monto NC" sum="Total"/>
+                <field name="reason_ref" string="Motivo"/>
+
+                <!-- Facturas Relacionadas -->
+                <field name="related_invoices" string="Facturas Relacionadas"/>
+
+                <!-- Estado y Compañía -->
+                <field name="state" string="Estado"
+                       decoration-info="state == 'draft'"
+                       decoration-success="state == 'posted'"
+                       decoration-muted="state == 'cancel'"/>
+                <field name="company_id" groups="base.group_multi_company" string="Compañía"/>
+
+                <!-- Campos ocultos para filtros -->
+                <field name="partner_id" column_invisible="1"/>
+                <field name="currency_id" column_invisible="1"/>
+                <field name="credit_note_id" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Vista Search con Filtros Avanzados -->
+    <record id="view_sng_credit_note_report_search" model="ir.ui.view">
+        <field name="name">sng.credit.note.report.search</field>
+        <field name="model">sng.credit.note.report</field>
+        <field name="arch" type="xml">
+            <search string="Buscar Notas de Crédito">
+
+                <!-- Búsqueda por campos -->
+                <field name="partner_name" string="Cliente"
+                       filter_domain="['|', ('partner_name', 'ilike', self), ('partner_unique_id', 'ilike', self)]"/>
+                <field name="credit_note_number" string="Número NC"/>
+                <field name="related_invoices" string="Factura Relacionada"/>
+                <field name="reason_ref" string="Motivo"/>
+
+                <!-- Filtros predefinidos -->
+                <filter string="Publicadas" name="filter_posted"
+                        domain="[('state', '=', 'posted')]"
+                        help="Notas de crédito publicadas"/>
+
+                <filter string="Borrador" name="filter_draft"
+                        domain="[('state', '=', 'draft')]"/>
+
+                <filter string="Canceladas" name="filter_cancel"
+                        domain="[('state', '=', 'cancel')]"/>
+
+                <separator/>
+
+                <filter string="Mes Actual" name="filter_current_month"
+                        domain="[
+                            ('credit_note_date', '&gt;=', (context_today() - relativedelta(day=1)).strftime('%Y-%m-%d')),
+                            ('credit_note_date', '&lt;=', (context_today() + relativedelta(day=31)).strftime('%Y-%m-%d'))
+                        ]"/>
+
+                <filter string="Año Actual" name="filter_current_year"
+                        domain="[
+                            ('credit_note_date', '&gt;=', (context_today() - relativedelta(month=1, day=1)).strftime('%Y-%m-%d')),
+                            ('credit_note_date', '&lt;=', (context_today() + relativedelta(month=12, day=31)).strftime('%Y-%m-%d'))
+                        ]"/>
+
+                <separator/>
+
+                <!-- Filtros de agrupación -->
+                <group expand="0" string="Agrupar por">
+                    <filter string="Cliente" name="group_partner"
+                            context="{'group_by': 'partner_id'}"/>
+                    <filter string="Estado" name="group_state"
+                            context="{'group_by': 'state'}"/>
+                    <filter string="Fecha NC" name="group_date"
+                            context="{'group_by': 'credit_note_date'}"/>
+                    <filter string="Compañía" name="group_company"
+                            context="{'group_by': 'company_id'}"
+                            groups="base.group_multi_company"/>
+                </group>
+
+                <!-- Filtros avanzados -->
+                <searchpanel>
+                    <field name="company_id" groups="base.group_multi_company" icon="fa-building"/>
+                    <field name="state" icon="fa-check-circle" select="multi"/>
+                </searchpanel>
+            </search>
+        </field>
+    </record>
+
+    <!-- Acción de Ventana -->
+    <record id="action_sng_credit_note_report" model="ir.actions.act_window">
+        <field name="name">Notas de Crédito (SNG)</field>
+        <field name="res_model">sng.credit.note.report</field>
+        <field name="view_mode">list</field>
+        <field name="search_view_id" ref="view_sng_credit_note_report_search"/>
+        <field name="context">{
+            'search_default_filter_posted': 1,
+        }</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No se encontraron notas de crédito
+            </p>
+            <p>
+                Este reporte muestra todas las notas de crédito de clientes con información detallada
+                sobre el cliente, monto, fecha y facturas relacionadas mediante reconciliación contable.
+            </p>
+        </field>
+    </record>
+
+    <!-- Menú en Contabilidad -> Reportes -->
+    <menuitem id="menu_sng_credit_note_report"
+              name="Notas de Crédito (SNG)"
+              parent="account.menu_finance_reports"
+              action="action_sng_credit_note_report"
+              sequence="50"
+              groups="account.group_account_readonly"/>
+
+    <!-- Botón de Exportación XLSX en la vista tree -->
+    <record id="action_sng_credit_note_export_wizard" model="ir.actions.act_window">
+        <field name="name">Exportar Notas de Crédito a Excel</field>
+        <field name="res_model">sng.credit.note.export.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="binding_model_id" ref="model_sng_credit_note_report"/>
+        <field name="binding_view_types">list</field>
+    </record>
+
+</odoo>

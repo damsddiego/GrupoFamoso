@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Wizard Form View -->
+    <record id="view_invoice_report_wizard_form" model="ir.ui.view">
+        <field name="name">invoice.report.wizard.form</field>
+        <field name="model">invoice.report.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Invoice Report by Salesperson">
+                <group>
+                    <group string="Date Range">
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                    </group>
+                    <group string="Companies">
+                        <field name="company_ids" widget="many2many_tags"
+                               options="{'no_create': True}"
+                               placeholder="Select companies (limited to your access)..."/>
+                    </group>
+                </group>
+                <group>
+                    <group string="Filters">
+                        <field name="invoice_type"/>
+                        <field name="payment_status"/>
+                    </group>
+                    <group string="Salesperson">
+                        <field name="salesperson_ids" widget="many2many_tags"
+                               placeholder="All salespersons if empty..."/>
+                    </group>
+                </group>
+                <footer>
+                    <button name="action_view_on_screen" string="View on Screen" type="object" class="btn-primary"/>
+                    <button name="action_print_excel" string="Download Excel" type="object" class="btn-secondary"/>
+                    <button name="action_print_pdf" string="Print PDF" type="object" class="btn-secondary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Wizard Action -->
+    <record id="action_invoice_report_wizard" model="ir.actions.act_window">
+        <field name="name">Reporte de facturas por vendedor</field>
+        <field name="res_model">invoice.report.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <!-- Menu Item under Invoicing > Reporting -->
+    <menuitem id="menu_invoice_report_wizard"
+              name="Reporte de facturas por vendedor"
+              parent="account.menu_finance_reports"
+              action="action_invoice_report_wizard"
+              sequence="100"/>
+
+</odoo>

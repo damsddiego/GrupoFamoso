@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============================================================
+         Menú: Contabilidad → Reportes → Estado de Cuenta de Clientes
+         ============================================================ -->
+
+    <!-- Abre el wizard para generar un nuevo estado de cuenta -->
+    <menuitem
+        id="menu_customer_statement_report"
+        name="Estado de Cuenta de Clientes"
+        parent="account.menu_finance_reports"
+        action="action_customer_statement_wizard"
+        sequence="85"
+        groups="sng_customer_statement.group_customer_statement_user"/>
+
+    <!-- Lista los reportes ya generados (sin volver a ejecutar el wizard) -->
+    <menuitem
+        id="menu_customer_statement_generated"
+        name="Estados de Cuenta Generados"
+        parent="account.menu_finance_reports"
+        action="action_customer_statement_reports"
+        sequence="86"
+        groups="sng_customer_statement.group_customer_statement_user"/>
+
+</odoo>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-inherit="web.SearchBarMenu.FavoriteItem" t-inherit-mode="extension" owl="1">
+        <xpath expr="//i[contains(@class, 'fa-pencil')]" position="attributes">
+            <attribute name="t-if">!env.searchModel.sh_global_hide_favorite_edit</attribute>
+        </xpath>
+    </t>
+
+</templates>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Vista Form del Wizard de Exportación -->
+    <record id="view_sng_credit_note_export_wizard_form" model="ir.ui.view">
+        <field name="name">sng.credit.note.export.wizard.form</field>
+        <field name="model">sng.credit.note.export.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Exportar Notas de Crédito a Excel">
+                <group invisible="state == 'done'">
+                    <div class="alert alert-info" role="alert">
+                        <p><strong>Exportar a Excel (XLSX)</strong></p>
+                        <p>
+                            Se exportarán los registros según los filtros aplicados en la vista.
+                            El archivo incluirá todas las columnas del reporte con formato profesional.
+                        </p>
+                    </div>
+                </group>
+
+                <group invisible="state == 'draft'">
+                    <field name="file_name" readonly="1"/>
+                    <field name="file_data" filename="file_name" readonly="1"/>
+                    <div class="alert alert-success" role="alert">
+                        <p><i class="fa fa-check-circle"/> <strong>Archivo generado exitosamente</strong></p>
+                        <p>Haga clic en el botón "Descargar" para obtener el archivo Excel.</p>
+                    </div>
+                </group>
+
+                <field name="state" invisible="1"/>
+
+                <footer>
+                    <button string="Generar Excel"
+                            name="action_export_xlsx"
+                            type="object"
+                            class="btn-primary"
+                            invisible="state == 'done'"
+                            data-hotkey="q"/>
+
+                    <button string="Descargar"
+                            name="action_download"
+                            type="object"
+                            class="btn-primary"
+                            invisible="state == 'draft'"
+                            data-hotkey="q"/>
+
+                    <button string="Cerrar"
+                            class="btn-secondary"
+                            special="cancel"
+                            data-hotkey="x"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>

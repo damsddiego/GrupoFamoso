@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_sng_credit_note_report_user,sng.credit.note.report.user,model_sng_credit_note_report,account.group_account_readonly,1,0,0,0
+access_sng_credit_note_report_invoice,sng.credit.note.report.invoice,model_sng_credit_note_report,account.group_account_invoice,1,0,0,0
+access_sng_credit_note_report_manager,sng.credit.note.report.manager,model_sng_credit_note_report,account.group_account_manager,1,0,0,0
+access_sng_credit_note_export_wizard_user,sng.credit.note.export.wizard.user,model_sng_credit_note_export_wizard,account.group_account_readonly,1,1,1,1
+access_sng_credit_note_export_wizard_invoice,sng.credit.note.export.wizard.invoice,model_sng_credit_note_export_wizard,account.group_account_invoice,1,1,1,1
+access_sng_credit_note_export_wizard_manager,sng.credit.note.export.wizard.manager,model_sng_credit_note_export_wizard,account.group_account_manager,1,1,1,1

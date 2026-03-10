@@ -1,0 +1,42 @@
+<odoo>
+    <record id="view_data_1" model="sh.view.list">
+        <field name="technical_name">graph</field>
+        <field name="name">Graph</field>
+    </record>
+    <record id="view_data_2" model="sh.view.list">
+        <field name="technical_name">pivot</field>
+        <field name="name">Pivot</field>
+    </record>
+    <record id="view_data_3" model="sh.view.list">
+        <field name="technical_name">diagram</field>
+        <field name="name">Diagram</field>
+    </record>
+    <record id="view_data_4" model="sh.view.list">
+        <field name="technical_name">calendar</field>
+        <field name="name">Calendar</field>
+    </record>
+    <record id="view_data_5" model="sh.view.list">
+        <field name="technical_name">gantt</field>
+        <field name="name">Gantt</field>
+    </record>
+    <record id="view_data_6" model="sh.view.list">
+        <field name="technical_name">activity</field>
+        <field name="name">Activity</field>
+    </record>
+    <record id="view_data_7" model="sh.view.list">
+        <field name="technical_name">map</field>
+        <field name="name">Map</field>
+    </record>
+    <record id="view_data_8" model="sh.view.list">
+        <field name="technical_name">dashboard</field>
+        <field name="name">Dashboard</field>
+    </record>
+    <record id="view_data_9" model="sh.view.list">
+        <field name="technical_name">list</field>
+        <field name="name">List</field>
+    </record>
+    <record id="view_data_10" model="sh.view.list">
+        <field name="technical_name">kanban</field>
+        <field name="name">Kanban</field>
+    </record>
+</odoo>

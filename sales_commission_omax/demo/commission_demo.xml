@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Demo Commission with Days Configuration -->
+        <record id="demo_commission_by_days" model="sales.commission">
+            <field name="name">Demo Commission by Days</field>
+            <field name="commission_type">standard</field>
+            <field name="commission_apply_on">invoice_payment</field>
+            <field name="start_date">2023-01-01</field>
+            <field name="end_date">2023-12-31</field>
+            <field name="commission_by_days" eval="True"/>
+            <field name="days_0_30_commission">5.0</field>
+            <field name="days_31_60_commission">3.0</field>
+            <field name="days_61_90_commission">2.0</field>
+            <field name="days_90_plus_commission">1.0</field>
+            <field name="salesperson_ids" eval="[(4, ref('base.user_admin'))]"/>
+        </record>
+    </data>
+</odoo>

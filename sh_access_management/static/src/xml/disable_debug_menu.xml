@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates>
+    <t t-name="web.DebugMenu" t-inherit="web.DebugMenu" t-inherit-mode="extension" owl="1">
+        <xpath expr="//div[@class='o_debug_manager']" position="attributes">
+            <attribute name="t-if">modelRestrictions and !modelRestrictions.disable_developer_mode</attribute>
+        </xpath>
+    </t>
+</templates>

@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Sales Commission Form View -->
+    <record id="sales_commission_view_form_omax" model="ir.ui.view">
+        <field name="name">sales.commission.form</field>
+        <field name="model">sales.commission</field>
+        <field name="arch" type="xml">
+            <form string="Sales Target">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group name="left">
+                            <field name="salesperson_ids" widget="many2many_tags"/>
+                            <field name="company_id" invisible="1"/>
+                            <field name="currency_id" force_save="1"/>
+                            <field name="start_date"/>
+                            <field name="commission_type"/>
+                            <field name="commission_by_days" invisible="commission_type != 'standard'"/>
+                            <field name="affiliated_partner_commission" required="commission_type == 'partner_based'" invisible="commission_type != 'partner_based'"/>
+                        </group>
+                        <group name="right">
+                            <field name="commission_apply_on"/>
+                            <field name="end_date"/>
+                            <field name="standard_commission" required="commission_type == 'standard' and not commission_by_days" invisible="commission_type != 'standard' or commission_by_days"/>
+                            <field name="days_0_30_commission" invisible="commission_type != 'standard' or not commission_by_days"/>
+                            <field name="days_31_60_commission" invisible="commission_type != 'standard' or not commission_by_days"/>
+                            <field name="days_61_90_commission" invisible="commission_type != 'standard' or not commission_by_days"/>
+                            <field name="days_90_plus_commission" invisible="commission_type != 'standard' or not commission_by_days"/>
+                            <field name="non_affiliated_partner_commission" required="commission_type == 'partner_based'" invisible="commission_type != 'partner_based'"/>
+                            <!-- widget="monetary" options="{'currency_field': 'currency_id'}"-->
+                        </group>
+                    </group>
+                    <field name="sales_commission_line" string="Commission Exception" invisible="commission_type != 'product_category_margin'">
+                        <list>
+                            <field name="name"/>
+                            <field name="com_with"/>
+                            <field name="product_id" required="name == 'product'"/>
+                            <field name="category_id" required="name == 'product_category'"/>
+                            <field name="currency_id" column_invisible="1"/>
+                            <field name="target_price" required="com_with == 'fix_price'" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            <field name="above_price_commission" required="com_with == 'fix_price'"/>
+                            <field name="target_margin" required="com_with == 'margin'"/>
+                            <field name="above_margin_commission" required="com_with == 'margin'"/>
+                            <field name="below_margin_commission" required="com_with == 'margin'"/>
+                            <field name="commission" required="com_with == 'commission_exception'"/>
+                        </list>
+                        <form>
+                            <sheet>
+                                <group>
+                                    <group>
+                                        <field name="name"/>
+                                        <field name="com_with"/>
+                                        <field name="product_id" invisible="name != 'product'" required="name == 'product'"/>
+                                        <field name="category_id" invisible="name != 'product_category'" required="name == 'product_category'"/>
+                                    </group>
+                                    <group>
+                                        <field name="target_price" invisible="com_with != 'fix_price'" required="com_with == 'fix_price'" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                        <field name="above_price_commission" invisible="com_with != 'fix_price'" required="com_with == 'fix_price'"/>
+                                        <field name="target_margin" invisible="com_with != 'margin'" required="com_with == 'margin'"/>
+                                        <field name="above_margin_commission" invisible="com_with != 'margin'" required="com_with == 'margin'"/>
+                                        <field name="below_margin_commission" invisible="com_with != 'margin'" required="com_with == 'margin'"/>
+                                        <field name="commission" invisible="com_with != 'commission_exception'" required="com_with == 'commission_exception'"/>
+                                    </group>
+                                </group>
+                            </sheet>
+                        </form>
+                    </field>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Sales Commission list View -->
+    <record id="sales_commission_view_list_omax" model="ir.ui.view">
+        <field name="name">sales.commission.list</field>
+        <field name="model">sales.commission</field>
+        <field name="arch" type="xml">
+            <list string="Sales Commission" name="sales_target_list">
+                <field name="name"/>
+                <field name="commission_type"/>
+                <field name="salesperson_ids" widget="many2many_tags"/>
+                <field name="commission_apply_on"/>
+                <field name="standard_commission"/>
+                <field name="affiliated_partner_commission"/>
+                <field name="non_affiliated_partner_commission"/>
+                <field name="start_date"/>
+                <field name="end_date"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Sales Commission Search View -->
+    <record id="sales_commission_search_omax" model="ir.ui.view">
+        <field name="name">Sales Commission - Search</field>
+        <field name="model">sales.commission</field>
+        <field name="arch" type="xml">
+            <search string="Sales Commission Search">
+                <field name="name"/>
+                <field name="salesperson_ids"/>
+                <field name="commission_type"/>
+                <field name="commission_apply_on"/>
+                <group expand="0" string="Group By...">
+                    <filter string="Commission Type" name="commission_type" domain="[]" context="{'group_by':'commission_type'}"/>
+                    <filter string="Sales Person" name="salesperson_id" domain="[]" context="{'group_by':'salesperson_ids'}"/>
+                    
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Sales Target Action View -->
+    <record id="sales_commission_action_omax" model="ir.actions.act_window">
+        <field name="name">Sales Commission</field>
+        <field name="res_model">sales.commission</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{}</field>
+    </record>
+    <!-- Sales Target Menu View -->
+    <menuitem id="menu_sale_commission_root"
+        name="Sales commission"
+        parent="sale.sale_menu_root"
+        sequence="35"
+        groups="sales_commission_omax.group_sales_commission_user"
+        action="sales_commission_action_omax"
+        />
+</odoo>

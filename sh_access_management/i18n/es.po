@@ -1,0 +1,976 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* sh_access_management
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-11-27 07:05+0000\n"
+"PO-Revision-Date: 2025-11-27 07:05+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: sh_access_management
+#: model:ir.actions.act_window,name:sh_access_management.sh_access_manager_action
+#: model:ir.model,name:sh_access_management.model_sh_access_manager
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_navbar_buttons_access__access_manager_id
+#: model:ir.ui.menu,name:sh_access_management.sh_aceess_manager_root
+#: model_terms:ir.actions.act_window,help:sh_access_management.sh_access_manager_action
+msgid "Access Management"
+msgstr "Gestión de acceso"
+
+#. module: sh_access_management
+#: model:res.groups,name:sh_access_management.sh_access_management_manager
+msgid "Access Management Manager"
+msgstr "Gerente de Gestión de Acceso"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_model__access_manager_id
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_field_access__access_manager_id
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_filter_access__access_manager_id
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_hide_chatter__access_manager_id
+#: model_terms:ir.ui.view,arch_db:sh_access_management.sh_access_manager_form_view
+msgid "Access Manager"
+msgstr "Administrador de acceso"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_manager__sh_access_model_line
+msgid "Access Model"
+msgstr "Modelo de acceso"
+
+#. module: sh_access_management
+#: model:ir.model.fields.selection,name:sh_access_management.selection__sh_store_model_data__sh_button_type__action
+msgid "Action"
+msgstr "Acción"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_manager__message_needaction
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_model__message_needaction
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_field_access__message_needaction
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_filter_access__message_needaction
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_hide_chatter__message_needaction
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_navbar_buttons_access__message_needaction
+msgid "Action Needed"
+msgstr "Acción necesaria"
+
+#. module: sh_access_management
+#: model:ir.model,name:sh_access_management.model_ir_actions_act_window
+msgid "Action Window"
+msgstr "Ventana de acción"
+
+#. module: sh_access_management
+#: model:ir.model,name:sh_access_management.model_ir_actions_actions
+msgid "Actions"
+msgstr "Comportamiento"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_manager__active_rule
+msgid "Active"
+msgstr "Activo"
+
+#. module: sh_access_management
+#. odoo-javascript
+#: code:addons/sh_access_management/static/src/xml/chatter_container.xml:0
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_manager__activity_ids
+msgid "Activities"
+msgstr "Actividades"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_hide_chatter__hide_activity
+msgid "Activity"
+msgstr "Actividad"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_manager__activity_exception_decoration
+msgid "Activity Exception Decoration"
+msgstr "Decoración de excepción de actividad"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_manager__activity_state
+msgid "Activity State"
+msgstr "Estado de actividad"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_manager__activity_type_icon
+msgid "Activity Type Icon"
+msgstr "Icono de tipo de actividad"
+
+#. module: sh_access_management
+#. odoo-javascript
+#: code:addons/sh_access_management/static/src/xml/chatter_container.xml:0
+msgid "Attach files"
+msgstr "Adjuntar archivos"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_manager__message_attachment_count
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_model__message_attachment_count
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_field_access__message_attachment_count
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_filter_access__message_attachment_count
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_hide_chatter__message_attachment_count
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_navbar_buttons_access__message_attachment_count
+msgid "Attachment Count"
+msgstr "Recuento de archivos adjuntos"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_hide_chatter__hide_attachments
+msgid "Attachments"
+msgstr "Adjuntos"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_store_model_data__sh_attribute_name
+msgid "Attribute Name"
+msgstr "Nombre del atributo"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_store_model_data__sh_attribute_string
+msgid "Attribute String"
+msgstr "Cadena de atributo"
+
+#. module: sh_access_management
+#: model:ir.model,name:sh_access_management.model_base
+msgid "Base"
+msgstr "Base"
+
+#. module: sh_access_management
+#: model:ir.model.fields.selection,name:sh_access_management.selection__sh_store_model_data__sh_node_option__button
+msgid "Button"
+msgstr "Botón"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_store_model_data__sh_button_type
+msgid "Button Type"
+msgstr "Tipo de botón"
+
+#. module: sh_access_management
+#: model_terms:ir.ui.view,arch_db:sh_access_management.sh_access_manager_form_view
+msgid "Chatter Options"
+msgstr "Opciones de charla"
+
+#. module: sh_access_management
+#. odoo-javascript
+#: code:addons/sh_access_management/static/src/xml/chatter_container.xml:0
+msgid "Close"
+msgstr "Cerca"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_manager__company_id
+msgid "Company"
+msgstr "Compañía"
+
+#. module: sh_access_management
+#. odoo-javascript
+#: code:addons/sh_access_management/static/src/xml/base.xml:0
+msgid "Create"
+msgstr "Crear"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_manager__created_by
+msgid "Created By"
+msgstr "Creado por"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_manager__create_uid
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_model__create_uid
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_field_access__create_uid
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_filter_access__create_uid
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_hide_chatter__create_uid
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_navbar_buttons_access__create_uid
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_store_model_data__create_uid
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_view_list__create_uid
+msgid "Created by"
+msgstr "Creado por"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_manager__create_date
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_model__create_date
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_field_access__create_date
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_filter_access__create_date
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_hide_chatter__create_date
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_navbar_buttons_access__create_date
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_store_model_data__create_date
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_view_list__create_date
+msgid "Created on"
+msgstr "Creado el"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_manager__sh_disable_developer_mode
+msgid "Disable Developer Mode"
+msgstr "Deshabilitar el modo de desarrollador"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_manager__sh_disable_user_login
+msgid "Disable Login"
+msgstr "Deshabilitar inicio de sesión"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_manager__display_name
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_model__display_name
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_field_access__display_name
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_filter_access__display_name
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_hide_chatter__display_name
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_navbar_buttons_access__display_name
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_store_model_data__display_name
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_view_list__display_name
+msgid "Display Name"
+msgstr "Nombre para mostrar"
+
+#. module: sh_access_management
+#. odoo-javascript
+#: code:addons/sh_access_management/static/src/xml/base.xml:0
+msgid "Edit"
+msgstr "Editar"
+
+#. module: sh_access_management
+#. odoo-javascript
+#: code:addons/sh_access_management/static/src/xml/base.xml:0
+#: code:addons/sh_access_management/static/src/xml/sh_create_access.xml:0
+msgid "Export All"
+msgstr "Exportar todo"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_field_access__sh_hide_external_links
+msgid "External Links"
+msgstr "Enlaces externos"
+
+#. module: sh_access_management
+#: model:ir.model,name:sh_access_management.model_sh_field_access
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_manager__sh_field_access_line
+#: model_terms:ir.ui.view,arch_db:sh_access_management.sh_access_manager_form_view
+msgid "Field Access"
+msgstr "Acceso al campo"
+
+#. module: sh_access_management
+#: model_terms:ir.ui.view,arch_db:sh_access_management.sh_access_manager_form_view
+msgid "Field Options"
+msgstr "Opciones de campo"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_field_access__field_ids
+msgid "Fields"
+msgstr "Campos"
+
+#. module: sh_access_management
+#. odoo-javascript
+#: code:addons/sh_access_management/static/src/xml/chatter_container.xml:0
+msgid "Files"
+msgstr "Archivos"
+
+#. module: sh_access_management
+#: model:ir.model.fields.selection,name:sh_access_management.selection__sh_store_model_data__sh_node_option__filter
+msgid "Filter"
+msgstr "Filtrar"
+
+#. module: sh_access_management
+#: model_terms:ir.ui.view,arch_db:sh_access_management.sh_access_manager_form_view
+msgid "Filter / Group By"
+msgstr "Filtrar / Agrupar por"
+
+#. module: sh_access_management
+#: model_terms:ir.ui.view,arch_db:sh_access_management.sh_access_manager_form_view
+msgid "Filter / Group By Access"
+msgstr "Filtrar / Agrupar por acceso"
+
+#. module: sh_access_management
+#: model:ir.model,name:sh_access_management.model_sh_filter_access
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_manager__sh_hide_filter_line
+msgid "Filter Access"
+msgstr "Acceso al filtro"
+
+#. module: sh_access_management
+#. odoo-javascript
+#: code:addons/sh_access_management/static/src/xml/chatter_container.xml:0
+msgid "Follow"
+msgstr "Seguir"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_manager__message_follower_ids
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_model__message_follower_ids
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_field_access__message_follower_ids
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_filter_access__message_follower_ids
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_hide_chatter__hide_followers
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_hide_chatter__message_follower_ids
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_navbar_buttons_access__message_follower_ids
+msgid "Followers"
+msgstr "Seguidoras"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_manager__message_partner_ids
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_model__message_partner_ids
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_field_access__message_partner_ids
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_filter_access__message_partner_ids
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_hide_chatter__message_partner_ids
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_navbar_buttons_access__message_partner_ids
+msgid "Followers (Partners)"
+msgstr "Seguidores (Socias)"
+
+#. module: sh_access_management
+#: model:ir.model.fields,help:sh_access_management.field_sh_access_manager__activity_type_icon
+msgid "Font awesome icon e.g. fa-tasks"
+msgstr "Icono de Font Awesome, por ejemplo, fa-tasks"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_manager__sh_global_hide_full_chatter
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_hide_chatter__hide_full_chatter
+msgid "Full Chatter"
+msgstr "Charla completa"
+
+#. module: sh_access_management
+#: model_terms:ir.ui.view,arch_db:sh_access_management.sh_access_manager_form_view
+msgid "General Buttons / Actions"
+msgstr "Botones/Acciones generales"
+
+#. module: sh_access_management
+#: model_terms:ir.ui.view,arch_db:sh_access_management.sh_access_manager_form_view
+msgid "Global Restrictions"
+msgstr "Restricciones globales"
+
+#. module: sh_access_management
+#: model:ir.model.fields.selection,name:sh_access_management.selection__sh_store_model_data__sh_node_option__groupby
+msgid "Group By"
+msgstr "Agrupar por"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_manager__has_message
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_model__has_message
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_field_access__has_message
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_filter_access__has_message
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_hide_chatter__has_message
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_navbar_buttons_access__has_message
+msgid "Has Message"
+msgstr "Tiene mensaje"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_manager__sh_global_hide_action_button
+msgid "Hide Action Button"
+msgstr "Ocultar botón de acción"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_model__action_id
+msgid "Hide Actions"
+msgstr "Ocultar acciones"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_manager__sh_global_hide_activity
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_hide_chatter__sh_global_hide_activity
+msgid "Hide Activity"
+msgstr "Ocultar actividad"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_manager__sh_global_hide_add_property
+msgid "Hide Add Property"
+msgstr "Ocultar Agregar propiedad"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_model__sh_hide_action
+msgid "Hide All Actions"
+msgstr "Ocultar todas las acciones"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_model__hide_archieve
+msgid "Hide Archive Button"
+msgstr "Ocultar botón de archivo"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_navbar_buttons_access__sh_store_btn_data_ids
+msgid "Hide Button"
+msgstr "Botón Ocultar"
+
+#. module: sh_access_management
+#: model_terms:ir.ui.view,arch_db:sh_access_management.sh_access_manager_form_view
+msgid "Hide Chatter"
+msgstr "Ocultar charla"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_manager__sh_hide_chatter_line
+msgid "Hide Chatters"
+msgstr "Ocultar usuarios de Chat"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_manager__sh_global_hide_field_create_edit
+msgid "Hide Create / Edit"
+msgstr "Ocultar Crear / Editar"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_model__hide_create
+msgid "Hide Create Button"
+msgstr "Ocultar botón Crear"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_field_access__sh_hide_create_edit
+msgid "Hide Create and Edit"
+msgstr "Ocultar Crear y Editar"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_manager__sh_global_hide_custom_filter_option
+msgid "Hide Custom Filter Option"
+msgstr "Ocultar la opción de filtro personalizado"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_manager__sh_global_hide_custom_group_by_option
+msgid "Hide Custom Group By Option"
+msgstr "Ocultar grupo personalizado por opción"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_model__hide_delete
+msgid "Hide Delete Button"
+msgstr "Ocultar botón Eliminar"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_model__hide_duplicate
+msgid "Hide Duplicate Button"
+msgstr "Botón Ocultar duplicado"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_model__hide_edit
+msgid "Hide Edit Button"
+msgstr Ocultar botón Editar"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_manager__sh_global_hide_export
+msgid "Hide Export"
+msgstr "Ocultar Exportar"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_model__hide_export
+msgid "Hide Export Button"
+msgstr "Ocultar botón Exportar"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_manager__sh_global_hide_filter
+msgid "Hide Filter"
+msgstr "Ocultar filtro"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_filter_access__sh_store_filter_data_ids
+msgid "Hide Filters"
+msgstr "Ocultar filtros"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_manager__sh_global_hide_group
+msgid "Hide Group"
+msgstr "Ocultar grupo"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_filter_access__sh_store_groupby_data_ids
+msgid "Hide Group By"
+msgstr "Ocultar grupo por"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_manager__sh_global_hide_import
+msgid "Hide Import"
+msgstr "Ocultar importación"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_navbar_buttons_access__sh_store_kanban_link_ids
+msgid "Hide Kanban Link"
+msgstr "Ocultar enlace Kanban"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_hide_chatter__sh_global_hide_log_note
+msgid "Hide Log Note"
+msgstr "Ocultar nota de registro"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_manager__sh_global_hide_log_note
+msgid "Hide Log note"
+msgstr "Ocultar nota de registro"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_ir_ui_menu__sh_child_menu
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_manager__sh_hide_menu_ids
+#: model_terms:ir.ui.view,arch_db:sh_access_management.sh_access_manager_form_view
+msgid "Hide Menu"
+msgstr "Ocultar menú"
+
+#. module: sh_access_management
+#: model:ir.model,name:sh_access_management.model_sh_navbar_buttons_access
+msgid "Hide Navbar And Buttos"
+msgstr "Ocultar la barra de navegación y los botones"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_manager__sh_global_hide_print_button
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_model__sh_hide_print
+msgid "Hide Print Button"
+msgstr "Ocultar botón Imprimir"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_model__report_ids
+msgid "Hide Reports"
+msgstr "Ocultar informes"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_manager__sh_global_hide_send_message
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_hide_chatter__sh_global_hide_send_message
+msgid "Hide Send Message"
+msgstr "Ocultar Enviar mensaje"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_manager__sh_global_hide_spreadsheet
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_model__hide_spreadsheet
+msgid "Hide Spreadsheet"
+msgstr "Ocultar hoja de cálculo"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_navbar_buttons_access__sh_store_page_data_ids
+msgid "Hide Tab/Page"
+msgstr "Ocultar pestaña/página"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_model__view_ids
+msgid "Hide Views"
+msgstr "Ocultar vistas"
+
+#. module: sh_access_management
+#: model:ir.model,name:sh_access_management.model_sh_view_list
+msgid "Holds All Available Views"
+msgstr "Contiene todas las vistas disponibles"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_manager__id
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_model__id
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_field_access__id
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_filter_access__id
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_hide_chatter__id
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_navbar_buttons_access__id
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_store_model_data__id
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_view_list__id
+msgid "ID"
+msgstr "IDENTIFICACIÓN"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_manager__activity_exception_icon
+msgid "Icon"
+msgstr "Icono"
+
+#. module: sh_access_management
+#: model:ir.model.fields,help:sh_access_management.field_sh_access_manager__activity_exception_icon
+msgid "Icon to indicate an exception activity."
+msgstr "Icono para indicar una actividad de excepción."
+
+#. module: sh_access_management
+#: model:ir.model.fields,help:sh_access_management.field_sh_access_manager__message_needaction
+#: model:ir.model.fields,help:sh_access_management.field_sh_access_model__message_needaction
+#: model:ir.model.fields,help:sh_access_management.field_sh_field_access__message_needaction
+#: model:ir.model.fields,help:sh_access_management.field_sh_filter_access__message_needaction
+#: model:ir.model.fields,help:sh_access_management.field_sh_hide_chatter__message_needaction
+#: model:ir.model.fields,help:sh_access_management.field_sh_navbar_buttons_access__message_needaction
+msgid "If checked, new messages require your attention."
+msgstr "Si está marcada, los mensajes nuevos requieren su atención."
+
+#. module: sh_access_management
+#: model:ir.model.fields,help:sh_access_management.field_sh_access_manager__message_has_error
+#: model:ir.model.fields,help:sh_access_management.field_sh_access_manager__message_has_sms_error
+#: model:ir.model.fields,help:sh_access_management.field_sh_access_model__message_has_error
+#: model:ir.model.fields,help:sh_access_management.field_sh_access_model__message_has_sms_error
+#: model:ir.model.fields,help:sh_access_management.field_sh_field_access__message_has_error
+#: model:ir.model.fields,help:sh_access_management.field_sh_field_access__message_has_sms_error
+#: model:ir.model.fields,help:sh_access_management.field_sh_filter_access__message_has_error
+#: model:ir.model.fields,help:sh_access_management.field_sh_filter_access__message_has_sms_error
+#: model:ir.model.fields,help:sh_access_management.field_sh_hide_chatter__message_has_error
+#: model:ir.model.fields,help:sh_access_management.field_sh_hide_chatter__message_has_sms_error
+#: model:ir.model.fields,help:sh_access_management.field_sh_navbar_buttons_access__message_has_error
+#: model:ir.model.fields,help:sh_access_management.field_sh_navbar_buttons_access__message_has_sms_error
+msgid "If checked, some messages have a delivery error."
+msgstr "Si está marcada, algunos mensajes tendrán un error de entrega."
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_field_access__invisible
+msgid "Invisible"
+msgstr "Invisible"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_manager__message_is_follower
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_model__message_is_follower
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_field_access__message_is_follower
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_filter_access__message_is_follower
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_hide_chatter__message_is_follower
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_navbar_buttons_access__message_is_follower
+msgid "Is Follower"
+msgstr "Es seguidora"
+
+#. module: sh_access_management
+#: model:ir.model.fields.selection,name:sh_access_management.selection__sh_store_model_data__sh_node_option__kanban_link
+msgid "Kanban Link"
+msgstr "Enlace Kanban"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_manager__write_uid
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_model__write_uid
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_field_access__write_uid
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_filter_access__write_uid
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_hide_chatter__write_uid
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_navbar_buttons_access__write_uid
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_store_model_data__write_uid
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_view_list__write_uid
+msgid "Last Updated by"
+msgstr "Actualizado por última vez por"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_manager__write_date
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_model__write_date
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_field_access__write_date
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_filter_access__write_date
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_hide_chatter__write_date
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_navbar_buttons_access__write_date
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_store_model_data__write_date
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_view_list__write_date
+msgid "Last Updated on"
+msgstr "Última actualización el"
+
+#. module: sh_access_management
+#: model:ir.model.fields.selection,name:sh_access_management.selection__sh_store_model_data__sh_node_option__link
+msgid "Link"
+msgstr "Enlace"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_hide_chatter__hide_log_notes
+msgid "Log Notes"
+msgstr "Notas de registro"
+
+#. module: sh_access_management
+#. odoo-javascript
+#: code:addons/sh_access_management/static/src/xml/chatter_container.xml:0
+msgid "Log note"
+msgstr "Nota de registro"
+
+#. module: sh_access_management
+#: model:ir.model,name:sh_access_management.model_ir_ui_menu
+msgid "Menu"
+msgstr "Menú"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_manager__message_has_error
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_model__message_has_error
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_field_access__message_has_error
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_filter_access__message_has_error
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_hide_chatter__message_has_error
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_navbar_buttons_access__message_has_error
+msgid "Message Delivery error"
+msgstr "Error de entrega de mensaje"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_manager__message_ids
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_model__message_ids
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_field_access__message_ids
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_filter_access__message_ids
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_hide_chatter__message_ids
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_navbar_buttons_access__message_ids
+msgid "Messages"
+msgstr "Mensajes"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_model__model_id
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_field_access__model_id
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_filter_access__model_id
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_hide_chatter__model_ids
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_navbar_buttons_access__model_id
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_store_model_data__model_id
+msgid "Model"
+msgstr "Modelo"
+
+#. module: sh_access_management
+#: model:ir.model,name:sh_access_management.model_ir_model_access
+#: model_terms:ir.ui.view,arch_db:sh_access_management.sh_access_manager_form_view
+msgid "Model Access"
+msgstr "Acceso al modelo"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_navbar_buttons_access__model_name
+msgid "Model Name"
+msgstr "Nombre del modelo"
+
+#. module: sh_access_management
+#: model:ir.model,name:sh_access_management.model_sh_access_model
+msgid "Model wise Restriction"
+msgstr "Restricción por modelo"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_manager__my_activity_date_deadline
+msgid "My Activity Deadline"
+msgstr "Fecha límite de mi actividad"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_manager__name
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_field_access__name
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_view_list__name
+#: model_terms:ir.ui.view,arch_db:sh_access_management.sh_access_manager_form_view
+msgid "Name"
+msgstr "Nombre"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_manager__sh_navbar_button_line
+msgid "Navbar Button Access"
+msgstr "Acceso al botón de la barra de navegación"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_hide_chatter__name
+msgid "Navbar Name"
+msgstr "Nombre de Nabba"
+
+#. module: sh_access_management
+#: model_terms:ir.ui.view,arch_db:sh_access_management.sh_access_manager_form_view
+msgid "Navbar/Button Access"
+msgstr "Acceso a la barra de navegación/botón"
+
+#. module: sh_access_management
+#. odoo-javascript
+#: code:addons/sh_access_management/static/src/xml/sh_create_access.xml:0
+msgid "New"
+msgstr "Nueva"
+
+#. module: sh_access_management
+#. odoo-python
+#: code:addons/sh_access_management/models/access_manager.py:0
+msgid "New → %s,%s (%s)"
+msgstr "Nuevo → %s,%s (%s)"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_manager__activity_date_deadline
+msgid "Next Activity Deadline"
+msgstr "Fecha límite para la próxima actividad"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_manager__activity_summary
+msgid "Next Activity Summary"
+msgstr "Resumen de la próxima actividad"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_manager__activity_type_id
+msgid "Next Activity Type"
+msgstr "Siguiente tipo de actividad"
+
+#. module: sh_access_management
+#. odoo-javascript
+#: code:addons/sh_access_management/static/src/xml/chatter_container.xml:0
+msgid "No recipient"
+msgstr "Sin destinataria"
+
+#. module: sh_access_management
+#. odoo-javascript
+#: code:addons/sh_access_management/static/src/js/sh_hide_create_and_edit.js:0
+msgid "No records"
+msgstr "Sin registros"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_store_model_data__sh_node_option
+msgid "Node Option"
+msgstr "Opción de nodo"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_manager__message_needaction_counter
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_model__message_needaction_counter
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_field_access__message_needaction_counter
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_filter_access__message_needaction_counter
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_hide_chatter__message_needaction_counter
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_navbar_buttons_access__message_needaction_counter
+msgid "Number of Actions"
+msgstr "Número de acciones"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_manager__message_has_error_counter
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_model__message_has_error_counter
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_field_access__message_has_error_counter
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_filter_access__message_has_error_counter
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_hide_chatter__message_has_error_counter
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_navbar_buttons_access__message_has_error_counter
+msgid "Number of errors"
+msgstr "Número de errores"
+
+#. module: sh_access_management
+#: model:ir.model.fields,help:sh_access_management.field_sh_access_manager__message_needaction_counter
+#: model:ir.model.fields,help:sh_access_management.field_sh_access_model__message_needaction_counter
+#: model:ir.model.fields,help:sh_access_management.field_sh_field_access__message_needaction_counter
+#: model:ir.model.fields,help:sh_access_management.field_sh_filter_access__message_needaction_counter
+#: model:ir.model.fields,help:sh_access_management.field_sh_hide_chatter__message_needaction_counter
+#: model:ir.model.fields,help:sh_access_management.field_sh_navbar_buttons_access__message_needaction_counter
+msgid "Number of messages requiring action"
+msgstr "Número de mensajes que requieren acción"
+
+#. module: sh_access_management
+#: model:ir.model.fields,help:sh_access_management.field_sh_access_manager__message_has_error_counter
+#: model:ir.model.fields,help:sh_access_management.field_sh_access_model__message_has_error_counter
+#: model:ir.model.fields,help:sh_access_management.field_sh_field_access__message_has_error_counter
+#: model:ir.model.fields,help:sh_access_management.field_sh_filter_access__message_has_error_counter
+#: model:ir.model.fields,help:sh_access_management.field_sh_hide_chatter__message_has_error_counter
+#: model:ir.model.fields,help:sh_access_management.field_sh_navbar_buttons_access__message_has_error_counter
+msgid "Number of messages with delivery error"
+msgstr "Número de mensajes con error de entrega"
+
+#. module: sh_access_management
+#: model:ir.model.fields.selection,name:sh_access_management.selection__sh_store_model_data__sh_button_type__object
+msgid "Object"
+msgstr "Objeto"
+
+#. module: sh_access_management
+#: model:ir.model.fields.selection,name:sh_access_management.selection__sh_store_model_data__sh_node_option__page
+msgid "Page"
+msgstr "Página"
+
+#. module: sh_access_management
+#. odoo-javascript
+#: code:addons/sh_access_management/static/src/xml/chatter_container.xml:0
+msgid "Pop out Attachments"
+msgstr "Archivos adjuntos emergentes"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_manager__sh_readonly
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_field_access__readonly
+msgid "Readonly"
+msgstr "Sólo lectura"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_field_access__required
+msgid "Required"
+msgstr "Requerida"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_manager__activity_user_id
+msgid "Responsible User"
+msgstr "Usuario responsable"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_manager__message_has_sms_error
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_model__message_has_sms_error
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_field_access__message_has_sms_error
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_filter_access__message_has_sms_error
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_hide_chatter__message_has_sms_error
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_navbar_buttons_access__message_has_sms_error
+msgid "SMS Delivery error"
+msgstr "Error de entrega de SMS"
+
+#. module: sh_access_management
+#. odoo-javascript
+#: code:addons/sh_access_management/static/src/xml/chatter_container.xml:0
+msgid "Search Messages"
+msgstr "Buscar mensajes"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_hide_chatter__hide_send_msg
+msgid "Send Message"
+msgstr "Enviar mensaje"
+
+#. module: sh_access_management
+#. odoo-javascript
+#: code:addons/sh_access_management/static/src/xml/chatter_container.xml:0
+msgid "Send message"
+msgstr "enviar mensaje"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_manager__sh_is_spreadsheet_installed
+msgid "Sh Is Spreadsheet Installed"
+msgstr "¿Está instalada la hoja de cálculo Sh?"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_store_model_data__sh_is_smart_button
+msgid "Smart Button"
+msgstr "Botón inteligente"
+
+#. module: sh_access_management
+#: model:ir.model,name:sh_access_management.model_sh_hide_chatter
+msgid "Smart Button List"
+msgstr "Lista de botones inteligentes"
+
+#. module: sh_access_management
+#: model:ir.model.fields,help:sh_access_management.field_sh_access_manager__activity_state
+msgid ""
+"Status based on activities\n"
+"Overdue: Due date is already passed\n"
+"Today: Activity date is today\n"
+"Planned: Future activities."
+msgstr ""
+"Estado basado en actividades.\n"
+"Vencido: La fecha de vencimiento ya pasó\n"
+"Hoy: La fecha de la actividad es hoy\n"
+"Planificado: Actividades futuras."
+
+"Estado basado en actividades\n"
+"Vencido: La fecha de vencimiento ya pasó\n"
+"Hoy: La fecha de la actividad es hoy\n"
+"Planificado: Actividades futuras."
+
+#. module: sh_access_management
+#: model:ir.model,name:sh_access_management.model_sh_store_model_data
+msgid "Store Model Nodes"
+msgstr "Almacenar nodos de modelo"
+
+#. module: sh_access_management
+#: model_terms:ir.ui.view,arch_db:sh_access_management.sh_access_manager_form_view
+msgid "Taxes Mapping"
+msgstr "Mapeo de Impuestos"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_view_list__technical_name
+msgid "Tech Name"
+msgstr "Nombre de la tecnología"
+
+#. module: sh_access_management
+#. odoo-javascript
+#: code:addons/sh_access_management/static/src/xml/chatter_container.xml:0
+msgid "To:"
+msgstr "A:"
+
+#. module: sh_access_management
+#: model:ir.model.fields,help:sh_access_management.field_sh_access_manager__activity_exception_decoration
+msgid "Type of the exception activity on record."
+msgstr "Tipo de actividad de excepción registrada."
+
+#. module: sh_access_management
+#: model:ir.model,name:sh_access_management.model_res_users
+msgid "User"
+msgstr "Usuaria"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_manager__responsible_user_ids
+msgid "Users"
+msgstr "Usuarias"
+
+#. module: sh_access_management
+#: model:ir.model,name:sh_access_management.model_ir_ui_view
+msgid "View"
+msgstr "Vista"
+
+#. module: sh_access_management
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_manager__website_message_ids
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_access_model__website_message_ids
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_field_access__website_message_ids
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_filter_access__website_message_ids
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_hide_chatter__website_message_ids
+#: model:ir.model.fields,field_description:sh_access_management.field_sh_navbar_buttons_access__website_message_ids
+msgid "Website Messages"
+msgstr "Mensajes del sitio web"
+
+#. module: sh_access_management
+#: model:ir.model.fields,help:sh_access_management.field_sh_access_manager__website_message_ids
+#: model:ir.model.fields,help:sh_access_management.field_sh_access_model__website_message_ids
+#: model:ir.model.fields,help:sh_access_management.field_sh_field_access__website_message_ids
+#: model:ir.model.fields,help:sh_access_management.field_sh_filter_access__website_message_ids
+#: model:ir.model.fields,help:sh_access_management.field_sh_hide_chatter__website_message_ids
+#: model:ir.model.fields,help:sh_access_management.field_sh_navbar_buttons_access__website_message_ids
+msgid "Website communication history"
+msgstr "Historial de comunicación del sitio web"
+
+#. module: sh_access_management
+#. odoo-python
+#: code:addons/sh_access_management/models/access_manager.py:0
+msgid "You cannot add an Administrator to the Restricted Users list."
+msgstr "No se puede agregar un administrador a la lista de usuarios restringidos."
+
+#. module: sh_access_management
+#. odoo-python
+#: code:addons/sh_access_management/models/access_manager.py:0
+msgid "You cannot add an Administrator to the Restricted Users list."
+msgstr "No se puede agregar un administrador a la lista de usuarios restringidos."
+
+#. module: sh_access_management
+#. odoo-python
+#: code:addons/sh_access_management/models/base.py:0
+#: code:addons/sh_access_management/models/ir_model_access.py:0
+#: code:addons/sh_access_management/models/ir_rule.py:0
+msgid ""
+"🚫 You have read-only access and are not permitted to modify any records."
+msgstr "🚫 Tiene acceso de solo lectura y no está permitido modificar ningún registro."

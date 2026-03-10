@@ -1,0 +1,30 @@
+<templates xml:space="preserve">
+
+    <t t-name="web.SearchBarMenu" t-inherit="web.SearchBarMenu" t-inherit-mode="extension" owl="1">
+
+        <!-- Hide FILTER tab completely -->
+        <xpath expr="//div[contains(@class, 'o_filter_menu')]" position="attributes">
+            <attribute name="t-if">!this.env.searchModel.sh_hide_filter_tab</attribute>
+        </xpath>
+
+        <!-- Hide GROUP BY tab completely -->
+        <xpath expr="//div[contains(@class, 'o_group_by_menu')]" position="attributes">
+            <attribute name="t-if">!this.env.searchModel.sh_hide_group_by_tab</attribute>
+        </xpath>
+
+        <!-- Hide Add Custom Filter button only -->
+        <xpath expr="//t[@t-if='!hideCustomGroupBy and fields.length']" position="attributes">
+            <attribute name="t-if">!hideCustomGroupBy and fields.length and !this.env.searchModel.sh_hide_custom_group_by</attribute>
+        </xpath>
+
+        <!-- Hide Add Custom Group button only -->
+        <xpath expr="//t[@t-if='filterItems.length']" position="attributes">
+            <attribute name="t-if">filterItems.length and !this.env.searchModel.sh_hide_custom_filter</attribute>
+        </xpath>
+
+        <xpath expr="//DropdownItem[contains(@class, 'o_add_custom_filter')]" position="attributes">
+            <attribute name="t-if">!this.env.searchModel.sh_hide_custom_filter</attribute>
+        </xpath>
+    </t>
+
+</templates>

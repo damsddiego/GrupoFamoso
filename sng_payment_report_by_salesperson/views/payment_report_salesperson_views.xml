@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Vista List: Lista detallada de pagos -->
+    <record id="view_payment_report_salesperson_list" model="ir.ui.view">
+        <field name="name">payment.report.salesperson.list</field>
+        <field name="model">payment.report.salesperson</field>
+        <field name="arch" type="xml">
+            <list string="Reporte de Pagos" create="false" edit="false" delete="false">
+                <field name="partner_name" string="Cliente"/>
+                <field name="salesperson_name" string="Vendedor" optional="show"/>
+                <field name="payment_date" string="Fecha de Pago"/>
+                <field name="payment_reference" string="Referencia"/>
+                <field name="payment_amount" string="Monto Pagado" sum="Total"/>
+                <field name="payment_state" string="Estado" widget="badge"
+                       decoration-info="payment_state == 'draft'"
+                       decoration-warning="payment_state == 'in_process'"
+                       decoration-success="payment_state == 'paid'"
+                       decoration-danger="payment_state in ['canceled', 'rejected']"/>
+                <field name="is_reconciled" string="Reconciliado" widget="boolean_toggle"/>
+                <field name="invoice_name" string="Factura" optional="show"/>
+                <field name="invoice_date" string="Fecha Factura" optional="show"/>
+                <field name="invoice_amount_untaxed" string="Monto sin Impuestos" sum="Total" optional="show"/>
+                <field name="days_to_pay" string="Días para Pago" avg="Promedio" optional="show"/>
+                <field name="currency_id" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Vista Pivot: Análisis multidimensional -->
+    <record id="view_payment_report_salesperson_pivot" model="ir.ui.view">
+        <field name="name">payment.report.salesperson.pivot</field>
+        <field name="model">payment.report.salesperson</field>
+        <field name="arch" type="xml">
+            <pivot string="Análisis de Pagos" sample="1">
+                <field name="salesperson_name" type="row"/>
+                <field name="partner_name" type="row"/>
+                <field name="payment_date" interval="month" type="col"/>
+                <field name="payment_amount" type="measure"/>
+                <field name="invoice_amount_untaxed" type="measure"/>
+                <field name="days_to_pay" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Vista Graph: Gráficos -->
+    <record id="view_payment_report_salesperson_graph" model="ir.ui.view">
+        <field name="name">payment.report.salesperson.graph</field>
+        <field name="model">payment.report.salesperson</field>
+        <field name="arch" type="xml">
+            <graph string="Gráfico de Pagos" sample="1">
+                <field name="salesperson_name"/>
+                <field name="payment_amount" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Vista Search: Filtros y agrupaciones -->
+    <record id="view_payment_report_salesperson_search" model="ir.ui.view">
+        <field name="name">payment.report.salesperson.search</field>
+        <field name="model">payment.report.salesperson</field>
+        <field name="arch" type="xml">
+            <search string="Buscar Pagos">
+                <!-- Campos de búsqueda -->
+                <field name="salesperson_name" string="Vendedor"/>
+                <field name="partner_name" string="Cliente"/>
+                <field name="invoice_name" string="Factura"/>
+                <field name="payment_reference" string="Referencia Pago"/>
+
+                <!-- Filtros predefinidos -->
+                <filter string="Este Mes" name="this_month"
+                        domain="[('payment_date', '&gt;=', (context_today() - relativedelta(day=1)).strftime('%Y-%m-%d')),
+                                 ('payment_date', '&lt;=', (context_today() + relativedelta(months=1, day=1, days=-1)).strftime('%Y-%m-%d'))]"/>
+
+                <filter string="Mes Anterior" name="last_month"
+                        domain="[('payment_date', '&gt;=', (context_today() - relativedelta(months=1, day=1)).strftime('%Y-%m-%d')),
+                                 ('payment_date', '&lt;=', (context_today() - relativedelta(day=1)).strftime('%Y-%m-%d'))]"/>
+
+                <filter string="Este Año" name="this_year"
+                        domain="[('payment_date', '&gt;=', (context_today() - relativedelta(month=1, day=1)).strftime('%Y-%m-%d')),
+                                 ('payment_date', '&lt;=', (context_today() + relativedelta(months=12, day=31)).strftime('%Y-%m-%d'))]"/>
+
+                <separator/>
+
+                <filter string="Pago Rápido (&lt;= 30 días)" name="fast_payment"
+                        domain="[('days_to_pay', '&lt;=', 30)]"/>
+
+                <filter string="Pago Normal (31-60 días)" name="normal_payment"
+                        domain="[('days_to_pay', '&gt;', 30), ('days_to_pay', '&lt;=', 60)]"/>
+
+                <filter string="Pago Lento (&gt; 60 días)" name="slow_payment"
+                        domain="[('days_to_pay', '&gt;', 60)]"/>
+
+                <separator/>
+
+                <!-- Filtros por estado del pago -->
+                <filter string="Borrador" name="draft"
+                        domain="[('payment_state', '=', 'draft')]"/>
+
+                <filter string="En Proceso" name="in_process"
+                        domain="[('payment_state', '=', 'in_process')]"/>
+
+                <filter string="Pagado" name="paid"
+                        domain="[('payment_state', '=', 'paid')]"/>
+
+                <filter string="Cancelado/Rechazado" name="canceled_rejected"
+                        domain="[('payment_state', 'in', ['canceled', 'rejected'])]"/>
+
+                <separator/>
+
+                <!-- Filtros de reconciliación -->
+                <filter string="Reconciliados" name="reconciled"
+                        domain="[('is_reconciled', '=', True)]"/>
+
+                <filter string="No Reconciliados" name="not_reconciled"
+                        domain="[('is_reconciled', '=', False)]"/>
+
+                <separator/>
+
+                <!-- Filtros por fecha -->
+                <filter string="Fecha de Pago" name="payment_date_filter" date="payment_date"/>
+                <filter string="Fecha de Factura" name="invoice_date_filter" date="invoice_date"/>
+
+                <separator/>
+
+                <!-- Agrupaciones -->
+                <group expand="0" string="Agrupar Por">
+                    <filter string="Vendedor" name="group_by_salesperson" context="{'group_by': 'salesperson_name'}"/>
+                    <filter string="Cliente" name="group_by_partner" context="{'group_by': 'partner_name'}"/>
+                    <filter string="Estado" name="group_by_state" context="{'group_by': 'payment_state'}"/>
+                    <filter string="Fecha de Pago" name="group_by_payment_date" context="{'group_by': 'payment_date'}"/>
+                    <filter string="Mes de Pago" name="group_by_payment_month" context="{'group_by': 'payment_date:month'}"/>
+                    <filter string="Estado Reconciliación" name="group_by_reconciled" context="{'group_by': 'is_reconciled'}"/>
+                    <filter string="Compañía" name="group_by_company" context="{'group_by': 'company_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Acción para abrir el reporte -->
+    <record id="action_payment_report_salesperson" model="ir.actions.act_window">
+        <field name="name">Reporte de Pagos</field>
+        <field name="res_model">payment.report.salesperson</field>
+        <field name="view_mode">list,pivot,graph</field>
+        <field name="search_view_id" ref="view_payment_report_salesperson_search"/>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No hay pagos en el período seleccionado
+            </p>
+            <p>
+                Este reporte muestra todos los pagos de clientes, incluyendo información
+                detallada de las facturas aplicadas y los días transcurridos hasta el pago.
+            </p>
+        </field>
+    </record>
+
+    <!-- Menú principal -->
+    <menuitem id="menu_payment_report_salesperson_root"
+              name="Reporte de Pagos"
+              parent="account.menu_finance_reports"
+              action="action_payment_report_salesperson"
+              sequence="50"/>
+
+</odoo>

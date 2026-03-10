@@ -1,0 +1,27 @@
+<odoo>
+    <record id="view_payment_invoice_match_wizard" model="ir.ui.view">
+        <field name="name">payment.invoice.match.wizard.form</field>
+        <field name="model">payment.invoice.match.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Aplicar pago a factura">
+                <group>
+                    <group string="Información del Pago">
+                        <field name="payment_id" readonly="1"/>
+                        <field name="partner_id" readonly="1"/>
+                        <field name="payment_type" readonly="1"/>
+                        <field name="currency_id" invisible="1"/>
+                        <field name="amount_unapplied" readonly="1" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                    </group>
+                    <group string="Factura a Aplicar">
+                        <field name="move_id" options="{'no_create': True}"/>
+                        <field name="invoice_amount_residual" readonly="1" widget="monetary" options="{'currency_field': 'currency_id'}" invisible="not move_id"/>
+                    </group>
+                </group>
+                <footer>
+                    <button string="Aplicar" type="object" name="action_apply" class="btn-primary"/>
+                    <button string="Cancelar" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

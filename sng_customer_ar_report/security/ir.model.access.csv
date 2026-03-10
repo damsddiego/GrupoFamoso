@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_customer_ar_report_invoice,customer.ar.report.invoice,model_customer_ar_report,account.group_account_invoice,1,0,0,0
+access_customer_ar_report_user,customer.ar.report.user,model_customer_ar_report,account.group_account_user,1,0,0,0
+access_customer_ar_report_wizard_invoice,customer.ar.report.wizard.invoice,model_customer_ar_report_wizard,account.group_account_invoice,1,1,1,1
+access_customer_ar_report_wizard_user,customer.ar.report.wizard.user,model_customer_ar_report_wizard,account.group_account_user,1,1,1,1

@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_tax_report_wizard_account,access_tax_report_wizard_account,account_tax_report_omax.model_tax_report_wizard_account,base.group_user,1,1,1,1
+access_account_excel_tax_report,access_account_excel_tax_report,account_tax_report_omax.model_account_excel_tax_report,base.group_user,1,1,1,1
+

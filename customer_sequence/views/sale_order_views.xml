@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Add unique_id to sale order form view -->
+    <record id="view_order_form" model="ir.ui.view">
+        <field name="name">sale.order.view.form.inherit.customer.sequence</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <field name="partner_id" position="after">
+                <field name="partner_unique_id" readonly="1" string="Código cliente"/>
+            </field>
+        </field>
+    </record>
+
+    <!-- Add unique_id to sale order tree view -->
+    <record id="view_quotation_tree" model="ir.ui.view">
+        <field name="name">sale.order.view.tree.inherit.customer.sequence</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_quotation_tree"/>
+        <field name="arch" type="xml">
+            <field name="partner_id" position="after">
+                <field name="partner_unique_id" optional="show" string="Código cliente"/>
+            </field>
+        </field>
+    </record>
+
+    <!-- Add search by unique_id in sale orders -->
+    <record id="view_sales_order_filter" model="ir.ui.view">
+        <field name="name">sale.order.view.search.inherit.customer.sequence</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_sales_order_filter"/>
+        <field name="arch" type="xml">
+            <field name="partner_id" position="after">
+                <field name="partner_unique_id" string="Código cliente"
+                       filter_domain="[('partner_id.unique_id', 'ilike', self)]"/>
+            </field>
+        </field>
+    </record>
+</odoo>

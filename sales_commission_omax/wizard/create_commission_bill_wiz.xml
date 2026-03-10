@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <!-- Wizard Form view -->
+        <record id="view_create_commission_bill_wiz_form" model="ir.ui.view">
+            <field name="name">create.commission.bill.wiz.form</field>
+            <field name="model">create.commission.bill.wiz</field>
+            <field name="arch" type="xml">
+                <form string="Create Bill">
+                    <group>
+                        <group>
+                            <field name="group_by_commission_type"/>
+                            <field name="company_id" invisible="1"/>
+                            <field name="account_id" domain="[('deprecated', '=', False), ('account_type', 'not in', ('asset_receivable', 'liability_payable', 'off_balance'))]"/><!-- ('company_id', '=', company_id)-->
+                        </group>
+                    </group>
+	                <footer>
+                        <button string='Create Bill' name="create_bill" type="object" class="btn-primary"/>
+                        <!-- confirm="Are you sure you want to Create Bill ?"-->
+                        <button string="Cancel" class="btn-default" special="cancel"/>
+	                </footer>
+               </form>
+            </field>
+        </record>
+        
+        <record id="action_create_commission_bill_action" model="ir.actions.act_window">
+            <field name="name">Create Bill</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">create.commission.bill.wiz</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+            <field name="binding_model_id" ref="sales_commission_omax.model_sales_commission_analysis"/>
+        </record>
+    </data>
+</odoo>

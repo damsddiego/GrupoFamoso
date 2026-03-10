@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+    <t t-extend="ListView.buttons">
+        <t t-jquery="t[t-if='widget.is_action_enabled(\'create\')']" t-operation="replace">
+            <t t-if="widget.is_action_enabled('create') and widget.group_show_create">
+                <button type="button" class="btn btn-primary o_list_button_add" accesskey="c">
+                    Create
+                </button>
+            </t>
+        </t>
+        <t t-jquery="t[t-if='widget.is_action_enabled(\'export_xlsx\') and widget.isExportEnable']" t-operation="replace">
+            <t t-if="widget.is_action_enabled('export_xlsx') and widget.isExportEnable and widget.group_show_export">
+                <button type="button" class="btn btn-secondary fa fa-download o_list_export_xlsx" title="Export All" />
+            </t>
+        </t>
+    </t>
+
+    <t t-extend="FormView.buttons">
+        <t t-jquery="button[t-if='widget.is_action_enabled(\'create\')']" t-operation="replace">
+            <button t-if="widget.is_action_enabled('create') and widget.group_show_create" type="button" class="btn btn-secondary o_form_button_create" accesskey="c">
+                Create
+            </button>
+        </t>
+        <t t-jquery="button[t-if='widget.is_action_enabled(\'edit\')']" t-operation="replace">
+            <button t-if="widget.is_action_enabled('edit') and widget.group_show_edit" type="button" class="btn btn-primary o_form_button_edit" accesskey="a">
+                Edit
+            </button>
+        </t>
+    </t>
+
+    <t t-extend="BillsListView.buttons">
+        <t t-jquery="t[t-if='widget.is_action_enabled(\'create\')']" t-operation="replace">
+            <t t-if="widget.is_action_enabled('create') and widget.group_show_create">
+                <button type="button" class="btn btn-primary o_list_button_add" accesskey="c">
+                    Create
+                </button>
+            </t>
+        </t>
+    </t>
+    <t t-extend="StockInventoryReport.Buttons">
+        <t t-jquery="t[t-if='widget.is_action_enabled(\'create\')']" t-operation="replace">
+            <t t-if="widget.is_action_enabled('create') and widget.group_show_create">
+                <button type="button" class="btn btn-primary o_list_button_add" accesskey="c">
+                    Create
+                </button>
+            </t>
+        </t>
+    </t>
+    <t t-extend="LeadMiningRequestListView.buttons">
+        <t t-jquery="t[t-if='widget.is_action_enabled(\'create\')']" t-operation="replace">
+            <t t-if="widget.is_action_enabled('create') and widget.group_show_create">
+                <button type="button" class="btn btn-primary o_list_button_add" accesskey="c">
+                    Create
+                </button>
+            </t>
+        </t>
+    </t>
+</templates>

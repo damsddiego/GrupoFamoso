@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="sh_update_customers_statement_wizard" model="ir.ui.view">
+        <field name="name">sh.customer.mass.updatet.config.wizard</field>
+        <field name="model">sh.customer.mass.update</field>
+        <field name="arch" type="xml">
+            <form string="Mass Update">
+                <group>
+                    <group>
+                        <field name="sh_update_customers_ids" widget="many2many_tags" domain="[('customer_rank','>=',1)]"/>
+                        <field name="sh_customer_update" widget="radio" nolabel="1" />
+                        <field name="sh_statement_ids" invisible="True" />
+                    </group>
+                </group>
+                <footer>
+                    <button name="update_customers" string="Update" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="sh_update_customer_statement_action_wizard" model="ir.actions.act_window">
+        <field name="name">Mass Update</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">sh.customer.mass.update</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="sh_update_customers_statement_wizard"/>
+        <field name="target">new</field>
+    </record>
+</odoo>

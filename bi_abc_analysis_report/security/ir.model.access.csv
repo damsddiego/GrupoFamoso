@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_inventory_abc_extended,access_inventory_abc_extended,model_inventory_abc_extended,base.group_user,1,1,1,1
+access_inventory_abc_report_wiz,access_inventory_abc_report_wiz,model_inventory_abc_report_wiz,base.group_user,1,1,1,1

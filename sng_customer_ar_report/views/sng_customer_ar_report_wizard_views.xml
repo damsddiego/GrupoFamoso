@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ================================================================== -->
+    <!--  WIZARD FORM VIEW                                                   -->
+    <!-- ================================================================== -->
+    <record id="view_customer_ar_report_wizard_form" model="ir.ui.view">
+        <field name="name">customer.ar.report.wizard.form</field>
+        <field name="model">customer.ar.report.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Filtrar Reporte CxC">
+                <group>
+                    <group string="Rango de Fechas">
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                    </group>
+                    <group string="Filtros">
+                        <field name="company_id" groups="base.group_multi_company"/>
+                        <field name="partner_id"/>
+                        <field name="only_with_balance"/>
+                    </group>
+                </group>
+                <footer>
+                    <button name="action_view_report" string="Ver Reporte"
+                        type="object" class="btn-primary"/>
+                    <button string="Cancelar" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- ================================================================== -->
+    <!--  WIZARD ACTION                                                      -->
+    <!-- ================================================================== -->
+    <record id="action_customer_ar_report_wizard" model="ir.actions.act_window">
+        <field name="name">CxC por Cliente (Wizard)</field>
+        <field name="res_model">customer.ar.report.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <!-- ================================================================== -->
+    <!--  WIZARD MENU                                                        -->
+    <!-- ================================================================== -->
+    <menuitem
+        id="menu_customer_ar_report_wizard"
+        name="CxC por Cliente (Filtro)"
+        parent="account.menu_finance_reports"
+        action="action_customer_ar_report_wizard"
+        sequence="101"/>
+
+</odoo>

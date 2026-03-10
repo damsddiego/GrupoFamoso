@@ -1,0 +1,72 @@
+<odoo>
+    <record id="view_account_payment_form_unapplied" model="ir.ui.view">
+        <field name="name">account.payment.form.unapplied</field>
+        <field name="model">account.payment</field>
+        <field name="inherit_id" ref="account.view_account_payment_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_open_apply_invoice_wizard"
+                        type="object"
+                        string="Asignar factura"
+                        class="oe_highlight"
+                        modifiers="{'invisible': ['|', ('state', '!=', 'posted'), ('unapplied', '=', False)]}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="account_unapplied_payment_list_view" model="ir.ui.view">
+        <field name="name">account.payment.list.unapplied</field>
+        <field name="model">account.payment</field>
+        <field name="arch" type="xml">
+            <list string="Pagos no aplicados" default_order="date desc">
+                <field name="date"/>
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="amount"/>
+                <field name="currency_id"/>
+                <field name="unapplied_amount"/>
+                <field name="payment_type"/>
+                <field name="journal_id"/>
+                <field name="state"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="account_unapplied_payment_search_view" model="ir.ui.view">
+        <field name="name">account.payment.search.unapplied</field>
+        <field name="model">account.payment</field>
+        <field name="arch" type="xml">
+            <search string="Pagos">
+                <field name="partner_id"/>
+                <field name="journal_id"/>
+                <field name="date"/>
+                <filter name="filter_unapplied"
+                        string="No aplicado"
+                        domain="[('unapplied', '=', True)]"
+                        help="Mostrar pagos sin conciliar contra factura."/>
+                <filter name="filter_unmatched"
+                        string="Sin conciliar"
+                        domain="[('is_matched', '=', False)]"
+                        help="Mostrar pagos no reconciliados."/>
+                <filter name="filter_posted" string="Publicado" domain="[('state', '=', 'posted')]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_account_unapplied_payments" model="ir.actions.act_window">
+        <field name="name">Pagos no aplicados</field>
+        <field name="res_model">account.payment</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="account_unapplied_payment_list_view"/>
+        <field name="domain">[('state', '=', 'posted'), '|', ('unapplied', '=', True), ('is_matched', '=', False)]</field>
+        <field name="context">{'search_default_filter_unapplied': 1}</field>
+        <field name="search_view_id" ref="account_unapplied_payment_search_view"/>
+    </record>
+
+    <menuitem id="menu_account_unapplied_payments"
+              name="Pagos no aplicados"
+              parent="account.menu_finance"
+              action="action_account_unapplied_payments"
+              sequence="40"
+              groups="account.group_account_user"/>
+</odoo>

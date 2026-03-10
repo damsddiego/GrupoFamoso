@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+         ACL para los modelos persistentes nuevos de este módulo.
+
+         Por qué está en XML y no en ir.model.access.csv:
+           El CSV se procesa muy temprano en el upgrade y solo acepta
+           model_id:id (external ID). Los external IDs de modelos nuevos
+           (model_customer_statement_report, model_customer_statement_report_line)
+           no existen aún en ese momento → error "External ID not found".
+           Al definir el ACL en XML con <record model="ir.model.access"> y
+           ref=, Odoo resuelve la referencia cuando este archivo se carga,
+           momento en que los modelos ya están registrados en ir.model.
+    -->
+
+    <!-- ── customer.statement.report ── -->
+    <record id="access_stmt_report_user" model="ir.model.access">
+        <field name="name">customer.statement.report user</field>
+        <field name="model_id" ref="model_customer_statement_report"/>
+        <field name="group_id" ref="group_customer_statement_user"/>
+        <field name="perm_read"   eval="True"/>
+        <field name="perm_write"  eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <record id="access_stmt_report_manager" model="ir.model.access">
+        <field name="name">customer.statement.report manager</field>
+        <field name="model_id" ref="model_customer_statement_report"/>
+        <field name="group_id" ref="group_customer_statement_manager"/>
+        <field name="perm_read"   eval="True"/>
+        <field name="perm_write"  eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <!-- ── customer.statement.report.line ── -->
+    <record id="access_stmt_line_user" model="ir.model.access">
+        <field name="name">customer.statement.report.line user</field>
+        <field name="model_id" ref="model_customer_statement_report_line"/>
+        <field name="group_id" ref="group_customer_statement_user"/>
+        <field name="perm_read"   eval="True"/>
+        <field name="perm_write"  eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <record id="access_stmt_line_manager" model="ir.model.access">
+        <field name="name">customer.statement.report.line manager</field>
+        <field name="model_id" ref="model_customer_statement_report_line"/>
+        <field name="group_id" ref="group_customer_statement_manager"/>
+        <field name="perm_read"   eval="True"/>
+        <field name="perm_write"  eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+</odoo>

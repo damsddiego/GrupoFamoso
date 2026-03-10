@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <!-- Server Action to Delete All Commission Analysis Records -->
+        <record id="action_delete_all_commission_analysis" model="ir.actions.server">
+            <field name="name">Delete All Commission Analysis</field>
+            <field name="model_id" ref="model_sales_commission_analysis"/>
+            <field name="binding_model_id" ref="model_sales_commission_analysis"/>
+            <field name="binding_view_types">list</field>
+            <field name="state">code</field>
+            <field name="code">
+# Eliminar todos los registros de análisis de comisiones
+all_records = env['sales.commission.analysis'].search([])
+total = len(all_records)
+all_records.unlink()
+
+# Mostrar notificación
+if total > 0:
+    action = {
+        'type': 'ir.actions.client',
+        'tag': 'display_notification',
+        'params': {
+            'title': 'Success',
+            'message': f'{total} registros de comisiones eliminados exitosamente.',
+            'type': 'success',
+            'sticky': False,
+        }
+    }
+else:
+    action = {
+        'type': 'ir.actions.client',
+        'tag': 'display_notification',
+        'params': {
+            'title': 'Info',
+            'message': 'No hay registros de comisiones para eliminar.',
+            'type': 'info',
+            'sticky': False,
+        }
+    }
+            </field>
+        </record>
+
+        <!-- Server Action to Repair legacy salesperson links in commission analysis -->
+        <record id="action_fix_legacy_salesperson_commission_analysis" model="ir.actions.server">
+            <field name="name">Fix Legacy Salesperson Links</field>
+            <field name="model_id" ref="model_sales_commission_analysis"/>
+            <field name="binding_model_id" ref="model_sales_commission_analysis"/>
+            <field name="binding_view_types">list</field>
+            <field name="state">code</field>
+            <field name="code">
+# Reparar vendedor (contacto) en líneas históricas de análisis de comisiones
+# 1) Prioriza el vendedor del documento origen (SO/Factura)
+# 2) Si no existe, intenta mapear por ID legado de res.users -> partner_id
+
+Analysis = env['sales.commission.analysis'].sudo()
+Users = env['res.users'].sudo()
+
+records = Analysis.search([('sales_person_id', '!=', False)])
+updated = 0
+skipped = 0
+
+for line in records:
+    current = line.sales_person_id
+    candidate = False
+
+    # Fuente más confiable: documento relacionado
+    if line.sale_order_id:
+        candidate = line.sale_order_id.salesperson_id or line.sale_order_id.user_id.partner_id
+    if not candidate and line.move_id:
+        candidate = line.move_id.salesperson_id or line.move_id.invoice_user_id.partner_id
+
+    # Fallback para datos legacy: sales_person_id guardado con ID de res.users
+    if not candidate:
+        legacy_user = Users.browse(current.id)
+        if legacy_user.exists() and legacy_user.partner_id:
+            candidate = legacy_user.partner_id
+
+    if candidate and candidate.id != current.id:
+        line.write({'sales_person_id': candidate.id})
+        if not candidate.is_salesperson:
+            candidate.write({'is_salesperson': True})
+        updated += 1
+    else:
+        skipped += 1
+
+action = {
+    'type': 'ir.actions.client',
+    'tag': 'display_notification',
+    'params': {
+        'title': 'Salesperson Fix',
+        'message': f'Registros corregidos: {updated}. Sin cambios: {skipped}.',
+        'type': 'success',
+        'sticky': False,
+    }
+}
+            </field>
+        </record>
+    </data>
+</odoo>

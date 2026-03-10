@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_order_form_header_notes" model="ir.ui.view">
+        <field name="name">sale.order.form.header.notes</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet/div[@class='oe_title']" position="after">
+                <div class="alert alert-warning mt-2 mb-0" role="alert">
+                    <field name="header_note"
+                           placeholder="Notas visibles en el encabezado..."
+                           nolabel="1"
+                           readonly="state not in ['draft', 'sent']"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>

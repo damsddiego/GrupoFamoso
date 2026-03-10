@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+	<!-- Report Excel Extended -->
+	<record model="ir.ui.view" id="action_inventory_abc_extended_report_form">
+		<field name="name">inventory.abc.extended.form</field>
+		<field name="model">inventory.abc.extended</field>
+		<field name="arch" type="xml">
+			<form string="Excel Report">
+				<group>
+					<group>
+						<field name="excel_file" readonly="1" filename="file_name" />
+					</group>
+					<group>
+						<field name="file_name" invisible="1" />
+					</group>
+				</group>
+				<footer>
+					<button string="Cancel" name="cancel" special="cancel" class="oe_highlight" />
+				</footer>
+			</form>
+		</field>
+	</record>
+	<!-- Report Excel Extened action -->
+	<record id="action_inventory_abc_report_extended" model="ir.actions.act_window">
+		<field name="name">inventory.abc.extended</field>
+		<field name="res_model">inventory.abc.extended</field>
+		<field name="view_mode">form</field>
+		<field name="target">new</field>
+	</record>
+	<record id="inventory_abc_extended_report_tree" model="ir.ui.view">
+		<field name="name">inventory.abc.extended.tree</field>
+		<field name="model">inventory.abc.extended</field>
+		<field name="arch" type="xml">
+			<list string="Stock ABC Ratio" create="false">
+				<field name="company" />
+				<field name="products" />
+				<field name="product_category" />
+				<field name="unit_sold" />
+				<field name="value" />
+				<field name="consumption_value_per" />
+				<field name="sold_value_percentage" />
+				<field name="annual_consumption_percentage" />
+				<field name="analysis_type" />
+			</list>
+		</field>
+	</record>
+	<record id="inventory_abc_extended_report_search" model="ir.ui.view">
+		<field name="name">inventory.abc.extended.search</field>
+		<field name="model">inventory.abc.extended</field>
+		<field name="arch" type="xml">
+			<search string="Stock ABC Ratio">
+				<field name="company" />
+				<field name="products" />
+				<field name="product_category" />
+				<separator />
+				<filter string="Product" context="{'group_by':'products'}" name="products_groupby" />
+				<filter string="Product Category" context="{'group_by':'product_category'}" name="product_category_groupby" />
+				<filter string="Company" context="{'group_by':'company'}" name="company_groupby" />
+				<separator />
+			</search>
+		</field>
+	</record>
+	<record id="inventory_abc_extended_report_graph" model="ir.ui.view">
+		<field name="name">inventory.abc.extended.report.graph</field>
+		<field name="model">inventory.abc.extended</field>
+		<field name="arch" type="xml">
+			<graph string="Stock ABC Ratio" type="bar" stacked="False">
+				<field name="company" type="col" />
+				<field name="analysis_type" type="row" />
+				<field name="sold_value_percentage" type="measure" />
+			</graph>
+		</field>
+	</record>
+	<!-- Report Wizard Form View -->
+	<record id="inventory_abc_wizard_form_view" model="ir.ui.view">
+		<field name="name">inventory.abc.report.wiz.form</field>
+		<field name="model">inventory.abc.report.wiz</field>
+		<field name="arch" type="xml">
+			<form string="Stock Analysis ABC Report">
+				<sheet string="Stock Analysis ABC Report">
+					<group expand="0" string="Select date">
+						<field name="from_date" required="True" />
+						<field name="to_date" required="True" />
+					</group>
+					<group expand="0" string="Select Product And Categories">
+						<field name="category_ids" widget="many2many_tags" />
+						<field name="product_ids" widget="many2many_tags" />
+					</group>
+					<group expand="0" string="Select Company">
+						<field name="company_ids" widget="many2many_tags" />
+					</group>
+					<group expand="0" string="Select value of Stock">
+						<field name="type" required="True" />
+					</group>
+				</sheet>
+				<footer>
+					<button name="print_inventory_ABC_report" string="Excel" type="object" class="oe_highlight" />
+					<button name="tree_graph_report_view" string="Data" type="object" class="oe_highlight" />
+					<button name="tree_graph_report_view" string="Graph" type="object" class="oe_highlight" context="{'report_graph':True}" />
+					<button string="Cancel" class="oe_link" special="cancel" />
+				</footer>
+			</form>
+		</field>
+	</record>
+	<!-- Report Wizard Action View -->
+	<record id="action_inventory_abc_report_action" model="ir.actions.act_window">
+		<field name="name">Stock Analysis ABC Report</field>
+		<field name="res_model">inventory.abc.report.wiz</field>
+		<field name="view_mode">form</field>
+		<field name="target">new</field>
+	</record>
+	<menuitem id="bi_inventory_abc_reports_report_menu" action="action_inventory_abc_report_action" parent="stock.menu_warehouse_report" sequence="4" />
+</odoo>

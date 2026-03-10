@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="sh_customer_due_statement_doc">
+        <t t-call="web.external_layout">
+            <t t-set="o" t-value="o.with_context(lang=o.lang)" />
+            <div class="page">
+                <div class="oe_structure" />
+
+                <address class="mb-0" t-out="o" t-options='{"widget": "contact", "fields": ["address", "vat"], "no_marker": True}'/>
+                <br></br>
+
+                <div>
+                    Date: <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%Y-%m-%d %H:%M:%S')" /><br />
+                    Hello Sir/Madam,<br />
+                    Some payments are still due.<br />
+                    Please find details are below.<br />
+                    <br />
+                    Thanks and Regards<br />
+                     <b><t t-esc="o.env.company.name" /></b>
+                </div>
+                <center>
+                    <span style="font-weight: 800;font-size: 25px;" t-field="o.name" />
+                </center>
+                 <div t-if="not o.env.context.get('sh_hide_dates', True) and (o.start_date or o.end_date)" class="mt-2 mb-2 text-center">
+                    <t t-if="o.start_date">
+                        <strong>From: </strong><span t-field="o.start_date"/>
+                    </t>
+                    <t t-if="o.end_date">
+                        <strong> To: </strong><span t-field="o.end_date"/>
+                    </t>
+                </div>
+                <t t-if="o.sh_customer_due_statement_ids">
+                    <table class="table table-sm o_main_table mt-3">
+                        <thead style="display: table-row-group;">
+                            <tr>
+                                <th>Number</th>
+                                <th>Account</th>
+                                <th>Date</th>
+                                <th>Due Date</th>
+                                <th>Total Amount</th>
+                                <th>Paid Amount</th>
+                                <th>Balance</th>
+                            </tr>
+                        </thead>
+                        <tbody class="sale_tbody">
+                            <t t-set="amount" t-value="0.0" />
+                            <t t-set="paid_amount" t-value="0.0" />
+                            <t t-set="balance" t-value="0.0" />
+                            <t t-foreach="o.sh_customer_due_statement_ids.filtered(lambda l: o.env.context.get('sh_hide_dates', True) or ((not o.start_date or l.sh_due_customer_due_date &gt;= o.start_date) and (not o.end_date or l.sh_due_customer_due_date &lt;= o.end_date))).sorted(lambda l:l.sh_due_customer_due_date)" t-as="line">
+                                <t t-set="amount" t-value="amount+line.sh_due_customer_amount" />
+                                <t t-set="paid_amount" t-value="paid_amount+line.sh_due_customer_paid_amount" />
+                                <t t-set="balance" t-value="balance+line.sh_due_customer_balance" />
+                                <t t-if="line.sh_due_customer_due_date and line.sh_today and line.sh_due_customer_due_date &lt;line.sh_today">
+                                	<tr style="color: red;">
+	                                    <td><span t-field="line.name" /></td>
+	                                    <td><span t-field="line.sh_account" /></td>
+	                                    <td><span t-field="line.sh_due_customer_invoice_date" /></td>
+	                                    <td><span t-field="line.sh_due_customer_due_date" /></td>
+	                                    <td><span t-field="line.sh_due_customer_amount" /></td>
+	                                    <td><span t-field="line.sh_due_customer_paid_amount" /></td>
+	                                    <td><span t-field="line.sh_due_customer_balance" /></td>
+	                                </tr>
+                                </t>
+                                <t t-else="">
+                                	<tr>
+	                                    <td><span t-field="line.name" /></td>
+	                                    <td><span t-field="line.sh_account" /></td>
+	                                    <td><span t-field="line.sh_due_customer_invoice_date" /></td>
+	                                    <td><span t-field="line.sh_due_customer_due_date" /></td>
+	                                    <td><span t-field="line.sh_due_customer_amount" /></td>
+	                                    <td><span t-field="line.sh_due_customer_paid_amount" /></td>
+	                                    <td><span t-field="line.sh_due_customer_balance" /></td>
+	                                </tr>
+                                </t>
+                            </t>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td>
+                                    <b><span t-esc="'%.2f'%amount" /></b>
+                                </td>
+                                <td>
+                                    <b><span t-esc="'%.2f'%paid_amount" /></b>
+                                </td>
+                                <td>
+                                    <b><span t-esc="'%.2f'%balance" /></b>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </t>
+                <t t-set="lines" t-value="o.sh_customer_due_statement_ids.filtered(lambda l: o.env.context.get('sh_hide_dates', True) or ((not o.start_date or l.sh_due_customer_due_date &gt;= o.start_date) and (not o.end_date or l.sh_due_customer_due_date &lt;= o.end_date)))" />
+                <t t-set="today" t-value="datetime.date.today()" />
+                <t t-set="b0_30" t-value="sum(lines.filtered(lambda l: l.sh_due_customer_invoice_date and l.sh_due_customer_invoice_date &gt; today - datetime.timedelta(days=30)).mapped('sh_due_customer_balance'))" />
+                <t t-set="b31_60" t-value="sum(lines.filtered(lambda l: l.sh_due_customer_invoice_date and l.sh_due_customer_invoice_date &lt;= today - datetime.timedelta(days=30) and l.sh_due_customer_invoice_date &gt; today - datetime.timedelta(days=60)).mapped('sh_due_customer_balance'))" />
+                <t t-set="b61_90" t-value="sum(lines.filtered(lambda l: l.sh_due_customer_invoice_date and l.sh_due_customer_invoice_date &lt;= today - datetime.timedelta(days=60) and l.sh_due_customer_invoice_date &gt; today - datetime.timedelta(days=90)).mapped('sh_due_customer_balance'))" />
+                <t t-set="b91p" t-value="sum(lines.filtered(lambda l: l.sh_due_customer_invoice_date and l.sh_due_customer_invoice_date &lt;= today - datetime.timedelta(days=90)).mapped('sh_due_customer_balance'))" />
+                <t t-set="total_bucket" t-value="b0_30 + b31_60 + b61_90 + b91p" />
+
+                <t t-if="o.env.context.get('is_show_aging_bucket') or o.env.context.get('always_show_bucket') or o.env.user.has_group('base.group_portal')">
+                    <table class="table table-sm o_main_table mt-4">
+                        <thead style="display: table-row-group;">
+                            <tr>
+                                <th>Gap Between Days</th>
+                                <th>0-30(Days)</th>
+                                <th>31-60(Days)</th>
+                                <th>61-90(Days)</th>
+                                <th>91+(Days)</th>
+                                <th>Total</th>
+                            </tr>
+
+                            <tr>
+                                <td><strong>Balance Amount</strong></td>
+                                <td><t t-esc="'%.2f'%b0_30" /></td>
+                                <td><t t-esc="'%.2f'%b31_60" /></td>
+                                <td><t t-esc="'%.2f'%b61_90" /></td>
+                                <td><t t-esc="'%.2f'%b91p" /></td>
+                                <td><t t-esc="'%.2f'%total_bucket" /></td>
+                            </tr>
+                        </thead>
+                    </table>
+                </t>
+            </div>
+        </t>
+    </template>
+    <template id="sh_customer_due_statement_template">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="sh_customer_statement.sh_customer_due_statement_doc" t-lang="o.lang" />
+            </t>
+        </t>
+    </template>
+    <record id="action_report_sh_customer_due_statement" model="ir.actions.report">
+        <field name="name">Customer Overdue Statement</field>
+        <field name="model">res.partner</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="print_report_name">'Customer Overdue Statement'</field>
+        <field name="report_name">sh_customer_statement.sh_customer_due_statement_template</field>
+        <field name="report_file">sh_customer_statement.sh_customer_due_statement_template</field>
+        <field name="binding_model_id" ref="model_res_partner" />
+        <field name="binding_type">report</field>
+    </record>
+</odoo>

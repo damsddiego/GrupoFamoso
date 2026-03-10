@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!--record id="tax_report_paperformat" model="report.paperformat">
+			<field name="name">Tax Report</field>
+			<field name="default" eval="True" />
+			<field name="format">A4</field>
+			<field name="page_height">0</field>
+			<field name="page_width">0</field>
+			<field name="orientation">Portrait</field>
+			<field name="margin_top">10</field>
+			<field name="margin_bottom">10</field>
+			<field name="margin_left">3</field>
+			<field name="margin_right">3</field>
+			<field name="header_line" eval="False"/>
+			<field name="header_spacing">61</field>
+			<field name="dpi">90</field>
+		</record-->
+		
+		<record id="account_tax_report_menu_id" model="ir.actions.report">
+            <field name="name">Tax Report</field>
+            <field name="model">account.tax.report.wizard</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">account_tax_report_omax.account_report_tax_tmpl_id</field>
+            <field name="report_file">account_tax_report_omax.account_report_tax_tmpl_id</field>
+            <!--field name="paperformat_id" ref="account_tax_report_paperformat"/-->
+        </record>
+    </data>
+</odoo>

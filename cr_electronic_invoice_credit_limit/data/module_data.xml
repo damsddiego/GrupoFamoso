@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Add a record to track module installation -->
+        <record id="module_cr_electronic_invoice_credit_limit" model="ir.module.module">
+            <field name="name">CR Electronic Invoice Credit Limit</field>
+            <field name="shortdesc">Limit credit notes amount based on original invoice</field>
+            <field name="description">This module extends the Costa Rican Electronic Invoice module to limit the creation of credit notes so that their total amount doesn't exceed the original invoice amount.</field>
+            <field name="author">SNG</field>
+            <field name="website">https://www.sngcloud.com</field>
+            <field name="category">Accounting</field>
+            <field name="license">OEEL-1</field>
+        </record>
+    </data>
+</odoo>

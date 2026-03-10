@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <record id="add_commission_view_order_form" model="ir.ui.view">
+            <field name="name">sale.order.form.inherit</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="arch" type="xml">
+                <field name="user_id" position="after">
+                    <field name="salesperson_id" string="Vendedor (Contacto)"/>
+                </field>
+                <xpath expr="//sheet/notebook/page[@name='order_lines']" position="after">
+                    <page string="Sales Commission" name="sale_commission_analysis">
+                        <field name="commission_analysis_line" mode="list,form">
+                            <list string="Sales Commission" create="false" edit="false" delete="false">
+                                <field name="date"/>
+                                <field name="name"/>
+                                <field name="sales_person_id"/>
+                                <field name="commission_amount" widget="monetary"/>
+                            </list>
+                            <form create="false" edit="false" delete="false">
+                                <group>
+                                    <group>
+                                        <field name="date"/>
+                                        <field name="name"/>
+                                    </group>
+                                    <group>
+                                        <field name="sales_person_id"/>
+                                        <field name="currency_id" invisible="1"/>
+                                        <field name="commission_amount" widget="monetary"/>
+                                    </group>
+                                </group>
+                            </form>
+                        </field>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="view_order_tree_inherit_commission" model="ir.ui.view">
+            <field name="name">sale.order.list.inherit.commission</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_tree"/>
+            <field name="arch" type="xml">
+                <field name="user_id" position="after">
+                    <field name="salesperson_id" string="Vendedor (Contacto)"/>
+                </field>
+            </field>
+        </record>
+
+        <record id="view_quotation_tree_inherit_commission" model="ir.ui.view">
+            <field name="name">sale.quotation.list.inherit.commission</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_quotation_tree_with_onboarding"/>
+            <field name="arch" type="xml">
+                <field name="user_id" position="after">
+                    <field name="salesperson_id" string="Vendedor (Contacto)"/>
+                </field>
+            </field>
+        </record>
+    </data>
+</odoo>

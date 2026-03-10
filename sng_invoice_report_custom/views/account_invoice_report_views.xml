@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vista de Lista (Tree) para Análisis de Facturas -->
+    <record id="account_invoice_report_view_tree_inherit" model="ir.ui.view">
+        <field name="name">account.invoice.report.view.list.inherit</field>
+        <field name="model">account.invoice.report</field>
+        <field name="inherit_id" ref="account.account_invoice_report_view_tree"/>
+        <field name="arch" type="xml">
+            <!-- Añadir el campo partner_code_name después del campo partner_id -->
+            <field name="partner_id" position="after">
+                <field name="partner_code_name" string="Cliente (Código - Nombre)" optional="show"/>
+            </field>
+        </field>
+    </record>
+
+    <!-- Vista de Búsqueda (Search) para Análisis de Facturas -->
+    <record id="view_account_invoice_report_search_inherit" model="ir.ui.view">
+        <field name="name">account.invoice.report.search.inherit</field>
+        <field name="model">account.invoice.report</field>
+        <field name="inherit_id" ref="account.view_account_invoice_report_search"/>
+        <field name="arch" type="xml">
+            <!-- Añadir el campo partner_code_name en los filtros de búsqueda -->
+            <field name="partner_id" position="after">
+                <field name="partner_code_name" string="Cliente (Código - Nombre)"
+                       filter_domain="['|', ('partner_id.ref', 'ilike', self), ('partner_id.name', 'ilike', self)]"/>
+            </field>
+        </field>
+    </record>
+
+    <!-- Vista de Gráfico (Graph) para Análisis de Facturas -->
+    <record id="view_account_invoice_report_graph_inherit" model="ir.ui.view">
+        <field name="name">account.invoice.report.graph.inherit</field>
+        <field name="model">account.invoice.report</field>
+        <field name="inherit_id" ref="account.view_account_invoice_report_graph"/>
+        <field name="arch" type="xml">
+            <!-- Hacer que el campo partner_code_name esté disponible para agrupar en gráficos -->
+            <graph position="inside">
+                <field name="partner_code_name" invisible="1"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Vista de Pivot para Análisis de Facturas -->
+    <record id="view_account_invoice_report_pivot_inherit" model="ir.ui.view">
+        <field name="name">account.invoice.report.pivot.inherit</field>
+        <field name="model">account.invoice.report</field>
+        <field name="inherit_id" ref="account.view_account_invoice_report_pivot"/>
+        <field name="arch" type="xml">
+            <!-- Hacer que el campo partner_code_name esté disponible para pivot -->
+            <pivot position="inside">
+                <field name="partner_code_name" type="row" invisible="1"/>
+            </pivot>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="sh_access_management_manager" model="res.groups">
+        <field name="name">Access Management Manager</field>
+    </record>
+</odoo>

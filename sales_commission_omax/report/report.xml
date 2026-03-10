@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--External header footer-->
+    <template id="external_layout_omax">
+        <div class="header">
+            <div class="o_boxed_header">
+                <div class="row mb8"/>
+            </div>
+        </div>
+        <div class="article" t-att-data-oe-model="o and o._name" t-att-data-oe-id="o and o.id" t-att-data-oe-lang="o and o.env.context.get('lang')">
+          <t t-raw="0"/>
+        </div>
+        <div class="footer o_boxed_footer">
+            <div class="text-center">
+                <div t-if="report_type == 'pdf'">
+                    Page:
+                    <span class="page"/>
+                    /
+                    <span class="topage"/>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <template id="sales_commission_report_tmpl_id">
+        <t t-call="web.html_container">
+<!--            <t t-call="web.external_layout">-->
+            <t t-call="sales_commission_omax.external_layout_omax">
+                <div class="page">
+                    <!-- company logo and name -->
+                    <t t-if="not o" t-set="o" t-value="doc"/>
+                    <t t-if="not company">
+                        <!-- Multicompany -->
+                        <t t-if="company_id">
+                            <t t-set="company" t-value="company_id"/>
+                        </t>
+                        <t t-elif="o and 'company_id' in o">
+                            <t t-set="company" t-value="o.company_id.sudo()"/>
+                        </t>
+                        <t t-else="else">
+                            <t t-set="company" t-value="res_company"/>
+                        </t>
+                    </t>
+                    <div class="row">
+                        <div class="col-3 mb4">
+                            <img t-if="company.logo" t-att-src="image_data_uri(company.logo)" style="max-height: 45px;" alt="Logo"/>
+                            <h3><div t-field="company.partner_id"
+                                t-options='{"widget": "contact", "fields": ["name"], "no_marker": true}'
+                            /></h3>
+                            <div t-field="company.partner_id"
+                                t-options='{"widget": "contact", "fields": ["address"], "no_marker": true}'
+                            />
+                        </div>
+                        <div class="col-9" style="margin-left:100px;"><h1>Sales Commission Report</h1></div>
+                        <!--div class="col-9"><center><h2>Sales Commission Report</h2></center></div-->
+                    </div>
+                    <!-- finish company logo and name -->
+
+                    <div class="oe_structure"/>
+                    <div>
+                        <center>
+                            <h4><span t-if="data['form']['start_date'] and data['form']['end_date']">
+                                From :-&amp;nbsp;&amp;nbsp;&amp;nbsp;<b><span t-esc="time.strftime('%d/%m/%Y',time.strptime(data['form']['start_date'], '%Y-%m-%d'))"/></b> &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;
+                                To :-&amp;nbsp;&amp;nbsp;&amp;nbsp;<b><span t-esc="time.strftime('%d/%m/%Y',time.strptime(data['form']['end_date'], '%Y-%m-%d'))"/></b>
+                            </span></h4>
+                        </center>
+				    </div>
+				    <div>
+				        <t t-foreach="salesperson_ids" t-as="salesperson_id">
+				            <center>
+				                <h3><b>Salesperson : </b> <span t-esc="salesperson_id.name"/></h3>
+				            </center>
+				            
+				            <div class="row col-xs-12">
+				                <table class="table table-condensed" name="commission_analys_table" width="100%" style="page-break-inside: avoid;">
+                                    <thead>
+                                        <tr style="page-break-inside: avoid;">
+                                            <th width="10%">
+                                                <span>Date</span>
+                                            </th>
+                                             <th width="20%">
+                                                <span>Name</span>
+                                            </th>
+                                            <th width="10%">
+                                                <span>Invoice/Sales Ref.</span>
+                                            </th>
+                                            <th width="10%">
+                                                <span>Commission Name</span>
+                                            </th>
+                                            <th width="10%">
+                                                <span>Commission Type</span>
+                                            </th>
+                                            <th width="15%">
+                                                <span>Product/Category</span>
+                                            </th>
+                                            <th width="15%">
+                                                <span>Partner</span>
+                                            </th>
+                                            <th width="10%" style="text-align:right;">
+                                                <span>Commission Amount</span>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-set="sp_total_comm_amount" t-value="0"/>
+                                        <t t-foreach="get_sales_commission_data(data['form']['start_date'],data['form']['end_date'],salesperson_id,docs)" t-as="l">
+                                            <tr style="page-break-inside: avoid;">
+                                                <td>
+                                                    <span t-esc="time.strftime('%d/%m/%Y',time.strptime(str(l.date), '%Y-%m-%d'))"/>
+                                                    <!--span t-esc="l.date"/-->
+                                                </td>
+                                                <td>
+                                                    <span t-esc="l.name"/>
+                                                </td>
+                                                <td>
+                                                    <t t-if="l.move_id">
+                                                        <span t-esc="l.move_id.name"/>
+                                                    </t>
+                                                    <t t-else="">
+                                                        <span t-esc="l.sale_order_id.name"/>
+                                                    </t>
+                                                </td>
+                                                <td>
+                                                    <span t-esc="l.commission_id.name"/>
+                                                </td>
+                                                <td>
+                                                    <!--span t-esc="l.commission_type"/-->
+                                                    <span t-esc="dict(l._fields['commission_type'].selection).get(l.commission_type)"/>
+                                                </td>
+                                                <td>
+                                                    <t t-if="l.product_id">
+                                                        <span t-esc="l.product_id.display_name"/>
+                                                    </t>
+                                                    <t t-elif="l.category_id">
+                                                        <span t-esc="l.category_id.display_name"/>
+                                                    </t>
+                                                    <t t-else="">
+                                                    </t>
+                                                </td>
+                                                <td>
+                                                    <span t-esc="l.partner_id.name"/>
+                                                    <t t-if="l.partner_type">
+                                                        (<span t-esc="l.partner_type"/>)
+                                                    </t>
+                                                </td>
+
+                                                <td style="text-align:right;">
+                                                    <!--span t-esc="'{0:,.2f}'.format(l.commission_amount)" t-options='{"widget": "monetary", "display_currency": l.currency_id}'/-->
+                                                    <span t-esc="l.commission_amount" t-options='{"widget": "monetary", "display_currency": l.currency_id}'/>
+                                                    <!-- -->
+                                                    <t t-set="sp_total_comm_amount" t-value="sp_total_comm_amount+l.commission_amount"/>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                        <tr style="page-break-inside: avoid;">
+                                            <td colspan="7" style="text-align:right;">
+                                                <b><span>Total Commission</span></b>
+                                            </td>
+                                            <td style="text-align:right;">
+                                                <b t-if="sp_total_comm_amount">
+                                                    <!--span t-esc="'{0:,.2f}'.format(sp_total_comm_amount)"/-->
+                                                    <span t-esc="sp_total_comm_amount" t-options='{"widget": "monetary", "display_currency": l.currency_id}'/>
+                                                </b>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+				            </div>
+				        </t>
+				    </div>
+				    
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>

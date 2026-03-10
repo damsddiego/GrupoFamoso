@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Inherited Partner form for adding the sequence field -->
+    <record id="view_partner_form" model="ir.ui.view">
+        <field name="name">res.partner.view.form.inherit.customer.sequence</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <!--
+                Mostrar el código de cliente en el cuerpo del formulario,
+                debajo de los datos principales, para que se vea con su etiqueta.
+                Lo insertamos después del campo "vat" (NIF/CIF) en la segunda columna.
+            -->
+            <xpath expr="//field[@name='vat']" position="after">
+                <field name="unique_id" string="Código cliente" readonly="1"/>
+            </xpath>
+        </field>
+    </record>
+    <!-- Inherited Partner tree for adding the sequence field -->
+    <record id="view_partner_tree" model="ir.ui.view">
+        <field name="name">res.partner.view.tree.inherit.customer.sequence
+        </field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_tree"/>
+        <field name="arch" type="xml">
+            <field name="complete_name" position="after">
+                <field name="unique_id"/>
+            </field>
+        </field>
+    </record>
+
+    <!-- Add search view with filter for unique_id -->
+    <record id="view_partner_filter" model="ir.ui.view">
+        <field name="name">res.partner.view.search.inherit.customer.sequence</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_res_partner_filter"/>
+        <field name="arch" type="xml">
+            <field name="name" position="before">
+                <field name="unique_id" string="Código cliente"
+                       filter_domain="[('unique_id', 'ilike', self)]"/>
+            </field>
+            <filter name="customer" position="after">
+                <separator/>
+                <filter name="filter_by_unique_id" string="Buscar por Código"
+                        domain="[('unique_id', '!=', '/')]"/>
+            </filter>
+        </field>
+    </record>
+</odoo>

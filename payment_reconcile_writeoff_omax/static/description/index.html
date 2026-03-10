@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+<body>
+
+	<div class="oe_styling_v8">
+		<br/>
+		<div style="background:#efefef; font-family:LatoOpen Sans !important; color:black;">
+			<section class="oe_container oe_dark">
+				<div style="border-top:#252E64 solid 10px;"></div>
+				<div class="oe_spaced">
+				<center>
+				<span class="btn btn-sm mb-2 mb-lg-0" style="font-size:14px; font-weight:500; background-color:#159bd7; color:#fff"> Supported for</span>
+                        <span class="btn btn-sm mb-2 mb-lg-0" style="font-size:14px; font-weight:500; background-color:#252E64; color:#fff"><i class="fa fa-check"></i> Community</span>
+                        <span class="btn btn-sm mb-2 mb-lg-0" style="font-size:14px; font-weight:500; background-color:#252E64; color:#fff"><i class="fa fa-check"></i> Enterprise</span>
+                        <span class="btn btn-sm mb-2 mb-lg-0" style="font-size:14px; font-weight:500; background-color:#252E64; color:#fff"><i class="fa fa-check"></i> Odoo.sh</span>
+                    </center>
+                    <br/>
+				    <h1 style="padding-top: 0%;font-weight: 1000;color: #252e64 !important;margin-bottom:18px;">
+	                    <center>Payment Reconcile Writeoff</center><br/>
+	                </h1>
+	                
+				    <center><div style="width: 50%; border-top:#252E64 solid 10px;"></div></center>
+				    <div class="oe_slogan" style="margin:5px 0 !important;">
+                        <a href="https://www.omaxinformatics.com" target="new">
+                            <img src="omax_logo_withoutbg.png" style="width: 120px; margin-bottom: 0px;" class="center-block">
+							<h2 class="mt-1" style="font-weight: bold;"><span style="color:#222e63;">OMAX</span> <span style="color:#0e9cd7;">INF</span><span style="color:#222e63;">O</span><span style="color:#0e9cd7;">R</span><span style="color:#222e63;">M</span><span style="color:#0e9cd7;">ATICS</span></h2>
+                        </a>
+                    </div>
+				    
+				</div>
+				<div style="border-top:#252E64 solid 10px;"></div>
+			</section>
+			<section class="oe_container">
+			    <div class="oe_spaced">
+			        <h2 class="oe_slogan" style="font-size:30px;"><b><u>Overview</u></b></h2>
+			        <p style="font-size: 30px;">
+			           This application extends the standard payment functionality in Odoo by allowing users to reconcile invoices or bills directly from the payment form, including reconciliation with write-off support. This makes it easier to manage payment discrepancies, handle small remaining balances, and streamline reconciliation without leaving the payment screen.
+			        </p>
+			        <p style="font-size: 30px;">
+		            When a user selects a partner on the payment form, a new option appears to pay related invoices or bills. Users can select open invoices/bills, enter a write-off amount if needed, and automatically apply payments along with proper journal entries.
+		        </p>
+			    </div>
+		    </section>
+		    
+		    <section class="oe_container">
+			    <div class="oe_spaced">
+				    <h2 class="oe_slogan" style="font-size:30px;"><b><u>Features</u></b></h2>
+				    <div style="font-size: 25px;">
+					    <ul class="list-unstyled mr32 ml32">
+					        <!-- 1 -->
+					        <li>
+					            <i class="fa fa-check" style="color: #252E64;">
+					                <strong>Invoice/Bill Reconciliation from Payment Form:</strong>
+					            </i>
+					            <br/>
+                                <span style="margin-left: 6%; font-size: 20px;">
+                                Enables a checkbox <strong>Pay Invoices/Bills</strong> once a partner is selected. Displays a list of open invoices/bills related to that partner for easy selection.
+                                </span>
+					        </li>
+					        <li>
+					            <i class="fa fa-check" style="color: #252E64;">
+					                <strong style="color: #252E64;">Write-Off Handling:</strong>
+					            </i>
+					            <br/>
+                                <span style="margin-left: 6%; font-size: 20px;">
+                                    When enabled, shows additional fields:
+                                </span>
+                                <ul style="margin-left: 6%;">
+                                    <li style="font-size: 20px;">Write-off Amount</li>
+                                    <li style="font-size: 20px;">Write-off Account</li>
+                                    <li style="font-size: 20px;">Write-off Notes</li>
+                                </ul>
+                                <span style="margin-left: 6%; font-size: 20px;">
+                                    Allows users to partially pay invoices and write off the remaining balance.
+                                </span>
+					        </li>
+					        <!-- 3 -->
+					        <li>
+					            <i class="fa fa-check" style="color: #252E64;">
+					                <strong style="color: #252E64;">Automatic Payment Amount Adjustment:</strong>    
+					            </i>
+					            <br/>
+                                <span style="margin-left: 6%; font-size: 20px;">
+                                    The <strong>Amount</strong> field auto-fills with the total due of selected invoices/bills. If a write-off amount is entered, it is subtracted from the total payment amount.
+                                </span>
+					        </li>
+					        <!-- 4 -->
+					        <li>
+					            <i class="fa fa-check" style="color: #252E64;">
+					                <strong style="color: #252E64;">Accurate Journal Entry Posting like odoo's default:</strong>
+					            </i>
+					            <br/>
+                                <span style="margin-left: 6%; font-size: 20px;">
+                                    On payment confirmation, journal entries are posted with:
+                                </span>
+                                <ul style="margin-left: 6%;">
+                                    <li style="font-size: 20px;">Payment Line</li>
+                                    <li style="font-size: 20px;">Receivable/Payable Line</li>
+                                    <li style="font-size: 20px;">Write-off Line (if applicable)</li>
+                                </ul>
+					        </li>
+					        <!-- 5 -->
+                            <li>
+                                <i class="fa fa-check" style="color: #252E64;">
+                                    <strong style="color: #252E64;">Reset to Draft Behavior:</strong>
+                                </i>
+                                <br/>
+                                <span style="margin-left: 6%; font-size: 20px;">
+                                    If the payment is reset to draft, the journal entry is updated to reflect only the base payment amount.
+                                </span>
+                            </li>
+                            <br/>
+                            <!-- 6 -->
+                            <li>
+                                <i class="fa fa-check" style="color: #252E64;">
+                                    <strong style="color: #252E64;">Fallback to Standard Flow:</strong>
+                                </i>
+                                <br/>
+                                <span style="margin-left: 6%; font-size: 20px;">
+                                    If the <strong>Pay Invoices/Bills</strong> option is not selected, the payment follows the standard Odoo process without reconciliation or write-off.
+                                </span>
+                            </li>
+					        
+					        
+                        </ul>
+				    </div>
+			    </div>
+		    </section>
+		    
+	        <section class="oe_container">
+			    <div class="oe_spaced">
+			        <h2 class="oe_slogan" style="font-size:30px;"><b><u>How It Works</u></b></h2>
+                    <div class="oe_bg_img">
+		                <p style="font-size:25px;text-align:center;color:#252E64;font-weight:bold;">
+		                    Pay Invoices option in Payment Form.
+                        </p>
+                        <p style="font-size:18px;text-align:left;">
+                            The <b>Pay Invoices</b> checkbox becomes visible on the payment form once a customer (partner) is selected.
+                        </p>
+                        <center>
+                            <img src="1.png" style="width:100%;border:5px solid #252E64;">
+                        </center>
+                        <br/><br/>
+                        <p style="font-size:25px;text-align:center;color:#252E64;font-weight:bold;">
+                            Invoice selection tree view and Write-off fields.
+                        </p>
+                        <p style="font-size:18px;text-align:left;">
+                            User tick <b>Pay Invoices</b> checkbox then visible Invoice selection tree view and Write-off fields.
+                        </p>
+                        <center>
+                            <img src="2.png" style="width:100%;border:5px solid #252E64;">
+                        </center>
+                        <br/><br/>
+                        
+                        <p style="font-size:25px;text-align:center;color:#252E64;font-weight:bold;">
+                            User can open and check Invoice details in payment form.
+                        </p>
+                        <p style="font-size:18px;text-align:left;">
+                            User click on button of Unpaid Inovice tree view, able to see whole invoice details.
+                        </p>
+                        <center>
+                            <img src="2_1.png" style="width:100%;border:5px solid #252E64;">
+                        </center>
+                        <br/><br/>
+                        
+                        <p style="font-size:25px;text-align:center;color:#252E64;font-weight:bold;">
+                            Auto Adjust Payment Amount.
+                        </p>
+                        <p style="font-size:18px;text-align:left;">
+                            When the user selects one or more <b>invoices</b> and enters a <b>Write-off Amount</b>, the system automatically calculates and sets the <b>Payment Amount</b>.
+                            <!--User select <b>Invoices</b> and set <b>Writeoff Amount</b> based on calculation auto set value in Payment Amount.-->
+                            
+                            <p style="font-size:18px;text-align:left;">
+                                <b style="color:red;">Formula : </b><br/>
+                                <span style="font-size:18px;text-align:left;color:#252E64;">Payment Amount = (Total of Selected Invoices) - (Writeoff Amount).</span>
+                                <br/>
+                                <span style="font-size:18px;text-align:left;color:#252E64;">3000 = (2300 + 1150) - (450)</span>
+                                
+                            </p>
+                        </p>
+                        <center>
+                            <img src="3.png" style="width:100%;border:5px solid #252E64;">
+                        </center>
+                        <br/><br/>
+                        <p style="font-size:25px;text-align:center;color:#252E64;font-weight:bold;">
+                            Writeoff Account warning.
+                        </p>
+                        <p style="font-size:18px;text-align:left;">
+                            If the user selects <b>invoices</b> and enters a <b>Write-off Amount</b>, but does <b>not specify a Write-off Account</b>, the system will prevent confirmation and raise a warning.
+                        </p>
+                        <center>
+                            <img src="4.png" style="width:100%;border:5px solid #252E64;">
+                        </center>
+                        <br/><br/>
+                        <p style="font-size:25px;text-align:center;color:#252E64;font-weight:bold;">
+                           <br/><b style="color:red;">Case 1 : </b>Confirm Payment with all Writeoff details.
+                        </p>
+                        <p style="font-size:18px;text-align:left;">
+                            When the user provides all write-off details (i.e., Write-off Amount, Write-off Account, and optionally Write-off Notes) and clicks <b>Confirm</b>, the system Creates a complete and accurate <b>journal entry</b> and the selected <b>invoices as paid</b>.
+                        </p>
+                        <center>
+                            <img src="5.png" style="width:100%;border:5px solid #252E64;">
+                            <img src="5_1.png" style="width:100%;border:5px solid #252E64;">
+                        </center>
+                        <br/>
+                        <p style="font-size:18px;text-align:center;color:#252E64;">
+                            Paid Selected Invoices.
+                        </p>
+                        <center>
+                            <img src="5_2.png" style="width:100%;border:5px solid #252E64;">
+                            <img src="5_3.png" style="width:100%;border:5px solid #252E64;">
+                        </center>
+                        <br/><br/>
+                        <p style="font-size:25px;text-align:center;color:#252E64;font-weight:bold;">
+                            Journal Entry.
+                        </p>
+                        <p style="font-size:18px;text-align:left;">
+                            Journal entry is created following Odoo’s default behavior.
+                            If a <b>write-off account</b>, <b>write-off amount</b>, and <b>write-off note</b> are entered on the <b>payment form</b>, these values are <b>applied to the write-off line</b> in the generated <b>journal entry</b>.
+                            
+                        </p>
+                        <center>
+                            <img src="6.png" style="width:100%;border:5px solid #252E64;">
+                        </center>
+                        <br/><br/>
+
+                        <p style="font-size:25px;text-align:center;color:#252E64;font-weight:bold;">
+                            Rest to Draft Payment.
+                        </p>
+                        <p style="font-size:18px;text-align:left;">
+                            If the payment is reset to draft, the <b>journal entry</b> is <b>updated</b> to reflect only the <b>base payment amount</b> and selected <b>invoices unpaid</b>.
+                        </p>
+                        <center>
+                            <img src="7.png" style="width:100%;border:5px solid #252E64;">
+                            <img src="7_1.png" style="width:100%;border:5px solid #252E64;">
+                        </center>
+                        <br/>
+                        <p style="font-size:18px;text-align:center;color:#252E64;">
+                            Write-off line remove in Journal Entry when Payment move to draft.
+                        </p>
+                        <center>
+                            <img src="7_1.png" style="width:100%;border:5px solid #252E64;">
+                        </center>
+                        <br/><br/>
+                        <p style="font-size:25px;text-align:center;color:#252E64;font-weight:bold;">
+                            <b style="color:red;">Case 2 : </b>Confirm Payment without Write-off Details.
+                        </p>
+                        <p style="font-size:18px;text-align:left;">
+                            When the user does not enter any write-off details and simply selects invoices, then clicks <b>Confirm</b>, the system creates a complete and accurate <b>journal entry</b> and marks the selected <b>invoices as paid</b> without applying any write-off.
+                        </p>
+                        <center>
+                            <img src="8.png" style="width:100%;border:5px solid #252E64;">
+                        </center>
+                        <br/>
+                        <p style="font-size:18px;text-align:center;color:#252E64;">
+                            Journal Entry when Write-off Details not assign in Payment.
+                        </p>
+                        <center>
+                            <img src="8_1.png" style="width:100%;border:5px solid #252E64;">
+                        </center>
+                        <br/><br/>
+                        <p style="font-size:25px;text-align:center;color:#252E64;font-weight:bold;">
+                            Same thing work in Vendor payments too.
+                        </p>
+                        <center>
+                            <img src="9.png" style="width:100%;border:5px solid #252E64;">
+                        </center>
+                    </div>
+                </div>
+		    </section>
+		    <!-- -->
+		    <!-- -->
+		    <section class="oe_container ">
+			    <div class="oe_spaced">
+				    <h2 class="oe_slogan" style="font-size:30px;"><b><u>Free Support</u></b></h2>
+				    <div style="font-size: 16px;">
+					    <ul class="list-unstyled mr32 ml32">
+                            <center>You will get <b>100 Days</b> free support incase any bugs or issue (Except data recovery).</center><br/>
+                        </ul>
+				    </div>
+			    </div>
+		    </section>
+		    
+		    <section class="oe_container ">
+				<div class="oe_spaced">
+					<h2 class="oe_slogan" style="font-size:30px;"><b>Recommended  &amp; Suggested Apps</b></h2>
+					<div class="row" style="margin-top:1rem">
+				        <div class="col-md-4 mb-3">
+					        <div class="shadow rounded" style="text-align:center">
+						        <div>
+							        <a href="https://apps.odoo.com/apps/modules/18.0/bank_stmt_omax/" title="Bank Statement & Reconciliation" target='_blank'>
+								        <img class="rounded" src="//apps.odoocdn.com/apps/assets/18.0/bank_stmt_omax/banner.png" width="100%">
+							        </a>
+						        </div>
+					        </div>
+				        </div>
+				        <div class="col-md-4 mb-3">
+					        <div class="shadow rounded" style="text-align:center">
+						        <div>
+							        <a href="https://apps.odoo.com/apps/modules/18.0/reconcile_outstanding_payment_omax/" title="Reconcile Outstanding Payment with Invoices, Bills, Credit Notes, Refunds" target='_blank'>
+								        <img class="rounded" src="//apps.odoocdn.com/apps/assets/18.0/reconcile_outstanding_payment_omax/banner.png" width="100%">
+							        </a>
+						        </div>
+					        </div>
+				        </div>
+				        <div class="col-md-4 mb-3">
+					        <div class="shadow rounded" style="text-align:center">
+						        <div>
+							        <a href="https://apps.odoo.com/apps/modules/18.0/payment_by_invoice_lines_advanced_omax/" title="Partial Payment by Invoice/Bill Lines Advanced" target='_blank'>
+								        <img class="rounded" src="//apps.odoocdn.com/apps/assets/18.0/payment_by_invoice_lines_advanced_omax/banner.png" width="100%">
+							        </a>
+						        </div>
+					        </div>
+				        </div>
+				        <div class="col-md-4 mb-3">
+					        <div class="shadow rounded" style="text-align:center">
+						        <div>
+							        <a href="https://apps.odoo.com/apps/modules/18.0/payment_by_invoice_lines_omax/" title="Partial Payment by Selected Invoice/Bill lines" target='_blank'>
+								        <img class="rounded" src="//apps.odoocdn.com/apps/assets/18.0/payment_by_invoice_lines_omax/banner.png" width="100%">
+							        </a>
+						        </div>
+					        </div>
+				        </div>
+				        
+				        <div class="col-md-4 mb-3">
+					        <div class="shadow rounded" style="text-align:center">
+						        <div>
+							        <a href="https://apps.odoo.com/apps/modules/18.0/partial_payment_omax/" title="Partial Payment Reconciliation and Unreconciliation" target='_blank'>
+								        <img class="rounded" src="//apps.odoocdn.com/apps/assets/18.0/partial_payment_omax/banner.png" width="100%">
+							        </a>
+						        </div>
+					        </div>
+				        </div>
+				        
+				        <div class="col-md-4 mb-3">
+					        <div class="shadow rounded" style="text-align:center">
+						        <div>
+							        <a href="https://apps.odoo.com/apps/modules/17.0/auto_reconcile_credit_notes/" title="Partial Payment Reconciliation and Unreconciliation" target='_blank'>
+								        <img class="rounded" src="//apps.odoocdn.com/apps/assets/17.0/auto_reconcile_credit_notes/banner.png" width="100%">
+							        </a>
+						        </div>
+					        </div>
+				        </div>
+				        <div class="col-md-4 mb-3">
+					        <div class="shadow rounded" style="text-align:center">
+						        <div>
+							        <a href="https://apps.odoo.com/apps/modules/18.0/payment_processing_omax/" title="Partial Payment Reconciliation and Unreconciliation" target='_blank'>
+								        <img class="rounded" src="//apps.odoocdn.com/apps/assets/18.0/payment_processing_omax/banner.png" width="100%">
+							        </a>
+						        </div>
+					        </div>
+				        </div>
+			        </div>
+		        </div>
+	        </section>
+	    
+		    <section class="oe_container ">
+			    <div class="oe_spaced">
+				    <h2 class="oe_slogan" style="font-size:30px;"><b><u>Get In Touch</u></b></h2>
+				    <div style="border-top:#252E64 solid 10px;"></div>
+				    <div class="oe_slogan" style="margin-top:10px !important;">
+						<a href="https://www.omaxinformatics.com" target="new">
+                            <img src="omax_logo_withoutbg.png" style="width: 120px; margin-bottom: 0px;" class="center-block">
+							<h2 class="mt-1" style="font-weight: bold;"><span style="color:#222e63;">OMAX</span> <span style="color:#0e9cd7;">INF</span><span style="color:#222e63;">O</span><span style="color:#0e9cd7;">R</span><span style="color:#222e63;">M</span><span style="color:#0e9cd7;">ATICS</span></h2>
+                        </a>
+                    </div>
+                    <div class="oe_slogan" style="margin-top:10px !important;">
+                        <a class="btn btn-primary btn-lg mt8" style="color: #FFFFFF !important; background-color: #252E64;"
+                           target="new" href="https://www.youtube.com/@omaxinformatics7137/videos">
+                            <i class="fa fa-check-square"></i> Video Tutorial
+                        </a>
+                        <a class="btn btn-primary btn-lg mt8" style="color: #FFFFFF !important; background-color: #252E64;"
+                           target="new"
+                           href="https://apps.odoo.com/apps/modules/browse?order=Best+Sellers&search=OMAX+Informatics">
+                            <i class="fa fa-binoculars"></i> More Apps
+                        </a>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table" cellpadding="0" cellspacing="0" border="0" width="100%">
+                            <tbody>
+		                        <tr>
+			                        <td colspan="2" style="font-size:16px; font-weight:bold;" width="100%" align="center">
+			                            <span class="fa fa-certificate fa-1x"> Our Odoo Services</span>
+			                        </td>
+		                        </tr>
+					        </tbody>
+                        </table>
+                        <table class="table" cellpadding="0" cellspacing="0" border="0" width="100%">
+					        <tbody>
+						        <tr>
+							        <td style="background-color: #252E64; color:white; border-radius: 15px; font-weight: bold;"><center><span class="fa fa-globe fa-1x"> Implementation</span></center></td>
+							        <td style="background-color: #252E64; color:white; border-radius: 15px; font-weight: bold;"><center><span class="fa fa-globe fa-1x"> Development</span></center></td>
+							        <td style="background-color: #252E64; color:white; border-radius: 15px; font-weight: bold;"><center><span class="fa fa-globe fa-1x"> Customization</span></center></td>
+							        <td style="background-color: #252E64; color:white; border-radius: 15px; font-weight: bold;"><center><span class="fa fa-globe fa-1x"> Migration</span></center></td>
+						        </tr>
+						        <tr>
+							        <td style="background-color: #252E64; color:white; border-radius: 15px; font-weight: bold;"><center><span class="fa fa-globe fa-1x"> Integration</span></center></td>
+							        <td style="background-color: #252E64; color:white; border-radius: 15px; font-weight: bold;"><center><span class="fa fa-globe fa-1x"> Training</span></center></td>
+							        <td style="background-color: #252E64; color:white; border-radius: 15px; font-weight: bold;"><center><span class="fa fa-globe fa-1x"> Support</span></center></td>
+							        <td style="background-color: #252E64; color:white; border-radius: 15px; font-weight: bold;"><center><span class="fa fa-globe fa-1x"> Hire Developer</span></center></td>
+						        </tr>
+					        </tbody>
+				        </table>
+                        <br/>
+                        <table class="table" cellpadding="0" cellspacing="0" border="0" width="100%">
+                            <tbody>
+		                        <tr>
+			                        <td colspan="2" style="font-size:16px; font-weight:bold;" width="100%" align="center">
+			                            <span class="fa fa-certificate fa-1x"> For support, query and question contact us.</span>
+			                        </td>
+		                        </tr>
+					        </tbody>
+                        </table>
+                        <table class="table" cellpadding="0" cellspacing="0" border="0" width="100%">
+					        <tbody>
+						        <tr>
+							        <td style="background-color: #252E64; color:white; border-radius: 15px; font-weight: bold;"><center><span class="fa fa-envelope fa-1x"> contact@omaxinformatics.com</span></center></td>
+							        <td style="background-color: #252E64; color:white; border-radius: 15px; font-weight: bold;"><center><span class="fa fa-globe fa-1x"> www.omaxinformatics.com</span></center></td>
+						        </tr>
+					        </tbody>
+				        </table>
+                    </div>
+                    <br/>
+                    <div style="border-top:#252E64 solid 10px;"></div>
+			    </div>
+		    </section>
+		    <section class="oe_container ">
+			    <div class="oe_spaced">
+				    <h2 class="oe_slogan" style="font-size:30px; color:#252E64"><b>Thank you for visiting</b></h2>
+			    </div>
+		    </section>
+		</div>
+	</div>
+</body>
+</html>

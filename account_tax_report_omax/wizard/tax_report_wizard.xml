@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+    
+        <record id="account_view_excel_tax_report_form" model="ir.ui.view">
+            <field name="name">account.excel.tax.report.form</field>
+            <field name="model">account.excel.tax.report</field>
+            <field name="arch" type="xml">
+                <form string="Excel Report">
+                    <p><h4>Click on the report file name to download the excel file.</h4></p>
+                    <group>
+                    </group>
+                    <group>
+                        <field name="excel_file" readonly="1" filename="file_name"/>
+                        <field name="file_name" invisible="1"/>
+                    </group>
+                    <footer>
+                      <button string="Close" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+        
+        <record id="view_tax_report_wizard_account" model="ir.ui.view">
+            <field name="name">tax.report.wizard.account.form</field>
+            <field name="model">tax.report.wizard.account</field>
+            <field name="arch" type="xml">
+                <form string="Tax Report">
+                    <group>
+                        <group>
+                            <field name="start_date"/>
+						    <field name="tax_type"/>
+						    <field name="report_format"/>
+						    <field name="detailed_report"/>
+					    </group>
+					    <group>
+							<field name="end_date"/>
+							<field name="company_ids" widget="many2many_tags" options="{'no_create': True}"/>
+							<field name="report_for"/>
+							
+							<field name="partner_ids" widget="many2many_tags" domain="partner_ids_domain" invisible="report_for != 'partners'" options="{'no_create': True}"/>
+                            <field name="product_category_ids" widget="many2many_tags" invisible="report_for != 'productCategory'" options="{'no_create': True}"/>
+                            <field name="product_ids" widget="many2many_tags" domain="generic_domain" invisible="report_for != 'products'" options="{'no_create': True}"/>
+                            <field name="sales_team_ids" widget="many2many_tags" domain="generic_domain" invisible="report_for != 'sales_team'" options="{'no_create': True}"/>
+                            <field name="salesperson_ids" widget="many2many_tags" domain="sales_person_ids_domain" invisible="report_for != 'sales_person'" options="{'no_create': True}"/>
+                            <field name="tax_ids" widget="many2many_tags" domain="tax_ids_domain" invisible="report_for != 'taxes'" options="{'no_create': True}"/>
+                            <field name="sales_person_ids_domain" invisible="True"/>
+                            <field name="partner_ids_domain" invisible="True"/>
+                            <field name="generic_domain" invisible="True"/>
+					        <field name="tax_ids_domain" invisible="True"/>
+					    </group>
+					</group>
+                    <footer>
+                        <button string="Print" name="print_report" type="object" class="oe_highlight"/>
+                        <button string="Discard" class="oe_link" special="cancel" />
+                    </footer>
+               </form>
+            </field>
+        </record>
+        
+        <record id="action_tax_report_wizard_account" model="ir.actions.act_window">
+            <field name="name">Tax Report</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">tax.report.wizard.account</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_tax_report_wizard_account"/>
+            <field name="target">new</field>
+        </record>
+
+		<!-- Menu antiguo ocultado - ahora se usan los menús separados de ventas y compras -->
+		<!--
+		<menuitem action="action_tax_report_wizard_account"
+				  id="menu_tax_report"
+				  parent="account.account_reports_management_menu"
+        		  name = "Tax Report" sequence="2"
+        		  />
+		-->
+    </data>
+</odoo>

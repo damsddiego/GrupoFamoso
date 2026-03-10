@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_invoice_salesperson_document">
+        <t t-call="web.html_container">
+            <t t-set="company" t-value="company"/>
+            <t t-call="web.external_layout">
+                <div class="page">
+                    <!-- Report Title -->
+                    <div class="text-center">
+                        <h2>Invoice Report by Salesperson</h2>
+                        <p>
+                            <strong>Companies:</strong>
+                            <span t-esc="data.get('company_names', company.name)"/>
+                        </p>
+                        <p>
+                            <strong>Period:</strong>
+                            <span t-esc="data.get('date_from')"/> to <span t-esc="data.get('date_to')"/>
+                        </p>
+                        <p>
+                            <strong>Total Invoices:</strong> <span t-esc="data.get('invoice_count', 0)"/>
+                        </p>
+                    </div>
+
+                    <br/>
+
+                    <!-- Data by Salesperson -->
+                    <t t-foreach="data.get('data_by_salesperson', [])" t-as="sp_data">
+                        <!-- Salesperson Header -->
+                        <div style="background-color: #4472C4; color: white; padding: 8px; margin-top: 15px;">
+                            <h4 style="margin: 0; color: white;">
+                                <strong>Salesperson: <t t-esc="sp_data.get('salesperson_name')"/></strong>
+                            </h4>
+                        </div>
+
+                        <!-- Invoice Table -->
+                        <t t-set="show_company" t-value="data.get('companies_count', 1) &gt; 1"/>
+                        <table class="table table-sm table-bordered" style="font-size: 11px;">
+                            <thead>
+                                <tr style="background-color: #D9E2F3;">
+                                    <th>Invoice #</th>
+                                    <th>Date</th>
+                                    <th>Customer</th>
+                                    <th>VAT</th>
+                                    <th t-if="show_company">Company</th>
+                                    <th>Type</th>
+                                    <th class="text-end">Untaxed</th>
+                                    <th class="text-end">Tax</th>
+                                    <th class="text-end">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="sp_data.get('invoices', [])" t-as="inv">
+                                    <t t-set="row_style" t-value="'color: #666666; font-style: italic;' if inv.get('is_reversal_line') else ('color: red;' if inv.get('payment_state') == 'reversed' else '')"/>
+                                    <tr t-att-style="row_style">
+                                        <td><t t-esc="inv.get('number')"/></td>
+                                        <td><t t-esc="inv.get('date')"/></td>
+                                        <td><t t-esc="inv.get('partner')"/></td>
+                                        <td><t t-esc="inv.get('partner_vat')"/></td>
+                                        <td t-if="show_company"><t t-esc="inv.get('company', '')"/></td>
+                                        <td><t t-esc="inv.get('move_type')"/></td>
+                                        <td class="text-end">
+                                            <t t-esc="'{:,.2f}'.format(inv.get('amount_untaxed', 0))"/>
+                                        </td>
+                                        <td class="text-end">
+                                            <t t-esc="'{:,.2f}'.format(inv.get('amount_tax', 0))"/>
+                                        </td>
+                                        <td class="text-end">
+                                            <t t-esc="'{:,.2f}'.format(inv.get('amount_total', 0))"/>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                            <tfoot>
+                                <tr style="background-color: #E2EFDA; font-weight: bold;">
+                                    <td t-att-colspan="6 if show_company else 5" class="text-end">
+                                        <strong>Subtotal - <t t-esc="sp_data.get('salesperson_name')"/>:</strong>
+                                    </td>
+                                    <td class="text-end">
+                                        <t t-esc="'{:,.2f}'.format(sp_data.get('total_untaxed', 0))"/>
+                                    </td>
+                                    <td class="text-end">
+                                        <t t-esc="'{:,.2f}'.format(sp_data.get('total_tax', 0))"/>
+                                    </td>
+                                    <td class="text-end">
+                                        <t t-esc="'{:,.2f}'.format(sp_data.get('total'))"/>
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </t>
+
+                    <!-- Grand Total -->
+                    <br/>
+                    <table class="table table-sm" style="width: 50%; margin-left: auto;">
+                        <tr style="background-color: #FFC000; font-weight: bold; font-size: 13px;">
+                            <td class="text-end" style="padding: 10px;">
+                                <strong>GRAND TOTAL:</strong>
+                            </td>
+                            <td class="text-end" style="padding: 10px; width: 120px;">
+                                <t t-esc="'{:,.2f}'.format(data.get('grand_total_untaxed', 0))"/>
+                            </td>
+                            <td class="text-end" style="padding: 10px; width: 100px;">
+                                <t t-esc="'{:,.2f}'.format(data.get('grand_total_tax', 0))"/>
+                            </td>
+                            <td class="text-end" style="padding: 10px; width: 120px;">
+                                <t t-esc="'{:,.2f}'.format(data.get('grand_total', 0))"/>
+                            </td>
+                        </tr>
+                    </table>
+
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>

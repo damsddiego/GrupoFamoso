@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Extend Tree/List View -->
+    <record id="sale_report_view_tree_inherit" model="ir.ui.view">
+        <field name="name">sale.report.view.list.inherit</field>
+        <field name="model">sale.report</field>
+        <field name="inherit_id" ref="sale.sale_report_view_tree"/>
+        <field name="arch" type="xml">
+            <!-- Add salesperson_partner_id after user_id -->
+            <field name="user_id" position="after">
+                <field name="salesperson_partner_id" optional="show"/>
+            </field>
+        </field>
+    </record>
+
+    <!-- Extend Search View -->
+    <record id="view_order_product_search_inherit" model="ir.ui.view">
+        <field name="name">sale.report.search.inherit</field>
+        <field name="model">sale.report</field>
+        <field name="inherit_id" ref="sale.view_order_product_search"/>
+        <field name="arch" type="xml">
+            <!-- Add salesperson_partner_id as searchable field -->
+            <field name="user_id" position="after">
+                <field name="salesperson_partner_id"/>
+            </field>
+
+            <!-- Add group by option for salesperson partner -->
+            <filter name="User" position="after">
+                <filter string="Vendedor (Contacto)" name="salesperson_partner" context="{'group_by':'salesperson_partner_id'}"/>
+            </filter>
+        </field>
+    </record>
+
+    <!-- Extend Pivot View -->
+    <record id="view_order_product_pivot_inherit" model="ir.ui.view">
+        <field name="name">sale.report.pivot.inherit</field>
+        <field name="model">sale.report</field>
+        <field name="inherit_id" ref="sale.view_order_product_pivot"/>
+        <field name="arch" type="xml">
+            <!-- Make salesperson_partner_id available in pivot -->
+            <field name="team_id" position="after">
+                <field name="salesperson_partner_id" type="row"/>
+            </field>
+        </field>
+    </record>
+
+</odoo>

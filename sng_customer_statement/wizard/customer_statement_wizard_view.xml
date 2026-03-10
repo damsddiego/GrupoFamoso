@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_customer_statement_wizard_form" model="ir.ui.view">
+        <field name="name">sng.customer.statement.wizard.form</field>
+        <field name="model">sng.customer.statement.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Estado de Cuenta de Clientes">
+
+                <div class="alert alert-info" role="alert">
+                    <strong>Estado de Cuenta de Clientes</strong> — Seleccione los filtros y
+                    elija cómo desea ver el resultado.
+                    Las facturas con estado de tributación <em>"Rechazado"</em> se excluyen automáticamente.
+                </div>
+
+                <group string="Rango de Fechas">
+                    <group>
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                    </group>
+                </group>
+
+                <group string="Filtros de Entidades">
+                    <group>
+                        <field name="partner_ids" widget="many2many_tags"
+                               placeholder="Todos los clientes..."/>
+                        <field name="company_ids" widget="many2many_tags"
+                               groups="base.group_multi_company"/>
+                    </group>
+                    <group>
+                        <field name="salesperson_ids" widget="many2many_tags"
+                               placeholder="Todos los vendedores..."/>
+                        <field name="tag_ids" widget="many2many_tags"
+                               placeholder="Todas las etiquetas..."/>
+                    </group>
+                </group>
+
+                <group string="Opciones del Reporte">
+                    <group>
+                        <field name="report_mode" widget="radio"/>
+                        <field name="group_by"/>
+                        <field name="currency_display"/>
+                    </group>
+                    <group>
+                        <field name="include_credit_notes"/>
+                        <field name="show_draft_payments"/>
+                        <field name="only_with_balance"/>
+                    </group>
+                </group>
+
+                <!-- Sección descarga XLSX: visible solo tras generar Excel -->
+                <group string="Archivo Generado" invisible="not excel_file">
+                    <field name="excel_file" filename="excel_filename" widget="binary"/>
+                    <field name="excel_filename" invisible="True"/>
+                </group>
+
+                <footer>
+                    <button name="action_view_report"
+                            string="Ver en pantalla"
+                            type="object"
+                            class="btn-primary"
+                            icon="fa-desktop"/>
+                    <button name="action_print_pdf"
+                            string="Imprimir PDF"
+                            type="object"
+                            context="{'report_mode_ctx': report_mode}"
+                            class="btn-secondary"
+                            icon="fa-file-pdf-o"/>
+                    <button name="action_print_excel"
+                            string="Exportar XLSX"
+                            type="object"
+                            context="{'report_mode_ctx': report_mode}"
+                            class="btn-secondary"
+                            icon="fa-file-excel-o"/>
+                    <button string="Cancelar" class="btn-secondary" special="cancel"/>
+                </footer>
+
+            </form>
+        </field>
+    </record>
+
+    <record id="action_customer_statement_wizard" model="ir.actions.act_window">
+        <field name="name">Estado de Cuenta de Clientes</field>
+        <field name="res_model">sng.customer.statement.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_customer_statement_wizard_form"/>
+        <field name="target">new</field>
+        <field name="groups_id" eval="[(4, ref('sng_customer_statement.group_customer_statement_user'))]"/>
+    </record>
+
+</odoo>

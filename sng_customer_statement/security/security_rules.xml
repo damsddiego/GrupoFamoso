@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============================================================
+         CATEGORÍA DE MÓDULO
+         ============================================================ -->
+    <record id="module_category_customer_statement" model="ir.module.category">
+        <field name="name">Estado de Cuenta</field>
+        <field name="description">Permisos para el módulo Estado de Cuenta de Clientes</field>
+        <field name="sequence">100</field>
+    </record>
+
+    <!-- ============================================================
+         GRUPOS DE SEGURIDAD
+         Se definen ANTES del ir.model.access.csv (ver __manifest__.py).
+         ============================================================ -->
+
+    <!-- Grupo: Usuario — puede abrir wizard, ver pantalla, exportar PDF/XLSX -->
+    <record id="group_customer_statement_user" model="res.groups">
+        <field name="name">Ver Estado de Cuenta</field>
+        <field name="category_id" ref="module_category_customer_statement"/>
+        <field name="comment">
+            Puede abrir el wizard, generar el reporte en pantalla,
+            exportar PDF y XLSX de estado de cuenta de clientes.
+        </field>
+    </record>
+
+    <!-- Grupo: Manager — acceso completo, puede ver reportes de otros usuarios -->
+    <record id="group_customer_statement_manager" model="res.groups">
+        <field name="name">Administrar Estado de Cuenta</field>
+        <field name="category_id" ref="module_category_customer_statement"/>
+        <field name="implied_ids" eval="[(4, ref('group_customer_statement_user'))]"/>
+        <field name="comment">
+            Acceso completo: puede ver y eliminar reportes de cualquier usuario.
+            Implica automáticamente el grupo 'Ver Estado de Cuenta'.
+        </field>
+        <field name="users" eval="[(4, ref('base.user_admin'))]"/>
+    </record>
+
+    <!--
+         Las record rules (ir.rule) se definen en security/record_rules.xml,
+         cargado AL FINAL en __manifest__.py, después de que los modelos
+         customer.statement.report y customer.statement.report.line ya están
+         registrados en ir.model y sus external IDs existen.
+
+         Si se pusieran aquí, Odoo lanzaría:
+           ValueError: External ID not found: model_customer_statement_report
+         porque security_rules.xml se carga antes que los modelos Python
+         se inserten en la tabla ir.model durante un upgrade.
+    -->
+
+</odoo>

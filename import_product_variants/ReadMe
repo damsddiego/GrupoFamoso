@@ -1,0 +1,6 @@
+Date:- 08/07/2025
+Version:- 18.0.0.1
+    => Fixed the issue when i select the import_option as xls and click on the download sample file button its raise the Internal Server Error
+
+Version: 18.0.0.2 | 03/02/2026
+=> when import the product using Create & update option , using XLS & with barcode. system is giving type related error.

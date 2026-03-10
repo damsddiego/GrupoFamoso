@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_account_journal_form_inherit_sng_api" model="ir.ui.view">
+        <field name="name">account.journal.form.inherit.sng.api</field>
+        <field name="model">account.journal</field>
+        <field name="inherit_id" ref="account.view_account_journal_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='type']" position="after">
+                <field name="include_in_app"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

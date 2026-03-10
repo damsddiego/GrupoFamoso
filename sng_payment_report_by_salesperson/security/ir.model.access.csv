@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_payment_report_salesperson_user,payment.report.salesperson.user,model_payment_report_salesperson,account.group_account_user,1,0,0,0
+access_payment_report_salesperson_manager,payment.report.salesperson.manager,model_payment_report_salesperson,account.group_account_manager,1,0,0,0
+access_payment_report_salesperson_readonly,payment.report.salesperson.readonly,model_payment_report_salesperson,account.group_account_readonly,1,0,0,0

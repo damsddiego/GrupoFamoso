@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <record id="module_sales_commission_category" model="ir.module.category">
+            <field name="name">Sales Commission</field>
+        </record>
+        
+        <record id="group_sales_commission_user" model="res.groups">
+            <field name="name">User</field>
+            <field name="category_id" ref="sales_commission_omax.module_sales_commission_category"/>
+        </record>
+        
+        <record id="group_sales_commission_manager" model="res.groups">
+            <field name="name">Manager</field>
+            <field name="implied_ids" eval="[(4, ref('group_sales_commission_user'))]"/>
+            <field name="category_id" ref="sales_commission_omax.module_sales_commission_category"/>
+        </record>
+    </data>
+</odoo>

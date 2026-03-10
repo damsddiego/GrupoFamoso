@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_tax_report_wizard_purchases" model="ir.ui.view">
+            <field name="name">tax.report.wizard.purchases.form</field>
+            <field name="model">tax.report.wizard.purchases</field>
+            <field name="arch" type="xml">
+                <form string="Reporte de Impuestos de Compras">
+                    <group>
+                        <group>
+                            <field name="start_date"/>
+                            <field name="report_format"/>
+                            <field name="detailed_report"/>
+                        </group>
+                        <group>
+                            <field name="end_date"/>
+                            <field name="company_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                            <field name="report_for"/>
+
+                            <field name="partner_ids" widget="many2many_tags" domain="partner_ids_domain" invisible="report_for != 'partners'" options="{'no_create': True}"/>
+                            <field name="product_category_ids" widget="many2many_tags" invisible="report_for != 'productCategory'" options="{'no_create': True}"/>
+                            <field name="product_ids" widget="many2many_tags" domain="generic_domain" invisible="report_for != 'products'" options="{'no_create': True}"/>
+                            <field name="tax_ids" widget="many2many_tags" domain="tax_ids_domain" invisible="report_for != 'taxes'" options="{'no_create': True}"/>
+                            <field name="partner_ids_domain" invisible="True"/>
+                            <field name="generic_domain" invisible="True"/>
+                            <field name="tax_ids_domain" invisible="True"/>
+                        </group>
+                    </group>
+                    <footer>
+                        <button string="Generar Reporte" name="print_report" type="object" class="oe_highlight"/>
+                        <button string="Cancelar" class="oe_link" special="cancel" />
+                    </footer>
+               </form>
+            </field>
+        </record>
+
+        <record id="action_tax_report_wizard_purchases" model="ir.actions.act_window">
+            <field name="name">Reporte de Impuestos de Compras</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">tax.report.wizard.purchases</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_tax_report_wizard_purchases"/>
+            <field name="target">new</field>
+        </record>
+
+        <menuitem action="action_tax_report_wizard_purchases"
+                  id="menu_tax_report_purchases"
+                  parent="account.account_reports_management_menu"
+                  name="Reporte Impuestos - Compras"
+                  sequence="3"/>
+    </data>
+</odoo>

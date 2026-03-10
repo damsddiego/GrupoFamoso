@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_inherit" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.auto.discount</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="account.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//app[@name='account']" position="inside">
+                <block title="Descuentos Automáticos" name="auto_discount_fields_setting_container">
+                    <setting id="auto_discount_fields" string="Auto-llenado de Campos de Descuento"
+                             help="Activa el llenado automático de campos de descuento en facturas">
+                        <field name="enable_auto_discount_fields"/>
+                        <div class="content-group" invisible="not enable_auto_discount_fields">
+                            <div class="row mt16">
+                                <label for="auto_discount_code_id" string="Código de Descuento" class="col-lg-3 o_light_label"/>
+                                <field name="auto_discount_code_id" placeholder="Seleccione un código de descuento"/>
+                            </div>
+                            <div class="row mt16">
+                                <label for="auto_discount_note" string="Nota de Descuento" class="col-lg-3 o_light_label"/>
+                                <field name="auto_discount_note" placeholder="Ej: Promo, Descuento comercial, etc."/>
+                            </div>
+                        </div>
+                    </setting>
+                </block>
+            </xpath>
+        </field>
+    </record>
+</odoo>

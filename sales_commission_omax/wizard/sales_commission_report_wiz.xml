@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <!-- Wizard Form view -->
+        <record id="sales_commission_report_wiz_form" model="ir.ui.view">
+            <field name="name">sales.commission.report.wiz.form</field>
+            <field name="model">sales.commission.report.wiz</field>
+            <field name="arch" type="xml">
+                <form string="Create Bill">
+                    <group>
+                        <group>
+                            <field name="start_date"/>
+                            <field name="company_id" invisible="1"/>
+                            <field name="salesperson_ids" widget="many2many_tags"/>
+                        </group>
+                        <group>
+                            <field name="end_date"/>
+                        </group>
+                    </group>
+                    <group name="commission_type" string="Commission Type">
+                        <group>
+                            <field name="commission_type_1"/>
+                            <field name="commission_type_2"/>
+                            <field name="commission_type_3"/>
+                        </group>
+                        <group>
+                            <field name="partner_ids" widget="many2many_tags" invisible="commission_type_2 != True"/>
+                        </group>
+                    </group>
+	                <footer>
+                        <button string='PDF Report' name="print_pdf_report" type="object" class="btn-primary"/>
+                        <button string='Excel Report' name="print_excel_report" type="object" class="btn-primary"/>
+                        <!-- confirm="Are you sure you want to Create Bill ?"-->
+                        <button string="Cancel" class="btn-default" special="cancel"/>
+	                </footer>
+               </form>
+            </field>
+        </record>
+        
+        <record id="action_sales_commission_report_wizard" model="ir.actions.act_window">
+            <field name="name">Sales Commission Report</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">sales.commission.report.wiz</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="sales_commission_report_wiz_form"/>
+            <field name="target">new</field>
+        </record>
+        
+		<menuitem action="action_sales_commission_report_wizard"
+		    id="menu_action_sales_commission_report_wiz"
+		    parent="sale.menu_sale_report" 
+		    name = "Sales Commission Report"
+		    groups="sales_commission_omax.group_sales_commission_manager"
+		    sequence="5"
+		/>
+        
+    </data>
+</odoo>

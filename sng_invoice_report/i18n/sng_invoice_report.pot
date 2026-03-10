@@ -1,0 +1,326 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-03-09 00:00+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. module: sng_invoice_report
+#: model:ir.actions.act_window,name:sng_invoice_report.action_invoice_report_wizard
+#: model:ir.actions.report,name:sng_invoice_report.action_report_invoice_salesperson
+#: model:ir.model,name:sng_invoice_report.model_report_sng_invoice_report_report_invoice_salesperson_document
+#: model:ir.ui.menu,name:sng_invoice_report.menu_invoice_report_wizard
+#: model_terms:ir.ui.view,arch_db:sng_invoice_report.view_invoice_report_wizard_form
+msgid "Invoice Report by Salesperson"
+msgstr ""
+
+#. module: sng_invoice_report
+#: model:ir.model,name:sng_invoice_report.model_invoice_report_wizard
+msgid "Invoice Report by Salesperson Wizard"
+msgstr ""
+
+#. module: sng_invoice_report
+#: model:ir.model.fields,field_description:sng_invoice_report.field_invoice_report_wizard__date_from
+msgid "Date From"
+msgstr ""
+
+#. module: sng_invoice_report
+#: model:ir.model.fields,field_description:sng_invoice_report.field_invoice_report_wizard__date_to
+msgid "Date To"
+msgstr ""
+
+#. module: sng_invoice_report
+#: model:ir.model.fields,field_description:sng_invoice_report.field_invoice_report_wizard__company_ids
+#: model_terms:ir.ui.view,arch_db:sng_invoice_report.view_invoice_report_wizard_form
+msgid "Companies"
+msgstr ""
+
+#. module: sng_invoice_report
+#: model:ir.model.fields,help:sng_invoice_report.field_invoice_report_wizard__company_ids
+msgid "Select companies to include in the report. Limited to your allowed companies."
+msgstr ""
+
+#. module: sng_invoice_report
+#: model_terms:ir.ui.view,arch_db:sng_invoice_report.view_invoice_report_wizard_form
+msgid "Select companies (limited to your access)..."
+msgstr ""
+
+#. module: sng_invoice_report
+#: model:ir.model.fields,field_description:sng_invoice_report.field_invoice_report_wizard__salesperson_ids
+msgid "Salespersons"
+msgstr ""
+
+#. module: sng_invoice_report
+#: model_terms:ir.ui.view,arch_db:sng_invoice_report.view_invoice_report_wizard_form
+msgid "Salesperson"
+msgstr ""
+
+#. module: sng_invoice_report
+#: model:ir.model.fields,help:sng_invoice_report.field_invoice_report_wizard__salesperson_ids
+msgid "Leave empty to include all salespersons"
+msgstr ""
+
+#. module: sng_invoice_report
+#: model_terms:ir.ui.view,arch_db:sng_invoice_report.view_invoice_report_wizard_form
+msgid "All salespersons if empty..."
+msgstr ""
+
+#. module: sng_invoice_report
+#: model:ir.model.fields,field_description:sng_invoice_report.field_invoice_report_wizard__invoice_type
+msgid "Invoice Type"
+msgstr ""
+
+#. module: sng_invoice_report
+#: model:ir.model.fields.selection,name:sng_invoice_report.selection__invoice_report_wizard__invoice_type__out_invoice
+msgid "Customer Invoices"
+msgstr ""
+
+#. module: sng_invoice_report
+#: model:ir.model.fields.selection,name:sng_invoice_report.selection__invoice_report_wizard__invoice_type__out_refund
+msgid "Customer Credit Notes"
+msgstr ""
+
+#. module: sng_invoice_report
+#: model:ir.model.fields.selection,name:sng_invoice_report.selection__invoice_report_wizard__invoice_type__all
+msgid "All Customer Documents"
+msgstr ""
+
+#. module: sng_invoice_report
+#: model:ir.model.fields,field_description:sng_invoice_report.field_invoice_report_wizard__payment_status
+msgid "Payment Status"
+msgstr ""
+
+#. module: sng_invoice_report
+#: model:ir.model.fields.selection,name:sng_invoice_report.selection__invoice_report_wizard__payment_status__all
+msgid "All"
+msgstr ""
+
+#. module: sng_invoice_report
+#: model:ir.model.fields.selection,name:sng_invoice_report.selection__invoice_report_wizard__payment_status__not_paid
+msgid "Not Paid"
+msgstr ""
+
+#. module: sng_invoice_report
+#: model:ir.model.fields.selection,name:sng_invoice_report.selection__invoice_report_wizard__payment_status__in_payment
+msgid "In Payment"
+msgstr ""
+
+#. module: sng_invoice_report
+#: model:ir.model.fields.selection,name:sng_invoice_report.selection__invoice_report_wizard__payment_status__paid
+msgid "Paid"
+msgstr ""
+
+#. module: sng_invoice_report
+#: model:ir.model.fields.selection,name:sng_invoice_report.selection__invoice_report_wizard__payment_status__partial
+msgid "Partially Paid"
+msgstr ""
+
+#. module: sng_invoice_report
+#: model:ir.model.fields.selection,name:sng_invoice_report.selection__invoice_report_wizard__payment_status__reversed
+msgid "Reversed"
+msgstr ""
+
+#. module: sng_invoice_report
+#: model:ir.model.fields,field_description:sng_invoice_report.field_invoice_report_wizard__excel_file
+msgid "Excel File"
+msgstr ""
+
+#. module: sng_invoice_report
+#: model:ir.model.fields,field_description:sng_invoice_report.field_invoice_report_wizard__excel_filename
+msgid "Excel Filename"
+msgstr ""
+
+#. module: sng_invoice_report
+#. odoo-python
+#: code:addons/sng_invoice_report/wizard/invoice_report_wizard.py:0
+msgid "'Date From' must be earlier than 'Date To'."
+msgstr ""
+
+#. module: sng_invoice_report
+#. odoo-python
+#: code:addons/sng_invoice_report/wizard/invoice_report_wizard.py:0
+msgid "No invoices found with the selected filters."
+msgstr ""
+
+#. module: sng_invoice_report
+#. odoo-python
+#: code:addons/sng_invoice_report/wizard/invoice_report_wizard.py:0
+msgid "The 'xlsxwriter' Python library is required. Please install it with: pip install xlsxwriter"
+msgstr ""
+
+#. module: sng_invoice_report
+#. odoo-python
+#: code:addons/sng_invoice_report/wizard/invoice_report_wizard.py:0
+msgid "Invoice Report: %(date_from)s to %(date_to)s"
+msgstr ""
+
+#. module: sng_invoice_report
+#. odoo-python
+#: code:addons/sng_invoice_report/wizard/invoice_report_wizard.py:0
+msgid "Invoice Report"
+msgstr ""
+
+#. module: sng_invoice_report
+#. odoo-python
+#: code:addons/sng_invoice_report/wizard/invoice_report_wizard.py:0
+msgid "%(companies)s - From %(date_from)s to %(date_to)s"
+msgstr ""
+
+#. module: sng_invoice_report
+#. odoo-python
+#: code:addons/sng_invoice_report/wizard/invoice_report_wizard.py:0
+#: model_terms:ir.ui.view,arch_db:sng_invoice_report.report_invoice_salesperson_document
+msgid "Invoice #"
+msgstr ""
+
+#. module: sng_invoice_report
+#. odoo-python
+#: code:addons/sng_invoice_report/wizard/invoice_report_wizard.py:0
+#: model_terms:ir.ui.view,arch_db:sng_invoice_report.report_invoice_salesperson_document
+msgid "Date"
+msgstr ""
+
+#. module: sng_invoice_report
+#. odoo-python
+#: code:addons/sng_invoice_report/wizard/invoice_report_wizard.py:0
+#: model_terms:ir.ui.view,arch_db:sng_invoice_report.report_invoice_salesperson_document
+msgid "Customer"
+msgstr ""
+
+#. module: sng_invoice_report
+#. odoo-python
+#: code:addons/sng_invoice_report/wizard/invoice_report_wizard.py:0
+#: model_terms:ir.ui.view,arch_db:sng_invoice_report.report_invoice_salesperson_document
+msgid "VAT"
+msgstr ""
+
+#. module: sng_invoice_report
+#. odoo-python
+#: code:addons/sng_invoice_report/wizard/invoice_report_wizard.py:0
+#: model_terms:ir.ui.view,arch_db:sng_invoice_report.report_invoice_salesperson_document
+msgid "Company"
+msgstr ""
+
+#. module: sng_invoice_report
+#. odoo-python
+#: code:addons/sng_invoice_report/wizard/invoice_report_wizard.py:0
+#: model_terms:ir.ui.view,arch_db:sng_invoice_report.report_invoice_salesperson_document
+msgid "Type"
+msgstr ""
+
+#. module: sng_invoice_report
+#. odoo-python
+#: code:addons/sng_invoice_report/wizard/invoice_report_wizard.py:0
+msgid "Currency"
+msgstr ""
+
+#. module: sng_invoice_report
+#. odoo-python
+#: code:addons/sng_invoice_report/wizard/invoice_report_wizard.py:0
+#: model_terms:ir.ui.view,arch_db:sng_invoice_report.report_invoice_salesperson_document
+msgid "Untaxed"
+msgstr ""
+
+#. module: sng_invoice_report
+#. odoo-python
+#: code:addons/sng_invoice_report/wizard/invoice_report_wizard.py:0
+#: model_terms:ir.ui.view,arch_db:sng_invoice_report.report_invoice_salesperson_document
+msgid "Tax"
+msgstr ""
+
+#. module: sng_invoice_report
+#. odoo-python
+#: code:addons/sng_invoice_report/wizard/invoice_report_wizard.py:0
+#: model_terms:ir.ui.view,arch_db:sng_invoice_report.report_invoice_salesperson_document
+msgid "Total"
+msgstr ""
+
+#. module: sng_invoice_report
+#. odoo-python
+#: code:addons/sng_invoice_report/wizard/invoice_report_wizard.py:0
+msgid "Salesperson: %(name)s"
+msgstr ""
+
+#. module: sng_invoice_report
+#. odoo-python
+#: code:addons/sng_invoice_report/wizard/invoice_report_wizard.py:0
+msgid "Subtotal - %(name)s"
+msgstr ""
+
+#. module: sng_invoice_report
+#. odoo-python
+#: code:addons/sng_invoice_report/wizard/invoice_report_wizard.py:0
+msgid "GRAND TOTAL"
+msgstr ""
+
+#. module: sng_invoice_report
+#: model_terms:ir.ui.view,arch_db:sng_invoice_report.view_invoice_report_wizard_form
+msgid "Date Range"
+msgstr ""
+
+#. module: sng_invoice_report
+#: model_terms:ir.ui.view,arch_db:sng_invoice_report.view_invoice_report_wizard_form
+msgid "Filters"
+msgstr ""
+
+#. module: sng_invoice_report
+#: model_terms:ir.ui.view,arch_db:sng_invoice_report.view_invoice_report_wizard_form
+msgid "View on Screen"
+msgstr ""
+
+#. module: sng_invoice_report
+#: model_terms:ir.ui.view,arch_db:sng_invoice_report.view_invoice_report_wizard_form
+msgid "Download Excel"
+msgstr ""
+
+#. module: sng_invoice_report
+#: model_terms:ir.ui.view,arch_db:sng_invoice_report.view_invoice_report_wizard_form
+msgid "Print PDF"
+msgstr ""
+
+#. module: sng_invoice_report
+#: model_terms:ir.ui.view,arch_db:sng_invoice_report.view_invoice_report_wizard_form
+msgid "Cancel"
+msgstr ""
+
+#. module: sng_invoice_report
+#: model_terms:ir.ui.view,arch_db:sng_invoice_report.report_invoice_salesperson_document
+msgid "<strong>Companies:</strong>"
+msgstr ""
+
+#. module: sng_invoice_report
+#: model_terms:ir.ui.view,arch_db:sng_invoice_report.report_invoice_salesperson_document
+msgid "<strong>Period:</strong>"
+msgstr ""
+
+#. module: sng_invoice_report
+#: model_terms:ir.ui.view,arch_db:sng_invoice_report.report_invoice_salesperson_document
+msgid "<strong>Total Invoices:</strong>"
+msgstr ""
+
+#. module: sng_invoice_report
+#: model_terms:ir.ui.view,arch_db:sng_invoice_report.report_invoice_salesperson_document
+msgid "to"
+msgstr ""
+
+#. module: sng_invoice_report
+#: model_terms:ir.ui.view,arch_db:sng_invoice_report.report_invoice_salesperson_document
+msgid "Salesperson:"
+msgstr ""
+
+#. module: sng_invoice_report
+#: model_terms:ir.ui.view,arch_db:sng_invoice_report.report_invoice_salesperson_document
+msgid "Subtotal -"
+msgstr ""
+
+#. module: sng_invoice_report
+#: model_terms:ir.ui.view,arch_db:sng_invoice_report.report_invoice_salesperson_document
+msgid "<strong>GRAND TOTAL:</strong>"
+msgstr ""

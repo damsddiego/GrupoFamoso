@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Sales Commission Analysis Form View -->
+    <record id="sales_commission_analysis_view_form_omax" model="ir.ui.view">
+        <field name="name">sales.commission.analysis.form</field>
+        <field name="model">sales.commission.analysis</field>
+        <field name="arch" type="xml">
+            <form string="Sales Commission Analysis">
+                <sheet>
+                    <group>
+                        <group name="left">
+                            <field name="name"/>
+                            <field name="date"/>
+                            <field name="sales_person_id"/>
+                            <field name="move_id"/>
+                            <field name="sale_order_id"/>
+                            <field name="commission_type"/>
+                        </group>
+                        <group name="right">
+                            <field name="commission_id"/>
+                            <field name="product_id"/>
+                            <field name="partner_id"/>
+                            <field name="partner_type"/>
+                            <field name="category_id"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="commission_amount" widget="monetary"/>
+                        </group>
+                    </group>
+                    
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Sales Commission Analysis List View -->
+    <record id="sales_commission_analysis_view_list_omax" model="ir.ui.view">
+        <field name="name">sales.commission.analysis.list</field>
+        <field name="model">sales.commission.analysis</field>
+        <field name="arch" type="xml">
+            <list string="Sales Commission" name="sales_target_list">
+                <field name="name"/>
+                <field name="date"/>
+                <field name="sales_person_id"/>
+                <field name="move_id"/>
+                <field name="sale_order_id"/>
+                <field name="commission_type"/>
+                <field name="commission_id"/>
+                <field name="product_id"/>
+                <field name="partner_id"/>
+                <field name="partner_type" optional="hide"/>
+                <field name="category_id" optional="show"/>
+                <field name="currency_id" column_invisible="1"/>
+                <field name="commission_amount" widget="monetary"/>
+            </list>
+        </field>
+    </record>
+    
+    <!-- Sales Commission Analysis Search View -->
+    <record id="sales_target_search_omax" model="ir.ui.view">
+        <field name="name">Sales Commission Analysis - Search</field>
+        <field name="model">sales.commission.analysis</field>
+        <field name="arch" type="xml">
+            <search string="Sales Commission Analysis Search">
+                <field name="name"/>
+                <field name="sales_person_id"/>
+                <field name="move_id"/>
+                <field name="sale_order_id"/>
+                <field name="commission_type"/>
+                <field name="commission_id"/>
+                <field name="partner_id"/>
+                <group expand="0" string="Group By...">
+                    <filter string="Salesperson" name="salesperson" domain="[]" context="{'group_by':'sales_person_id'}"/>
+                    <filter string="Commission Type" name="commission_type" domain="[]" context="{'group_by':'commission_type'}"/>
+                    <filter string="Invoice" name="move_id" domain="[]" context="{'group_by':'move_id'}"/>
+                    <filter string="Sales Order" name="sale_order_id" domain="[]" context="{'group_by':'sale_order_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Sales Commission Analysis Action View -->
+    <record id="sales_commission_analysis_action_omax" model="ir.actions.act_window">
+        <field name="name">Sales Commission Analysis</field>
+        <field name="res_model">sales.commission.analysis</field>
+        <field name="view_mode">list,form</field>
+        <!--field name="domain">['|',('sale_order_id','!=', False), ('move_id','!=', False)]</field-->
+        <field name="domain">[]</field>
+        <field name="context">{'create': False,'edit': False}</field>
+    </record>
+
+    <!-- SALES Commission Analysis MENU -->
+     <menuitem
+        id="sales_commission_analysis_menu"
+        name="Sales Commission Analysis"
+		action="sales_commission_analysis_action_omax"
+        parent="sale.menu_sale_report"
+        groups="sales_commission_omax.group_sales_commission_manager"
+        sequence="4"/>
+</odoo>

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #34495e;
+            margin-top: 30px;
+        }
+        ul {
+            list-style-type: square;
+        }
+        .feature {
+            background-color: #ecf0f1;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .highlight {
+            background-color: #3498db;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <h1>📊 Payment Report by Salesperson</h1>
+
+    <div class="feature">
+        <p><strong>Reporte completo de pagos agrupado por vendedor con análisis detallado de tiempos de cobro.</strong></p>
+    </div>
+
+    <h2>🎯 Características Principales</h2>
+    <ul>
+        <li><span class="highlight">Vendedor</span> - Nombre del vendedor asignado a cada cliente</li>
+        <li><span class="highlight">Cliente</span> - Información completa del pagador</li>
+        <li><span class="highlight">Factura</span> - Número y fecha de la factura aplicada</li>
+        <li><span class="highlight">Monto sin Impuestos</span> - Base imponible de la factura</li>
+        <li><span class="highlight">Monto Pagado</span> - Cantidad recibida del pago</li>
+        <li><span class="highlight">Días para Pago</span> - Tiempo transcurrido desde emisión hasta cobro</li>
+    </ul>
+
+    <h2>📈 Vistas Disponibles</h2>
+    <ul>
+        <li><strong>Vista Lista:</strong> Detalle completo de cada pago</li>
+        <li><strong>Vista Pivot:</strong> Análisis multidimensional con totales dinámicos</li>
+        <li><strong>Vista Gráfico:</strong> Visualización gráfica de los datos</li>
+    </ul>
+
+    <h2>🔍 Filtros Predefinidos</h2>
+    <ul>
+        <li>Por período: Este Mes, Mes Anterior, Este Año</li>
+        <li>Por velocidad de pago:
+            <ul>
+                <li>Pago Rápido (≤ 30 días)</li>
+                <li>Pago Normal (31-60 días)</li>
+                <li>Pago Lento (> 60 días)</li>
+            </ul>
+        </li>
+        <li>Por fecha de pago o fecha de factura</li>
+    </ul>
+
+    <h2>📋 Agrupaciones</h2>
+    <ul>
+        <li>Por Vendedor</li>
+        <li>Por Cliente</li>
+        <li>Por Fecha/Mes de Pago</li>
+        <li>Por Compañía</li>
+    </ul>
+
+    <h2>⚙️ Requisitos</h2>
+    <p>El modelo <code>res.partner</code> debe tener el campo <code>assigned_salesperson_id</code> que vincula cada cliente con su vendedor asignado.</p>
+
+    <h2>🚀 Acceso</h2>
+    <p><strong>Contabilidad → Reportes → Pagos por Vendedor</strong></p>
+
+    <h2>📝 Notas</h2>
+    <ul>
+        <li>Solo muestra pagos confirmados (posted)</li>
+        <li>Solo pagos de entrada (inbound)</li>
+        <li>Solo facturas de cliente (out_invoice, out_refund)</li>
+        <li>Optimizado con vista SQL para mejor rendimiento</li>
+    </ul>
+
+    <hr style="margin: 40px 0;">
+    <p style="text-align: center; color: #7f8c8d;">
+        <strong>Desarrollado por SNG</strong><br>
+        Version 18.0.1.0.0
+    </p>
+</body>
+</html>

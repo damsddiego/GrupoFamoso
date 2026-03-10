@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ================================================================
+         VISTAS: customer.statement.report.line
+         ================================================================ -->
+
+    <!-- ── Vista LIST (tree) principal ── -->
+    <record id="view_customer_statement_line_list" model="ir.ui.view">
+        <field name="name">customer.statement.report.line.list</field>
+        <field name="model">customer.statement.report.line</field>
+        <field name="arch" type="xml">
+            <list string="Estado de Cuenta — Líneas"
+                  decoration-info="entry_type == 'credit_note'"
+                  decoration-muted="entry_type == 'payment_draft' or level &gt; 0"
+                  decoration-danger="residual > 0 and entry_type == 'invoice'"
+                  default_order="partner_id asc, sequence asc, date asc">
+
+                <field name="partner_id" optional="show"/>
+                <field name="date" optional="show"/>
+                <field name="entry_type" string="Tipo" optional="show" widget="badge"
+                       decoration-success="entry_type == 'payment_applied'"
+                       decoration-info="entry_type == 'credit_note'"
+                       decoration-warning="entry_type == 'payment_draft'"
+                       decoration-primary="entry_type == 'invoice'"/>
+                <field name="display_document" string="Documento" optional="show"/>
+                <field name="journal_id" optional="show"/>
+                <field name="reference" optional="hide"/>
+                <field name="date_due" optional="hide"/>
+                <field name="currency_id" optional="show"/>
+                <field name="amount_total" optional="show" sum="Total Facturado"/>
+                <field name="amount_applied" optional="show"/>
+                <field name="residual" optional="show" sum="Saldo Pendiente"/>
+                <!-- Campo informativo: nunca se suma al saldo contable -->
+                <field name="amount_pending_draft" optional="show" sum="Pendiente x Aplicar"/>
+                <field name="bucket_aging" optional="show"/>
+                <field name="bucket_0_30" optional="hide" sum="Venc. 0-30"/>
+                <field name="bucket_31_60" optional="hide" sum="Venc. 31-60"/>
+                <field name="bucket_61_90" optional="hide" sum="Venc. 61-90"/>
+                <field name="bucket_91_plus" optional="hide" sum="Venc. 91+"/>
+                <field name="legend" optional="show"/>
+                <field name="payment_state" optional="hide"/>
+                <field name="salesperson_id" optional="hide"/>
+                <field name="company_id" optional="hide" groups="base.group_multi_company"/>
+                <field name="level" optional="hide"/>
+                <field name="sequence" optional="hide"/>
+                <field name="parent_id" optional="hide"/>
+                <!-- Campos ocultos para navegación -->
+                <field name="move_id" optional="hide"/>
+                <field name="report_id" column_invisible="True"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ── Vista FORM de línea (solo lectura, para drill-down) ── -->
+    <record id="view_customer_statement_line_form" model="ir.ui.view">
+        <field name="name">customer.statement.report.line.form</field>
+        <field name="model">customer.statement.report.line</field>
+        <field name="arch" type="xml">
+            <form string="Línea de Estado de Cuenta" create="false" edit="false" delete="false">
+                <sheet>
+                    <group>
+                        <group string="Documento">
+                            <field name="partner_id"/>
+                            <field name="entry_type"/>
+                            <field name="display_document" readonly="1"/>
+                            <field name="document"/>
+                            <field name="reference"/>
+                            <field name="move_id"/>
+                            <field name="payment_id"/>
+                            <field name="journal_id"/>
+                            <field name="parent_id"/>
+                            <field name="level"/>
+                            <field name="sequence"/>
+                        </group>
+                        <group string="Fechas">
+                            <field name="date"/>
+                            <field name="date_due"/>
+                            <field name="bucket_aging"/>
+                        </group>
+                    </group>
+                    <group string="Importes">
+                        <group>
+                            <field name="currency_id"/>
+                            <field name="amount_total"/>
+                            <field name="amount_applied"/>
+                            <field name="residual"/>
+                        </group>
+                        <group>
+                            <!-- Campo solo informativo -->
+                            <field name="amount_pending_draft"/>
+                            <field name="legend"/>
+                            <field name="payment_state"/>
+                        </group>
+                    </group>
+                    <group string="Aging (Saldo por tramo)">
+                        <group>
+                            <field name="bucket_0_30"/>
+                            <field name="bucket_31_60"/>
+                        </group>
+                        <group>
+                            <field name="bucket_61_90"/>
+                            <field name="bucket_91_plus"/>
+                        </group>
+                    </group>
+                    <group string="Contexto">
+                        <field name="salesperson_id"/>
+                        <field name="company_id" groups="base.group_multi_company"/>
+                        <field name="report_id"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- ── Vista SEARCH con filtros y group_by ── -->
+    <record id="view_customer_statement_line_search" model="ir.ui.view">
+        <field name="name">customer.statement.report.line.search</field>
+        <field name="model">customer.statement.report.line</field>
+        <field name="arch" type="xml">
+            <search string="Estado de Cuenta — Búsqueda">
+
+                <!-- Filtros rápidos -->
+                <filter name="filter_invoices"
+                        string="Solo Facturas"
+                        domain="[('entry_type', '=', 'invoice')]"/>
+                <filter name="filter_credit_notes"
+                        string="Notas de Crédito"
+                        domain="[('entry_type', '=', 'credit_note')]"/>
+                <filter name="filter_with_balance"
+                        string="Con Saldo Pendiente"
+                        domain="[('residual', '&gt;', 0)]"/>
+                <filter name="filter_draft_payments"
+                        string="Pagos Borrador"
+                        domain="[('entry_type', '=', 'payment_draft')]"/>
+                <separator/>
+                <filter name="filter_overdue_91"
+                        string="Vencido 91+ días"
+                        domain="[('bucket_aging', '=', '91_plus')]"/>
+                <filter name="filter_overdue_61_90"
+                        string="Vencido 61-90 días"
+                        domain="[('bucket_aging', '=', '61_90')]"/>
+                <filter name="filter_overdue_31_60"
+                        string="Vencido 31-60 días"
+                        domain="[('bucket_aging', '=', '31_60')]"/>
+                <filter name="filter_current"
+                        string="Al Día (0-30)"
+                        domain="[('bucket_aging', '=', '0_30')]"/>
+
+                <!-- Campos de búsqueda libre -->
+                <field name="partner_id"/>
+                <field name="document" string="Documento"/>
+                <field name="reference" string="Referencia"/>
+                <field name="salesperson_id"/>
+
+                <!-- Agrupaciones -->
+                <group expand="1" string="Agrupar por">
+                    <filter name="group_partner"
+                            string="Cliente"
+                            context="{'group_by': 'partner_id'}"/>
+                    <filter name="group_entry_type"
+                            string="Tipo"
+                            context="{'group_by': 'entry_type'}"/>
+                    <filter name="group_salesperson"
+                            string="Vendedor"
+                            context="{'group_by': 'salesperson_id'}"/>
+                    <filter name="group_company"
+                            string="Empresa"
+                            context="{'group_by': 'company_id'}"
+                            groups="base.group_multi_company"/>
+                    <filter name="group_aging"
+                            string="Antigüedad"
+                            context="{'group_by': 'bucket_aging'}"/>
+                    <filter name="group_date_month"
+                            string="Mes"
+                            context="{'group_by': 'date:month'}"/>
+                </group>
+
+            </search>
+        </field>
+    </record>
+
+    <!-- ── Vista PIVOT para métricas ── -->
+    <record id="view_customer_statement_line_pivot" model="ir.ui.view">
+        <field name="name">customer.statement.report.line.pivot</field>
+        <field name="model">customer.statement.report.line</field>
+        <field name="arch" type="xml">
+            <pivot string="Estado de Cuenta — Análisis" disable_linking="True">
+                <field name="partner_id" type="row"/>
+                <field name="entry_type" type="col"/>
+                <field name="amount_total" type="measure" string="Facturado"/>
+                <field name="amount_applied" type="measure" string="Pagado"/>
+                <field name="residual" type="measure" string="Saldo"/>
+                <field name="amount_pending_draft" type="measure" string="Pend. x Aplicar"/>
+                <field name="bucket_0_30" type="measure" string="0-30"/>
+                <field name="bucket_31_60" type="measure" string="31-60"/>
+                <field name="bucket_61_90" type="measure" string="61-90"/>
+                <field name="bucket_91_plus" type="measure" string="91+"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- ── Vista GRAPH ── -->
+    <record id="view_customer_statement_line_graph" model="ir.ui.view">
+        <field name="name">customer.statement.report.line.graph</field>
+        <field name="model">customer.statement.report.line</field>
+        <field name="arch" type="xml">
+            <graph string="Estado de Cuenta — Gráfico" type="bar">
+                <field name="partner_id" type="row"/>
+                <field name="residual" type="measure" string="Saldo Pendiente"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- ── Acción de ventana para las líneas (menú "Estados Generados") ── -->
+    <record id="action_customer_statement_lines" model="ir.actions.act_window">
+        <field name="name">Estados de Cuenta Generados</field>
+        <field name="res_model">customer.statement.report.line</field>
+        <field name="view_mode">list,pivot,graph,form</field>
+        <field name="search_view_id" ref="view_customer_statement_line_search"/>
+        <field name="context">{'search_default_group_partner': 1}</field>
+        <field name="groups_id" eval="[(4, ref('sng_customer_statement.group_customer_statement_user'))]"/>
+    </record>
+
+    <!-- ================================================================
+         VISTAS: customer.statement.report (cabecera)
+         ================================================================ -->
+
+    <!-- ── Vista FORM de cabecera ── -->
+    <record id="view_customer_statement_report_form" model="ir.ui.view">
+        <field name="name">customer.statement.report.form</field>
+        <field name="model">customer.statement.report</field>
+        <field name="arch" type="xml">
+            <form string="Estado de Cuenta" create="false" delete="false">
+                <sheet>
+                    <!-- Smart button: acceso directo a las líneas -->
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_lines"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-list">
+                            <field name="line_count" widget="statinfo"
+                                   string="Líneas"/>
+                        </button>
+                    </div>
+
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="True"/></h1>
+                    </div>
+
+                    <group>
+                        <group string="Período y Configuración">
+                            <field name="date_from" readonly="True"/>
+                            <field name="date_to" readonly="True"/>
+                            <field name="mode" readonly="True"/>
+                            <field name="currency_mode" readonly="True"/>
+                            <field name="company_id" readonly="True"
+                                   groups="base.group_multi_company"/>
+                        </group>
+                        <group string="Opciones">
+                            <field name="include_credit_notes" readonly="True"/>
+                            <field name="show_draft_payments" readonly="True"/>
+                            <field name="only_with_balance" readonly="True"/>
+                        </group>
+                    </group>
+
+                    <!-- Totales calculados (compute) -->
+                    <group string="Resumen de Totales">
+                        <group>
+                            <field name="total_invoiced"/>
+                            <field name="total_applied"/>
+                        </group>
+                        <group>
+                            <field name="total_residual"/>
+                            <field name="total_draft_pending"/>
+                        </group>
+                    </group>
+
+                    <!-- Filtros aplicados -->
+                    <group string="Filtros Aplicados">
+                        <field name="partner_ids" widget="many2many_tags" readonly="True"/>
+                        <field name="salesperson_ids" widget="many2many_tags" readonly="True"/>
+                        <field name="tag_ids" widget="many2many_tags" readonly="True"/>
+                    </group>
+
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- ── Vista LIST de cabeceras ── -->
+    <record id="view_customer_statement_report_list" model="ir.ui.view">
+        <field name="name">customer.statement.report.list</field>
+        <field name="model">customer.statement.report</field>
+        <field name="arch" type="xml">
+            <list string="Estados de Cuenta" create="false" delete="True"
+                  default_order="create_date desc">
+                <field name="name"/>
+                <field name="date_from"/>
+                <field name="date_to"/>
+                <field name="mode"/>
+                <field name="line_count" string="# Líneas"/>
+                <field name="total_invoiced"/>
+                <field name="total_applied"/>
+                <field name="total_residual"/>
+                <field name="create_date"/>
+                <field name="create_uid"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ── Acción de ventana para cabeceras ── -->
+    <record id="action_customer_statement_reports" model="ir.actions.act_window">
+        <field name="name">Estados de Cuenta Generados</field>
+        <field name="res_model">customer.statement.report</field>
+        <field name="view_mode">list,form</field>
+        <field name="groups_id" eval="[(4, ref('sng_customer_statement.group_customer_statement_user'))]"/>
+    </record>
+
+</odoo>

@@ -1,0 +1,2184 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* sh_customer_statement
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-11-18 04:32+0000\n"
+"PO-Revision-Date: 2025-11-18 04:32+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_config_settings__sh_cust_due_weekly_statement_template_id
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_statement_config__sh_cust_due_weekly_statement_template_id
+msgid "   Weekly Mail Template"
+msgstr "Plantilla de correo semanal"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_config_settings__sh_cus_daily_statement_template_id
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_statement_config__sh_cus_daily_statement_template_id
+msgid "  Daily Mail Template"
+msgstr "Plantilla del Daily Mail"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_config_settings__sh_cust_yearly_month
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_statement_config__sh_cust_yearly_month
+msgid "  Month"
+msgstr "Mes"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_company__sh_cust_due_week_day
+msgid "  Week Day "
+msgstr "Día de la semana"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_config_settings__sh_cust_due_yearly_date
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_statement_config__sh_cust_due_yearly_date
+msgid "  Yearly Day     "
+msgstr "Día anual"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_company__sh_cust_yearly_template_id
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_config_settings__sh_cust_yearly_template_id
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_statement_config__sh_cust_yearly_template_id
+msgid "  Yearly Mail Template"
+msgstr "Plantilla de correo anual"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_config_settings__sh_cus_due_daily_statement_template_id
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_statement_config__sh_cus_due_daily_statement_template_id
+msgid " Daily Mail Template"
+msgstr "Plantilla del Daily Mail"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_company__sh_cust_due_yearly_month
+msgid " Month"
+msgstr "Mes"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_company__sh_cust_week_day
+msgid " Week Day"
+msgstr "Día de la semana"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_company__sh_cust_due_yearly_template_id
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_config_settings__sh_cust_due_yearly_template_id
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_statement_config__sh_cust_due_yearly_template_id
+msgid " Yearly Mail Template"
+msgstr "Plantilla de correo anual"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_config_settings__sh_cust_yearly_date
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_statement_config__sh_cust_yearly_date
+msgid " Yearly day "
+msgstr "Día anual"
+
+#. module: sh_customer_statement
+#. odoo-python
+#: code:addons/sh_customer_statement/controllers/main.py:0
+msgid "%s is not the reference of a report"
+msgstr "%s no es la referencia de un informe"
+
+#. module: sh_customer_statement
+#: model:ir.actions.report,print_report_name:sh_customer_statement.action_report_sh_customer_due_statement
+msgid "'Customer Overdue Statement'"
+msgstr "Estado de cuenta vencido del cliente"
+
+#. module: sh_customer_statement
+#: model:ir.actions.report,print_report_name:sh_customer_statement.action_report_sh_customer_filtered_statement
+msgid "'Customer Statement Filter By Date'"
+msgstr "'Filtrar extracto de cliente por fecha'"
+
+#. module: sh_customer_statement
+#: model:ir.actions.report,print_report_name:sh_customer_statement.action_report_sh_customer_statement
+msgid "'Customer Statement'"
+msgstr "Declaración del cliente"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_partner__sh_customer_zero_to_thiry
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_users__sh_customer_zero_to_thiry
+msgid "0-30"
+msgstr "0-30"
+
+#. module: sh_customer_statement
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_statement_doc
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_view
+msgid "0-30(Days)"
+msgstr "0-30 (días)"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_partner__sh_customer_thirty_to_sixty
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_users__sh_customer_thirty_to_sixty
+msgid "30-60"
+msgstr "30-60"
+
+#. module: sh_customer_statement
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_statement_doc
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_view
+msgid "30-60(Days)"
+msgstr "30-60 (días)"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_partner__sh_customer_sixty_to_ninety
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_users__sh_customer_sixty_to_ninety
+msgid "60-90"
+msgstr "60-90"
+
+#. module: sh_customer_statement
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_statement_doc
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_view
+msgid "60-90(Days)"
+msgstr "60-90 (días)"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_partner__sh_customer_ninety_plus
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_users__sh_customer_ninety_plus
+msgid "90+"
+msgstr "Más de 90 años"
+
+#. module: sh_customer_statement
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_statement_doc
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_view
+msgid "90+(Days)"
+msgstr "90+ (Días)"
+
+#. module: sh_customer_statement
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_filtered_statement_doc
+msgid ""
+"<br/>\n"
+"                    Date To -"
+msgstr ""
+"<br/>\n"
+"                    Fecha para -"
+
+#. module: sh_customer_statement
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_due_statement_doc
+msgid ""
+"<br/>\n"
+"                    Hello Sir/Madam,<br/>\n"
+"                    Some payments are still due.<br/>\n"
+"                    Please find details are below.<br/>\n"
+"                    <br/>\n"
+"                    Thanks and Regards<br/>"
+msgstr ""
+"<br/>\n"
+"                    Buenos días, señor/señora,<br/>\n"
+"                    Algunos pagos aún están pendientes.<br/>\n"
+"                    A continuación encontrará los detalles.<br/>\n"
+"                    <br/>\n"
+"                    Gracias y saludos<br/>"
+
+#. module: sh_customer_statement
+#: model:mail.template,body_html:sh_customer_statement.sh_customer_due_statement_mail_template
+msgid ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"        \t\t<table border=\"0\" width=\"100%\" cellpadding=\"0\" bgcolor=\"#ededed\" style=\"padding: 20px; background-color: #ededed; border-collapse:separate;\" summary=\"o_mail_notification\">\n"
+"                    <tbody>\n"
+"                      <!-- HEADER -->\n"
+"                      <tr>\n"
+"                        <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                          <table width=\"590\" border=\"0\" cellpadding=\"0\" bgcolor=\"#875A7B\" style=\"min-width: 590px; background-color: rgb(135,90,123); padding: 20px; border-collapse:separate;\">\n"
+"                            <tr>\n"
+"                              <td valign=\"middle\">\n"
+"                                  <span style=\"font-size:20px; color:white; font-weight: bold;\">\n"
+"                                      Customer Overdue Statement\n"
+"                                  </span>\n"
+"                              </td>\n"
+"                              <td valign=\"middle\" align=\"right\">\n"
+"                                <img t-att-src=\"'/logo.png?company=%s'%object.get_company().id\" style=\"padding: 0px; margin: 0px; height: auto; width: 80px;\" t-att-alt=\"'%s'%object.get_company().name\"/>\n"
+"                              </td>\n"
+"                            </tr>\n"
+"                          </table>\n"
+"                        </td>\n"
+"                      </tr>\n"
+"\n"
+"                      <!-- CONTENT -->\n"
+"                      <tr>\n"
+"                        <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                          <table width=\"590\" border=\"0\" cellpadding=\"0\" bgcolor=\"#ffffff\" style=\"min-width: 590px; background-color: rgb(255, 255, 255); padding: 20px; border-collapse:separate;\">\n"
+"                            <tbody>\n"
+"                              <td valign=\"top\" style=\"font-family:Arial,Helvetica,sans-serif; color: #555; font-size: 14px;\">\n"
+"                                <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
+"\t\t\t\t\t\t\t    \tDear <t t-out=\"object.name or ''\"/>,\n"
+"\t\t\t\t\t\t\t\t\t<br/>\n"
+"\t\t\t\t\t\t\t\t\tWe have attached your account overdue statement.\n"
+"\t\t\t\t\t\t\t\t\t<br/>\n"
+"\t\t\t\t\t\t\t\t\tPlease clear of your overdue payments as soon as possible.\n"
+"\t\t\t\t\t\t\t\t\t<br/>\n"
+"\t\t\t\t\t\t\t\t\tDownload your overdue statement.\n"
+"\t\t\t\t\t\t\t\t\t<br/>\n"
+"\t\t\t\t\t\t\t\t\tIf you have any concern regarding overdue statement then feel free to contact us.\n"
+"\t\t\t\t\t\t\t\t\t<br/>\n"
+"\t\t\t\t\t\t\t\t\t<br/>\n"
+"\t\t\t\t\t\t\t    </p>\n"
+"                              </td>\n"
+"                            </tbody>\n"
+"                          </table>\n"
+"                        </td>\n"
+"                      </tr>\n"
+"\n"
+"                      <!-- FOOTER -->\n"
+"                      <tr>\n"
+"                        <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                          <table width=\"590\" border=\"0\" cellpadding=\"0\" bgcolor=\"#875A7B\" style=\"min-width: 590px; background-color: rgb(135,90,123); padding: 20px; border-collapse:separate;\">\n"
+"                            <tr>\n"
+"                              <td valign=\"middle\" align=\"left\" style=\"color: #fff; padding-top: 10px; padding-bottom: 10px; font-size: 12px;\">\n"
+"                                <t t-out=\"object.get_company().name or ''\"/><br/>\n"
+"                                <t t-out=\"object.get_company().phone or ''\"/>\n"
+"                              </td>\n"
+"                              <td valign=\"middle\" align=\"right\" style=\"color: #fff; padding-top: 10px; padding-bottom: 10px; font-size: 12px;\">\n"
+"                                <t t-if=\"object.get_company().email\">\n"
+"                                  <a t-att-href=\"'mailto:%s'%object.get_company().email\" style=\"text-decoration:none; color: white;\"><t t-out=\"object.get_company().email or ''\"/></a><br/>\n"
+"                                </t>\n"
+"\n"
+"                                <t t-if=\"object.get_company().website\">\n"
+"                                  <a t-att-href=\"'%s'%object.get_company().website\" style=\"text-decoration:none; color: white;\"><t t-out=\"object.get_company().website or ''\"/></a><br/>\n"
+"                                </t>\n"
+"                              </td>\n"
+"                            </tr>\n"
+"                          </table>\n"
+"                        </td>\n"
+"                      </tr>\n"
+"                    </tbody>\n"
+"                </table>\n"
+"        \t</div>\n"
+"        "
+msgstr ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"        \t\t<table border=\"0\" width=\"100%\" cellpadding=\"0\" bgcolor=\"#ededed\" style=\"padding: 20px; background-color: #ededed; border-collapse:separate;\" summary=\"o_mail_notification\">\n"
+"                    <tbody>\n"
+"                      <!-- HEADER -->\n"
+"                      <tr>\n"
+"                        <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                          <table width=\"590\" border=\"0\" cellpadding=\"0\" bgcolor=\"#875A7B\" style=\"min-width: 590px; background-color: rgb(135,90,123); padding: 20px; border-collapse:separate;\">\n"
+"                            <tr>\n"
+"                              <td valign=\"middle\">\n"
+"                                  <span style=\"font-size:20px; color:white; font-weight: bold;\">\n"
+"                                      Customer Overdue Statement\n"
+"                                  </span>\n"
+"                              </td>\n"
+"                              <td valign=\"middle\" align=\"right\">\n"
+"                                <img t-att-src=\"'/logo.png?company=%s'%object.get_company().id\" style=\"padding: 0px; margin: 0px; height: auto; width: 80px;\" t-att-alt=\"'%s'%object.get_company().name\"/>\n"
+"                              </td>\n"
+"                            </tr>\n"
+"                          </table>\n"
+"                        </td>\n"
+"                      </tr>\n"
+"\n"
+"                      <!-- CONTENT -->\n"
+"                      <tr>\n"
+"                        <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                          <table width=\"590\" border=\"0\" cellpadding=\"0\" bgcolor=\"#ffffff\" style=\"min-width: 590px; background-color: rgb(255, 255, 255); padding: 20px; border-collapse:separate;\">\n"
+"                            <tbody>\n"
+"                              <td valign=\"top\" style=\"font-family:Arial,Helvetica,sans-serif; color: #555; font-size: 14px;\">\n"
+"                                <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
+"\t\t\t\t\t\t\t    \tEstimado <t t-out=\"object.name or ''\"/>,\n"
+"\t\t\t\t\t\t\t\t\t<br/>\n"
+"\t\t\t\t\t\t\t\t\tAdjuntamos su estado de cuenta vencido.\n"
+"\t\t\t\t\t\t\t\t\t<br/>\n"
+"\t\t\t\t\t\t\t\t\tPor favor, salde sus pagos atrasados lo antes posible.\n"
+"\t\t\t\t\t\t\t\t\t<br/>\n"
+"\t\t\t\t\t\t\t\t\tDescarga tu extracto.\n"
+"\t\t\t\t\t\t\t\t\t<br/>\n"
+"\t\t\t\t\t\t\t\t\tSi tiene alguna duda sobre un estado de cuenta vencido, no dude en contactarnos.\n"
+"\t\t\t\t\t\t\t\t\t<br/>\n"
+"\t\t\t\t\t\t\t\t\t<br/>\n"
+"\t\t\t\t\t\t\t    </p>\n"
+"                              </td>\n"
+"                            </tbody>\n"
+"                          </table>\n"
+"                        </td>\n"
+"                      </tr>\n"
+"\n"
+"                      <!-- FOOTER -->\n"
+"                      <tr>\n"
+"                        <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                          <table width=\"590\" border=\"0\" cellpadding=\"0\" bgcolor=\"#875A7B\" style=\"min-width: 590px; background-color: rgb(135,90,123); padding: 20px; border-collapse:separate;\">\n"
+"                            <tr>\n"
+"                              <td valign=\"middle\" align=\"left\" style=\"color: #fff; padding-top: 10px; padding-bottom: 10px; font-size: 12px;\">\n"
+"                                <t t-out=\"object.get_company().name or ''\"/><br/>\n"
+"                                <t t-out=\"object.get_company().phone or ''\"/>\n"
+"                              </td>\n"
+"                              <td valign=\"middle\" align=\"right\" style=\"color: #fff; padding-top: 10px; padding-bottom: 10px; font-size: 12px;\">\n"
+"                                <t t-if=\"object.get_company().email\">\n"
+"                                  <a t-att-href=\"'mailto:%s'%object.get_company().email\" style=\"text-decoration:none; color: white;\"><t t-out=\"object.get_company().email or ''\"/></a><br/>\n"
+"                                </t>\n"
+"\n"
+"                                <t t-if=\"object.get_company().website\">\n"
+"                                  <a t-att-href=\"'%s'%object.get_company().website\" style=\"text-decoration:none; color: white;\"><t t-out=\"object.get_company().website or ''\"/></a><br/>\n"
+"                                </t>\n"
+"                              </td>\n"
+"                            </tr>\n"
+"                          </table>\n"
+"                        </td>\n"
+"                      </tr>\n"
+"                    </tbody>\n"
+"                </table>\n"
+"        \t</div>\n"
+"        "
+
+#. module: sh_customer_statement
+#: model:mail.template,body_html:sh_customer_statement.sh_customer_statement_mail_template
+msgid ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"        \t\t<table border=\"0\" width=\"100%\" cellpadding=\"0\" bgcolor=\"#ededed\" style=\"padding: 20px; background-color: #ededed; border-collapse:separate;\" summary=\"o_mail_notification\">\n"
+"                    <tbody>\n"
+"                      <!-- HEADER -->\n"
+"                      <tr>\n"
+"                        <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                          <table width=\"590\" border=\"0\" cellpadding=\"0\" bgcolor=\"#875A7B\" style=\"min-width: 590px; background-color: rgb(135,90,123); padding: 20px; border-collapse:separate;\">\n"
+"                            <tr>\n"
+"                              <td valign=\"middle\">\n"
+"                                  <span style=\"font-size:20px; color:white; font-weight: bold;\">\n"
+"                                      Customer Statement\n"
+"                                  </span>\n"
+"                              </td>\n"
+"                              <td valign=\"middle\" align=\"right\">\n"
+"                                <img t-att-src=\"'/logo.png?company=%s'%object.get_company().id\" style=\"padding: 0px; margin: 0px; height: auto; width: 80px;\" t-att-alt=\"'%s'%object.get_company().name\"/>\n"
+"                              </td>\n"
+"                            </tr>\n"
+"                          </table>\n"
+"                        </td>\n"
+"                      </tr>\n"
+"\n"
+"                      <!-- CONTENT -->\n"
+"                      <tr>\n"
+"                        <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                          <table width=\"590\" border=\"0\" cellpadding=\"0\" bgcolor=\"#ffffff\" style=\"min-width: 590px; background-color: rgb(255, 255, 255); padding: 20px; border-collapse:separate;\">\n"
+"                            <tbody>\n"
+"                              <td valign=\"top\" style=\"font-family:Arial,Helvetica,sans-serif; color: #555; font-size: 14px;\">\n"
+"                                <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
+"\t\t\t\t\t\t\t    \tDear <t t-out=\"object.name or ''\"/>,\n"
+"\t\t\t\t\t\t\t\t\t<br/>\n"
+"\t\t\t\t\t\t\t\t\tWe have attached your account statement.\n"
+"\t\t\t\t\t\t\t\t\t<br/>\n"
+"\t\t\t\t\t\t\t\t\tDownload your statement.\n"
+"\t\t\t\t\t\t\t\t\t<br/>\n"
+"\t\t\t\t\t\t\t\t\tIf you have any concern regarding statement then feel free to contact us.\n"
+"\t\t\t\t\t\t\t\t\t<br/>\n"
+"\t\t\t\t\t\t\t\t\t<br/>\n"
+"\t\t\t\t\t\t\t    </p>\n"
+"                              </td>\n"
+"                            </tbody>\n"
+"                          </table>\n"
+"                        </td>\n"
+"                      </tr>\n"
+"\n"
+"                      <!-- FOOTER -->\n"
+"                      <tr>\n"
+"                        <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                          <table width=\"590\" border=\"0\" cellpadding=\"0\" bgcolor=\"#875A7B\" style=\"min-width: 590px; background-color: rgb(135,90,123); padding: 20px; border-collapse:separate;\">\n"
+"                            <tr>\n"
+"                              <td valign=\"middle\" align=\"left\" style=\"color: #fff; padding-top: 10px; padding-bottom: 10px; font-size: 12px;\">\n"
+"                                <t t-out=\"object.get_company().name or ''\"/><br/>\n"
+"                                <t t-out=\"object.get_company().phone or ''\"/>\n"
+"                              </td>\n"
+"                              <td valign=\"middle\" align=\"right\" style=\"color: #fff; padding-top: 10px; padding-bottom: 10px; font-size: 12px;\">\n"
+"                                <t t-if=\"object.get_company().email\">\n"
+"                                  <a t-att-href=\"'mailto:%s'%object.get_company().email\" style=\"text-decoration:none; color: white;\"><t t-out=\"object.get_company().email or ''\"/></a><br/>\n"
+"                                </t>\n"
+"\n"
+"                                <t t-if=\"object.get_company().website\">\n"
+"                                  <a t-att-href=\"'%s'%object.get_company().website\" style=\"text-decoration:none; color: white;\"><t t-out=\"object.get_company().website or ''\"/></a><br/>\n"
+"                                </t>\n"
+"\n"
+"                              </td>\n"
+"                            </tr>\n"
+"                          </table>\n"
+"                        </td>\n"
+"                      </tr>\n"
+"                    </tbody>\n"
+"                </table>\n"
+"        \t</div>\n"
+"        "
+msgstr ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"        \t\t<table border=\"0\" width=\"100%\" cellpadding=\"0\" bgcolor=\"#ededed\" style=\"padding: 20px; background-color: #ededed; border-collapse:separate;\" summary=\"o_mail_notification\">\n"
+"                    <tbody>\n"
+"                      <!-- HEADER -->\n"
+"                      <tr>\n"
+"                        <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                          <table width=\"590\" border=\"0\" cellpadding=\"0\" bgcolor=\"#875A7B\" style=\"min-width: 590px; background-color: rgb(135,90,123); padding: 20px; border-collapse:separate;\">\n"
+"                            <tr>\n"
+"                              <td valign=\"middle\">\n"
+"                                  <span style=\"font-size:20px; color:white; font-weight: bold;\">\n"
+"                                      Customer Statement\n"
+"                                  </span>\n"
+"                              </td>\n"
+"                              <td valign=\"middle\" align=\"right\">\n"
+"                                <img t-att-src=\"'/logo.png?company=%s'%object.get_company().id\" style=\"padding: 0px; margin: 0px; height: auto; width: 80px;\" t-att-alt=\"'%s'%object.get_company().name\"/>\n"
+"                              </td>\n"
+"                            </tr>\n"
+"                          </table>\n"
+"                        </td>\n"
+"                      </tr>\n"
+"\n"
+"                      <!-- CONTENT -->\n"
+"                      <tr>\n"
+"                        <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                          <table width=\"590\" border=\"0\" cellpadding=\"0\" bgcolor=\"#ffffff\" style=\"min-width: 590px; background-color: rgb(255, 255, 255); padding: 20px; border-collapse:separate;\">\n"
+"                            <tbody>\n"
+"                              <td valign=\"top\" style=\"font-family:Arial,Helvetica,sans-serif; color: #555; font-size: 14px;\">\n"
+"                                <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
+"\t\t\t\t\t\t\t    \tEstimado <t t-out=\"object.name or ''\"/>,\n"
+"\t\t\t\t\t\t\t\t\t<br/>\n"
+"\t\t\t\t\t\t\t\t\tAdjuntamos su extracto bancario.\n"
+"\t\t\t\t\t\t\t\t\t<br/>\n"
+"\t\t\t\t\t\t\t\t\tDescarga tu extracto.\n"
+"\t\t\t\t\t\t\t\t\t<br/>\n"
+"\t\t\t\t\t\t\t\t\tSi tiene alguna duda sobre esta declaración, no dude en ponerse en contacto con nosotros.\n"
+"\t\t\t\t\t\t\t\t\t<br/>\n"
+"\t\t\t\t\t\t\t\t\t<br/>\n"
+"\t\t\t\t\t\t\t    </p>\n"
+"                              </td>\n"
+"                            </tbody>\n"
+"                          </table>\n"
+"                        </td>\n"
+"                      </tr>\n"
+"\n"
+"                      <!-- FOOTER -->\n"
+"                      <tr>\n"
+"                        <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                          <table width=\"590\" border=\"0\" cellpadding=\"0\" bgcolor=\"#875A7B\" style=\"min-width: 590px; background-color: rgb(135,90,123); padding: 20px; border-collapse:separate;\">\n"
+"                            <tr>\n"
+"                              <td valign=\"middle\" align=\"left\" style=\"color: #fff; padding-top: 10px; padding-bottom: 10px; font-size: 12px;\">\n"
+"                                <t t-out=\"object.get_company().name or ''\"/><br/>\n"
+"                                <t t-out=\"object.get_company().phone or ''\"/>\n"
+"                              </td>\n"
+"                              <td valign=\"middle\" align=\"right\" style=\"color: #fff; padding-top: 10px; padding-bottom: 10px; font-size: 12px;\">\n"
+"                                <t t-if=\"object.get_company().email\">\n"
+"                                  <a t-att-href=\"'mailto:%s'%object.get_company().email\" style=\"text-decoration:none; color: white;\"><t t-out=\"object.get_company().email or ''\"/></a><br/>\n"
+"                                </t>\n"
+"\n"
+"                                <t t-if=\"object.get_company().website\">\n"
+"                                  <a t-att-href=\"'%s'%object.get_company().website\" style=\"text-decoration:none; color: white;\"><t t-out=\"object.get_company().website or ''\"/></a><br/>\n"
+"                                </t>\n"
+"\n"
+"                              </td>\n"
+"                            </tr>\n"
+"                          </table>\n"
+"                        </td>\n"
+"                      </tr>\n"
+"                    </tbody>\n"
+"                </table>\n"
+"        \t</div>\n"
+"        "
+
+#. module: sh_customer_statement
+#: model:mail.template,body_html:sh_customer_statement.sh_customer_filter_statement_mail_template
+msgid ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"        \t\t<table border=\"0\" width=\"100%\" cellpadding=\"0\" bgcolor=\"#ededed\" style=\"padding: 20px; background-color: #ededed; border-collapse:separate;\" summary=\"o_mail_notification\">\n"
+"                    <tbody>\n"
+"                      <!-- HEADER -->\n"
+"                      <tr>\n"
+"                        <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                          <table width=\"590\" border=\"0\" cellpadding=\"0\" bgcolor=\"#875A7B\" style=\"min-width: 590px; background-color: rgb(135,90,123); padding: 20px; border-collapse:separate;\">\n"
+"                            <tr>\n"
+"                              <td valign=\"middle\">\n"
+"                                  <span style=\"font-size:20px; color:white; font-weight: bold;\">\n"
+"                                      Customer Statement By Date\n"
+"                                  </span>\n"
+"                              </td>\n"
+"                              <td valign=\"middle\" align=\"right\">\n"
+"                                <img t-att-src=\"'/logo.png?company=%s'%object.get_company().id\" style=\"padding: 0px; margin: 0px; height: auto; width: 80px;\" t-att-alt=\"'%s'%object.get_company().name\"/>\n"
+"                              </td>\n"
+"                            </tr>\n"
+"                          </table>\n"
+"                        </td>\n"
+"                      </tr>\n"
+"\n"
+"                      <!-- CONTENT -->\n"
+"                      <tr>\n"
+"                        <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                          <table width=\"590\" border=\"0\" cellpadding=\"0\" bgcolor=\"#ffffff\" style=\"min-width: 590px; background-color: rgb(255, 255, 255); padding: 20px; border-collapse:separate;\">\n"
+"                            <tbody>\n"
+"                              <td valign=\"top\" style=\"font-family:Arial,Helvetica,sans-serif; color: #555; font-size: 14px;\">\n"
+"                                <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
+"\t\t\t\t\t\t\t    \tDear<t t-out=\"object.name or ''\"/>,\n"
+"\t\t\t\t\t\t\t\t\t<br/>\n"
+"\t\t\t\t\t\t\t\t\tWe have attached your account statement.\n"
+"\t\t\t\t\t\t\t\t\t<br/>\n"
+"\t\t\t\t\t\t\t\t\tDownload your statement.\n"
+"\t\t\t\t\t\t\t\t\t<br/>\n"
+"\t\t\t\t\t\t\t\t\tIf you have any concern regarding statement then feel free to contact us.\n"
+"\t\t\t\t\t\t\t\t\t<br/>\n"
+"\t\t\t\t\t\t\t    </p>\n"
+"                              </td>\n"
+"                            </tbody>\n"
+"                          </table>\n"
+"                        </td>\n"
+"                      </tr>\n"
+"\n"
+"                      <!-- FOOTER -->\n"
+"                      <tr>\n"
+"                        <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                          <table width=\"590\" border=\"0\" cellpadding=\"0\" bgcolor=\"#875A7B\" style=\"min-width: 590px; background-color: rgb(135,90,123); padding: 20px; border-collapse:separate;\">\n"
+"                            <tr>\n"
+"                              <td valign=\"middle\" align=\"left\" style=\"color: #fff; padding-top: 10px; padding-bottom: 10px; font-size: 12px;\">\n"
+"                                <t t-out=\"object.get_company().name or ''\"/><br/>\n"
+"                                <t t-out=\"object.get_company().phone or ''\"/>\n"
+"                              </td>\n"
+"                              <td valign=\"middle\" align=\"right\" style=\"color: #fff; padding-top: 10px; padding-bottom: 10px; font-size: 12px;\">\n"
+"                                <t t-if=\"object.get_company().email\">\n"
+"                                  <a t-att-href=\"'mailto:%s'%object.get_company().email\" style=\"text-decoration:none; color: white;\"><t t-out=\"object.get_company().email or ''\"/></a><br/>\n"
+"                                </t>\n"
+"\n"
+"                                <t t-if=\"object.get_company().website\">\n"
+"                                  <a t-att-href=\"'%s'%object.get_company().website\" style=\"text-decoration:none; color: white;\"><t t-out=\"object.get_company().website or ''\"/></a><br/>\n"
+"                                </t>\n"
+"                              </td>\n"
+"                            </tr>\n"
+"                          </table>\n"
+"                        </td>\n"
+"                      </tr>\n"
+"                    </tbody>\n"
+"                </table>\n"
+"        \t</div>\n"
+"        "
+msgstr ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"        \t\t<table border=\"0\" width=\"100%\" cellpadding=\"0\" bgcolor=\"#ededed\" style=\"padding: 20px; background-color: #ededed; border-collapse:separate;\" summary=\"o_mail_notification\">\n"
+"                    <tbody>\n"
+"                      <!-- HEADER -->\n"
+"                      <tr>\n"
+"                        <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                          <table width=\"590\" border=\"0\" cellpadding=\"0\" bgcolor=\"#875A7B\" style=\"min-width: 590px; background-color: rgb(135,90,123); padding: 20px; border-collapse:separate;\">\n"
+"                            <tr>\n"
+"                              <td valign=\"middle\">\n"
+"                                  <span style=\"font-size:20px; color:white; font-weight: bold;\">\n"
+"                                      Customer Statement By Date\n"
+"                                  </span>\n"
+"                              </td>\n"
+"                              <td valign=\"middle\" align=\"right\">\n"
+"                                <img t-att-src=\"'/logo.png?company=%s'%object.get_company().id\" style=\"padding: 0px; margin: 0px; height: auto; width: 80px;\" t-att-alt=\"'%s'%object.get_company().name\"/>\n"
+"                              </td>\n"
+"                            </tr>\n"
+"                          </table>\n"
+"                        </td>\n"
+"                      </tr>\n"
+"\n"
+"                      <!-- CONTENT -->\n"
+"                      <tr>\n"
+"                        <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                          <table width=\"590\" border=\"0\" cellpadding=\"0\" bgcolor=\"#ffffff\" style=\"min-width: 590px; background-color: rgb(255, 255, 255); padding: 20px; border-collapse:separate;\">\n"
+"                            <tbody>\n"
+"                              <td valign=\"top\" style=\"font-family:Arial,Helvetica,sans-serif; color: #555; font-size: 14px;\">\n"
+"                                <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
+"\t\t\t\t\t\t\t    \tEstimado<t t-out=\"object.name or ''\"/>,\n"
+"\t\t\t\t\t\t\t\t\t<br/>\n"
+"\t\t\t\t\t\t\t\t\tAdjuntamos su extracto bancario.\n"
+"\t\t\t\t\t\t\t\t\t<br/>\n"
+"\t\t\t\t\t\t\t\t\tDescarga tu extracto.\n"
+"\t\t\t\t\t\t\t\t\t<br/>\n"
+"\t\t\t\t\t\t\t\t\tSi tiene alguna duda sobre esta declaración, no dude en ponerse en contacto con nosotros..\n"
+"\t\t\t\t\t\t\t\t\t<br/>\n"
+"\t\t\t\t\t\t\t    </p>\n"
+"                              </td>\n"
+"                            </tbody>\n"
+"                          </table>\n"
+"                        </td>\n"
+"                      </tr>\n"
+"\n"
+"                      <!-- FOOTER -->\n"
+"                      <tr>\n"
+"                        <td align=\"center\" style=\"min-width: 590px;\">\n"
+"                          <table width=\"590\" border=\"0\" cellpadding=\"0\" bgcolor=\"#875A7B\" style=\"min-width: 590px; background-color: rgb(135,90,123); padding: 20px; border-collapse:separate;\">\n"
+"                            <tr>\n"
+"                              <td valign=\"middle\" align=\"left\" style=\"color: #fff; padding-top: 10px; padding-bottom: 10px; font-size: 12px;\">\n"
+"                                <t t-out=\"object.get_company().name or ''\"/><br/>\n"
+"                                <t t-out=\"object.get_company().phone or ''\"/>\n"
+"                              </td>\n"
+"                              <td valign=\"middle\" align=\"right\" style=\"color: #fff; padding-top: 10px; padding-bottom: 10px; font-size: 12px;\">\n"
+"                                <t t-if=\"object.get_company().email\">\n"
+"                                  <a t-att-href=\"'mailto:%s'%object.get_company().email\" style=\"text-decoration:none; color: white;\"><t t-out=\"object.get_company().email or ''\"/></a><br/>\n"
+"                                </t>\n"
+"\n"
+"                                <t t-if=\"object.get_company().website\">\n"
+"                                  <a t-att-href=\"'%s'%object.get_company().website\" style=\"text-decoration:none; color: white;\"><t t-out=\"object.get_company().website or ''\"/></a><br/>\n"
+"                                </t>\n"
+"                              </td>\n"
+"                            </tr>\n"
+"                          </table>\n"
+"                        </td>\n"
+"                      </tr>\n"
+"                    </tbody>\n"
+"                </table>\n"
+"        \t</div>\n"
+"        "
+
+#. module: sh_customer_statement
+#: model:mail.template,body_html:sh_customer_statement.sh_send_customer_due_whatsapp_email_template
+msgid ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
+"                        </p><div style=\"list-style-type: none;\">\n"
+"\t\t\t\t\t\t\tDear  <t t-out=\"object.name or ''\"/>,%0A%0A\n"
+"\t\t\t\t\t\t\tHere is the your statement from *<t t-out=\"object.get_company().name or ''\"/>* %0A%0A \n"
+"                            <br/>\n"
+"                            <t t-if=\"object.get_company().sh_statement_pdf_in_message\">\n"
+"                              <span style=\"list-style-type: none;\">*Click here to download statement* %20 :<t t-out=\"object.sh_cust_due_statement_report_url or ''\"/> %0A%0A</span>\n"
+"                            </t>\n"
+"                            <br/>\n"
+"\n"
+"                            <t t-if=\"object.get_company().sh_statement_url_in_message\">\n"
+"                              <span style=\"list-style-type: none;\">*Click here to See Statement History* %20 :<t t-out=\"object.portal_statement_url_wp or ''\"/> %0A%0A</span>\n"
+"                            </t>\n"
+"\n"
+"                            <span style=\"list-style-type: none;\">Let me know if any concern.%0A</span>\n"
+"                            <span style=\"list-style-type: none;\">Thank You.%0A</span>\n"
+"                            <t t-if=\"object.get_company().sh_statement_signature and object.env.user.sh_company_sign\">\n"
+"                              <span style=\"list-style-type: none;\">%20 *<t t-out=\"object.env.user.sh_company_sign or ''\"/>*  %0A%0A</span>\n"
+"                            </t>\n"
+"\n"
+"                        </div>\n"
+"                    \n"
+"                </div>\n"
+"            "
+msgstr ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
+"                        </p><div style=\"list-style-type: none;\">\n"
+"\t\t\t\t\t\t\tEstimado  <t t-out=\"object.name or ''\"/>,%0A%0A\n"
+"\t\t\t\t\t\t\tAquí está su declaración de *<t t-out=\"object.get_company().name or ''\"/>* %0A%0A \n"
+"                            <br/>\n"
+"                            <t t-if=\"object.get_company().sh_statement_pdf_in_message\">\n"
+"                              <span style=\"list-style-type: none;\">*Haga clic aquí para descargar el extracto* %20 :<t t-out=\"object.sh_cust_due_statement_report_url or ''\"/> %0A%0A</span>\n"
+"                            </t>\n"
+"                            <br/>\n"
+"\n"
+"                            <t t-if=\"object.get_company().sh_statement_url_in_message\">\n"
+"                              <span style=\"list-style-type: none;\">*Haga clic aquí para ver el historial de estados de cuenta.* %20 :<t t-out=\"object.portal_statement_url_wp or ''\"/> %0A%0A</span>\n"
+"                            </t>\n"
+"\n"
+"                            <span style=\"list-style-type: none;\">Avísame si tienes alguna duda..%0A</span>\n"
+"                            <span style=\"list-style-type: none;\">Gracias.%0A</span>\n"
+"                            <t t-if=\"object.get_company().sh_statement_signature and object.env.user.sh_company_sign\">\n"
+"                              <span style=\"list-style-type: none;\">%20 *<t t-out=\"object.env.user.sh_company_sign or ''\"/>*  %0A%0A</span>\n"
+"                            </t>\n"
+"\n"
+"                        </div>\n"
+"                    \n"
+"                </div>\n"
+"            "
+
+#. module: sh_customer_statement
+#: model:mail.template,body_html:sh_customer_statement.sh_send_customer_whatsapp_email_template
+msgid ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
+"                        </p><div style=\"list-style-type: none;\">\n"
+"\t\t\t\t\t\t\tDear <t t-out=\"object.name or ''\"/> ,%0A%0A\n"
+"\t\t\t\t\t\t\tHere is the your statement from *<t t-out=\"object.get_company().name or ''\"/>* %0A%0A \n"
+"                            <br/>\n"
+"\n"
+"                            <t t-if=\"object.get_company().sh_statement_pdf_in_message\">\n"
+"                              <span style=\"list-style-type: none;\">*Click here to download statement* %20 :<t t-out=\"object.sh_cust_statement_report_url or ''\"/> %0A%0A</span>\n"
+"                            </t>\n"
+"                            <br/>\n"
+"\n"
+"                            <t t-if=\"object.get_company().sh_statement_url_in_message\">\n"
+"                              <span style=\"list-style-type: none;\">*Click here to See Statement History* %20 :<t t-out=\"object.portal_statement_url_wp or ''\"/> %0A%0A</span>\n"
+"                            </t>\n"
+"\n"
+"                            <span style=\"list-style-type: none;\">Let me know if any concern.%0A</span>\n"
+"                            <span style=\"list-style-type: none;\">Thank You.%0A</span>\n"
+"\n"
+"                            <t t-if=\"object.get_company().sh_statement_signature and object.env.user.sh_company_sign\">\n"
+"                              <span style=\"list-style-type: none;\">%20 *<t t-out=\"object.env.user.sh_company_sign or ''\"/>* %0A%0A</span>\n"
+"                            </t>\n"
+"\n"
+"                        </div>\n"
+"                    \n"
+"                </div>\n"
+"            "
+msgstr ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
+"                        </p><div style=\"list-style-type: none;\">\n"
+"\t\t\t\t\t\t\tEstimado <t t-out=\"object.name or ''\"/> ,%0A%0A\n"
+"\t\t\t\t\t\t\tAquí está su declaración de *<t t-out=\"object.get_company().name or ''\"/>* %0A%0A \n"
+"                            <br/>\n"
+"\n"
+"                            <t t-if=\"object.get_company().sh_statement_pdf_in_message\">\n"
+"                              <span style=\"list-style-type: none;\">*Haga clic aquí para descargar el extracto* %20 :<t t-out=\"object.sh_cust_statement_report_url or ''\"/> %0A%0A</span>\n"
+"                            </t>\n"
+"                            <br/>\n"
+"\n"
+"                            <t t-if=\"object.get_company().sh_statement_url_in_message\">\n"
+"                              <span style=\"list-style-type: none;\">*Haga clic aquí para ver el historial de estados de cuenta* %20 :<t t-out=\"object.portal_statement_url_wp or ''\"/> %0A%0A</span>\n"
+"                            </t>\n"
+"\n"
+"                            <span style=\"list-style-type: none;\">Avísame si tienes alguna duda..%0A</span>\n"
+"                            <span style=\"list-style-type: none;\">Gracias.%0A</span>\n"
+"\n"
+"                            <t t-if=\"object.get_company().sh_statement_signature and object.env.user.sh_company_sign\">\n"
+"                              <span style=\"list-style-type: none;\">%20 *<t t-out=\"object.env.user.sh_company_sign or ''\"/>* %0A%0A</span>\n"
+"                            </t>\n"
+"\n"
+"                        </div>\n"
+"                    \n"
+"                </div>\n"
+"            "
+
+#. module: sh_customer_statement
+#: model:mail.template,body_html:sh_customer_statement.sh_send_customer_filter_whatsapp_email_template
+msgid ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
+"                        </p><div style=\"list-style-type: none;\">\n"
+"\t\t\t\t\t\t\tDear <t t-out=\"object.name or ''\"/> ,%0A%0A\n"
+"              Here is the your account statement From <t t-out=\"object.start_date or ''\"/> To <t t-out=\"object.end_date or ''\"/> *<t t-out=\"object.get_company().name or ''\"/>* %0A%0A \n"
+"                            <br/>\n"
+"\n"
+"                            <t t-if=\"object.get_company().sh_statement_pdf_in_message\">\n"
+"                              <span style=\"list-style-type: none;\">*Click here to download statement* %20 :<t t-out=\"object.sh_cfs_statement_report_url or ''\"/> %0A%0A</span>\n"
+"                            </t>\n"
+"                            <br/>\n"
+"\n"
+"                            <t t-if=\"object.get_company().sh_statement_url_in_message\">\n"
+"                              <span style=\"list-style-type: none;\">*Click here to See Statement History* %20 :<t t-out=\"object.portal_statement_url_wp or ''\"/> %0A%0A</span>\n"
+"                            </t>\n"
+"\n"
+"                            <span style=\"list-style-type: none;\">Let me know if any concern.%0A</span>\n"
+"                            <span style=\"list-style-type: none;\">Thank You.%0A</span>\n"
+"                            <t t-if=\"object.get_company().sh_statement_signature and object.env.user.sh_company_sign\">\n"
+"                              <span style=\"list-style-type: none;\">%20 *<t t-out=\"object.env.user.sh_company_sign or ''\"/>*  %0A%0A</span>\n"
+"                            </t>\n"
+"\n"
+"                        </div>\n"
+"                    \n"
+"                </div>\n"
+"            "
+msgstr ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"                    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
+"                        </p><div style=\"list-style-type: none;\">\n"
+"\t\t\t\t\t\t\tEstimado <t t-out=\"object.name or ''\"/> ,%0A%0A\n"
+"              Aquí está su extracto de cuenta de <t t-out=\"object.start_date or ''\"/> To <t t-out=\"object.end_date or ''\"/> *<t t-out=\"object.get_company().name or ''\"/>* %0A%0A \n"
+"                            <br/>\n"
+"\n"
+"                            <t t-if=\"object.get_company().sh_statement_pdf_in_message\">\n"
+"                              <span style=\"list-style-type: none;\">*Haga clic aquí para descargar el extracto* %20 :<t t-out=\"object.sh_cfs_statement_report_url or ''\"/> %0A%0A</span>\n"
+"                            </t>\n"
+"                            <br/>\n"
+"\n"
+"                            <t t-if=\"object.get_company().sh_statement_url_in_message\">\n"
+"                              <span style=\"list-style-type: none;\">*Haga clic aquí para ver el historial de estados de cuenta* %20 :<t t-out=\"object.portal_statement_url_wp or ''\"/> %0A%0A</span>\n"
+"                            </t>\n"
+"\n"
+"                            <span style=\"list-style-type: none;\">Avísame si tienes alguna duda.%0A</span>\n"
+"                            <span style=\"list-style-type: none;\">Gracias.%0A</span>\n"
+"                            <t t-if=\"object.get_company().sh_statement_signature and object.env.user.sh_company_sign\">\n"
+"                              <span style=\"list-style-type: none;\">%20 *<t t-out=\"object.env.user.sh_company_sign or ''\"/>*  %0A%0A</span>\n"
+"                            </t>\n"
+"\n"
+"                        </div>\n"
+"                    \n"
+"                </div>\n"
+"            "
+#. module: sh_customer_statement
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_view
+msgid "<span class=\"o_stat_text\">Log History</span>"
+msgstr "<span class=\"o_stat_text\">Historial de registros</span>"
+
+#. module: sh_customer_statement
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_statement_portal
+msgid "<strong>0-30(Days)</strong>"
+msgstr "<strong>0-30 (días)</strong>"
+
+#. module: sh_customer_statement
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_statement_portal
+msgid "<strong>30-60(Days)</strong>"
+msgstr "<strong>30-60 (Días)</strong>"
+
+#. module: sh_customer_statement
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_statement_portal
+msgid "<strong>60-90(Days)</strong>"
+msgstr "<strong>60-90 (Días)</strong>"
+
+#. module: sh_customer_statement
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_statement_portal
+msgid "<strong>90+(Days)</strong>"
+msgstr "<strong>Más de 90 días</strong>"
+
+#. module: sh_customer_statement
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_statement_doc
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_statement_portal
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_view
+msgid "<strong>Balance Amount</strong>"
+msgstr "<strong>Importe del saldo</strong>"
+
+#. module: sh_customer_statement
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_statement_portal
+msgid "<strong>From</strong>"
+msgstr "<strong>De</strong>"
+
+#. module: sh_customer_statement
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_statement_portal
+msgid "<strong>To</strong>"
+msgstr "<strong>A</strong>"
+
+#. module: sh_customer_statement
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_statement_portal
+msgid "<strong>Total</strong>"
+msgstr "<strong>Total</strong>"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_partner__report_token
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_users__report_token
+msgid "Access Token"
+msgstr "Token de acceso"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_due_statement__sh_account
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_statement__sh_account
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_res_partner_filter_statement__sh_account
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_due_statement_doc
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_filtered_statement_doc
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_statement_doc
+msgid "Account"
+msgstr "Cuenta"
+
+#. module: sh_customer_statement
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_statement_config_setting_view
+msgid "Account Statement Auto Send Configuration"
+msgstr "Configuración de envío automático de extractos de cuenta"
+
+#. module: sh_customer_statement
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_statement_config_setting_view
+msgid "Account Statement Mail Log History Configuration"
+msgstr "Historial de registro de correo del extracto de cuenta"
+
+#. module: sh_customer_statement
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_statement_config_setting_view
+msgid "Account Statement Menu Display in portal configuration"
+msgstr "Visualización del menú de extracto de cuenta en la configuración del portal"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__sh_customer_config_mass_update__sh_customer_config_update__add
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__sh_customer_mass_update__sh_customer_update__add
+msgid "Add"
+msgstr "Agregar"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__res_company__sh_cust_due_yearly_month__april
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__res_company__sh_cust_yearly_month__april
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__sh_customer_statement_config__sh_cust_due_yearly_month__april
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__sh_customer_statement_config__sh_cust_yearly_month__april
+msgid "April"
+msgstr "Abril"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__res_company__sh_cust_due_yearly_month__august
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__res_company__sh_cust_yearly_month__august
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__sh_customer_statement_config__sh_cust_due_yearly_month__august
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__sh_customer_statement_config__sh_cust_yearly_month__august
+msgid "August"
+msgstr "Agosto"
+
+#. module: sh_customer_statement
+#: model:ir.actions.server,name:sh_customer_statement.cron_send_customer_statement_auto_ir_actions_server
+msgid "Auto Send Customer Statements"
+msgstr "Envío automático de estados de cuenta a clientes"
+
+#. module: sh_customer_statement
+#: model:ir.actions.server,name:sh_customer_statement.cron_send_customer_statement_config_auto_ir_actions_server
+msgid "Auto Send Customer Statements Configuration"
+msgstr "Configuración de envío automático de estados de cuenta a clientes"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_due_statement__sh_due_customer_balance
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_statement__sh_customer_balance
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_res_partner_filter_statement__sh_filter_balance
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_due_statement_doc
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_filtered_statement_doc
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_statement_doc
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_statement_portal
+msgid "Balance"
+msgstr "Balance"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_partner__sh_customer_compute_boolean
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_users__sh_customer_compute_boolean
+msgid "Boolean"
+msgstr "booleano"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__res_company__sh_display_due_statement__both
+msgid "Both"
+msgstr "Ambos"
+
+#. module: sh_customer_statement
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_update_customers_statement_config_wizard
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_update_customers_statement_wizard
+msgid "Cancel"
+msgstr "Cancelar"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__sh_customer_mail_history__sh_mail_status__cancel
+msgid "Cancelled"
+msgstr "Cancelado"
+
+#. module: sh_customer_statement
+#: model:ir.model,name:sh_customer_statement.model_res_company
+msgid "Companies"
+msgstr "Empresas"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_partner__company_id
+msgid "Company"
+msgstr "Compañía"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_config_mass_update__sh_update_config_ids
+msgid "Config"
+msgstr "Configuración"
+
+#. module: sh_customer_statement
+#: model:ir.model,name:sh_customer_statement.model_res_config_settings
+msgid "Config Settings"
+msgstr "Configuración"
+
+#. module: sh_customer_statement
+#: model:ir.model,name:sh_customer_statement.model_res_partner
+msgid "Contact"
+msgstr "Contacto"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_config_mass_update__create_uid
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_due_statement__create_uid
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_mail_history__create_uid
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_mass_update__create_uid
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_statement__create_uid
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_statement_config__create_uid
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_res_partner_filter_statement__create_uid
+msgid "Created by"
+msgstr "Creado por"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_config_mass_update__create_date
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_due_statement__create_date
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_mail_history__create_date
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_mass_update__create_date
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_statement__create_date
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_statement_config__create_date
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_res_partner_filter_statement__create_date
+msgid "Created on"
+msgstr "Creado el"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_due_statement__currency_id
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_statement__currency_id
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_res_partner_filter_statement__currency_id
+msgid "Currency"
+msgstr "Divisa"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__res_partner__sh_date_filter__custom
+msgid "Custom"
+msgstr "Costumbre"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_mail_history__sh_partner_id
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_statement_config__sh_partner_ids
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_mail_history_search_view
+msgid "Customer"
+msgstr "Cliente"
+
+#. module: sh_customer_statement
+#: model:ir.model,name:sh_customer_statement.model_sh_customer_statement_config
+msgid "Customer  Statement Config"
+msgstr "Configuración del estado de cuenta del cliente"
+
+#. module: sh_customer_statement
+#: model:mail.template,subject:sh_customer_statement.sh_customer_due_statement_mail_template
+msgid ""
+"Customer Account Overdue Statement from {{object.get_company().name}} - "
+"{{object.name}}"
+msgstr ""
+"Estado de cuenta vencido del cliente de {{object.get_company().name}} - "
+"{{object.name}}"
+
+#. module: sh_customer_statement
+#: model:mail.template,subject:sh_customer_statement.sh_customer_filter_statement_mail_template
+#: model:mail.template,subject:sh_customer_statement.sh_customer_statement_mail_template
+msgid ""
+"Customer Account Statement from {{object.get_company().name}} - "
+"{{object.name}}"
+msgstr ""
+"Extracto de cuenta del cliente de {{object.get_company().name}} - "
+"{{object.name}}"
+
+#. module: sh_customer_statement
+#: model:ir.model,name:sh_customer_statement.model_sh_customer_due_statement
+msgid "Customer Due Statement"
+msgstr "Estado de cuenta del cliente"
+
+#. module: sh_customer_statement
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_view
+msgid "Customer Due Statements"
+msgstr "Estados de cuenta de clientes"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_partner__sh_filter_customer_statement_ids
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_users__sh_filter_customer_statement_ids
+msgid "Customer Filtered Statements"
+msgstr "Estados de cuenta filtrados del cliente"
+
+#. module: sh_customer_statement
+#: model:ir.actions.report,name:sh_customer_statement.action_report_sh_customer_due_statement
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__sh_customer_mail_history__sh_statement_type__customer_overdue_statement
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_mail_history_search_view
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_res_partner_search_view
+msgid "Customer Overdue Statement"
+msgstr "Estado de cuenta vencido del cliente"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_company__sh_customer_due_statement_action
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_config_settings__sh_customer_due_statement_action
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_config_mass_update__sh_customer_config_update
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_mass_update__sh_customer_update
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_statement_config__sh_customer_due_statement_action
+msgid "Customer Overdue Statement Action"
+msgstr "Acciones por estado de cuenta vencido del cliente"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_company__sh_customer_due_statement_auto_send
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_config_settings__sh_customer_due_statement_auto_send
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_statement_config__sh_customer_due_statement_auto_send
+msgid "Customer Overdue Statement Auto Send"
+msgstr "Estado de cuenta vencido del cliente (envío automático)"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_company__sh_cust_due_create_log_history
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_config_settings__sh_cust_due_create_log_history
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_statement_config__sh_cust_due_create_log_history
+msgid "Customer Overdue Statement Mail Log History"
+msgstr "Historial de correos electrónicos con estado de cuenta vencido del cliente"
+
+#. module: sh_customer_statement
+#: model:mail.template,name:sh_customer_statement.sh_customer_due_statement_mail_template
+msgid "Customer Overdue Statement: Send by email"
+msgstr "Estado de cuenta vencido del cliente: Enviar por correo electrónico"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_partner__sh_customer_due_statement_ids
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_users__sh_customer_due_statement_ids
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_view
+msgid "Customer Overdue Statements"
+msgstr "Estados de cuenta vencidos de clientes"
+
+#. module: sh_customer_statement
+#: model:ir.actions.report,name:sh_customer_statement.action_report_sh_customer_statement
+#: model:ir.model,name:sh_customer_statement.model_sh_customer_statement
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__sh_customer_mail_history__sh_statement_type__customer_statement
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_mail_history_search_view
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_view
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_res_partner_search_view
+msgid "Customer Statement"
+msgstr "Declaración del cliente"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_company__sh_customer_statement_action
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_config_settings__sh_customer_statement_action
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_statement_config__sh_customer_statement_action
+msgid "Customer Statement Action"
+msgstr "Declaración del cliente Acción"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_company__sh_customer_statement_auto_send
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_config_settings__sh_customer_statement_auto_send
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_statement_config__sh_customer_statement_auto_send
+msgid "Customer Statement Auto Send"
+msgstr "Envío automático del extracto del cliente"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__sh_customer_mail_history__sh_statement_type__customer_statement_filter
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_mail_history_search_view
+msgid "Customer Statement By Date"
+msgstr "Estado de cuenta del cliente por fecha"
+
+#. module: sh_customer_statement
+#: model:mail.template,name:sh_customer_statement.sh_customer_filter_statement_mail_template
+msgid "Customer Statement By Date: Send by email"
+msgstr "Estado de cuenta del cliente. Fecha límite: Enviar por correo electrónico"
+
+#. module: sh_customer_statement
+#: model:ir.actions.act_window,name:sh_customer_statement.sh_customer_statement_action
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_partner__sh_customer_statement_config
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_users__sh_customer_statement_config
+#: model:ir.ui.menu,name:sh_customer_statement.menu_customer_statement_config
+msgid "Customer Statement Config"
+msgstr "Configuración del estado de cuenta del cliente"
+
+#. module: sh_customer_statement
+#: model:ir.actions.report,name:sh_customer_statement.action_report_sh_customer_filtered_statement
+msgid "Customer Statement Filter By Date"
+msgstr "Filtrar extracto de cliente por fecha"
+
+#. module: sh_customer_statement
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_view
+msgid "Customer Statement Filters"
+msgstr "Filtros de extractos de clientes"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_company__sh_cust_create_log_history
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_config_settings__sh_cust_create_log_history
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_statement_config__sh_cust_create_log_history
+msgid "Customer Statement Mail Log History"
+msgstr "Historial de correos electrónicos de estados de cuenta de clientes"
+
+#. module: sh_customer_statement
+#: model:ir.model,name:sh_customer_statement.model_sh_customer_mass_update
+msgid "Customer Statement Mass Update"
+msgstr "Actualización masiva del estado de cuenta del cliente"
+
+#. module: sh_customer_statement
+#: model:mail.template,name:sh_customer_statement.sh_customer_statement_mail_template
+msgid "Customer Statement: Send by email"
+msgstr "Declaración del cliente: Enviar por correo electrónico"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_partner__sh_customer_statement_ids
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_users__sh_customer_statement_ids
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.portal_my_home_customer_statements
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.portal_my_home_menu_customer_statements
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_statement_portal
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_view
+msgid "Customer Statements"
+msgstr "Estados de cuenta del cliente"
+
+#. module: sh_customer_statement
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_statement_portal
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_view
+msgid "Customer Statements By Filter"
+msgstr "Estados de cuenta de clientes por filtro"
+
+#. module: sh_customer_statement
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_view
+msgid "Customer Statements by Filter"
+msgstr "Estados de cuenta de clientes por filtro"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_mail_compose_message__is_customer_statement
+msgid "Customer Whatsapp ?"
+msgstr "¿Cliente por WhatsApp?"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_mass_update__sh_update_customers_ids
+msgid "Customers"
+msgstr "Clientes"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__res_company__sh_customer_due_statement_action__daily
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__res_company__sh_customer_statement_action__daily
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__sh_customer_statement_config__sh_customer_due_statement_action__daily
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__sh_customer_statement_config__sh_customer_statement_action__daily
+msgid "Daily"
+msgstr "A diario"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_company__sh_cus_daily_statement_template_id
+msgid "Daily Mail Template"
+msgstr "Plantilla del Daily Mail"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_company__sh_cus_due_daily_statement_template_id
+msgid "Daily Mail Template "
+msgstr "Plantilla del Daily Mail"
+
+#. module: sh_customer_statement
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_due_statement_doc
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_filtered_statement_doc
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_statement_doc
+msgid "Date"
+msgstr "Fecha"
+
+#. module: sh_customer_statement
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_filtered_statement_doc
+msgid "Date From -"
+msgstr "Fecha de inicio -"
+
+#. module: sh_customer_statement
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_due_statement_doc
+msgid "Date:"
+msgstr "Fecha:"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__res_company__sh_cust_due_yearly_month__december
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__res_company__sh_cust_yearly_month__december
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__sh_customer_statement_config__sh_cust_due_yearly_month__december
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__sh_customer_statement_config__sh_cust_yearly_month__december
+msgid "December"
+msgstr "Diciembre"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__sh_customer_mail_history__sh_mail_status__exception
+msgid "Delivery Failed"
+msgstr "Falló la entrega"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_company__sh_display_due_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_config_settings__sh_display_due_statement
+msgid "Display Due/Overdue Statements"
+msgstr "Mostrar estados de cuenta vencidos/vencidos"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_config_mass_update__display_name
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_due_statement__display_name
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_mail_history__display_name
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_mass_update__display_name
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_statement__display_name
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_statement_config__display_name
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_res_partner_filter_statement__display_name
+msgid "Display Name"
+msgstr "Nombre para mostrar"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_company__sh_display_message_in_chatter
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_config_settings__sh_display_message_in_chatter
+msgid "Display in Chatter Message?"
+msgstr "¿Mostrar en el mensaje de Chatter?"
+
+#. module: sh_customer_statement
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_res_partner_search_view
+msgid "Don't Send Customer Statement Auto"
+msgstr "No enviar extracto de cliente automático"
+
+#. module: sh_customer_statement
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_res_partner_search_view
+msgid "Don't Send Overdue Customer Statement Auto"
+msgstr "No enviar estados de cuenta de clientes vencidos automáticamente"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_partner__sh_dont_send_due_customer_statement_auto
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_users__sh_dont_send_due_customer_statement_auto
+msgid "Don't send Overdue statement auto ?"
+msgstr "¿No enviar automáticamente el estado de cuenta vencido?"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_partner__sh_dont_send_customer_statement_auto
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_users__sh_dont_send_customer_statement_auto
+msgid "Don't send statement auto ?"
+msgstr "¿No enviar extracto automáticamente?"
+
+#. module: sh_customer_statement
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_statement_portal
+msgid "Download Filterd Statement"
+msgstr "Descargar extracto filtrado"
+
+#. module: sh_customer_statement
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_statement_portal
+msgid "Download Filtered Statement"
+msgstr "Descargar extracto filtrado"
+
+#. module: sh_customer_statement
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_statement_portal
+msgid "Download Filtered Statement XLS"
+msgstr "Descargar extracto filtrado XLS"
+
+#. module: sh_customer_statement
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_statement_portal
+msgid "Download Overdue Statement"
+msgstr "Descargar estado de cuenta vencido"
+
+#. module: sh_customer_statement
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_statement_portal
+msgid "Download Overdue Statement XLS"
+msgstr "Descargar estado de cuenta vencido (XLS)"
+
+#. module: sh_customer_statement
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_statement_portal
+msgid "Download Statement"
+msgstr "Descargar declaración"
+
+#. module: sh_customer_statement
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_statement_portal
+msgid "Download Statement XLS"
+msgstr "Descargar extracto XLS"
+
+#. module: sh_customer_statement
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_due_statement_doc
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_filtered_statement_doc
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_statement_doc
+msgid "Due Date"
+msgstr "Fecha de vencimiento"
+
+#. module: sh_customer_statement
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_statement_config_setting_view
+msgid "Due/Overdue Statement Display configuration"
+msgstr "Configuración de visualización de estados de cuenta vencidos/vencidos"
+
+#. module: sh_customer_statement
+#: model:ir.model,name:sh_customer_statement.model_mail_compose_message
+msgid "Email composition wizard"
+msgstr "Asistente para redacción de correo electrónico"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_partner__end_date
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_users__end_date
+msgid "End Date"
+msgstr "Fecha de finalización"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_config_settings__sh_cust_monthly_end
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_statement_config__sh_cust_monthly_end
+msgid "End of  month"
+msgstr "Fin de mes"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_company__sh_cust_monthly_end
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_config_settings__sh_cust_due_monthly_end
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_statement_config__sh_cust_due_monthly_end
+msgid "End of month"
+msgstr "Fin de mes"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_company__sh_cust_due_monthly_end
+msgid "End of month "
+msgstr "Fin de mes"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__res_company__sh_cust_due_yearly_month__february
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__res_company__sh_cust_yearly_month__february
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__sh_customer_statement_config__sh_cust_due_yearly_month__february
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__sh_customer_statement_config__sh_cust_yearly_month__february
+msgid "February"
+msgstr "Febrero"
+
+#. module: sh_customer_statement
+#: model:ir.model,name:sh_customer_statement.model_sh_res_partner_filter_statement
+msgid "Filter Customer Statement"
+msgstr "Filtrar extracto del cliente"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_company__filter_only_unpaid_and_send_that
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_config_settings__filter_only_unpaid_and_send_that
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_statement_config__filter_only_unpaid_and_send_that
+msgid "Filter Only Unpaid, Send nothing if all invoices are paid"
+msgstr "Filtrar solo facturas impagadas; no enviar nada si todas las facturas están pagadas."
+
+#. module: sh_customer_statement
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_statement_portal
+msgid "Form Date"
+msgstr "Fecha del formulario"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__res_company__sh_cust_due_week_day__4
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__res_company__sh_cust_week_day__4
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__sh_customer_statement_config__sh_cust_due_week_day__4
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__sh_customer_statement_config__sh_cust_week_day__4
+msgid "Friday"
+msgstr "Viernes"
+
+#. module: sh_customer_statement
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_statement_doc
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_statement_portal
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_view
+msgid "Gap Between Days"
+msgstr "Intervalo entre días"
+
+#. module: sh_customer_statement
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_view
+msgid "Get Customer Statement"
+msgstr "Obtenga el estado de cuenta del cliente"
+
+#. module: sh_customer_statement
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_statement_portal
+msgid "Get Statement"
+msgstr "Obtener estado de cuenta"
+
+#. module: sh_customer_statement
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_mail_history_search_view
+msgid "Group By"
+msgstr "Agrupar por"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_config_mass_update__id
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_due_statement__id
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_mail_history__id
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_mass_update__id
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_statement__id
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_statement_config__id
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_res_partner_filter_statement__id
+msgid "ID"
+msgstr "IDENTIFICACIÓN"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__res_partner__payment_state__in_payment
+msgid "In Payment"
+msgstr "En pago"
+
+#. module: sh_customer_statement
+#. odoo-python
+#: code:addons/sh_customer_statement/controllers/main.py:0
+msgid "Invalid report type: %s"
+msgstr "Tipo de informe no válido: %s"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_due_statement__sh_due_customer_invoice_date
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_statement__sh_customer_invoice_date
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_res_partner_filter_statement__sh_filter_invoice_date
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_statement_portal
+msgid "Invoice Date"
+msgstr "Fecha de factura"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_due_statement__sh_due_customer_due_date
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_statement__sh_customer_due_date
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_res_partner_filter_statement__sh_filter_due_date
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_statement_portal
+msgid "Invoice Due Date"
+msgstr "Fecha de vencimiento de la factura"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_due_statement__name
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_statement__name
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_res_partner_filter_statement__name
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_statement_portal
+msgid "Invoice Number"
+msgstr "Número de factura"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__res_partner__payment_state__invoicing_legacy
+msgid "Invoicing App Legacy"
+msgstr "Aplicación de facturación heredada"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__res_company__sh_cust_due_yearly_month__january
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__res_company__sh_cust_yearly_month__january
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__sh_customer_statement_config__sh_cust_due_yearly_month__january
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__sh_customer_statement_config__sh_cust_yearly_month__january
+msgid "January"
+msgstr "Enero"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__res_company__sh_cust_due_yearly_month__july
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__res_company__sh_cust_yearly_month__july
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__sh_customer_statement_config__sh_cust_due_yearly_month__july
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__sh_customer_statement_config__sh_cust_yearly_month__july
+msgid "July"
+msgstr "Julio"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__res_company__sh_cust_due_yearly_month__june
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__res_company__sh_cust_yearly_month__june
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__sh_customer_statement_config__sh_cust_due_yearly_month__june
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__sh_customer_statement_config__sh_cust_yearly_month__june
+msgid "June"
+msgstr "Junio"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__res_partner__sh_date_filter__last_month
+msgid "Last Month"
+msgstr "Mes pasado"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__res_partner__sh_date_filter__last_quarter
+msgid "Last Quarter"
+msgstr "Último trimestre"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_config_mass_update__write_uid
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_due_statement__write_uid
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_mail_history__write_uid
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_mass_update__write_uid
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_statement__write_uid
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_statement_config__write_uid
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_res_partner_filter_statement__write_uid
+msgid "Last Updated by"
+msgstr "Última actualización por"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_config_mass_update__write_date
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_due_statement__write_date
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_mail_history__write_date
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_mass_update__write_date
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_statement__write_date
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_statement_config__write_date
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_res_partner_filter_statement__write_date
+msgid "Last Updated on"
+msgstr "Última actualización:"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__res_partner__sh_date_filter__last_year
+msgid "Last Year"
+msgstr "El año pasado"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_mail_history__sh_current_date
+msgid "Log Date"
+msgstr "Fecha de registro"
+
+#. module: sh_customer_statement
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_statement_form
+msgid "Mail History"
+msgstr "Historial de correo"
+
+#. module: sh_customer_statement
+#. odoo-python
+#: code:addons/sh_customer_statement/models/sh_customer_statement_config.py:0
+#: model:ir.actions.act_window,name:sh_customer_statement.sh_customer_mail_history_action
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_history_form_view
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_history_tree_view
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_mail_history_search_view
+msgid "Mail Log History"
+msgstr "Historial del registro de correo"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_mail_history__sh_mail_id
+msgid "Mail Reference"
+msgstr "Referencia de correo"
+
+#. module: sh_customer_statement
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_mail_history_search_view
+msgid "Mail Sent Date"
+msgstr "Fecha de envío del correo"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_mail_history__sh_mail_status
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_mail_history_search_view
+msgid "Mail Sent Status"
+msgstr "Estado del correo enviado"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__res_company__sh_cust_due_yearly_month__march
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__res_company__sh_cust_yearly_month__march
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__sh_customer_statement_config__sh_cust_due_yearly_month__march
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__sh_customer_statement_config__sh_cust_yearly_month__march
+msgid "March"
+msgstr "Marzo"
+
+#. module: sh_customer_statement
+#: model:ir.actions.act_window,name:sh_customer_statement.sh_update_customer_statement_action_wizard
+#: model:ir.actions.act_window,name:sh_customer_statement.sh_update_customer_statement_config_action_wizard
+#: model:ir.actions.server,name:sh_customer_statement.sh_customer_statement_mass_update
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_update_customers_statement_config_wizard
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_update_customers_statement_wizard
+msgid "Mass Update"
+msgstr "Actualización masiva"
+
+#. module: sh_customer_statement
+#: model:ir.actions.server,name:sh_customer_statement.sh_customer_statement_config_mass_update
+msgid "Mass Update Config"
+msgstr "Configuración de actualización masiva"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__res_company__sh_cust_due_yearly_month__may
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__res_company__sh_cust_yearly_month__may
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__sh_customer_statement_config__sh_cust_due_yearly_month__may
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__sh_customer_statement_config__sh_cust_yearly_month__may
+msgid "May"
+msgstr "Puede"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__res_company__sh_cust_due_week_day__0
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__res_company__sh_cust_week_day__0
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__sh_customer_statement_config__sh_cust_due_week_day__0
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__sh_customer_statement_config__sh_cust_week_day__0
+msgid "Monday"
+msgstr "Lunes"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_company__sh_cust_yearly_month
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_config_settings__sh_cust_due_yearly_month
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_statement_config__sh_cust_due_yearly_month
+msgid "Month"
+msgstr "Mes"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__res_company__sh_customer_due_statement_action__monthly
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__res_company__sh_customer_statement_action__monthly
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__sh_customer_statement_config__sh_customer_due_statement_action__monthly
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__sh_customer_statement_config__sh_customer_statement_action__monthly
+msgid "Monthly"
+msgstr "Mensual"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_config_settings__sh_cust_monthly_date
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_statement_config__sh_cust_monthly_date
+msgid "Monthly  Day"
+msgstr "Día del mes"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_config_settings__sh_cust_due_monthly_template_id
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_statement_config__sh_cust_due_monthly_template_id
+msgid "Monthly  Mail Template"
+msgstr "Plantilla de correo mensual"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_company__sh_cust_monthly_date
+msgid "Monthly Day"
+msgstr "Día del mes"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_company__sh_cust_due_monthly_date
+msgid "Monthly Day "
+msgstr "Día del mes"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_config_settings__sh_cust_due_monthly_date
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_statement_config__sh_cust_due_monthly_date
+msgid "Monthly Day    "
+msgstr "Día del mes"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_company__sh_cust_monthly_template_id
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_config_settings__sh_cust_monthly_template_id
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_statement_config__sh_cust_monthly_template_id
+msgid "Monthly Mail Template"
+msgstr "Plantilla de correo mensual"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_company__sh_cust_due_monthly_template_id
+msgid "Monthly Mail Template "
+msgstr "Plantilla de correo mensual"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_mail_history__name
+msgid "Name"
+msgstr "Nombre"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__res_partner__payment_state__not_paid
+msgid "Not Paid"
+msgstr "No pagado"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__res_company__sh_cust_due_yearly_month__november
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__res_company__sh_cust_yearly_month__november
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__sh_customer_statement_config__sh_cust_due_yearly_month__november
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__sh_customer_statement_config__sh_cust_yearly_month__november
+msgid "November"
+msgstr "Noviembre"
+
+#. module: sh_customer_statement
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_due_statement_doc
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_filtered_statement_doc
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_statement_doc
+msgid "Number"
+msgstr "Número"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__res_company__sh_cust_due_yearly_month__october
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__res_company__sh_cust_yearly_month__october
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__sh_customer_statement_config__sh_cust_due_yearly_month__october
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__sh_customer_statement_config__sh_cust_yearly_month__october
+msgid "October"
+msgstr "Octubre"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__res_company__sh_display_due_statement__due
+msgid "Only Due"
+msgstr "Solo debido a"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__res_company__sh_display_due_statement__overdue
+msgid "Only Overdue"
+msgstr "Solo atrasado"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__sh_customer_mail_history__sh_mail_status__outgoing
+msgid "Outgoing"
+msgstr "Extrovertido"
+
+#. module: sh_customer_statement
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_statement_portal
+msgid "Overdue Statements"
+msgstr "Estados de cuenta vencidos"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__res_partner__payment_state__paid
+msgid "Paid"
+msgstr "Pagado"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_due_statement__sh_due_customer_paid_amount
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_statement__sh_customer_paid_amount
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_res_partner_filter_statement__sh_filter_paid_amount
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_due_statement_doc
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_filtered_statement_doc
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_statement_doc
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_statement_portal
+msgid "Paid Amount"
+msgstr "Importe pagado"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__res_partner__payment_state__partial
+msgid "Partially Paid"
+msgstr "Parcialmente pagado"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_due_statement__partner_id
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_statement__partner_id
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_res_partner_filter_statement__partner_id
+msgid "Partner"
+msgstr "Pareja"
+
+#. module: sh_customer_statement
+#: model:ir.model,name:sh_customer_statement.model_sh_customer_mail_history
+msgid "Partner Mail History"
+msgstr "Historial de correo de socios"
+
+#. module: sh_customer_statement
+#. odoo-python
+#: code:addons/sh_customer_statement/models/res_partner.py:0
+msgid "Partner Mobile Number Not Exist !"
+msgstr "¡El número de móvil del socio no existe!"
+
+#. module: sh_customer_statement
+#: model:ir.model,name:sh_customer_statement.model_sh_customer_config_mass_update
+msgid "Partner Statement Mass Update"
+msgstr "Actualización masiva de la declaración del socio"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_partner__payment_state
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_users__payment_state
+msgid "Payment Status"
+msgstr "Estado del pago"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_partner__portal_statement_url_wp
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_users__portal_statement_url_wp
+msgid "Portal Statement Url Wp"
+msgstr "URL de declaración del portal WP"
+
+#. module: sh_customer_statement
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_view
+msgid "Print Customer Statement"
+msgstr "Imprimir estado de cuenta del cliente"
+
+#. module: sh_customer_statement
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_view
+msgid "Print Filter Customer Statement"
+msgstr "Imprimir extracto del cliente"
+
+#. module: sh_customer_statement
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_view
+msgid "Print Overdue Customer Statement"
+msgstr "Imprimir estado de cuenta vencido del cliente"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__sh_customer_mail_history__sh_mail_status__received
+msgid "Received"
+msgstr "Recibió"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__sh_customer_config_mass_update__sh_customer_config_update__remove
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__sh_customer_mass_update__sh_customer_update__remove
+msgid "Remove"
+msgstr "Eliminar"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__res_partner__payment_state__reversed
+msgid "Reversed"
+msgstr "Invertido"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__res_company__sh_cust_due_week_day__5
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__res_company__sh_cust_week_day__5
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__sh_customer_statement_config__sh_cust_due_week_day__5
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__sh_customer_statement_config__sh_cust_week_day__5
+msgid "Saturday"
+msgstr "Sábado"
+
+#. module: sh_customer_statement
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_statement_config_setting_view
+msgid "See all mail log history"
+msgstr "Ver todo el historial del registro de correo"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_config_mass_update__sh_selected_partner_ids
+msgid "Selected partners"
+msgstr "Socios seleccionados"
+
+#. module: sh_customer_statement
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_view
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_mail_compose_view
+msgid "Send By Whatsapp"
+msgstr "Enviar por WhatsApp"
+
+#. module: sh_customer_statement
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_view
+msgid "Send Customer Statement"
+msgstr "Enviar estado de cuenta del cliente"
+
+#. module: sh_customer_statement
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_view
+msgid "Send Filter Customer Statement"
+msgstr "Enviar filtro Estado de cuenta del cliente"
+
+#. module: sh_customer_statement
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_statement_portal
+msgid "Send Filtered Statement"
+msgstr "Enviar declaración filtrada"
+
+#. module: sh_customer_statement
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_view
+msgid "Send Overdue Customer Statement"
+msgstr "Enviar estado de cuenta vencido del cliente"
+
+#. module: sh_customer_statement
+#: model:ir.actions.server,name:sh_customer_statement.sh_send_customer_overdue_statement_action
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_statement_portal
+msgid "Send Overdue Statement"
+msgstr "Enviar estado de cuenta vencido"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_company__sh_statement_pdf_in_message
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_config_settings__sh_statement_pdf_in_message
+msgid "Send Report URL in Message?"
+msgstr "¿Enviar la URL del informe en el mensaje?"
+
+#. module: sh_customer_statement
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_statement_config_setting_view
+msgid "Send Report Url in Message"
+msgstr "Enviar URL del informe en el mensaje"
+
+#. module: sh_customer_statement
+#: model:ir.actions.server,name:sh_customer_statement.sh_send_customer_statement_action
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_statement_portal
+msgid "Send Statement"
+msgstr "Enviar declaración"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_company__sh_statement_url_in_message
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_config_settings__sh_statement_url_in_message
+msgid "Send Statement URL in Message?"
+msgstr "¿Enviar la URL del extracto en el mensaje?"
+
+#. module: sh_customer_statement
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_statement_config_setting_view
+msgid "Send Statement Url in Message"
+msgstr "Enviar URL del extracto en el mensaje"
+
+#. module: sh_customer_statement
+#: model:res.groups,name:sh_customer_statement.customer_statement_group_whatsapp
+msgid "Send customer statement by whatsapp feature"
+msgstr "Función para enviar extractos de clientes por WhatsApp"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__sh_customer_mail_history__sh_mail_status__sent
+msgid "Sent"
+msgstr "Enviado"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__res_company__sh_cust_due_yearly_month__september
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__res_company__sh_cust_yearly_month__september
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__sh_customer_statement_config__sh_cust_due_yearly_month__september
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__sh_customer_statement_config__sh_cust_yearly_month__september
+msgid "September"
+msgstr "Septiembre"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_partner__sh_cfs_statement_report_url
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_users__sh_cfs_statement_report_url
+msgid "Sh Cfs Statement Report Url"
+msgstr "URL del informe de declaración de Sh Cfs"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_partner__sh_cust_due_statement_report_url
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_users__sh_cust_due_statement_report_url
+msgid "Sh Cust Due Statement Report Url"
+msgstr "URL del informe de estado de cuenta de Sh Cust"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_partner__sh_cust_statement_report_url
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_users__sh_cust_statement_report_url
+msgid "Sh Cust Statement Report Url"
+msgstr "URL del informe de estado de cuenta del cliente"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_partner__sh_date_filter
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_users__sh_date_filter
+msgid "Sh Date Filter"
+msgstr "Filtro de fecha Sh"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_res_partner_filter_statement__sh_filter_type
+msgid "Sh Filter Type"
+msgstr "Tipo de filtro Sh"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_company__sh_display_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_config_settings__sh_display_customer_statement
+msgid "Show Customer Statement Menu in portal ?"
+msgstr "¿Mostrar el menú de extracto del cliente en el portal?"
+
+#. module: sh_customer_statement
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_statement_config_setting_view
+msgid "Show Message in Chatter"
+msgstr "Mostrar mensaje en Chatter"
+
+#. module: sh_customer_statement
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_statement_config_setting_view
+msgid "Show Signature"
+msgstr "Mostrar firma"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_users__sh_company_sign
+msgid "Signature"
+msgstr "Firma"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_company__sh_statement_signature
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_config_settings__sh_statement_signature
+msgid "Signature?"
+msgstr "¿Firma?"
+
+#. module: sh_customer_statement
+#. odoo-python
+#: code:addons/sh_customer_statement/controllers/main.py:0
+msgid "Sorry, you are not allowed to access this document."
+msgstr "Lo sentimos, no tiene permiso para acceder a este documento."
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_partner__start_date
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_users__start_date
+msgid "Start Date"
+msgstr "Fecha de inicio"
+
+#. module: sh_customer_statement
+#: model:mail.template,name:sh_customer_statement.sh_send_customer_due_whatsapp_email_template
+#: model:mail.template,name:sh_customer_statement.sh_send_customer_filter_whatsapp_email_template
+#: model:mail.template,name:sh_customer_statement.sh_send_customer_whatsapp_email_template
+msgid "Statement By Whatsapp: Send by email"
+msgstr "Declaración por WhatsApp: Enviar por correo electrónico"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_mass_update__sh_statement_ids
+msgid "Statement Mass Update"
+msgstr "Actualización masiva de declaraciones"
+
+#. module: sh_customer_statement
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_statement_config_setting_view
+msgid "Statement Send Whatsapp Configuration"
+msgstr "Declaración Enviar configuración de WhatsApp"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_mail_history__sh_statement_type
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_mail_history_search_view
+msgid "Statement Type"
+msgstr "Tipo de declaración"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__res_company__sh_cust_due_week_day__6
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__res_company__sh_cust_week_day__6
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__sh_customer_statement_config__sh_cust_due_week_day__6
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__sh_customer_statement_config__sh_cust_week_day__6
+msgid "Sunday"
+msgstr "Domingo"
+
+#. module: sh_customer_statement
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_statement_portal
+msgid "There are currently no statements for your account."
+msgstr "Actualmente no hay extractos de su cuenta."
+
+#. module: sh_customer_statement
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__res_partner__sh_date_filter__this_month
+msgid "This Month"
+msgstr "Este mes"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__res_partner__sh_date_filter__this_quarter
+msgid "This Quarter"
+msgstr "Este trimestre"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__res_partner__sh_date_filter__this_year
+msgid "This Year"
+msgstr "Este año"
+
+#. module: sh_customer_statement
+#. odoo-python
+#: code:addons/sh_customer_statement/controllers/main.py:0
+msgid "This document does not exist."
+msgstr "Este documento no existe."
+
+#. module: sh_customer_statement
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__res_company__sh_cust_due_week_day__3
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__res_company__sh_cust_week_day__3
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__sh_customer_statement_config__sh_cust_due_week_day__3
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__sh_customer_statement_config__sh_cust_week_day__3
+msgid "Thursday"
+msgstr "Jueves"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_statement_config__name
+msgid "Title"
+msgstr "Título"
+
+#. module: sh_customer_statement
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_view
+msgid "To"
+msgstr "A"
+
+#. module: sh_customer_statement
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_statement_portal
+msgid "To Date"
+msgstr "Hasta la fecha"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_due_statement__sh_today
+msgid "Today"
+msgstr "Hoy"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_partner__sh_customer_total
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_users__sh_customer_total
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_statement_doc
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_view
+msgid "Total"
+msgstr "Total"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_due_statement__sh_due_customer_amount
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_statement__sh_customer_amount
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_res_partner_filter_statement__sh_filter_amount
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_due_statement_doc
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_filtered_statement_doc
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_statement_doc
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_statement_portal
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_view
+msgid "Total Amount"
+msgstr "Importe total"
+
+#. module: sh_customer_statement
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_view
+msgid "Total Balance"
+msgstr "Saldo total"
+
+#. module: sh_customer_statement
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_view
+msgid "Total Due Amount"
+msgstr "Importe total adeudado"
+
+#. module: sh_customer_statement
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_view
+msgid "Total Due Balance"
+msgstr "Saldo total adeudado"
+
+#. module: sh_customer_statement
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_view
+msgid "Total Due Paid Amount"
+msgstr "Importe total a pagar"
+
+#. module: sh_customer_statement
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_view
+msgid "Total Filter Amount"
+msgstr "Cantidad total del filtro"
+
+#. module: sh_customer_statement
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_customer_view
+msgid "Total Paid Amount"
+msgstr "Importe total pagado"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__res_company__sh_cust_due_week_day__1
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__res_company__sh_cust_week_day__1
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__sh_customer_statement_config__sh_cust_due_week_day__1
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__sh_customer_statement_config__sh_cust_week_day__1
+msgid "Tuesday"
+msgstr "Martes"
+
+#. module: sh_customer_statement
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_update_customers_statement_config_wizard
+#: model_terms:ir.ui.view,arch_db:sh_customer_statement.sh_update_customers_statement_wizard
+msgid "Update"
+msgstr "Actualizar"
+
+#. module: sh_customer_statement
+#: model:ir.model,name:sh_customer_statement.model_res_users
+msgid "User"
+msgstr "Usuario"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__res_company__sh_cust_due_week_day__2
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__res_company__sh_cust_week_day__2
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__sh_customer_statement_config__sh_cust_due_week_day__2
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__sh_customer_statement_config__sh_cust_week_day__2
+msgid "Wednesday"
+msgstr "Miércoles"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_config_settings__sh_cust_week_day
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_statement_config__sh_cust_week_day
+msgid "Week Day"
+msgstr "Día de la semana"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_config_settings__sh_cust_due_week_day
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_statement_config__sh_cust_due_week_day
+msgid "Week Day "
+msgstr "Día de la semana"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__res_company__sh_customer_due_statement_action__weekly
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__res_company__sh_customer_statement_action__weekly
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__sh_customer_statement_config__sh_customer_due_statement_action__weekly
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__sh_customer_statement_config__sh_customer_statement_action__weekly
+msgid "Weekly"
+msgstr "Semanalmente"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_company__sh_cust_weekly_statement_template_id
+msgid "Weekly Mail Template"
+msgstr "Plantilla de correo semanal"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_company__sh_cust_due_weekly_statement_template_id
+msgid "Weekly Mail Template "
+msgstr "Plantilla de correo semanal"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_config_settings__sh_cust_weekly_statement_template_id
+#: model:ir.model.fields,field_description:sh_customer_statement.field_sh_customer_statement_config__sh_cust_weekly_statement_template_id
+msgid "Weekly Mail Template   "
+msgstr "Plantilla de correo semanal"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__res_company__sh_customer_due_statement_action__yearly
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__res_company__sh_customer_statement_action__yearly
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__sh_customer_statement_config__sh_customer_due_statement_action__yearly
+#: model:ir.model.fields.selection,name:sh_customer_statement.selection__sh_customer_statement_config__sh_customer_statement_action__yearly
+msgid "Yearly"
+msgstr "Anual"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_company__sh_cust_due_yearly_date
+msgid "Yearly Day "
+msgstr "Día anual"
+
+#. module: sh_customer_statement
+#: model:ir.model.fields,field_description:sh_customer_statement.field_res_company__sh_cust_yearly_date
+msgid "Yearly day "
+msgstr "Día anual"
+
+#. module: sh_customer_statement
+#. odoo-python
+#: code:addons/sh_customer_statement/models/res_partner.py:0
+msgid "start date must be less than end date."
+msgstr "La fecha de inicio debe ser anterior a la fecha de finalización."
+
+#. module: sh_customer_statement
+#: model:mail.template,subject:sh_customer_statement.sh_send_customer_due_whatsapp_email_template
+msgid "{{object.get_company().name}} Customer Due/Overdue Statement"
+msgstr "{{object.get_company().name}} Estado de cuenta vencido/vencido del cliente"
+
+#. module: sh_customer_statement
+#: model:mail.template,subject:sh_customer_statement.sh_send_customer_whatsapp_email_template
+msgid "{{object.get_company().name}} Customer Statement"
+msgstr "{{object.get_company().name}} Estado de cuenta del cliente"
+
+#. module: sh_customer_statement
+#: model:mail.template,subject:sh_customer_statement.sh_send_customer_filter_whatsapp_email_template
+msgid "{{object.get_company().name}} Customer Statement By Date"
+msgstr "{{object.get_company().name}} Estado de cuenta del cliente por fecha"

@@ -1,0 +1,96 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* sng_control_sale
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-29 00:00+0000\n"
+"PO-Revision-Date: 2026-01-29 00:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: sng_control_sale
+#: model:ir.ui.view,arch_db:sng_control_sale.res_config_settings_view_form_inherit_sng_control_sale
+msgid "Bloqueo por stock"
+msgstr "Bloqueo por stock"
+
+#. module: sng_control_sale
+#: model:ir.ui.view,arch_db:sng_control_sale.res_config_settings_view_form_inherit_sng_control_sale
+msgid "Bloquear ventas sin stock"
+msgstr "Bloquear ventas sin stock"
+
+#. module: sng_control_sale
+#: model:ir.ui.view,arch_db:sng_control_sale.res_config_settings_view_form_inherit_sng_control_sale
+msgid "Bloquea la confirmación de ventas cuando no hay stock disponible."
+msgstr "Bloquea la confirmación de ventas cuando no hay stock disponible."
+
+#. module: sng_control_sale
+#: model:ir.ui.view,arch_db:sng_control_sale.res_config_settings_view_form_inherit_sng_control_sale
+msgid "Permitir excepciones por usuario"
+msgstr "Permitir excepciones por usuario"
+
+#. module: sng_control_sale
+#: model:ir.ui.view,arch_db:sng_control_sale.res_config_settings_view_form_inherit_sng_control_sale
+msgid "Validar solo ciertos almacenes"
+msgstr "Validar solo ciertos almacenes"
+
+#. module: sng_control_sale
+#: model:res.groups,name:sng_control_sale.group_allow_negative_stock
+msgid "Permitir confirmar sin stock"
+msgstr "Permitir confirmar sin stock"
+
+#. module: sng_control_sale
+#: model:ir.model.fields,field_description:sng_control_sale.field_res_company__block_sale_without_stock
+msgid "Block sales without stock"
+msgstr "Bloquear ventas sin stock"
+
+#. module: sng_control_sale
+#: model:ir.model.fields,field_description:sng_control_sale.field_res_company__stock_block_allow_exception_group
+msgid "Allow user exceptions"
+msgstr "Permitir excepciones por usuario"
+
+#. module: sng_control_sale
+#: model:ir.model.fields,field_description:sng_control_sale.field_res_company__stock_block_warehouse_ids
+msgid "Warehouses to validate"
+msgstr "Almacenes a validar"
+
+#. module: sng_control_sale
+#: model:ir.model.fields,field_description:sng_control_sale.field_res_config_settings__block_sale_without_stock
+msgid "Block sales without stock"
+msgstr "Bloquear ventas sin stock"
+
+#. module: sng_control_sale
+#: model:ir.model.fields,field_description:sng_control_sale.field_res_config_settings__stock_block_allow_exception_group
+msgid "Allow user exceptions"
+msgstr "Permitir excepciones por usuario"
+
+#. module: sng_control_sale
+#: model:ir.model.fields,field_description:sng_control_sale.field_res_config_settings__stock_block_warehouse_ids
+msgid "Warehouses to validate"
+msgstr "Almacenes a validar"
+
+#. module: sng_control_sale
+#: code:addons/sng_control_sale/models/sale_order.py:0
+msgid "No hay stock suficiente para confirmar la orden:"
+msgstr "No hay stock suficiente para confirmar la orden:"
+
+#. module: sng_control_sale
+#: code:addons/sng_control_sale/models/sale_order.py:0
+msgid "Producto: %s"
+msgstr "Producto: %s"
+
+#. module: sng_control_sale
+#: code:addons/sng_control_sale/models/sale_order.py:0
+msgid "Solicitado: %s %s"
+msgstr "Solicitado: %s %s"
+
+#. module: sng_control_sale
+#: code:addons/sng_control_sale/models/sale_order.py:0
+msgid "Disponible en Almacén %s: %s %s"
+msgstr "Disponible en Almacén %s: %s %s"

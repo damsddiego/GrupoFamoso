@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_inherit_sng_control_sale" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.sng.control.sale</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="sale.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//app[@name='sale_management']" position="inside">
+                <block title="Bloqueo por stock" name="sng_control_sale_stock_block">
+                    <setting id="block_sale_without_stock" string="Bloquear ventas sin stock"
+                             help="Bloquea la confirmación de ventas cuando no hay stock disponible.">
+                        <field name="block_sale_without_stock"/>
+                        <div class="content-group" invisible="not block_sale_without_stock">
+                            <div class="row mt16">
+                                <label for="stock_block_allow_exception_group"
+                                       string="Permitir excepciones por usuario"
+                                       class="col-lg-3 o_light_label"/>
+                                <field name="stock_block_allow_exception_group"/>
+                            </div>
+                            <div class="row mt16">
+                                <label for="stock_block_warehouse_ids"
+                                       string="Validar solo ciertos almacenes"
+                                       class="col-lg-3 o_light_label"/>
+                                <field name="stock_block_warehouse_ids"
+                                       widget="many2many_tags"
+                                       options="{'no_create': True}"/>
+                            </div>
+                        </div>
+                    </setting>
+                </block>
+            </xpath>
+        </field>
+    </record>
+</odoo>

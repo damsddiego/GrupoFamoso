@@ -1,0 +1,368 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<template id="report_customer_statement_doc">
+    <t t-call="web.html_container">
+        <t t-foreach="docs" t-as="wizard">
+            <t t-call="web.external_layout">
+                <div class="page">
+                    <t t-set="report_mode" t-value="data.get('report_mode') or 'summary'"/>
+
+                    <!-- ================================================
+                         ENCABEZADO DEL REPORTE
+                         ================================================ -->
+                    <div class="row mb-4">
+                        <div class="col-12 text-center">
+                            <h2 class="mb-1">Estado de Cuenta de Clientes</h2>
+                            <p class="text-muted mb-0">
+                                Empresa: <strong t-esc="company.name"/>
+                                &amp;nbsp;|&amp;nbsp;
+                                Período:
+                                <strong t-esc="fmt_date(data.get('date_from', ''))"/>
+                                al
+                                <strong t-esc="fmt_date(data.get('date_to', ''))"/>
+                            </p>
+                            <p class="text-muted small">
+                                Modo:
+                                <span t-if="report_mode == 'summary'">Resumen por cliente</span>
+                                <span t-if="report_mode == 'detail'">Detalle por cliente</span>
+                                &amp;nbsp;|&amp;nbsp;
+                                <span t-if="data.get('include_credit_notes')">Incluye notas de crédito</span>
+                                <span t-if="data.get('show_draft_payments')">&amp;nbsp;|&amp;nbsp;Muestra pagos en borrador</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- ================================================
+                         MODO RESUMEN: tabla KPI por cliente
+                         ================================================ -->
+                    <t t-if="report_mode == 'summary'">
+
+                        <table class="table table-sm table-bordered o_report_block" style="font-size:9pt;">
+                            <thead style="background-color:#2E75B6; color:white;">
+                                <tr>
+                                    <th>Cliente</th>
+                                    <th>RUC/NIT</th>
+                                    <th class="text-right">Total Facturado</th>
+                                    <th class="text-right">Total Pagado</th>
+                                    <th class="text-right">Saldo Pendiente</th>
+                                    <th class="text-right">Pendiente x Aplicar</th>
+                                    <th class="text-right">Venc. 0-30</th>
+                                    <th class="text-right">Venc. 31-60</th>
+                                    <th class="text-right">Venc. 61-90</th>
+                                    <th class="text-right">Venc. 91+</th>
+                                    <th>Últ. Factura</th>
+                                    <th>Últ. Pago</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="data.get('customers', [])" t-as="cust">
+                                    <tr>
+                                        <td><strong t-esc="cust.get('partner_name', '')"/></td>
+                                        <td t-esc="cust.get('partner_vat', '')"/>
+                                        <td class="text-right">
+                                            <t t-esc="fmt_amount(cust.get('total_invoiced', 0))"/>
+                                        </td>
+                                        <td class="text-right" style="color:#1F618D;">
+                                            <t t-esc="fmt_amount(cust.get('total_applied', 0))"/>
+                                        </td>
+                                        <td class="text-right"
+                                            t-attf-style="color: #{cust.get('total_residual',0) > 0 and 'C0392B' or '000000'}; font-weight:bold;">
+                                            <t t-esc="fmt_amount(cust.get('total_residual', 0))"/>
+                                        </td>
+                                        <!-- Pendiente por aplicar = pagos en borrador (informativo) -->
+                                        <td class="text-right" style="color:#7F8C8D; font-style:italic;">
+                                            <t t-esc="fmt_amount(cust.get('total_draft_pending', 0))"/>
+                                            <t t-if="cust.get('total_draft_pending', 0) > 0">
+                                                <br/><small>(borrador)</small>
+                                            </t>
+                                        </td>
+                                        <td class="text-right" t-esc="fmt_amount(cust.get('bucket_0_30', 0))"/>
+                                        <td class="text-right" t-esc="fmt_amount(cust.get('bucket_31_60', 0))"/>
+                                        <td class="text-right" t-esc="fmt_amount(cust.get('bucket_61_90', 0))"/>
+                                        <td class="text-right"
+                                            t-attf-style="color: #{cust.get('bucket_91_plus',0) > 0 and 'C0392B' or '000000'};">
+                                            <t t-esc="fmt_amount(cust.get('bucket_91_plus', 0))"/>
+                                        </td>
+                                        <td t-esc="fmt_date(cust.get('last_invoice_date'))"/>
+                                        <td t-esc="fmt_date(cust.get('last_payment_date'))"/>
+                                    </tr>
+                                </t>
+                            </tbody>
+                            <tfoot style="background-color:#FFF2CC; font-weight:bold;">
+                                <tr>
+                                    <td colspan="2">TOTAL GENERAL
+                                        (<t t-esc="data.get('grand_totals', {}).get('customer_count', 0)"/> clientes)
+                                    </td>
+                                    <td class="text-right">
+                                        <t t-esc="fmt_amount(data.get('grand_totals', {}).get('total_invoiced', 0))"/>
+                                    </td>
+                                    <td class="text-right">
+                                        <t t-esc="fmt_amount(data.get('grand_totals', {}).get('total_applied', 0))"/>
+                                    </td>
+                                    <td class="text-right">
+                                        <t t-esc="fmt_amount(data.get('grand_totals', {}).get('total_residual', 0))"/>
+                                    </td>
+                                    <td class="text-right" style="font-style:italic;">
+                                        <t t-esc="fmt_amount(data.get('grand_totals', {}).get('total_draft_pending', 0))"/>
+                                    </td>
+                                    <td class="text-right">
+                                        <t t-esc="fmt_amount(data.get('grand_totals', {}).get('bucket_0_30', 0))"/>
+                                    </td>
+                                    <td class="text-right">
+                                        <t t-esc="fmt_amount(data.get('grand_totals', {}).get('bucket_31_60', 0))"/>
+                                    </td>
+                                    <td class="text-right">
+                                        <t t-esc="fmt_amount(data.get('grand_totals', {}).get('bucket_61_90', 0))"/>
+                                    </td>
+                                    <td class="text-right">
+                                        <t t-esc="fmt_amount(data.get('grand_totals', {}).get('bucket_91_plus', 0))"/>
+                                    </td>
+                                    <td colspan="2"></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+
+                        <!-- Nota al pie sobre exclusiones -->
+                        <div class="mt-3" style="font-size:8pt; color:#7F8C8D;">
+                            <strong>Notas:</strong>
+                            Se excluyen automáticamente facturas con estado de tributación
+                            <em>"Rechazado"</em>.
+                            La columna "Pendiente x Aplicar" corresponde a pagos en borrador
+                            y es <strong>solo informativa</strong> (no afecta el saldo contable).
+                        </div>
+
+                    </t><!-- /summary -->
+
+
+                    <!-- ================================================
+                         MODO DETALLE: ledger por cliente
+                         ================================================ -->
+                    <t t-if="report_mode == 'detail'">
+
+                        <t t-foreach="data.get('customers', [])" t-as="cust">
+
+                            <!-- Encabezado del cliente -->
+                            <div class="row mt-3" style="background-color:#D6E4F0; padding:6px; border-radius:4px;">
+                                <div class="col-8">
+                                    <strong style="font-size:11pt;">
+                                        <t t-esc="cust.get('partner_name', '')"/>
+                                    </strong>
+                                    <span class="text-muted ml-2" t-esc="cust.get('partner_vat', '')"/>
+                                    <t t-if="cust.get('salesperson_name')">
+                                        &amp;nbsp;|&amp;nbsp; Vendedor:
+                                        <em t-esc="cust.get('salesperson_name', '')"/>
+                                    </t>
+                                </div>
+                                <div class="col-4 text-right">
+                                    <span class="badge badge-secondary">
+                                        Saldo: <strong t-esc="fmt_amount(cust.get('total_residual', 0))"/>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Tabla de movimientos -->
+                            <t t-set="invoice_rows" t-value="[inv for inv in cust.get('invoices', []) if inv.get('type') == 'invoice']"/>
+                            <t t-set="subtotal_invoiced" t-value="sum((inv.get('amount_total') or 0.0) for inv in invoice_rows)"/>
+                            <t t-set="subtotal_applied" t-value="sum((inv.get('amount_applied') or 0.0) for inv in invoice_rows)"/>
+                            <t t-set="subtotal_residual" t-value="sum((inv.get('amount_residual') or 0.0) for inv in invoice_rows)"/>
+                            <table class="table table-sm table-bordered o_report_block mt-1"
+                                   style="font-size:8.5pt;">
+                                <thead style="background-color:#4472C4; color:white;">
+                                    <tr>
+                                        <th>Fecha</th>
+                                        <th>Tipo</th>
+                                        <th>Documento</th>
+                                        <th>Diario</th>
+                                        <th>Referencia</th>
+                                        <th>Moneda</th>
+                                        <th class="text-right">Monto</th>
+                                        <th class="text-right">Aplicado</th>
+                                        <th class="text-right">Saldo</th>
+                                        <th>Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="invoice_rows" t-as="inv">
+                                        <!-- Padre: factura -->
+                                        <tr>
+                                            <td t-esc="fmt_date(inv.get('invoice_date'))"/>
+                                            <td>Factura</td>
+                                            <td>
+                                                <strong t-esc="inv.get('document_name', '')"/>
+                                            </td>
+                                            <td t-esc="inv.get('journal_name', '')"/>
+                                            <td t-esc="inv.get('reference', '')"/>
+                                            <td t-esc="inv.get('currency_name', '')"/>
+                                            <td class="text-right" t-esc="fmt_amount(inv.get('amount_total', 0))"/>
+                                            <td class="text-right" style="color:#1F618D;">
+                                                <t t-esc="fmt_amount(inv.get('amount_applied', 0))"/>
+                                            </td>
+                                            <td class="text-right"
+                                                t-attf-style="font-weight:bold; color:#{inv.get('amount_residual',0) > 0 and 'C0392B' or '2ECC71'};">
+                                                <t t-esc="fmt_amount(inv.get('amount_residual', 0))"/>
+                                            </td>
+                                            <td t-esc="inv.get('payment_state', '')"/>
+                                        </tr>
+
+                                        <!-- Hijos: pagos/NC/reversiones aplicadas -->
+                                        <t t-foreach="inv.get('applied_lines', [])" t-as="ap">
+                                            <t t-set="child_type"
+                                               t-value="'Pago aplicado' if ap.get('counterpart_kind') == 'payment' else ('NC aplicada' if ap.get('counterpart_kind') == 'credit_note' else 'Reversion aplicada')"/>
+                                            <tr style="font-style:italic; color:#7F8C8D;">
+                                                <td t-esc="fmt_date(ap.get('counterpart_date'))"/>
+                                                <td t-esc="child_type"/>
+                                                <td t-esc="'   -> ' + str(ap.get('counterpart_name', '') or '')"/>
+                                                <td t-esc="ap.get('counterpart_journal_name', '')"/>
+                                                <td t-esc="ap.get('counterpart_reference', '')"/>
+                                                <td t-esc="ap.get('counterpart_currency_name', '')"/>
+                                                <td class="text-right" t-esc="fmt_amount(0)"/>
+                                                <td class="text-right" style="color:#1F618D;"
+                                                    t-esc="fmt_amount(ap.get('applied_amount', 0))"/>
+                                                <td class="text-right" t-esc="fmt_amount(0)"/>
+                                                <td t-esc="ap.get('counterpart_payment_state', '')"/>
+                                            </tr>
+                                        </t>
+                                    </t>
+                                </tbody>
+
+                                <!-- Subtotal del cliente -->
+                                <tfoot style="background-color:#E8F8F5; font-weight:bold;">
+                                    <tr>
+                                        <td colspan="6">
+                                            Subtotal — <t t-esc="cust.get('partner_name', '')"/>
+                                        </td>
+                                        <td class="text-right">
+                                            <t t-esc="fmt_amount(subtotal_invoiced)"/>
+                                        </td>
+                                        <td class="text-right" style="color:#1F618D;">
+                                            <t t-esc="fmt_amount(subtotal_applied)"/>
+                                        </td>
+                                        <td class="text-right"
+                                            t-attf-style="color:#{subtotal_residual > 0 and 'C0392B' or '000000'};">
+                                            <t t-esc="fmt_amount(subtotal_residual)"/>
+                                        </td>
+                                        <td></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+
+                            <!-- ======================================
+                                 SECCIÓN: Pagos en Borrador (Draft)
+                                 Solo informativo — NO afecta saldo
+                                 ====================================== -->
+                            <t t-if="data.get('show_draft_payments') and cust.get('draft_payments')">
+                                <div class="mt-2 mb-1"
+                                     style="background-color:#FEF9E7; border-left:4px solid #F39C12; padding:6px; border-radius:2px;">
+                                    <strong style="color:#E67E22; font-size:9pt;">
+                                        ⚠ PAGOS EN BORRADOR — Pendiente por aplicar
+                                    </strong>
+                                    <span class="text-muted" style="font-size:8pt;">
+                                        (Solo informativo. No se incluyen en el saldo contable aplicado.)
+                                    </span>
+                                </div>
+                                <table class="table table-sm table-bordered"
+                                       style="font-size:8pt; color:#7F8C8D;">
+                                    <thead>
+                                        <tr style="background-color:#FAD7A0;">
+                                            <th>Fecha</th>
+                                            <th>Pago</th>
+                                            <th>Diario</th>
+                                            <th>Referencia</th>
+                                            <th>Moneda</th>
+                                            <th class="text-right">Monto</th>
+                                            <th>Estado</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-foreach="cust.get('draft_payments', [])" t-as="dp">
+                                            <tr style="font-style:italic;">
+                                                <td t-esc="fmt_date(dp.get('payment_date'))"/>
+                                                <td t-esc="dp.get('payment_name', '') or ''"/>
+                                                <td t-esc="dp.get('journal_name', '')"/>
+                                                <td t-esc="dp.get('reference', '') or ''"/>
+                                                <td t-esc="dp.get('currency_name', '')"/>
+                                                <td class="text-right">
+                                                    <t t-esc="fmt_amount(dp.get('amount', 0))"/>
+                                                </td>
+                                                <td>
+                                                    <span style="color:#E67E22; font-weight:bold;">
+                                                        Pendiente por aplicar
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                    <tfoot style="background-color:#FAD7A0; font-weight:bold;">
+                                        <tr>
+                                            <td colspan="5">Total pendiente por aplicar</td>
+                                            <td class="text-right" style="color:#E67E22;">
+                                                <t t-esc="fmt_amount(cust.get('total_draft_pending', 0))"/>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </t><!-- /draft_payments -->
+
+                            <!-- Separador entre clientes -->
+                            <div style="page-break-after: avoid; margin-bottom:16px;"/>
+
+                        </t><!-- /foreach customers -->
+
+                        <!-- ================================================
+                             TOTALES GENERALES (modo detalle)
+                             ================================================ -->
+                        <div class="mt-4 p-3"
+                             style="background-color:#FFF2CC; border:2px solid #F0C060; border-radius:4px;">
+                            <h5 class="mb-2">Resumen General</h5>
+                            <table class="table table-sm" style="font-size:9pt; width:auto;">
+                                <tr>
+                                    <td><strong>Total de Clientes:</strong></td>
+                                    <td t-esc="data.get('grand_totals', {}).get('customer_count', 0)"/>
+                                </tr>
+                                <tr>
+                                    <td><strong>Total Facturado:</strong></td>
+                                    <td class="text-right">
+                                        <t t-esc="fmt_amount(data.get('grand_totals', {}).get('total_invoiced', 0))"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Total Pagado/Aplicado:</strong></td>
+                                    <td class="text-right" style="color:#1F618D;">
+                                        <t t-esc="fmt_amount(data.get('grand_totals', {}).get('total_applied', 0))"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Saldo Total Pendiente:</strong></td>
+                                    <td class="text-right" style="color:#C0392B; font-weight:bold;">
+                                        <t t-esc="fmt_amount(data.get('grand_totals', {}).get('total_residual', 0))"/>
+                                    </td>
+                                </tr>
+                                <t t-if="data.get('show_draft_payments')">
+                                    <tr>
+                                        <td><strong>Total Pendiente x Aplicar (borradores):</strong></td>
+                                        <td class="text-right" style="color:#E67E22; font-style:italic;">
+                                            <t t-esc="fmt_amount(data.get('grand_totals', {}).get('total_draft_pending', 0))"/>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </table>
+                        </div>
+
+                        <!-- Nota al pie -->
+                        <div class="mt-3" style="font-size:8pt; color:#7F8C8D;">
+                            <strong>Notas:</strong>
+                            Se excluyen automáticamente facturas con estado de tributación
+                            <em>"Rechazado"</em>.
+                            Los pagos en borrador son <strong>solo informativos</strong>
+                            y no modifican el saldo contable.
+                        </div>
+
+                    </t><!-- /detail -->
+
+                </div><!-- /page -->
+            </t><!-- /external_layout -->
+        </t><!-- /foreach docs -->
+    </t><!-- /html_container -->
+</template>
+</odoo>

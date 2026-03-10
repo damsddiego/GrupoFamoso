@@ -1,0 +1,117 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* cr_electronic_invoice_credit_limit
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-11-17 22:38+0000\n"
+"PO-Revision-Date: 2025-11-17 16:42-0600\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 3.8\n"
+
+#. module: cr_electronic_invoice_credit_limit
+#: model:ir.model,name:cr_electronic_invoice_credit_limit.model_account_move
+msgid "AccountInvoiceElectronic"
+msgstr "Asiento contable"
+
+#. module: cr_electronic_invoice_credit_limit
+#. odoo-python
+#: code:addons/cr_electronic_invoice_credit_limit/models/account_move_line.py:0
+msgid ""
+"Adding this line would cause the total credit notes amount (%s) to exceed "
+"the original invoice amount (%s)."
+msgstr ""
+"Agregar esta línea haría que el monto total de las notas de crédito (%s) "
+"excediera el monto de la factura original (%s)."
+
+#. module: cr_electronic_invoice_credit_limit
+#: model:ir.model,name:cr_electronic_invoice_credit_limit.model_account_move_line
+msgid "Invoice Line Electronic"
+msgstr "Apunte contable"
+
+#. module: cr_electronic_invoice_credit_limit
+#. odoo-python
+#: code:addons/cr_electronic_invoice_credit_limit/models/account_move.py:0
+msgid ""
+"The total amount of credit notes (%.2f) cannot exceed the original "
+"invoice amount (%.2f).\n"
+"Original Invoice: %s\n"
+"Current Credit Notes Total: %.2f\n"
+"This Credit Note Amount: %.2f"
+msgstr ""
+"El monto total de notas de crédito (%.2f) no puede exceder el monto de la "
+"factura original (%.2f).\n"
+"Factura Original: %s\n"
+"Total Actual de Notas de Crédito: %.2f\n"
+"Monto de Esta Nota de Crédito: %.2f"
+
+#. module: cr_electronic_invoice_credit_limit
+#: model:ir.model.fields,field_description:cr_electronic_invoice_credit_limit.field_account_bank_statement_line__credit_note_total
+#: model:ir.model.fields,field_description:cr_electronic_invoice_credit_limit.field_account_move__credit_note_total
+msgid "Total Credit Notes"
+msgstr "Total de Notas de Crédito"
+
+#. module: cr_electronic_invoice_credit_limit
+#: model:ir.model.fields,help:cr_electronic_invoice_credit_limit.field_account_bank_statement_line__credit_note_total
+#: model:ir.model.fields,help:cr_electronic_invoice_credit_limit.field_account_move__credit_note_total
+msgid "Total amount of credit notes created for this invoice"
+msgstr "Monto total de notas de crédito creadas para esta factura"
+
+#. module: cr_electronic_invoice_credit_limit
+#: model:ir.model.fields,field_description:cr_electronic_invoice_credit_limit.field_account_move_line__remaining_qty_to_refund
+msgid "Remaining Qty to Refund"
+msgstr "Cantidad Disponible para Devolver"
+
+#. module: cr_electronic_invoice_credit_limit
+#: model_terms:ir.ui.view,arch_db:cr_electronic_invoice_credit_limit.view_move_form_inherit_credit_limit_lines
+msgid "Available to Refund"
+msgstr "Disponible para Devolver"
+
+#. module: cr_electronic_invoice_credit_limit
+#: model:ir.model.fields,help:cr_electronic_invoice_credit_limit.field_account_move_line__remaining_qty_to_refund
+msgid "Quantity that can still be refunded for this product from the original invoice"
+msgstr "Cantidad que aún puede devolverse de este producto de la factura original"
+
+#. module: cr_electronic_invoice_credit_limit
+#. odoo-python
+#: code:addons/cr_electronic_invoice_credit_limit/models/account_move_line.py:0
+msgid ""
+"Cannot refund more than available quantity!\n"
+"\n"
+"Product: %s\n"
+"Original Invoice: %s\n"
+"Original Quantity: %.2f %s\n"
+"Already Refunded: %.2f %s\n"
+"Available to Refund: %.2f %s\n"
+"Trying to Refund: %.2f %s\n"
+"\n"
+"Please adjust the quantity to %.2f or less."
+msgstr ""
+"¡No se puede devolver más de la cantidad disponible!\n"
+"\n"
+"Producto: %s\n"
+"Factura Original: %s\n"
+"Cantidad Original: %.2f %s\n"
+"Ya Devuelto: %.2f %s\n"
+"Disponible para Devolver: %.2f %s\n"
+"Intentando Devolver: %.2f %s\n"
+"\n"
+"Por favor ajuste la cantidad a %.2f o menos."
+
+#. module: cr_electronic_invoice_credit_limit
+#. odoo-python
+#: code:addons/cr_electronic_invoice_credit_limit/models/account_move_line.py:0
+msgid ""
+"Product \"%s\" was not found in the original invoice.\n"
+"You can only refund products that were in the original invoice."
+msgstr ""
+"El producto \"%s\" no se encontró en la factura original.\n"
+"Solo puede devolver productos que estaban en la factura original."

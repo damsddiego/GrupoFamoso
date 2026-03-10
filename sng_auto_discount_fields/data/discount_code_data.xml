@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Discount Code 07 for promotional discounts -->
+        <record id="discount_code_07" model="discount.code">
+            <field name="code">07</field>
+            <field name="name">Descuento Comercial</field>
+            <field name="active">True</field>
+        </record>
+    </data>
+</odoo>

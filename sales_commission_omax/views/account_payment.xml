@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <record id="view_account_payment_tree_inherit_salesperson_contact" model="ir.ui.view">
+            <field name="name">account.payment.list.inherit.salesperson.contact</field>
+            <field name="model">account.payment</field>
+            <field name="inherit_id" ref="account.view_account_payment_tree"/>
+            <field name="arch" type="xml">
+                <field name="partner_id" position="after">
+                    <field name="salesperson_id" string="Vendedor (Contacto)" optional="show"/>
+                </field>
+            </field>
+        </record>
+
+        <record id="view_account_payment_form_inherit_salesperson_contact" model="ir.ui.view">
+            <field name="name">account.payment.form.inherit.salesperson.contact</field>
+            <field name="model">account.payment</field>
+            <field name="inherit_id" ref="account.view_account_payment_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//group[@name='group1']/field[@name='memo']" position="after">
+                    <field name="salesperson_id" string="Vendedor (Contacto)"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="view_account_payment_search_inherit_salesperson_contact" model="ir.ui.view">
+            <field name="name">account.payment.search.inherit.salesperson.contact</field>
+            <field name="model">account.payment</field>
+            <field name="inherit_id" ref="account.view_account_payment_search"/>
+            <field name="arch" type="xml">
+                <field name="partner_id" position="after">
+                    <field name="salesperson_id" string="Vendedor (Contacto)"/>
+                </field>
+                <filter name="state_in_process" position="after">
+                    <filter string="Con vendedor" name="with_salesperson" domain="[('salesperson_id', '!=', False)]"/>
+                    <filter string="Sin vendedor" name="without_salesperson" domain="[('salesperson_id', '=', False)]"/>
+                </filter>
+                <filter name="partner" position="after">
+                    <filter string="Vendedor" name="salesperson" domain="[]" context="{'group_by': 'salesperson_id'}"/>
+                </filter>
+            </field>
+        </record>
+    </data>
+</odoo>

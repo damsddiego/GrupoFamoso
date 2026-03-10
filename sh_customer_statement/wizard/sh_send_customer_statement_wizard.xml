@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="sh_send_customer_statement_wizard_view_form" model="ir.ui.view">
+        <field name="name">sh.send.customer.statement.wizard.view.form</field>
+        <field name="model">sh.send.customer.statement.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Send Customer Statement">
+                <group>
+                    <group>
+                        <field name="statement_type" widget="radio"/>
+                        <field name="start_date"/>
+                        <field name="end_date"/>
+                        <field name="is_show_aging_bucket" />
+
+                    </group>
+                </group>
+                <footer>
+                    <button name="action_send_statement" string="Send" type="object" class="btn-primary"/>
+                      <button name="action_pdf"
+                        string="Print PDF"
+                        type="object"
+                        class="btn-primary"/>
+
+                    <button name="action_excel"
+                        string="Excel"
+                        type="object"
+                        class="btn-secondary"/>
+
+
+                     <button string="Cancel"
+                            class="btn-secondary"
+                            special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+
+
+     <record id="sh_send_customer_statement_wizard_action" model="ir.actions.act_window">
+        <field name="name">Send Customer Statement</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">sh.send.customer.statement.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="sh_send_customer_statement_wizard_view_form"/>
+        <field name="target">new</field>
+    </record>
+</odoo>

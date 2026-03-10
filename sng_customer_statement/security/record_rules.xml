@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+         RECORD RULES — cargadas AL FINAL del data list en __manifest__.py.
+
+         Por qué al final:
+           Los external IDs model_customer_statement_report y
+           model_customer_statement_report_line los genera Odoo automáticamente
+           cuando registra los modelos Python en la tabla ir.model.
+           Ese registro ocurre al inicio del upgrade, ANTES de cargar los XMLs
+           de data. Sin embargo, durante una instalación limpia el orden importa:
+           security_rules.xml (grupos) → ir.model.access.csv → vistas → record_rules.xml.
+           Si las rules estuvieran en security_rules.xml (primer archivo), en una
+           instalación desde cero los modelos aún no tendrían external ID disponible.
+           Al ponerlas al final se garantiza que ir.model ya tiene los registros.
+    -->
+
+    <!-- ============================================================
+         RECORD RULES: customer.statement.report (cabecera)
+         ============================================================ -->
+
+    <!-- Usuarios normales: solo ven sus propios reportes -->
+    <record id="rule_statement_report_own_user" model="ir.rule">
+        <field name="name">Estado de Cuenta: usuario ve solo sus reportes</field>
+        <field name="model_id" ref="model_customer_statement_report"/>
+        <field name="domain_force">[('create_uid', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('sng_customer_statement.group_customer_statement_user'))]"/>
+        <field name="perm_read"   eval="True"/>
+        <field name="perm_write"  eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <!-- Managers: todos los reportes de la empresa activa -->
+    <record id="rule_statement_report_manager" model="ir.rule">
+        <field name="name">Estado de Cuenta: manager ve todos los reportes de su empresa</field>
+        <field name="model_id" ref="model_customer_statement_report"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        <field name="groups" eval="[(4, ref('sng_customer_statement.group_customer_statement_manager'))]"/>
+        <field name="perm_read"   eval="True"/>
+        <field name="perm_write"  eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <!-- ============================================================
+         RECORD RULES: customer.statement.report.line (líneas)
+         ============================================================ -->
+
+    <!-- Usuarios: solo líneas de sus propios reportes -->
+    <record id="rule_statement_line_own_user" model="ir.rule">
+        <field name="name">Líneas Estado de Cuenta: usuario ve solo sus líneas</field>
+        <field name="model_id" ref="model_customer_statement_report_line"/>
+        <field name="domain_force">[('report_id.create_uid', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('sng_customer_statement.group_customer_statement_user'))]"/>
+        <field name="perm_read"   eval="True"/>
+        <field name="perm_write"  eval="False"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <!-- Managers: todas las líneas de su empresa -->
+    <record id="rule_statement_line_manager" model="ir.rule">
+        <field name="name">Líneas Estado de Cuenta: manager ve líneas de su empresa</field>
+        <field name="model_id" ref="model_customer_statement_report_line"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        <field name="groups" eval="[(4, ref('sng_customer_statement.group_customer_statement_manager'))]"/>
+        <field name="perm_read"   eval="True"/>
+        <field name="perm_write"  eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+</odoo>

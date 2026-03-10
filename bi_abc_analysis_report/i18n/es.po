@@ -1,0 +1,192 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* bi_abc_analysis_report
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-02-13 00:00+0000\n"
+"PO-Revision-Date: 2026-02-13 00:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. module: bi_abc_analysis_report
+#: model:ir.model,name:bi_abc_analysis_report.model_inventory_abc_report_wiz
+msgid "Inventory abc Analysis Report"
+msgstr "Reporte de análisis ABC de inventario"
+
+#. module: bi_abc_analysis_report
+#: model:ir.model,name:bi_abc_analysis_report.model_inventory_abc_extended
+msgid "Stock abc Excel Extended"
+msgstr "Excel extendido ABC de inventario"
+
+#. module: bi_abc_analysis_report
+#: model:ir.model.fields,field_description:bi_abc_analysis_report.field_inventory_abc_report_wiz__from_date
+msgid "From Date"
+msgstr "Desde la fecha"
+
+#. module: bi_abc_analysis_report
+#: model:ir.model.fields,field_description:bi_abc_analysis_report.field_inventory_abc_report_wiz__to_date
+msgid "To Date"
+msgstr "Hasta la fecha"
+
+#. module: bi_abc_analysis_report
+#: model:ir.model.fields,field_description:bi_abc_analysis_report.field_inventory_abc_report_wiz__company_ids
+#: model:ir.model.fields,field_description:bi_abc_analysis_report.field_inventory_abc_extended__company
+#: model_terms:ir.ui.view,arch_db:bi_abc_analysis_report.inventory_abc_extended_report_search
+msgid "Company"
+msgstr "Compañía"
+
+#. module: bi_abc_analysis_report
+#: model:ir.model.fields,field_description:bi_abc_analysis_report.field_inventory_abc_report_wiz__category_ids
+#: model_terms:ir.ui.view,arch_db:bi_abc_analysis_report.inventory_abc_extended_report_search
+msgid "Product Category"
+msgstr "Categoría de producto"
+
+#. module: bi_abc_analysis_report
+#: model:ir.model.fields,field_description:bi_abc_analysis_report.field_inventory_abc_report_wiz__product_ids
+#: model:ir.model.fields,field_description:bi_abc_analysis_report.field_inventory_abc_extended__products
+#: model_terms:ir.ui.view,arch_db:bi_abc_analysis_report.inventory_abc_extended_report_search
+msgid "Product"
+msgstr "Producto"
+
+#. module: bi_abc_analysis_report
+#: model:ir.model.fields,field_description:bi_abc_analysis_report.field_inventory_abc_report_wiz__type
+#: model:ir.model.fields,field_description:bi_abc_analysis_report.field_inventory_abc_extended__analysis_type
+msgid "Classification For ABC"
+msgstr "Clasificación para ABC"
+
+#. module: bi_abc_analysis_report
+#: model:ir.model.fields,field_description:bi_abc_analysis_report.field_inventory_abc_extended__excel_file
+msgid "Download Report :- "
+msgstr "Descargar reporte :- "
+
+#. module: bi_abc_analysis_report
+#: model:ir.model.fields,field_description:bi_abc_analysis_report.field_inventory_abc_extended__file_name
+msgid "Excel File"
+msgstr "Archivo Excel"
+
+#. module: bi_abc_analysis_report
+#: model:ir.model.fields,field_description:bi_abc_analysis_report.field_inventory_abc_extended__product_category
+msgid "Category"
+msgstr "Categoría"
+
+#. module: bi_abc_analysis_report
+#: model:ir.model.fields,field_description:bi_abc_analysis_report.field_inventory_abc_extended__unit_sold
+msgid "Annual Unit Sold"
+msgstr "Unidades vendidas anualmente"
+
+#. module: bi_abc_analysis_report
+#: model:ir.model.fields,field_description:bi_abc_analysis_report.field_inventory_abc_extended__value
+msgid "Standard Cost"
+msgstr "Costo estándar"
+
+#. module: bi_abc_analysis_report
+#: model:ir.model.fields,field_description:bi_abc_analysis_report.field_inventory_abc_extended__sold_value_percentage
+msgid "(%) Of Annual Sold"
+msgstr "(%) de ventas anuales"
+
+#. module: bi_abc_analysis_report
+#: model:ir.model.fields,field_description:bi_abc_analysis_report.field_inventory_abc_extended__annual_consumption_percentage
+msgid "(%) Of Annual Consumption Value"
+msgstr "(%) del valor de consumo anual"
+
+#. module: bi_abc_analysis_report
+#: model:ir.model.fields,field_description:bi_abc_analysis_report.field_inventory_abc_extended__consumption_value_per
+msgid "Annual Consumption Value"
+msgstr "Valor de consumo anual"
+
+#. module: bi_abc_analysis_report
+#: model:ir.model.fields,field_description:bi_abc_analysis_report.field_product_product__stock_value
+msgid "Stock Value"
+msgstr "Valor de inventario"
+
+#. module: bi_abc_analysis_report
+#: model:ir.model.fields.selection,name:bi_abc_analysis_report.selection__inventory_abc_report_wiz__type__all
+msgid "All"
+msgstr "Todos"
+
+#. module: bi_abc_analysis_report
+#: model:ir.model.fields.selection,name:bi_abc_analysis_report.selection__inventory_abc_report_wiz__type__high_stock
+msgid "A Class"
+msgstr "Clase A"
+
+#. module: bi_abc_analysis_report
+#: model:ir.model.fields.selection,name:bi_abc_analysis_report.selection__inventory_abc_report_wiz__type__medium_stock
+msgid "B Class"
+msgstr "Clase B"
+
+#. module: bi_abc_analysis_report
+#: model:ir.model.fields.selection,name:bi_abc_analysis_report.selection__inventory_abc_report_wiz__type__low_stock
+msgid "C Class"
+msgstr "Clase C"
+
+#. module: bi_abc_analysis_report
+#: model_terms:ir.ui.view,arch_db:bi_abc_analysis_report.action_inventory_abc_extended_report_form
+msgid "Excel Report"
+msgstr "Reporte en Excel"
+
+#. module: bi_abc_analysis_report
+#: model_terms:ir.ui.view,arch_db:bi_abc_analysis_report.action_inventory_abc_extended_report_form
+#: model_terms:ir.ui.view,arch_db:bi_abc_analysis_report.inventory_abc_wizard_form_view
+msgid "Cancel"
+msgstr "Cancelar"
+
+#. module: bi_abc_analysis_report
+#: model_terms:ir.ui.view,arch_db:bi_abc_analysis_report.inventory_abc_extended_report_tree
+#: model_terms:ir.ui.view,arch_db:bi_abc_analysis_report.inventory_abc_extended_report_search
+#: model_terms:ir.ui.view,arch_db:bi_abc_analysis_report.inventory_abc_extended_report_graph
+msgid "Stock ABC Ratio"
+msgstr "Ratio ABC de inventario"
+
+#. module: bi_abc_analysis_report
+#: model_terms:ir.ui.view,arch_db:bi_abc_analysis_report.inventory_abc_wizard_form_view
+#: model:ir.actions.act_window,name:bi_abc_analysis_report.action_inventory_abc_report_action
+msgid "Stock Analysis ABC Report"
+msgstr "Reporte ABC de análisis de inventario"
+
+#. module: bi_abc_analysis_report
+#: model_terms:ir.ui.view,arch_db:bi_abc_analysis_report.inventory_abc_wizard_form_view
+msgid "Select date"
+msgstr "Seleccionar fecha"
+
+#. module: bi_abc_analysis_report
+#: model_terms:ir.ui.view,arch_db:bi_abc_analysis_report.inventory_abc_wizard_form_view
+msgid "Select Product And Categories"
+msgstr "Seleccionar productos y categorías"
+
+#. module: bi_abc_analysis_report
+#: model_terms:ir.ui.view,arch_db:bi_abc_analysis_report.inventory_abc_wizard_form_view
+msgid "Select Company"
+msgstr "Seleccionar compañía"
+
+#. module: bi_abc_analysis_report
+#: model_terms:ir.ui.view,arch_db:bi_abc_analysis_report.inventory_abc_wizard_form_view
+msgid "Select value of Stock"
+msgstr "Seleccionar valor del inventario"
+
+#. module: bi_abc_analysis_report
+#: model_terms:ir.ui.view,arch_db:bi_abc_analysis_report.inventory_abc_wizard_form_view
+msgid "Excel"
+msgstr "Excel"
+
+#. module: bi_abc_analysis_report
+#: model_terms:ir.ui.view,arch_db:bi_abc_analysis_report.inventory_abc_wizard_form_view
+msgid "Data"
+msgstr "Datos"
+
+#. module: bi_abc_analysis_report
+#: model_terms:ir.ui.view,arch_db:bi_abc_analysis_report.inventory_abc_wizard_form_view
+msgid "Graph"
+msgstr "Gráfico"
+
+#. module: bi_abc_analysis_report
+#: code:addons/bi_abc_analysis_report/wizard/bi_abc_analysis_report.py:0
+#, python-format
+msgid "Stock ABC Ratio Analysis"
+msgstr "Análisis de ratio ABC de inventario"

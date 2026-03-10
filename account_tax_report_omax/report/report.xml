@@ -1,0 +1,2623 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--External header footer-->
+    <template id="external_layout_omax">
+        <div class="header">
+            <div class="o_boxed_header">
+                <div class="row mb8"/>
+            </div>
+        </div>
+        <div class="article" t-att-data-oe-model="o and o._name" t-att-data-oe-id="o and o.id" t-att-data-oe-lang="o and o.env.context.get('lang')">
+          <t t-raw="0"/>
+        </div>
+        <div class="footer o_boxed_footer">
+            <div class="text-center">
+                <div t-if="report_type == 'pdf'">
+                    Page:
+                    <span class="page"/>
+                    /
+                    <span class="topage"/>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <template id="account_report_tax_tmpl_id">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+            <!--t t-call="account_tax_report_omax.external_layout_omax"-->
+                <div class="page" style="font-size: 15px !important">
+                    <!-- company logo and name -->
+                    <t t-if="not o" t-set="o" t-value="doc"/>
+                    <t t-if="not company">
+                        <!-- Multicompany -->
+                        <t t-if="company_id">
+                            <t t-set="company" t-value="company_id"/>
+                        </t>
+                        <t t-elif="o and 'company_id' in o">
+                            <t t-set="company" t-value="o.company_id.sudo()"/>
+                        </t>
+                        <t t-else="else">
+                            <t t-set="company" t-value="res_company"/>
+                        </t>
+                    </t>
+                    <!-- finish company logo and name -->
+
+                    <div class="oe_structure"/>
+                    <div class="row">
+                        <div class="col-12 text-center mb-2" style="background-color: lightgray;"><h2>Tax Report</h2></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <div>
+                                <span class="fw-bold me-2">Start Date</span><span t-esc="time.strftime('%Y/%m/%d',time.strptime(data['form']['start_date'], '%Y-%m-%d'))"/>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="float-end" style="width:fit-content !important">
+                                <span class="fw-bold me-2">End Date</span><span t-esc="time.strftime('%Y/%m/%d',time.strptime(data['form']['end_date'], '%Y-%m-%d'))"/>
+                            </div>
+                        </div>
+                    </div>
+                    <br/>
+                    <div class="row col-xs-12">
+                        <table class="table table-borderless table-condensed" width="100%" style="page-break-inside: avoid;">
+                            <thead>
+                                <tr style="page-break-inside: avoid;background-color: lightgray;">
+                                    <th class="text-center fw-bold">
+                                        <span>Report For</span>
+                                    </th>
+                                    <th class="text-center fw-bold">
+                                        <span>Tax Name</span>
+                                    </th>
+                                    <th class="text-center fw-bold" t-if="data['form']['detailed_report']">
+                                        <span>Partner Name</span>
+                                    </th>
+                                    <th class="text-center fw-bold" t-if="data['form']['detailed_report']">
+                                        <span>Ref</span>
+                                    </th>
+                                    <th class="text-center fw-bold" t-if="data['form']['detailed_report']">
+                                        <span>Invoice Date</span>
+                                    </th>
+                                    <th class="text-center fw-bold" t-if="data['form']['detailed_report']">
+                                        <span>Sub Total</span>
+                                    </th>
+                                    <th class="text-center fw-bold" t-if="data['form']['detailed_report']">
+                                        <span>Discount Electronic Invoice</span>
+                                    </th>
+                                    <!-- Hidden: Amount Paid -->
+                                    <!-- Hidden: Amount Residual -->
+                                    <!-- Hidden: Amount Residual Signed -->
+                                    <th class="text-center fw-bold" t-if="data['form']['detailed_report']">
+                                        <span>Subtotal Without IVA Returned</span>
+                                    </th>
+                                    <!-- Hidden: Tax -->
+                                    <!-- Hidden: Tax Electronic Invoice -->
+                                    <th class="text-center fw-bold" t-if="data['form']['detailed_report']">
+                                        <span>Tax Signed</span>
+                                    </th>
+                                    <th class="text-center fw-bold" t-if="data['form']['detailed_report']">
+                                        <span>IVA Returned</span>
+                                    </th>
+                                    <!-- Hidden: Total -->
+                                    <!-- Hidden: Total In Currency Signed -->
+                                    <th class="text-center fw-bold" t-if="data['form']['detailed_report']">
+                                        <span>Total Signed</span>
+                                    </th>
+                                    <!-- Hidden: Untaxed -->
+                                    <!-- Hidden: Untaxed In Currency Signed -->
+                                    <th class="text-center fw-bold" t-if="data['form']['detailed_report']">
+                                        <span>Electronic Invoice Return Message</span>
+                                    </th>
+                                    <th t-if="not data['form']['detailed_report']">
+                                    </th>
+                                    <th class="text-center fw-bold" t-if="not data['form']['detailed_report']">
+                                        <span>Base Amount</span>
+                                    </th>
+                                    <th class="text-center fw-bold" t-if="not data['form']['detailed_report']">
+                                        <span>Tax Amount</span>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="get_selected_company(data['form']['company_ids'])" t-as="company">
+                                    <t t-set="account_invoices_c" t-value="get_account_invoices(company,data['form']['start_date'],data['form']['end_date'])"/>
+                                    <tr>
+                                        <td t-if="data['form']['detailed_report']" colspan="11" class="text-center fw-bold" style="background-color: rgba(135, 90, 123, 1); color: white;">
+                                            <t t-esc="company.name"/>
+                                        </td>
+                                        <td t-else="" colspan="5" class="text-center fw-bold" style="background-color: rgba(135, 90, 123, 1); color: white;">
+                                            <t t-esc="company.name"/>
+                                        </td>
+                                    </tr>
+                                    <!--Partners-->
+                                    <t t-if="data['form']['report_for'] == 'partners' or not data['form']['report_for']">
+                                        <t t-call="account_tax_report_omax.partners_tax_render"/> 
+                                    </t>
+                                    
+                                    <!--Product Category-->
+                                    <t t-if="data['form']['report_for'] == 'productCategory' or not data['form']['report_for']">
+                                        <t t-call="account_tax_report_omax.product_category_tax_render"/> 
+                                    </t>
+                                    
+                                    <!--Products-->
+                                    <t t-if="data['form']['report_for'] == 'products' or not data['form']['report_for']">
+                                        <t t-call="account_tax_report_omax.product_product_render"/> 
+                                    </t>
+                                    
+                                    <!--Sales Team-->
+                                    <t t-if="data['form']['report_for'] == 'sales_team' or not data['form']['report_for']">
+                                        <t t-call="account_tax_report_omax.sales_team_render"/> 
+                                    </t>
+                                    
+                                    <!--Sales Person-->
+                                    <t t-if="data['form']['report_for'] == 'sales_person' or not data['form']['report_for']">
+                                        <t t-call="account_tax_report_omax.sales_person_render"/> 
+                                    </t>
+                                    
+                                    <!--Taxes-->
+                                    <t t-if="data['form']['report_for'] == 'taxes' or not data['form']['report_for']">
+                                        <t t-call="account_tax_report_omax.tax_move_render"/> 
+                                    </t>
+                                </t>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </t>
+        </t>
+    </template>
+
+    
+    
+    <template id="partners_tax_render">
+        <tr>
+            <td class="text-center fw-bold" style="background-color: lightgray;">
+                Partners
+            </td>
+            <td t-if="data['form']['detailed_report']" colspan="10">
+            </td>
+            <td t-else="" colspan="4">
+            </td>
+        </tr>
+        <t t-foreach="get_partners(account_invoices_c,data['form']['partner_ids'],data['form']['report_for'],)" t-as="partner">
+            <t t-set="partner_invoices" t-value="account_invoices_c.sudo().filtered(lambda l: l.partner_id.id == partner.id)"/>
+            <t t-set="inv_tax" t-value="get_tax_name(partner_invoices)"/>
+            <t t-set="vandor_bill" t-value="partner_invoices.sudo().filtered(lambda l: l.move_type in ['in_invoice', 'in_refund',])"/>
+            <t t-set="customer_invoice" t-value="partner_invoices.sudo().filtered(lambda l: l.move_type in ['out_invoice', 'out_refund',])"/>
+            <t t-set="bal_total_base_amount" t-value="0"/>
+            <t t-set="bal_total_tax_amount" t-value="0"/>
+            <t t-set="bal_total_iva_returned" t-value="0"/>
+            <t t-if="customer_invoice and (data['form']['tax_type'] == 'sales' or not data['form']['tax_type'])">
+                <tr>
+                    <td class="text-center fw-bold" style="background-color: rgba(135, 90, 123, 1); color: white;">
+                        <t t-esc="partner.name"/>
+                    </td>
+                    <td t-if="data['form']['detailed_report']" colspan="10" class="text-center fw-bold">
+                        Tax Received
+                    </td>
+                    <td t-else="" colspan="4" class="text-center fw-bold">
+                        Tax Received
+                    </td>
+                </tr>
+                <t t-set="grand_total_base_amount" t-value="0"/>
+                <t t-set="grand_total_tax_amount" t-value="0"/>
+                <t t-set="grand_total_iva_returned" t-value="0"/>
+                <t t-foreach="inv_tax" t-as="tax">
+                    <t t-set="tex_inv" t-value="filter_inv_on_tax(tax,customer_invoice)"/>
+                    <t t-set="len_tex_inv" t-value="len(tex_inv)"/>
+                    <t t-set="total_base_amount" t-value="0"/>
+                    <t t-set="total_tax_amount" t-value="0"/>
+                    <t t-set="total_iva_returned" t-value="0"/>
+                    <t t-set="line_no" t-value="0"/>
+                    <t t-foreach="tex_inv" t-as="tex_line">
+                        <tr t-if="data['form']['detailed_report']">
+                            <td>
+                            </td>
+                            <td class="fw-bold">
+                                <t t-if="line_no == 0">
+                                    <t t-esc="tax"/>
+                                </t>
+                            </td>
+                            <td t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['name']"/>
+                            </td>
+                            <td class="text-center" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['ref']"/>
+                            </td>
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['inv_date']"/>
+                            </td>
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['sub_total_currency']"/>
+                            </td>
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['amount_discount_electronic_invoice_currency']"/>
+                            </td>
+                            <!-- Hidden: amount_paid_currency -->
+                            <!-- Hidden: amount_residual_currency -->
+                            <!-- Hidden: amount_residual_signed_currency -->
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['amount_subtotal_without_iva_returned_currency']"/>
+                            </td>
+                            <!-- Hidden: amount_tax_currency -->
+                            <!-- Hidden: amount_tax_electronic_invoice_currency -->
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['amount_tax_signed_currency']"/>
+                            </td>
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['amount_iva_returned_currency']"/>
+                            </td>
+                            <!-- Hidden: amount_total_currency -->
+                            <!-- Hidden: amount_total_in_currency_signed_currency -->
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['amount_total_signed_currency']"/>
+                            </td>
+                            <!-- Hidden: amount_untaxed_currency -->
+                            <!-- Hidden: amount_untaxed_in_currency_signed_currency -->
+                            <td class="text-start" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['electronic_invoice_return_message']"/>
+                            </td>
+                            <td t-if="not data['form']['detailed_report']">
+                            </td>
+                            <td class="text-end" t-if="not data['form']['detailed_report']">
+                                <t t-esc="tex_line.get('amount_subtotal_without_iva_returned_currency', '')"/>
+                            </td>
+                            <td class="text-end" t-if="not data['form']['detailed_report']">
+                                <t t-esc="tex_line.get('amount_tax_currency', '')"/>
+                            </td>
+                        </tr>
+                        <t t-set="total_base_amount" t-value="total_base_amount + tex_line['base_amount']"/>
+                        <t t-set="total_tax_amount" t-value="total_tax_amount + tex_line['tax_amount']"/>
+                        <t t-set="total_iva_returned" t-value="total_iva_returned + (tex_line.get('iva_returned') or 0)"/>
+                        <t t-if="line_no == (len_tex_inv - 1)">
+                            <tr>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td>
+                                </td>
+                                <td class="fw-bold">
+                                    <t t-if="not data['form']['detailed_report']" t-esc="tax"/>
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td t-att-class="'fw-bold text-end border-top border-black' if data['form']['detailed_report'] else 'text-end'">
+                                    Total
+                                </td>
+                                <td t-att-class="'fw-bold text-end border-top border-black' if data['form']['detailed_report'] else 'text-end'">
+                                    <t t-esc="company.currency_id.format(total_base_amount)"/>
+                                </td>
+                                <td t-att-class="'fw-bold text-end border-top border-black' if data['form']['detailed_report'] else 'text-end'">
+                                    <t t-esc="company.currency_id.format(total_tax_amount)"/>
+                                </td>
+                                <td t-if="data['form']['detailed_report']" t-att-class="'fw-bold text-end border-top border-black'">
+                                    <t t-esc="company.currency_id.format(total_iva_returned)"/>
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                            </tr>
+                        </t>
+                        <t t-set="line_no" t-value="line_no+1"/>
+                    </t>
+                    <t t-set="grand_total_base_amount" t-value="grand_total_base_amount + total_base_amount"/>
+                    <t t-set="grand_total_tax_amount" t-value="grand_total_tax_amount + total_tax_amount"/>
+                    <t t-set="grand_total_iva_returned" t-value="grand_total_iva_returned + total_iva_returned"/>
+                </t>
+                <t t-set="bal_total_base_amount" t-value="bal_total_base_amount + grand_total_base_amount"/>
+                <t t-set="bal_total_tax_amount" t-value="bal_total_tax_amount + grand_total_tax_amount"/>
+                <t t-set="bal_total_iva_returned" t-value="bal_total_iva_returned + grand_total_iva_returned"/>
+                <tr>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td>
+                    </td>
+                    <td>
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td class="fw-bold text-end" style="background-color: lightgray;">
+                        Total Tax Received
+                    </td>
+                    <td class="fw-bold text-end" style="background-color: lightgray;">
+                        <t t-esc="company.currency_id.format(grand_total_base_amount)"/>
+                    </td>
+                    <td class="fw-bold text-end" style="background-color: lightgray;">
+                        <t t-esc="company.currency_id.format(grand_total_tax_amount)"/>
+                    </td>
+                    <td t-if="data['form']['detailed_report']" class="fw-bold text-end" style="background-color: lightgray;">
+                        <t t-esc="company.currency_id.format(grand_total_iva_returned)"/>
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                </tr>
+            </t>
+            <t t-if="vandor_bill and (data['form']['tax_type'] == 'purchases' or not data['form']['tax_type'])">
+                <tr>
+                    <t t-if="not customer_invoice or data['form']['tax_type'] == 'purchases'">
+                        <td class="text-center fw-bold" style="background-color: rgba(135, 90, 123, 1); color: white;">
+                            <t t-esc="partner.name"/>
+                        </td>
+                    </t>
+                    <t t-else="">
+                        <td></td>
+                    </t>
+                    <td t-if="data['form']['detailed_report']" colspan="10" class="text-center fw-bold">
+                        Tax Paid
+                    </td>
+                    <td t-else="" colspan="4" class="text-center fw-bold">
+                        Tax Paid
+                    </td>
+                </tr>
+                <t t-set="grand_total_base_amount" t-value="0"/>
+                <t t-set="grand_total_tax_amount" t-value="0"/>
+                <t t-foreach="inv_tax" t-as="tax">
+                    <t t-set="tex_inv" t-value="filter_inv_on_tax(tax,vandor_bill)"/>
+                    <t t-set="len_tex_inv" t-value="len(tex_inv)"/>
+                    <t t-set="total_base_amount" t-value="0"/>
+                    <t t-set="total_tax_amount" t-value="0"/>
+                    <t t-set="line_no" t-value="0"/>
+                    <t t-foreach="tex_inv" t-as="tex_line">
+                        <tr t-if="data['form']['detailed_report']">
+                            <td>
+                            </td>
+                            <td class="fw-bold">
+                                <t t-if="line_no == 0">
+                                    <t t-esc="tax"/>
+                                </t>
+                            </td>
+                            <td t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['name']"/>
+                            </td>
+                            <td class="text-center" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['ref']"/>
+                            </td>
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['inv_date']"/>
+                            </td>
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['sub_total_currency']"/>
+                            </td>
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['amount_discount_electronic_invoice_currency']"/>
+                            </td>
+                            <!-- Hidden: amount_paid_currency -->
+                            <!-- Hidden: amount_residual_currency -->
+                            <!-- Hidden: amount_residual_signed_currency -->
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['amount_subtotal_without_iva_returned_currency']"/>
+                            </td>
+                            <!-- Hidden: amount_tax_currency -->
+                            <!-- Hidden: amount_tax_electronic_invoice_currency -->
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['amount_tax_signed_currency']"/>
+                            </td>
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['amount_iva_returned_currency']"/>
+                            </td>
+                            <!-- Hidden: amount_total_currency -->
+                            <!-- Hidden: amount_total_in_currency_signed_currency -->
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['amount_total_signed_currency']"/>
+                            </td>
+                            <!-- Hidden: amount_untaxed_currency -->
+                            <!-- Hidden: amount_untaxed_in_currency_signed_currency -->
+                            <td class="text-start" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['electronic_invoice_return_message']"/>
+                            </td>
+                            <td t-if="not data['form']['detailed_report']">
+                            </td>
+                            <td class="text-end" t-if="not data['form']['detailed_report']">
+                                <t t-esc="tex_line.get('amount_subtotal_without_iva_returned_currency', '')"/>
+                            </td>
+                            <td class="text-end" t-if="not data['form']['detailed_report']">
+                                <t t-esc="tex_line.get('amount_tax_currency', '')"/>
+                            </td>
+                        </tr>
+                        <t t-set="total_base_amount" t-value="total_base_amount + tex_line['base_amount']"/>
+                        <t t-set="total_tax_amount" t-value="total_tax_amount + tex_line['tax_amount']"/>
+                        <t t-set="total_iva_returned" t-value="total_iva_returned + (tex_line.get('iva_returned') or 0)"/>
+                        <t t-if="line_no == (len_tex_inv - 1)">
+                            <tr>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td>
+                                </td>
+                                <td class="fw-bold">
+                                    <t t-if="not data['form']['detailed_report']" t-esc="tax"/>
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td t-att-class="'fw-bold text-end border-top border-black' if data['form']['detailed_report'] else 'text-end'">
+                                    Total
+                                </td>
+                                <td t-att-class="'fw-bold text-end border-top border-black' if data['form']['detailed_report'] else 'text-end'">
+                                    <t t-esc="company.currency_id.format(total_base_amount)"/>
+                                </td>
+                                <td t-att-class="'fw-bold text-end border-top border-black' if data['form']['detailed_report'] else 'text-end'">
+                                    <t t-esc="company.currency_id.format(total_tax_amount)"/>
+                                </td>
+                                <td t-if="data['form']['detailed_report']" t-att-class="'fw-bold text-end border-top border-black'">
+                                    <t t-esc="company.currency_id.format(total_iva_returned)"/>
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                            </tr>
+                        </t>
+                        <t t-set="line_no" t-value="line_no+1"/>
+                    </t>
+                    <t t-set="grand_total_base_amount" t-value="grand_total_base_amount + total_base_amount"/>
+                    <t t-set="grand_total_tax_amount" t-value="grand_total_tax_amount + total_tax_amount"/>
+                    <t t-set="grand_total_iva_returned" t-value="grand_total_iva_returned + total_iva_returned"/>
+                </t>
+                <t t-set="bal_total_base_amount" t-value="bal_total_base_amount - grand_total_base_amount"/>
+                <t t-set="bal_total_tax_amount" t-value="bal_total_tax_amount - grand_total_tax_amount"/>
+                <t t-set="bal_total_iva_returned" t-value="bal_total_iva_returned - grand_total_iva_returned"/>
+                <tr>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td>
+                    </td>
+                    <td>
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td class="fw-bold text-end" style="background-color: lightgray;">
+                        Total Tax Paid
+                    </td>
+                    <td class="fw-bold text-end" style="background-color: lightgray;">
+                        <t t-esc="company.currency_id.format(grand_total_base_amount)"/>
+                    </td>
+                    <td class="fw-bold text-end" style="background-color: lightgray;">
+                        <t t-esc="company.currency_id.format(grand_total_tax_amount)"/>
+                    </td>
+                    <td t-if="data['form']['detailed_report']" class="fw-bold text-end" style="background-color: lightgray;">
+                        <t t-esc="company.currency_id.format(grand_total_iva_returned)"/>
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                </tr>
+            </t>
+            <t t-set="vandor_bill_render" t-value="False"/>
+            <t t-set="customer_invoice_render" t-value="False"/>
+            <t t-if="vandor_bill">
+                <t t-set="vandor_bill_render" t-value="data['form']['tax_type'] == 'purchases' or not data['form']['tax_type']"/>
+            </t>
+            <t t-if="customer_invoice">
+                <t t-set="customer_invoice_render" t-value="data['form']['tax_type'] == 'sales' or not data['form']['tax_type']"/>
+            </t>
+            <t t-if="vandor_bill_render or customer_invoice_render">
+                <tr>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td>
+                    </td>
+                    <td>
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td class="fw-bold text-end" style="background-color: rgba(135, 90, 123, 1); color: white;">
+                        Balance
+                    </td>
+                    <td class="fw-bold text-end" style="background-color: rgba(135, 90, 123, 1); color: white;">
+                        <t t-esc="company.currency_id.format(bal_total_base_amount)"/>
+                    </td>
+                    <td class="fw-bold text-end" style="background-color: rgba(135, 90, 123, 1); color: white;">
+                        <t t-esc="company.currency_id.format(bal_total_tax_amount)"/>
+                    </td>
+                    <td t-if="data['form']['detailed_report']" class="fw-bold text-end" style="background-color: rgba(135, 90, 123, 1); color: white;">
+                        <t t-esc="company.currency_id.format(bal_total_iva_returned)"/>
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                </tr>
+            </t>
+        </t>
+    </template>
+    <template id="product_category_tax_render">
+        <tr>
+            <td class="text-center fw-bold" style="background-color: lightgray;">
+                Product Category
+            </td>
+            <td t-if="data['form']['detailed_report']" colspan="10">
+            </td>
+            <td t-else="" colspan="4">
+            </td>
+        </tr>
+        <t t-foreach="get_product_categories(account_invoices_c,data['form']['product_category_ids'],data['form']['report_for'],)" t-as="partner">
+            <t t-set="partner_invoices" t-value="account_invoices_c.sudo().filtered(lambda inv: any(
+                                                line.product_id.categ_id.id == partner.id and line.tax_ids for line in inv.invoice_line_ids))"/>
+            <t t-set="inv_tax" t-value="get_tax_name(partner_invoices)"/>
+            <t t-set="vandor_bill" t-value="partner_invoices.sudo().filtered(lambda l: l.move_type in ['in_invoice', 'in_refund',])"/>
+            <t t-set="customer_invoice" t-value="partner_invoices.sudo().filtered(lambda l: l.move_type in ['out_invoice', 'out_refund',])"/>
+            <t t-set="bal_total_base_amount" t-value="0"/>
+            <t t-set="bal_total_tax_amount" t-value="0"/>
+            <t t-set="bal_total_iva_returned" t-value="0"/>
+            <t t-if="customer_invoice and (data['form']['tax_type'] == 'sales' or not data['form']['tax_type'])">
+                <tr>
+                    <td class="text-center fw-bold" style="background-color: rgba(135, 90, 123, 1); color: white;">
+                        <t t-esc="partner.name"/>
+                    </td>
+                    <td t-if="data['form']['detailed_report']" colspan="10" class="text-center fw-bold">
+                        Tax Received
+                    </td>
+                    <td t-else="" colspan="4" class="text-center fw-bold">
+                        Tax Received
+                    </td>
+                </tr>
+                <t t-set="grand_total_base_amount" t-value="0"/>
+                <t t-set="grand_total_tax_amount" t-value="0"/>
+                <t t-foreach="inv_tax" t-as="tax">
+                    <t t-set="tex_inv" t-value="filter_inv_on_product_tax(tax,customer_invoice,category_rec=partner)"/>
+                    <t t-set="len_tex_inv" t-value="len(tex_inv)"/>
+                    <t t-set="total_base_amount" t-value="0"/>
+                    <t t-set="total_tax_amount" t-value="0"/>
+                    <t t-set="line_no" t-value="0"/>
+                    <t t-foreach="tex_inv" t-as="tex_line">
+                        <tr t-if="data['form']['detailed_report']">
+                            <td>
+                            </td>
+                            <td class="fw-bold">
+                                <t t-if="line_no == 0">
+                                    <t t-esc="tax"/>
+                                </t>
+                            </td>
+                            <td t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['name']"/>
+                            </td>
+                            <td class="text-center" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['ref']"/>
+                            </td>
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['inv_date']"/>
+                            </td>
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['sub_total_currency']"/>
+                            </td>
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['amount_discount_electronic_invoice_currency']"/>
+                            </td>
+                            <!-- Hidden: amount_paid_currency -->
+                            <!-- Hidden: amount_residual_currency -->
+                            <!-- Hidden: amount_residual_signed_currency -->
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['amount_subtotal_without_iva_returned_currency']"/>
+                            </td>
+                            <!-- Hidden: amount_tax_currency -->
+                            <!-- Hidden: amount_tax_electronic_invoice_currency -->
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['amount_tax_signed_currency']"/>
+                            </td>
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['amount_iva_returned_currency']"/>
+                            </td>
+                            <!-- Hidden: amount_total_currency -->
+                            <!-- Hidden: amount_total_in_currency_signed_currency -->
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['amount_total_signed_currency']"/>
+                            </td>
+                            <!-- Hidden: amount_untaxed_currency -->
+                            <!-- Hidden: amount_untaxed_in_currency_signed_currency -->
+                            <td class="text-start" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['electronic_invoice_return_message']"/>
+                            </td>
+                            <td t-if="not data['form']['detailed_report']">
+                            </td>
+                            <td class="text-end" t-if="not data['form']['detailed_report']">
+                                <t t-esc="tex_line.get('amount_subtotal_without_iva_returned_currency', '')"/>
+                            </td>
+                            <td class="text-end" t-if="not data['form']['detailed_report']">
+                                <t t-esc="tex_line.get('amount_tax_currency', '')"/>
+                            </td>
+                        </tr>
+                        <t t-set="total_base_amount" t-value="total_base_amount + tex_line['base_amount']"/>
+                        <t t-set="total_tax_amount" t-value="total_tax_amount + tex_line['tax_amount']"/>
+                        <t t-set="total_iva_returned" t-value="total_iva_returned + (tex_line.get('iva_returned') or 0)"/>
+                        <t t-if="line_no == (len_tex_inv - 1)">
+                            <tr>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td>
+                                </td>
+                                <td class="fw-bold">
+                                    <t t-if="not data['form']['detailed_report']" t-esc="tax"/>
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td t-att-class="'fw-bold text-end border-top border-black' if data['form']['detailed_report'] else 'text-end'">
+                                    Total
+                                </td>
+                                <td t-att-class="'fw-bold text-end border-top border-black' if data['form']['detailed_report'] else 'text-end'">
+                                    <t t-esc="company.currency_id.format(total_base_amount)"/>
+                                </td>
+                                <td t-att-class="'fw-bold text-end border-top border-black' if data['form']['detailed_report'] else 'text-end'">
+                                    <t t-esc="company.currency_id.format(total_tax_amount)"/>
+                                </td>
+                                <td t-if="data['form']['detailed_report']" t-att-class="'fw-bold text-end border-top border-black'">
+                                    <t t-esc="company.currency_id.format(total_iva_returned)"/>
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                            </tr>
+                        </t>
+                        <t t-set="line_no" t-value="line_no+1"/>
+                    </t>
+                    <t t-set="grand_total_base_amount" t-value="grand_total_base_amount + total_base_amount"/>
+                    <t t-set="grand_total_tax_amount" t-value="grand_total_tax_amount + total_tax_amount"/>
+                    <t t-set="grand_total_iva_returned" t-value="grand_total_iva_returned + total_iva_returned"/>
+                </t>
+                <t t-set="bal_total_base_amount" t-value="bal_total_base_amount + grand_total_base_amount"/>
+                <t t-set="bal_total_tax_amount" t-value="bal_total_tax_amount + grand_total_tax_amount"/>
+                <t t-set="bal_total_iva_returned" t-value="bal_total_iva_returned + grand_total_iva_returned"/>
+                <tr>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td>
+                    </td>
+                    <td>
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td class="fw-bold text-end" style="background-color: lightgray;">
+                        Total Tax Received
+                    </td>
+                    <td class="fw-bold text-end" style="background-color: lightgray;">
+                        <t t-esc="company.currency_id.format(grand_total_base_amount)"/>
+                    </td>
+                    <td class="fw-bold text-end" style="background-color: lightgray;">
+                        <t t-esc="company.currency_id.format(grand_total_tax_amount)"/>
+                    </td>
+                    <td t-if="data['form']['detailed_report']" class="fw-bold text-end" style="background-color: lightgray;">
+                        <t t-esc="company.currency_id.format(grand_total_iva_returned)"/>
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                </tr>
+            </t>
+            <t t-if="vandor_bill and (data['form']['tax_type'] == 'purchases' or not data['form']['tax_type'])">
+                <tr>
+                    <t t-if="not customer_invoice or data['form']['tax_type'] == 'purchases'">
+                        <td class="text-center fw-bold" style="background-color: rgba(135, 90, 123, 1); color: white;">
+                            <t t-esc="partner.name"/>
+                        </td>
+                    </t>
+                    <t t-else="">
+                        <td></td>
+                    </t>
+                    <td t-if="data['form']['detailed_report']" colspan="10" class="text-center fw-bold">
+                        Tax Paid
+                    </td>
+                    <td t-else="" colspan="4" class="text-center fw-bold">
+                        Tax Paid
+                    </td>
+                </tr>
+                <t t-set="grand_total_base_amount" t-value="0"/>
+                <t t-set="grand_total_tax_amount" t-value="0"/>
+                <t t-foreach="inv_tax" t-as="tax">
+                    <t t-set="tex_inv" t-value="filter_inv_on_product_tax(tax,vandor_bill,category_rec=partner)"/>
+                    <t t-set="len_tex_inv" t-value="len(tex_inv)"/>
+                    <t t-set="total_base_amount" t-value="0"/>
+                    <t t-set="total_tax_amount" t-value="0"/>
+                    <t t-set="line_no" t-value="0"/>
+                    <t t-foreach="tex_inv" t-as="tex_line">
+                        <tr t-if="data['form']['detailed_report']">
+                            <td>
+                            </td>
+                            <td class="fw-bold">
+                                <t t-if="line_no == 0">
+                                    <t t-esc="tax"/>
+                                </t>
+                            </td>
+                            <td t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['name']"/>
+                            </td>
+                            <td class="text-center" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['ref']"/>
+                            </td>
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['inv_date']"/>
+                            </td>
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['sub_total_currency']"/>
+                            </td>
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['amount_discount_electronic_invoice_currency']"/>
+                            </td>
+                            <!-- Hidden: amount_paid_currency -->
+                            <!-- Hidden: amount_residual_currency -->
+                            <!-- Hidden: amount_residual_signed_currency -->
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['amount_subtotal_without_iva_returned_currency']"/>
+                            </td>
+                            <!-- Hidden: amount_tax_currency -->
+                            <!-- Hidden: amount_tax_electronic_invoice_currency -->
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['amount_tax_signed_currency']"/>
+                            </td>
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['amount_iva_returned_currency']"/>
+                            </td>
+                            <!-- Hidden: amount_total_currency -->
+                            <!-- Hidden: amount_total_in_currency_signed_currency -->
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['amount_total_signed_currency']"/>
+                            </td>
+                            <!-- Hidden: amount_untaxed_currency -->
+                            <!-- Hidden: amount_untaxed_in_currency_signed_currency -->
+                            <td class="text-start" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['electronic_invoice_return_message']"/>
+                            </td>
+                            <td t-if="not data['form']['detailed_report']">
+                            </td>
+                            <td class="text-end" t-if="not data['form']['detailed_report']">
+                                <t t-esc="tex_line.get('amount_subtotal_without_iva_returned_currency', '')"/>
+                            </td>
+                            <td class="text-end" t-if="not data['form']['detailed_report']">
+                                <t t-esc="tex_line.get('amount_tax_currency', '')"/>
+                            </td>
+                        </tr>
+                        <t t-set="total_base_amount" t-value="total_base_amount + tex_line['base_amount']"/>
+                        <t t-set="total_tax_amount" t-value="total_tax_amount + tex_line['tax_amount']"/>
+                        <t t-set="total_iva_returned" t-value="total_iva_returned + (tex_line.get('iva_returned') or 0)"/>
+                        <t t-if="line_no == (len_tex_inv - 1)">
+                            <tr>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td>
+                                </td>
+                                <td class="fw-bold">
+                                    <t t-if="not data['form']['detailed_report']" t-esc="tax"/>
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td t-att-class="'fw-bold text-end border-top border-black' if data['form']['detailed_report'] else 'text-end'">
+                                    Total
+                                </td>
+                                <td t-att-class="'fw-bold text-end border-top border-black' if data['form']['detailed_report'] else 'text-end'">
+                                    <t t-esc="company.currency_id.format(total_base_amount)"/>
+                                </td>
+                                <td t-att-class="'fw-bold text-end border-top border-black' if data['form']['detailed_report'] else 'text-end'">
+                                    <t t-esc="company.currency_id.format(total_tax_amount)"/>
+                                </td>
+                                <td t-if="data['form']['detailed_report']" t-att-class="'fw-bold text-end border-top border-black'">
+                                    <t t-esc="company.currency_id.format(total_iva_returned)"/>
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                            </tr>
+                        </t>
+                        <t t-set="line_no" t-value="line_no+1"/>
+                    </t>
+                    <t t-set="grand_total_base_amount" t-value="grand_total_base_amount + total_base_amount"/>
+                    <t t-set="grand_total_tax_amount" t-value="grand_total_tax_amount + total_tax_amount"/>
+                    <t t-set="grand_total_iva_returned" t-value="grand_total_iva_returned + total_iva_returned"/>
+                </t>
+                <t t-set="bal_total_base_amount" t-value="bal_total_base_amount - grand_total_base_amount"/>
+                <t t-set="bal_total_tax_amount" t-value="bal_total_tax_amount - grand_total_tax_amount"/>
+                <t t-set="bal_total_iva_returned" t-value="bal_total_iva_returned - grand_total_iva_returned"/>
+                <tr>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td>
+                    </td>
+                    <td>
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td class="fw-bold text-end" style="background-color: lightgray;">
+                        Total Tax Paid
+                    </td>
+                    <td class="fw-bold text-end" style="background-color: lightgray;">
+                        <t t-esc="company.currency_id.format(grand_total_base_amount)"/>
+                    </td>
+                    <td class="fw-bold text-end" style="background-color: lightgray;">
+                        <t t-esc="company.currency_id.format(grand_total_tax_amount)"/>
+                    </td>
+                    <td t-if="data['form']['detailed_report']" class="fw-bold text-end" style="background-color: lightgray;">
+                        <t t-esc="company.currency_id.format(grand_total_iva_returned)"/>
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                </tr>
+            </t>
+            <t t-set="vandor_bill_render" t-value="False"/>
+            <t t-set="customer_invoice_render" t-value="False"/>
+            <t t-if="vandor_bill">
+                <t t-set="vandor_bill_render" t-value="data['form']['tax_type'] == 'purchases' or not data['form']['tax_type']"/>
+            </t>
+            <t t-if="customer_invoice">
+                <t t-set="customer_invoice_render" t-value="data['form']['tax_type'] == 'sales' or not data['form']['tax_type']"/>
+            </t>
+            <t t-if="vandor_bill_render or customer_invoice_render">
+                <tr>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td>
+                    </td>
+                    <td>
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td class="fw-bold text-end" style="background-color: rgba(135, 90, 123, 1); color: white;">
+                        Balance
+                    </td>
+                    <td class="fw-bold text-end" style="background-color: rgba(135, 90, 123, 1); color: white;">
+                        <t t-esc="company.currency_id.format(bal_total_base_amount)"/>
+                    </td>
+                    <td class="fw-bold text-end" style="background-color: rgba(135, 90, 123, 1); color: white;">
+                        <t t-esc="company.currency_id.format(bal_total_tax_amount)"/>
+                    </td>
+                    <td t-if="data['form']['detailed_report']" class="fw-bold text-end" style="background-color: rgba(135, 90, 123, 1); color: white;">
+                        <t t-esc="company.currency_id.format(bal_total_iva_returned)"/>
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                </tr>
+            </t>
+        </t>
+    </template>
+    <template id="product_product_render">
+        <tr>
+            <td class="text-center fw-bold" style="background-color: lightgray;">
+                Products
+            </td>
+            <td t-if="data['form']['detailed_report']" colspan="10">
+            </td>
+            <td t-else="" colspan="4">
+            </td>
+        </tr>
+        <t t-foreach="get_products(account_invoices_c,data['form']['product_ids'],data['form']['report_for'],)" t-as="partner">
+            <t t-set="partner_invoices" t-value="account_invoices_c.sudo().filtered(lambda inv: any(
+                                                line.product_id.id == partner.id and line.tax_ids for line in inv.invoice_line_ids))"/>
+            <t t-set="inv_tax" t-value="get_product_tax_name(partner_invoices,partner)"/>
+            <t t-set="vandor_bill" t-value="partner_invoices.sudo().filtered(lambda l: l.move_type in ['in_invoice', 'in_refund',])"/>
+            <t t-set="customer_invoice" t-value="partner_invoices.sudo().filtered(lambda l: l.move_type in ['out_invoice', 'out_refund',])"/>
+            <t t-set="bal_total_base_amount" t-value="0"/>
+            <t t-set="bal_total_tax_amount" t-value="0"/>
+            <t t-set="bal_total_iva_returned" t-value="0"/>
+            <t t-if="customer_invoice and (data['form']['tax_type'] == 'sales' or not data['form']['tax_type'])">
+                <tr>
+                    <td class="text-center fw-bold" style="background-color: rgba(135, 90, 123, 1); color: white;">
+                        <t t-esc="partner.name"/>
+                    </td>
+                    <td t-if="data['form']['detailed_report']" colspan="10" class="text-center fw-bold">
+                        Tax Received
+                    </td>
+                    <td t-else="" colspan="4" class="text-center fw-bold">
+                        Tax Received
+                    </td>
+                </tr>
+                <t t-set="grand_total_base_amount" t-value="0"/>
+                <t t-set="grand_total_tax_amount" t-value="0"/>
+                <t t-foreach="inv_tax" t-as="tax">
+                    <t t-set="tex_inv" t-value="filter_inv_on_product_tax(tax,customer_invoice,product_rec=partner)"/>
+                    <t t-set="len_tex_inv" t-value="len(tex_inv)"/>
+                    <t t-set="total_base_amount" t-value="0"/>
+                    <t t-set="total_tax_amount" t-value="0"/>
+                    <t t-set="line_no" t-value="0"/>
+                    <t t-foreach="tex_inv" t-as="tex_line">
+                        <tr t-if="data['form']['detailed_report']">
+                            <td>
+                            </td>
+                            <td class="fw-bold">
+                                <t t-if="line_no == 0">
+                                    <t t-esc="tax"/>
+                                </t>
+                            </td>
+                            <td t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['name']"/>
+                            </td>
+                            <td class="text-center" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['ref']"/>
+                            </td>
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['inv_date']"/>
+                            </td>
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['sub_total_currency']"/>
+                            </td>
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['amount_discount_electronic_invoice_currency']"/>
+                            </td>
+                            <!-- Hidden: amount_paid_currency -->
+                            <!-- Hidden: amount_residual_currency -->
+                            <!-- Hidden: amount_residual_signed_currency -->
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['amount_subtotal_without_iva_returned_currency']"/>
+                            </td>
+                            <!-- Hidden: amount_tax_currency -->
+                            <!-- Hidden: amount_tax_electronic_invoice_currency -->
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['amount_tax_signed_currency']"/>
+                            </td>
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['amount_iva_returned_currency']"/>
+                            </td>
+                            <!-- Hidden: amount_total_currency -->
+                            <!-- Hidden: amount_total_in_currency_signed_currency -->
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['amount_total_signed_currency']"/>
+                            </td>
+                            <!-- Hidden: amount_untaxed_currency -->
+                            <!-- Hidden: amount_untaxed_in_currency_signed_currency -->
+                            <td class="text-start" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['electronic_invoice_return_message']"/>
+                            </td>
+                            <td t-if="not data['form']['detailed_report']">
+                            </td>
+                            <td class="text-end" t-if="not data['form']['detailed_report']">
+                                <t t-esc="tex_line.get('amount_subtotal_without_iva_returned_currency', '')"/>
+                            </td>
+                            <td class="text-end" t-if="not data['form']['detailed_report']">
+                                <t t-esc="tex_line.get('amount_tax_currency', '')"/>
+                            </td>
+                        </tr>
+                        <t t-set="total_base_amount" t-value="total_base_amount + tex_line['base_amount']"/>
+                        <t t-set="total_tax_amount" t-value="total_tax_amount + tex_line['tax_amount']"/>
+                        <t t-set="total_iva_returned" t-value="total_iva_returned + (tex_line.get('iva_returned') or 0)"/>
+                        <t t-if="line_no == (len_tex_inv - 1)">
+                            <tr>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td>
+                                </td>
+                                <td class="fw-bold">
+                                    <t t-if="not data['form']['detailed_report']" t-esc="tax"/>
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td t-att-class="'fw-bold text-end border-top border-black' if data['form']['detailed_report'] else 'text-end'">
+                                    Total
+                                </td>
+                                <td t-att-class="'fw-bold text-end border-top border-black' if data['form']['detailed_report'] else 'text-end'">
+                                    <t t-esc="company.currency_id.format(total_base_amount)"/>
+                                </td>
+                                <td t-att-class="'fw-bold text-end border-top border-black' if data['form']['detailed_report'] else 'text-end'">
+                                    <t t-esc="company.currency_id.format(total_tax_amount)"/>
+                                </td>
+                                <td t-if="data['form']['detailed_report']" t-att-class="'fw-bold text-end border-top border-black'">
+                                    <t t-esc="company.currency_id.format(total_iva_returned)"/>
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                            </tr>
+                        </t>
+                        <t t-set="line_no" t-value="line_no+1"/>
+                    </t>
+                    <t t-set="grand_total_base_amount" t-value="grand_total_base_amount + total_base_amount"/>
+                    <t t-set="grand_total_tax_amount" t-value="grand_total_tax_amount + total_tax_amount"/>
+                    <t t-set="grand_total_iva_returned" t-value="grand_total_iva_returned + total_iva_returned"/>
+                </t>
+                <t t-set="bal_total_base_amount" t-value="bal_total_base_amount + grand_total_base_amount"/>
+                <t t-set="bal_total_tax_amount" t-value="bal_total_tax_amount + grand_total_tax_amount"/>
+                <t t-set="bal_total_iva_returned" t-value="bal_total_iva_returned + grand_total_iva_returned"/>
+                <tr>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td>
+                    </td>
+                    <td>
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td class="fw-bold text-end" style="background-color: lightgray;">
+                        Total Tax Received
+                    </td>
+                    <td class="fw-bold text-end" style="background-color: lightgray;">
+                        <t t-esc="company.currency_id.format(grand_total_base_amount)"/>
+                    </td>
+                    <td class="fw-bold text-end" style="background-color: lightgray;">
+                        <t t-esc="company.currency_id.format(grand_total_tax_amount)"/>
+                    </td>
+                    <td t-if="data['form']['detailed_report']" class="fw-bold text-end" style="background-color: lightgray;">
+                        <t t-esc="company.currency_id.format(grand_total_iva_returned)"/>
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                </tr>
+            </t>
+            <t t-if="vandor_bill and (data['form']['tax_type'] == 'purchases' or not data['form']['tax_type'])">
+                <tr>
+                    <t t-if="not customer_invoice or data['form']['tax_type'] == 'purchases'">
+                        <td class="text-center fw-bold" style="background-color: rgba(135, 90, 123, 1); color: white;">
+                            <t t-esc="partner.name"/>
+                        </td>
+                    </t>
+                    <t t-else="">
+                        <td></td>
+                    </t>
+                    <td t-if="data['form']['detailed_report']" colspan="10" class="text-center fw-bold">
+                        Tax Paid
+                    </td>
+                    <td t-else="" colspan="4" class="text-center fw-bold">
+                        Tax Paid
+                    </td>
+                </tr>
+                <t t-set="grand_total_base_amount" t-value="0"/>
+                <t t-set="grand_total_tax_amount" t-value="0"/>
+                <t t-foreach="inv_tax" t-as="tax">
+                    <t t-set="tex_inv" t-value="filter_inv_on_product_tax(tax,vandor_bill,product_rec=partner)"/>
+                    <t t-set="len_tex_inv" t-value="len(tex_inv)"/>
+                    <t t-set="total_base_amount" t-value="0"/>
+                    <t t-set="total_tax_amount" t-value="0"/>
+                    <t t-set="line_no" t-value="0"/>
+                    <t t-foreach="tex_inv" t-as="tex_line">
+                        <tr t-if="data['form']['detailed_report']">
+                            <td>
+                            </td>
+                            <td class="fw-bold">
+                                <t t-if="line_no == 0">
+                                    <t t-esc="tax"/>
+                                </t>
+                            </td>
+                            <td t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['name']"/>
+                            </td>
+                            <td class="text-center" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['ref']"/>
+                            </td>
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['inv_date']"/>
+                            </td>
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['sub_total_currency']"/>
+                            </td>
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['amount_discount_electronic_invoice_currency']"/>
+                            </td>
+                            <!-- Hidden: amount_paid_currency -->
+                            <!-- Hidden: amount_residual_currency -->
+                            <!-- Hidden: amount_residual_signed_currency -->
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['amount_subtotal_without_iva_returned_currency']"/>
+                            </td>
+                            <!-- Hidden: amount_tax_currency -->
+                            <!-- Hidden: amount_tax_electronic_invoice_currency -->
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['amount_tax_signed_currency']"/>
+                            </td>
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['amount_iva_returned_currency']"/>
+                            </td>
+                            <!-- Hidden: amount_total_currency -->
+                            <!-- Hidden: amount_total_in_currency_signed_currency -->
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['amount_total_signed_currency']"/>
+                            </td>
+                            <!-- Hidden: amount_untaxed_currency -->
+                            <!-- Hidden: amount_untaxed_in_currency_signed_currency -->
+                            <td class="text-start" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['electronic_invoice_return_message']"/>
+                            </td>
+                            <td t-if="not data['form']['detailed_report']">
+                            </td>
+                            <td class="text-end" t-if="not data['form']['detailed_report']">
+                                <t t-esc="tex_line.get('amount_subtotal_without_iva_returned_currency', '')"/>
+                            </td>
+                            <td class="text-end" t-if="not data['form']['detailed_report']">
+                                <t t-esc="tex_line.get('amount_tax_currency', '')"/>
+                            </td>
+                        </tr>
+                        <t t-set="total_base_amount" t-value="total_base_amount + tex_line['base_amount']"/>
+                        <t t-set="total_tax_amount" t-value="total_tax_amount + tex_line['tax_amount']"/>
+                        <t t-set="total_iva_returned" t-value="total_iva_returned + (tex_line.get('iva_returned') or 0)"/>
+                        <t t-if="line_no == (len_tex_inv - 1)">
+                            <tr>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td>
+                                </td>
+                                <td class="fw-bold">
+                                    <t t-if="not data['form']['detailed_report']" t-esc="tax"/>
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td t-att-class="'fw-bold text-end border-top border-black' if data['form']['detailed_report'] else 'text-end'">
+                                    Total
+                                </td>
+                                <td t-att-class="'fw-bold text-end border-top border-black' if data['form']['detailed_report'] else 'text-end'">
+                                    <t t-esc="company.currency_id.format(total_base_amount)"/>
+                                </td>
+                                <td t-att-class="'fw-bold text-end border-top border-black' if data['form']['detailed_report'] else 'text-end'">
+                                    <t t-esc="company.currency_id.format(total_tax_amount)"/>
+                                </td>
+                                <td t-if="data['form']['detailed_report']" t-att-class="'fw-bold text-end border-top border-black'">
+                                    <t t-esc="company.currency_id.format(total_iva_returned)"/>
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                            </tr>
+                        </t>
+                        <t t-set="line_no" t-value="line_no+1"/>
+                    </t>
+                    <t t-set="grand_total_base_amount" t-value="grand_total_base_amount + total_base_amount"/>
+                    <t t-set="grand_total_tax_amount" t-value="grand_total_tax_amount + total_tax_amount"/>
+                    <t t-set="grand_total_iva_returned" t-value="grand_total_iva_returned + total_iva_returned"/>
+                </t>
+                <t t-set="bal_total_base_amount" t-value="bal_total_base_amount - grand_total_base_amount"/>
+                <t t-set="bal_total_tax_amount" t-value="bal_total_tax_amount - grand_total_tax_amount"/>
+                <t t-set="bal_total_iva_returned" t-value="bal_total_iva_returned - grand_total_iva_returned"/>
+                <tr>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td>
+                    </td>
+                    <td>
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td class="fw-bold text-end" style="background-color: lightgray;">
+                        Total Tax Paid
+                    </td>
+                    <td class="fw-bold text-end" style="background-color: lightgray;">
+                        <t t-esc="company.currency_id.format(grand_total_base_amount)"/>
+                    </td>
+                    <td class="fw-bold text-end" style="background-color: lightgray;">
+                        <t t-esc="company.currency_id.format(grand_total_tax_amount)"/>
+                    </td>
+                    <td t-if="data['form']['detailed_report']" class="fw-bold text-end" style="background-color: lightgray;">
+                        <t t-esc="company.currency_id.format(grand_total_iva_returned)"/>
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                </tr>
+            </t>
+            <t t-set="vandor_bill_render" t-value="False"/>
+            <t t-set="customer_invoice_render" t-value="False"/>
+            <t t-if="vandor_bill">
+                <t t-set="vandor_bill_render" t-value="data['form']['tax_type'] == 'purchases' or not data['form']['tax_type']"/>
+            </t>
+            <t t-if="customer_invoice">
+                <t t-set="customer_invoice_render" t-value="data['form']['tax_type'] == 'sales' or not data['form']['tax_type']"/>
+            </t>
+            <t t-if="vandor_bill_render or customer_invoice_render">
+                <tr>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td>
+                    </td>
+                    <td>
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td class="fw-bold text-end" style="background-color: rgba(135, 90, 123, 1); color: white;">
+                        Balance
+                    </td>
+                    <td class="fw-bold text-end" style="background-color: rgba(135, 90, 123, 1); color: white;">
+                        <t t-esc="company.currency_id.format(bal_total_base_amount)"/>
+                    </td>
+                    <td class="fw-bold text-end" style="background-color: rgba(135, 90, 123, 1); color: white;">
+                        <t t-esc="company.currency_id.format(bal_total_tax_amount)"/>
+                    </td>
+                    <td t-if="data['form']['detailed_report']" class="fw-bold text-end" style="background-color: rgba(135, 90, 123, 1); color: white;">
+                        <t t-esc="company.currency_id.format(bal_total_iva_returned)"/>
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                </tr>
+            </t>
+        </t>
+    </template>
+    <template id="sales_team_render">
+        <tr>
+            <td class="text-center fw-bold" style="background-color: lightgray;">
+                Sales Team
+            </td>
+            <td t-if="data['form']['detailed_report']" colspan="10">
+            </td>
+            <td t-else="" colspan="4">
+            </td>
+        </tr>
+        <t t-foreach="get_sales_team(account_invoices_c,data['form']['sales_team_ids'],data['form']['report_for'],)" t-as="partner">
+            <t t-set="partner_invoices" t-value="account_invoices_c.sudo().filtered(lambda l: l.team_id.id == partner.id)"/>
+            <t t-set="inv_tax" t-value="get_tax_name(partner_invoices)"/>
+            <t t-set="vandor_bill" t-value="partner_invoices.sudo().filtered(lambda l: l.move_type in ['in_invoice', 'in_refund',])"/>
+            <t t-set="customer_invoice" t-value="partner_invoices.sudo().filtered(lambda l: l.move_type in ['out_invoice', 'out_refund',])"/>
+            <t t-set="bal_total_base_amount" t-value="0"/>
+            <t t-set="bal_total_tax_amount" t-value="0"/>
+            <t t-set="bal_total_iva_returned" t-value="0"/>
+            <t t-if="customer_invoice and (data['form']['tax_type'] == 'sales' or not data['form']['tax_type'])">
+                <tr>
+                    <td class="text-center fw-bold" style="background-color: rgba(135, 90, 123, 1); color: white;">
+                        <t t-esc="partner.name"/>
+                    </td>
+                    <td t-if="data['form']['detailed_report']" colspan="10" class="text-center fw-bold">
+                        Tax Received
+                    </td>
+                    <td t-else="" colspan="4" class="text-center fw-bold">
+                        Tax Received
+                    </td>
+                </tr>
+                <t t-set="grand_total_base_amount" t-value="0"/>
+                <t t-set="grand_total_tax_amount" t-value="0"/>
+                <t t-set="grand_total_iva_returned" t-value="0"/>
+                <t t-foreach="inv_tax" t-as="tax">
+                    <t t-set="tex_inv" t-value="filter_inv_on_tax(tax,customer_invoice)"/>
+                    <t t-set="len_tex_inv" t-value="len(tex_inv)"/>
+                    <t t-set="total_base_amount" t-value="0"/>
+                    <t t-set="total_tax_amount" t-value="0"/>
+                    <t t-set="total_iva_returned" t-value="0"/>
+                    <t t-set="line_no" t-value="0"/>
+                    <t t-foreach="tex_inv" t-as="tex_line">
+                        <tr t-if="data['form']['detailed_report']">
+                            <td>
+                            </td>
+                            <td class="fw-bold">
+                                <t t-if="line_no == 0">
+                                    <t t-esc="tax"/>
+                                </t>
+                            </td>
+                            <td t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['name']"/>
+                            </td>
+                            <td class="text-center" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['ref']"/>
+                            </td>
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['inv_date']"/>
+                            </td>
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['sub_total_currency']"/>
+                            </td>
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['amount_discount_electronic_invoice_currency']"/>
+                            </td>
+                            <!-- Hidden: amount_paid_currency -->
+                            <!-- Hidden: amount_residual_currency -->
+                            <!-- Hidden: amount_residual_signed_currency -->
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['amount_subtotal_without_iva_returned_currency']"/>
+                            </td>
+                            <!-- Hidden: amount_tax_currency -->
+                            <!-- Hidden: amount_tax_electronic_invoice_currency -->
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['amount_tax_signed_currency']"/>
+                            </td>
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['amount_iva_returned_currency']"/>
+                            </td>
+                            <!-- Hidden: amount_total_currency -->
+                            <!-- Hidden: amount_total_in_currency_signed_currency -->
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['amount_total_signed_currency']"/>
+                            </td>
+                            <!-- Hidden: amount_untaxed_currency -->
+                            <!-- Hidden: amount_untaxed_in_currency_signed_currency -->
+                            <td class="text-start" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['electronic_invoice_return_message']"/>
+                            </td>
+                            <td t-if="not data['form']['detailed_report']">
+                            </td>
+                            <td class="text-end" t-if="not data['form']['detailed_report']">
+                                <t t-esc="tex_line.get('amount_subtotal_without_iva_returned_currency', '')"/>
+                            </td>
+                            <td class="text-end" t-if="not data['form']['detailed_report']">
+                                <t t-esc="tex_line.get('amount_tax_currency', '')"/>
+                            </td>
+                        </tr>
+                        <t t-set="total_base_amount" t-value="total_base_amount + tex_line['base_amount']"/>
+                        <t t-set="total_tax_amount" t-value="total_tax_amount + tex_line['tax_amount']"/>
+                        <t t-set="total_iva_returned" t-value="total_iva_returned + (tex_line.get('iva_returned') or 0)"/>
+                        <t t-if="line_no == (len_tex_inv - 1)">
+                            <tr>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td>
+                                </td>
+                                <td class="fw-bold">
+                                    <t t-if="not data['form']['detailed_report']" t-esc="tax"/>
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td t-att-class="'fw-bold text-end border-top border-black' if data['form']['detailed_report'] else 'text-end'">
+                                    Total
+                                </td>
+                                <td t-att-class="'fw-bold text-end border-top border-black' if data['form']['detailed_report'] else 'text-end'">
+                                    <t t-esc="company.currency_id.format(total_base_amount)"/>
+                                </td>
+                                <td t-att-class="'fw-bold text-end border-top border-black' if data['form']['detailed_report'] else 'text-end'">
+                                    <t t-esc="company.currency_id.format(total_tax_amount)"/>
+                                </td>
+                                <td t-if="data['form']['detailed_report']" t-att-class="'fw-bold text-end border-top border-black'">
+                                    <t t-esc="company.currency_id.format(total_iva_returned)"/>
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                            </tr>
+                        </t>
+                        <t t-set="line_no" t-value="line_no+1"/>
+                    </t>
+                    <t t-set="grand_total_base_amount" t-value="grand_total_base_amount + total_base_amount"/>
+                    <t t-set="grand_total_tax_amount" t-value="grand_total_tax_amount + total_tax_amount"/>
+                    <t t-set="grand_total_iva_returned" t-value="grand_total_iva_returned + total_iva_returned"/>
+                </t>
+                <t t-set="bal_total_base_amount" t-value="bal_total_base_amount + grand_total_base_amount"/>
+                <t t-set="bal_total_tax_amount" t-value="bal_total_tax_amount + grand_total_tax_amount"/>
+                <t t-set="bal_total_iva_returned" t-value="bal_total_iva_returned + grand_total_iva_returned"/>
+                <tr>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td>
+                    </td>
+                    <td>
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td class="fw-bold text-end" style="background-color: lightgray;">
+                        Total Tax Received
+                    </td>
+                    <td class="fw-bold text-end" style="background-color: lightgray;">
+                        <t t-esc="company.currency_id.format(grand_total_base_amount)"/>
+                    </td>
+                    <td class="fw-bold text-end" style="background-color: lightgray;">
+                        <t t-esc="company.currency_id.format(grand_total_tax_amount)"/>
+                    </td>
+                    <td t-if="data['form']['detailed_report']" class="fw-bold text-end" style="background-color: lightgray;">
+                        <t t-esc="company.currency_id.format(grand_total_iva_returned)"/>
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                </tr>
+            </t>
+            <t t-if="vandor_bill and (data['form']['tax_type'] == 'purchases' or not data['form']['tax_type'])">
+                <tr>
+                    <t t-if="not customer_invoice or data['form']['tax_type'] == 'purchases'">
+                        <td class="text-center fw-bold" style="background-color: rgba(135, 90, 123, 1); color: white;">
+                            <t t-esc="partner.name"/>
+                        </td>
+                    </t>
+                    <t t-else="">
+                        <td></td>
+                    </t>
+                    <td t-if="data['form']['detailed_report']" colspan="10" class="text-center fw-bold">
+                        Tax Paid
+                    </td>
+                    <td t-else="" colspan="4" class="text-center fw-bold">
+                        Tax Paid
+                    </td>
+                </tr>
+                <t t-set="grand_total_base_amount" t-value="0"/>
+                <t t-set="grand_total_tax_amount" t-value="0"/>
+                <t t-foreach="inv_tax" t-as="tax">
+                    <t t-set="tex_inv" t-value="filter_inv_on_tax(tax,vandor_bill)"/>
+                    <t t-set="len_tex_inv" t-value="len(tex_inv)"/>
+                    <t t-set="total_base_amount" t-value="0"/>
+                    <t t-set="total_tax_amount" t-value="0"/>
+                    <t t-set="line_no" t-value="0"/>
+                    <t t-foreach="tex_inv" t-as="tex_line">
+                        <tr t-if="data['form']['detailed_report']">
+                            <td>
+                            </td>
+                            <td class="fw-bold">
+                                <t t-if="line_no == 0">
+                                    <t t-esc="tax"/>
+                                </t>
+                            </td>
+                            <td t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['name']"/>
+                            </td>
+                            <td class="text-center" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['ref']"/>
+                            </td>
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['inv_date']"/>
+                            </td>
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['sub_total_currency']"/>
+                            </td>
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['amount_discount_electronic_invoice_currency']"/>
+                            </td>
+                            <!-- Hidden: amount_paid_currency -->
+                            <!-- Hidden: amount_residual_currency -->
+                            <!-- Hidden: amount_residual_signed_currency -->
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['amount_subtotal_without_iva_returned_currency']"/>
+                            </td>
+                            <!-- Hidden: amount_tax_currency -->
+                            <!-- Hidden: amount_tax_electronic_invoice_currency -->
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['amount_tax_signed_currency']"/>
+                            </td>
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['amount_iva_returned_currency']"/>
+                            </td>
+                            <!-- Hidden: amount_total_currency -->
+                            <!-- Hidden: amount_total_in_currency_signed_currency -->
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['amount_total_signed_currency']"/>
+                            </td>
+                            <!-- Hidden: amount_untaxed_currency -->
+                            <!-- Hidden: amount_untaxed_in_currency_signed_currency -->
+                            <td class="text-start" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['electronic_invoice_return_message']"/>
+                            </td>
+                            <td t-if="not data['form']['detailed_report']">
+                            </td>
+                            <td class="text-end" t-if="not data['form']['detailed_report']">
+                                <t t-esc="tex_line.get('amount_subtotal_without_iva_returned_currency', '')"/>
+                            </td>
+                            <td class="text-end" t-if="not data['form']['detailed_report']">
+                                <t t-esc="tex_line.get('amount_tax_currency', '')"/>
+                            </td>
+                        </tr>
+                        <t t-set="total_base_amount" t-value="total_base_amount + tex_line['base_amount']"/>
+                        <t t-set="total_tax_amount" t-value="total_tax_amount + tex_line['tax_amount']"/>
+                        <t t-set="total_iva_returned" t-value="total_iva_returned + (tex_line.get('iva_returned') or 0)"/>
+                        <t t-if="line_no == (len_tex_inv - 1)">
+                            <tr>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td>
+                                </td>
+                                <td class="fw-bold">
+                                    <t t-if="not data['form']['detailed_report']" t-esc="tax"/>
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td t-att-class="'fw-bold text-end border-top border-black' if data['form']['detailed_report'] else 'text-end'">
+                                    Total
+                                </td>
+                                <td t-att-class="'fw-bold text-end border-top border-black' if data['form']['detailed_report'] else 'text-end'">
+                                    <t t-esc="company.currency_id.format(total_base_amount)"/>
+                                </td>
+                                <td t-att-class="'fw-bold text-end border-top border-black' if data['form']['detailed_report'] else 'text-end'">
+                                    <t t-esc="company.currency_id.format(total_tax_amount)"/>
+                                </td>
+                                <td t-if="data['form']['detailed_report']" t-att-class="'fw-bold text-end border-top border-black'">
+                                    <t t-esc="company.currency_id.format(total_iva_returned)"/>
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                            </tr>
+                        </t>
+                        <t t-set="line_no" t-value="line_no+1"/>
+                    </t>
+                    <t t-set="grand_total_base_amount" t-value="grand_total_base_amount + total_base_amount"/>
+                    <t t-set="grand_total_tax_amount" t-value="grand_total_tax_amount + total_tax_amount"/>
+                    <t t-set="grand_total_iva_returned" t-value="grand_total_iva_returned + total_iva_returned"/>
+                </t>
+                <t t-set="bal_total_base_amount" t-value="bal_total_base_amount - grand_total_base_amount"/>
+                <t t-set="bal_total_tax_amount" t-value="bal_total_tax_amount - grand_total_tax_amount"/>
+                <t t-set="bal_total_iva_returned" t-value="bal_total_iva_returned - grand_total_iva_returned"/>
+                <tr>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td>
+                    </td>
+                    <td>
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td class="fw-bold text-end" style="background-color: lightgray;">
+                        Total Tax Paid
+                    </td>
+                    <td class="fw-bold text-end" style="background-color: lightgray;">
+                        <t t-esc="company.currency_id.format(grand_total_base_amount)"/>
+                    </td>
+                    <td class="fw-bold text-end" style="background-color: lightgray;">
+                        <t t-esc="company.currency_id.format(grand_total_tax_amount)"/>
+                    </td>
+                    <td t-if="data['form']['detailed_report']" class="fw-bold text-end" style="background-color: lightgray;">
+                        <t t-esc="company.currency_id.format(grand_total_iva_returned)"/>
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                </tr>
+            </t>
+            <t t-set="vandor_bill_render" t-value="False"/>
+            <t t-set="customer_invoice_render" t-value="False"/>
+            <t t-if="vandor_bill">
+                <t t-set="vandor_bill_render" t-value="data['form']['tax_type'] == 'purchases' or not data['form']['tax_type']"/>
+            </t>
+            <t t-if="customer_invoice">
+                <t t-set="customer_invoice_render" t-value="data['form']['tax_type'] == 'sales' or not data['form']['tax_type']"/>
+            </t>
+            <t t-if="vandor_bill_render or customer_invoice_render">
+                <tr>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td>
+                    </td>
+                    <td>
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td class="fw-bold text-end" style="background-color: rgba(135, 90, 123, 1); color: white;">
+                        Balance
+                    </td>
+                    <td class="fw-bold text-end" style="background-color: rgba(135, 90, 123, 1); color: white;">
+                        <t t-esc="company.currency_id.format(bal_total_base_amount)"/>
+                    </td>
+                    <td class="fw-bold text-end" style="background-color: rgba(135, 90, 123, 1); color: white;">
+                        <t t-esc="company.currency_id.format(bal_total_tax_amount)"/>
+                    </td>
+                    <td t-if="data['form']['detailed_report']" class="fw-bold text-end" style="background-color: rgba(135, 90, 123, 1); color: white;">
+                        <t t-esc="company.currency_id.format(bal_total_iva_returned)"/>
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                </tr>
+            </t>
+        </t>
+    </template>
+    <template id="sales_person_render">
+        <tr>
+            <td class="text-center fw-bold" style="background-color: lightgray;">
+                Sales Person
+            </td>
+            <td t-if="data['form']['detailed_report']" colspan="10">
+            </td>
+            <td t-else="" colspan="4">
+            </td>
+        </tr>
+        <t t-foreach="get_sales_person(account_invoices_c,data['form']['salesperson_ids'],data['form']['report_for'],)" t-as="partner">
+            <t t-set="partner_invoices" t-value="account_invoices_c.sudo().filtered(lambda l: l.invoice_user_id.id == partner.id)"/>
+            <t t-set="inv_tax" t-value="get_tax_name(partner_invoices)"/>
+            <t t-set="vandor_bill" t-value="partner_invoices.sudo().filtered(lambda l: l.move_type in ['in_invoice', 'in_refund',])"/>
+            <t t-set="customer_invoice" t-value="partner_invoices.sudo().filtered(lambda l: l.move_type in ['out_invoice', 'out_refund',])"/>
+            <t t-set="bal_total_base_amount" t-value="0"/>
+            <t t-set="bal_total_tax_amount" t-value="0"/>
+            <t t-set="bal_total_iva_returned" t-value="0"/>
+            <t t-if="customer_invoice and (data['form']['tax_type'] == 'sales' or not data['form']['tax_type'])">
+                <tr>
+                    <td class="text-center fw-bold" style="background-color: rgba(135, 90, 123, 1); color: white;">
+                        <t t-esc="partner.name"/>
+                    </td>
+                    <td t-if="data['form']['detailed_report']" colspan="10" class="text-center fw-bold">
+                        Tax Received
+                    </td>
+                    <td t-else="" colspan="4" class="text-center fw-bold">
+                        Tax Received
+                    </td>
+                </tr>
+                <t t-set="grand_total_base_amount" t-value="0"/>
+                <t t-set="grand_total_tax_amount" t-value="0"/>
+                <t t-set="grand_total_iva_returned" t-value="0"/>
+                <t t-foreach="inv_tax" t-as="tax">
+                    <t t-set="tex_inv" t-value="filter_inv_on_tax(tax,customer_invoice)"/>
+                    <t t-set="len_tex_inv" t-value="len(tex_inv)"/>
+                    <t t-set="total_base_amount" t-value="0"/>
+                    <t t-set="total_tax_amount" t-value="0"/>
+                    <t t-set="total_iva_returned" t-value="0"/>
+                    <t t-set="line_no" t-value="0"/>
+                    <t t-foreach="tex_inv" t-as="tex_line">
+                        <tr t-if="data['form']['detailed_report']">
+                            <td>
+                            </td>
+                            <td class="fw-bold">
+                                <t t-if="line_no == 0">
+                                    <t t-esc="tax"/>
+                                </t>
+                            </td>
+                            <td t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['name']"/>
+                            </td>
+                            <td class="text-center" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['ref']"/>
+                            </td>
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['inv_date']"/>
+                            </td>
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['sub_total_currency']"/>
+                            </td>
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['amount_discount_electronic_invoice_currency']"/>
+                            </td>
+                            <!-- Hidden: amount_paid_currency -->
+                            <!-- Hidden: amount_residual_currency -->
+                            <!-- Hidden: amount_residual_signed_currency -->
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['amount_subtotal_without_iva_returned_currency']"/>
+                            </td>
+                            <!-- Hidden: amount_tax_currency -->
+                            <!-- Hidden: amount_tax_electronic_invoice_currency -->
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['amount_tax_signed_currency']"/>
+                            </td>
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['amount_iva_returned_currency']"/>
+                            </td>
+                            <!-- Hidden: amount_total_currency -->
+                            <!-- Hidden: amount_total_in_currency_signed_currency -->
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['amount_total_signed_currency']"/>
+                            </td>
+                            <!-- Hidden: amount_untaxed_currency -->
+                            <!-- Hidden: amount_untaxed_in_currency_signed_currency -->
+                            <td class="text-start" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['electronic_invoice_return_message']"/>
+                            </td>
+                            <td t-if="not data['form']['detailed_report']">
+                            </td>
+                            <td class="text-end" t-if="not data['form']['detailed_report']">
+                                <t t-esc="tex_line.get('amount_subtotal_without_iva_returned_currency', '')"/>
+                            </td>
+                            <td class="text-end" t-if="not data['form']['detailed_report']">
+                                <t t-esc="tex_line.get('amount_tax_currency', '')"/>
+                            </td>
+                        </tr>
+                        <t t-set="total_base_amount" t-value="total_base_amount + tex_line['base_amount']"/>
+                        <t t-set="total_tax_amount" t-value="total_tax_amount + tex_line['tax_amount']"/>
+                        <t t-set="total_iva_returned" t-value="total_iva_returned + (tex_line.get('iva_returned') or 0)"/>
+                        <t t-if="line_no == (len_tex_inv - 1)">
+                            <tr>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td>
+                                </td>
+                                <td class="fw-bold">
+                                    <t t-if="not data['form']['detailed_report']" t-esc="tax"/>
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td t-att-class="'fw-bold text-end border-top border-black' if data['form']['detailed_report'] else 'text-end'">
+                                    Total
+                                </td>
+                                <td t-att-class="'fw-bold text-end border-top border-black' if data['form']['detailed_report'] else 'text-end'">
+                                    <t t-esc="company.currency_id.format(total_base_amount)"/>
+                                </td>
+                                <td t-att-class="'fw-bold text-end border-top border-black' if data['form']['detailed_report'] else 'text-end'">
+                                    <t t-esc="company.currency_id.format(total_tax_amount)"/>
+                                </td>
+                                <td t-if="data['form']['detailed_report']" t-att-class="'fw-bold text-end border-top border-black'">
+                                    <t t-esc="company.currency_id.format(total_iva_returned)"/>
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                            </tr>
+                        </t>
+                        <t t-set="line_no" t-value="line_no+1"/>
+                    </t>
+                    <t t-set="grand_total_base_amount" t-value="grand_total_base_amount + total_base_amount"/>
+                    <t t-set="grand_total_tax_amount" t-value="grand_total_tax_amount + total_tax_amount"/>
+                    <t t-set="grand_total_iva_returned" t-value="grand_total_iva_returned + total_iva_returned"/>
+                </t>
+                <t t-set="bal_total_base_amount" t-value="bal_total_base_amount + grand_total_base_amount"/>
+                <t t-set="bal_total_tax_amount" t-value="bal_total_tax_amount + grand_total_tax_amount"/>
+                <t t-set="bal_total_iva_returned" t-value="bal_total_iva_returned + grand_total_iva_returned"/>
+                <tr>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td>
+                    </td>
+                    <td>
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td class="fw-bold text-end" style="background-color: lightgray;">
+                        Total Tax Received
+                    </td>
+                    <td class="fw-bold text-end" style="background-color: lightgray;">
+                        <t t-esc="company.currency_id.format(grand_total_base_amount)"/>
+                    </td>
+                    <td class="fw-bold text-end" style="background-color: lightgray;">
+                        <t t-esc="company.currency_id.format(grand_total_tax_amount)"/>
+                    </td>
+                    <td t-if="data['form']['detailed_report']" class="fw-bold text-end" style="background-color: lightgray;">
+                        <t t-esc="company.currency_id.format(grand_total_iva_returned)"/>
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                </tr>
+            </t>
+            <t t-if="vandor_bill and (data['form']['tax_type'] == 'purchases' or not data['form']['tax_type'])">
+                <tr>
+                    <t t-if="not customer_invoice or data['form']['tax_type'] == 'purchases'">
+                        <td class="text-center fw-bold" style="background-color: rgba(135, 90, 123, 1); color: white;">
+                            <t t-esc="partner.name"/>
+                        </td>
+                    </t>
+                    <t t-else="">
+                        <td></td>
+                    </t>
+                    <td t-if="data['form']['detailed_report']" colspan="10" class="text-center fw-bold">
+                        Tax Paid
+                    </td>
+                    <td t-else="" colspan="4" class="text-center fw-bold">
+                        Tax Paid
+                    </td>
+                </tr>
+                <t t-set="grand_total_base_amount" t-value="0"/>
+                <t t-set="grand_total_tax_amount" t-value="0"/>
+                <t t-foreach="inv_tax" t-as="tax">
+                    <t t-set="tex_inv" t-value="filter_inv_on_tax(tax,vandor_bill)"/>
+                    <t t-set="len_tex_inv" t-value="len(tex_inv)"/>
+                    <t t-set="total_base_amount" t-value="0"/>
+                    <t t-set="total_tax_amount" t-value="0"/>
+                    <t t-set="line_no" t-value="0"/>
+                    <t t-foreach="tex_inv" t-as="tex_line">
+                        <tr t-if="data['form']['detailed_report']">
+                            <td>
+                            </td>
+                            <td class="fw-bold">
+                                <t t-if="line_no == 0">
+                                    <t t-esc="tax"/>
+                                </t>
+                            </td>
+                            <td t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['name']"/>
+                            </td>
+                            <td class="text-center" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['ref']"/>
+                            </td>
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['inv_date']"/>
+                            </td>
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['sub_total_currency']"/>
+                            </td>
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['amount_discount_electronic_invoice_currency']"/>
+                            </td>
+                            <!-- Hidden: amount_paid_currency -->
+                            <!-- Hidden: amount_residual_currency -->
+                            <!-- Hidden: amount_residual_signed_currency -->
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['amount_subtotal_without_iva_returned_currency']"/>
+                            </td>
+                            <!-- Hidden: amount_tax_currency -->
+                            <!-- Hidden: amount_tax_electronic_invoice_currency -->
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['amount_tax_signed_currency']"/>
+                            </td>
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['amount_iva_returned_currency']"/>
+                            </td>
+                            <!-- Hidden: amount_total_currency -->
+                            <!-- Hidden: amount_total_in_currency_signed_currency -->
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['amount_total_signed_currency']"/>
+                            </td>
+                            <!-- Hidden: amount_untaxed_currency -->
+                            <!-- Hidden: amount_untaxed_in_currency_signed_currency -->
+                            <td class="text-start" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['electronic_invoice_return_message']"/>
+                            </td>
+                            <td t-if="not data['form']['detailed_report']">
+                            </td>
+                            <td class="text-end" t-if="not data['form']['detailed_report']">
+                                <t t-esc="tex_line.get('amount_subtotal_without_iva_returned_currency', '')"/>
+                            </td>
+                            <td class="text-end" t-if="not data['form']['detailed_report']">
+                                <t t-esc="tex_line.get('amount_tax_currency', '')"/>
+                            </td>
+                        </tr>
+                        <t t-set="total_base_amount" t-value="total_base_amount + tex_line['base_amount']"/>
+                        <t t-set="total_tax_amount" t-value="total_tax_amount + tex_line['tax_amount']"/>
+                        <t t-set="total_iva_returned" t-value="total_iva_returned + (tex_line.get('iva_returned') or 0)"/>
+                        <t t-if="line_no == (len_tex_inv - 1)">
+                            <tr>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td>
+                                </td>
+                                <td class="fw-bold">
+                                    <t t-if="not data['form']['detailed_report']" t-esc="tax"/>
+                                </td>
+                                <td ct-att-class="'fw-bold text-end border-top border-black' if data['form']['detailed_report'] else 'text-end'">
+                                    Total
+                                </td>
+                                <td t-att-class="'fw-bold text-end border-top border-black' if data['form']['detailed_report'] else 'text-end'">
+                                    <t t-esc="company.currency_id.format(total_base_amount)"/>
+                                </td>
+                                <td t-att-class="'fw-bold text-end border-top border-black' if data['form']['detailed_report'] else 'text-end'">
+                                    <t t-esc="company.currency_id.format(total_tax_amount)"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                            </tr>
+                        </t>
+                        <t t-set="line_no" t-value="line_no+1"/>
+                    </t>
+                    <t t-set="grand_total_base_amount" t-value="grand_total_base_amount + total_base_amount"/>
+                    <t t-set="grand_total_tax_amount" t-value="grand_total_tax_amount + total_tax_amount"/>
+                    <t t-set="grand_total_iva_returned" t-value="grand_total_iva_returned + total_iva_returned"/>
+                </t>
+                <t t-set="bal_total_base_amount" t-value="bal_total_base_amount - grand_total_base_amount"/>
+                <t t-set="bal_total_tax_amount" t-value="bal_total_tax_amount - grand_total_tax_amount"/>
+                <t t-set="bal_total_iva_returned" t-value="bal_total_iva_returned - grand_total_iva_returned"/>
+                <tr>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td>
+                    </td>
+                    <td>
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td class="fw-bold text-end" style="background-color: lightgray;">
+                        Total Tax Paid
+                    </td>
+                    <td class="fw-bold text-end" style="background-color: lightgray;">
+                        <t t-esc="company.currency_id.format(grand_total_base_amount)"/>
+                    </td>
+                    <td class="fw-bold text-end" style="background-color: lightgray;">
+                        <t t-esc="company.currency_id.format(grand_total_tax_amount)"/>
+                    </td>
+                    <td t-if="data['form']['detailed_report']" class="fw-bold text-end" style="background-color: lightgray;">
+                        <t t-esc="company.currency_id.format(grand_total_iva_returned)"/>
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                </tr>
+            </t>
+            <t t-set="vandor_bill_render" t-value="False"/>
+            <t t-set="customer_invoice_render" t-value="False"/>
+            <t t-if="vandor_bill">
+                <t t-set="vandor_bill_render" t-value="data['form']['tax_type'] == 'purchases' or not data['form']['tax_type']"/>
+            </t>
+            <t t-if="customer_invoice">
+                <t t-set="customer_invoice_render" t-value="data['form']['tax_type'] == 'sales' or not data['form']['tax_type']"/>
+            </t>
+            <t t-if="vandor_bill_render or customer_invoice_render">
+                <tr>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td>
+                    </td>
+                    <td>
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td class="fw-bold text-end" style="background-color: rgba(135, 90, 123, 1); color: white;">
+                        Balance
+                    </td>
+                    <td class="fw-bold text-end" style="background-color: rgba(135, 90, 123, 1); color: white;">
+                        <t t-esc="company.currency_id.format(bal_total_base_amount)"/>
+                    </td>
+                    <td class="fw-bold text-end" style="background-color: rgba(135, 90, 123, 1); color: white;">
+                        <t t-esc="company.currency_id.format(bal_total_tax_amount)"/>
+                    </td>
+                    <td t-if="data['form']['detailed_report']" class="fw-bold text-end" style="background-color: rgba(135, 90, 123, 1); color: white;">
+                        <t t-esc="company.currency_id.format(bal_total_iva_returned)"/>
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                </tr>
+            </t>
+        </t>
+    </template>
+    <template id="tax_move_render">
+        <tr>
+            <td class="text-center fw-bold" style="background-color: lightgray;">
+                Taxes
+            </td>
+            <td t-if="data['form']['detailed_report']" colspan="10">
+            </td>
+            <td t-else="" colspan="4">
+            </td>
+        </tr>
+        <t t-foreach="get_move_taxes(account_invoices_c,data['form']['tax_ids'],data['form']['report_for'],)" t-as="partner">
+            <t t-set="partner_invoices" t-value="account_invoices_c.sudo().filtered(lambda inv: any(
+                                                 partner.id in line.tax_ids.ids for line in inv.invoice_line_ids))"/>
+            <t t-set="inv_tax" t-value="get_tax_detail(partner_invoices,partner)"/>
+            <t t-set="vandor_bill" t-value="partner_invoices.sudo().filtered(lambda l: l.move_type in ['in_invoice', 'in_refund',])"/>
+            <t t-set="customer_invoice" t-value="partner_invoices.sudo().filtered(lambda l: l.move_type in ['out_invoice', 'out_refund',])"/>
+            <t t-set="bal_total_base_amount" t-value="0"/>
+            <t t-set="bal_total_tax_amount" t-value="0"/>
+            <t t-set="bal_total_iva_returned" t-value="0"/>
+            <t t-if="customer_invoice and (data['form']['tax_type'] == 'sales' or not data['form']['tax_type'])">
+                <tr>
+                    <td class="text-center fw-bold" style="background-color: rgba(135, 90, 123, 1); color: white;">
+                        <t t-esc="partner.name"/>
+                    </td>
+                    <td t-if="data['form']['detailed_report']" colspan="10" class="text-center fw-bold">
+                        Tax Received
+                    </td>
+                    <td t-else="" colspan="4" class="text-center fw-bold">
+                        Tax Received
+                    </td>
+                </tr>
+                <t t-set="grand_total_base_amount" t-value="0"/>
+                <t t-set="grand_total_tax_amount" t-value="0"/>
+                <t t-set="grand_total_iva_returned" t-value="0"/>
+                <t t-foreach="inv_tax" t-as="tax">
+                    <t t-set="tex_inv" t-value="filter_inv_on_tax(tax,customer_invoice)"/>
+                    <t t-set="len_tex_inv" t-value="len(tex_inv)"/>
+                    <t t-set="total_base_amount" t-value="0"/>
+                    <t t-set="total_tax_amount" t-value="0"/>
+                    <t t-set="total_iva_returned" t-value="0"/>
+                    <t t-set="line_no" t-value="0"/>
+                    <t t-foreach="tex_inv" t-as="tex_line">
+                        <tr t-if="data['form']['detailed_report']">
+                            <td>
+                            </td>
+                            <td class="fw-bold">
+                                <t t-if="line_no == 0">
+                                    <t t-esc="tax"/>
+                                </t>
+                            </td>
+                            <td t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['name']"/>
+                            </td>
+                            <td class="text-center" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['ref']"/>
+                            </td>
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['inv_date']"/>
+                            </td>
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['sub_total_currency']"/>
+                            </td>
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['amount_discount_electronic_invoice_currency']"/>
+                            </td>
+                            <!-- Hidden: amount_paid_currency -->
+                            <!-- Hidden: amount_residual_currency -->
+                            <!-- Hidden: amount_residual_signed_currency -->
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['amount_subtotal_without_iva_returned_currency']"/>
+                            </td>
+                            <!-- Hidden: amount_tax_currency -->
+                            <!-- Hidden: amount_tax_electronic_invoice_currency -->
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['amount_tax_signed_currency']"/>
+                            </td>
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['amount_iva_returned_currency']"/>
+                            </td>
+                            <!-- Hidden: amount_total_currency -->
+                            <!-- Hidden: amount_total_in_currency_signed_currency -->
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['amount_total_signed_currency']"/>
+                            </td>
+                            <!-- Hidden: amount_untaxed_currency -->
+                            <!-- Hidden: amount_untaxed_in_currency_signed_currency -->
+                            <td class="text-start" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['electronic_invoice_return_message']"/>
+                            </td>
+                            <td t-if="not data['form']['detailed_report']">
+                            </td>
+                            <td class="text-end" t-if="not data['form']['detailed_report']">
+                                <t t-esc="tex_line.get('amount_subtotal_without_iva_returned_currency', '')"/>
+                            </td>
+                            <td class="text-end" t-if="not data['form']['detailed_report']">
+                                <t t-esc="tex_line.get('amount_tax_currency', '')"/>
+                            </td>
+                        </tr>
+                        <t t-set="total_base_amount" t-value="total_base_amount + tex_line['base_amount']"/>
+                        <t t-set="total_tax_amount" t-value="total_tax_amount + tex_line['tax_amount']"/>
+                        <t t-set="total_iva_returned" t-value="total_iva_returned + (tex_line.get('iva_returned') or 0)"/>
+                        <t t-if="line_no == (len_tex_inv - 1)">
+                            <tr>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td>
+                                </td>
+                                <td class="fw-bold">
+                                    <t t-if="not data['form']['detailed_report']" t-esc="tax"/>
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td t-att-class="'fw-bold text-end border-top border-black' if data['form']['detailed_report'] else 'text-end'">
+                                    Total
+                                </td>
+                                <td t-att-class="'fw-bold text-end border-top border-black' if data['form']['detailed_report'] else 'text-end'">
+                                    <t t-esc="company.currency_id.format(total_base_amount)"/>
+                                </td>
+                                <td t-att-class="'fw-bold text-end border-top border-black' if data['form']['detailed_report'] else 'text-end'">
+                                    <t t-esc="company.currency_id.format(total_tax_amount)"/>
+                                </td>
+                                <td t-if="data['form']['detailed_report']" t-att-class="'fw-bold text-end border-top border-black'">
+                                    <t t-esc="company.currency_id.format(total_iva_returned)"/>
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                            </tr>
+                        </t>
+                        <t t-set="line_no" t-value="line_no+1"/>
+                    </t>
+                    <t t-set="grand_total_base_amount" t-value="grand_total_base_amount + total_base_amount"/>
+                    <t t-set="grand_total_tax_amount" t-value="grand_total_tax_amount + total_tax_amount"/>
+                    <t t-set="grand_total_iva_returned" t-value="grand_total_iva_returned + total_iva_returned"/>
+                </t>
+                <t t-set="bal_total_base_amount" t-value="bal_total_base_amount + grand_total_base_amount"/>
+                <t t-set="bal_total_tax_amount" t-value="bal_total_tax_amount + grand_total_tax_amount"/>
+                <t t-set="bal_total_iva_returned" t-value="bal_total_iva_returned + grand_total_iva_returned"/>
+                <tr>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td>
+                    </td>
+                    <td>
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td class="fw-bold text-end" style="background-color: lightgray;">
+                        Total Tax Received
+                    </td>
+                    <td class="fw-bold text-end" style="background-color: lightgray;">
+                        <t t-esc="company.currency_id.format(grand_total_base_amount)"/>
+                    </td>
+                    <td class="fw-bold text-end" style="background-color: lightgray;">
+                        <t t-esc="company.currency_id.format(grand_total_tax_amount)"/>
+                    </td>
+                    <td t-if="data['form']['detailed_report']" class="fw-bold text-end" style="background-color: lightgray;">
+                        <t t-esc="company.currency_id.format(grand_total_iva_returned)"/>
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                </tr>
+            </t>
+            <t t-if="vandor_bill and (data['form']['tax_type'] == 'purchases' or not data['form']['tax_type'])">
+                <tr>
+                    <t t-if="not customer_invoice or data['form']['tax_type'] == 'purchases'">
+                        <td class="text-center fw-bold" style="background-color: rgba(135, 90, 123, 1); color: white;">
+                            <t t-esc="partner.name"/>
+                        </td>
+                    </t>
+                    <t t-else="">
+                        <td></td>
+                    </t>
+                    <td t-if="data['form']['detailed_report']" colspan="10" class="text-center fw-bold">
+                        Tax Paid
+                    </td>
+                    <td t-else="" colspan="4" class="text-center fw-bold">
+                        Tax Paid
+                    </td>
+                </tr>
+                <t t-set="grand_total_base_amount" t-value="0"/>
+                <t t-set="grand_total_tax_amount" t-value="0"/>
+                <t t-foreach="inv_tax" t-as="tax">
+                    <t t-set="tex_inv" t-value="filter_inv_on_tax(tax,vandor_bill)"/>
+                    <t t-set="len_tex_inv" t-value="len(tex_inv)"/>
+                    <t t-set="total_base_amount" t-value="0"/>
+                    <t t-set="total_tax_amount" t-value="0"/>
+                    <t t-set="line_no" t-value="0"/>
+                    <t t-foreach="tex_inv" t-as="tex_line">
+                        <tr t-if="data['form']['detailed_report']">
+                            <td>
+                            </td>
+                            <td class="fw-bold">
+                                <t t-if="line_no == 0">
+                                    <t t-esc="tax"/>
+                                </t>
+                            </td>
+                            <td t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['name']"/>
+                            </td>
+                            <td class="text-center" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['ref']"/>
+                            </td>
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['inv_date']"/>
+                            </td>
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['sub_total_currency']"/>
+                            </td>
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['amount_discount_electronic_invoice_currency']"/>
+                            </td>
+                            <!-- Hidden: amount_paid_currency -->
+                            <!-- Hidden: amount_residual_currency -->
+                            <!-- Hidden: amount_residual_signed_currency -->
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['amount_subtotal_without_iva_returned_currency']"/>
+                            </td>
+                            <!-- Hidden: amount_tax_currency -->
+                            <!-- Hidden: amount_tax_electronic_invoice_currency -->
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['amount_tax_signed_currency']"/>
+                            </td>
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['amount_iva_returned_currency']"/>
+                            </td>
+                            <!-- Hidden: amount_total_currency -->
+                            <!-- Hidden: amount_total_in_currency_signed_currency -->
+                            <td class="text-end" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['amount_total_signed_currency']"/>
+                            </td>
+                            <!-- Hidden: amount_untaxed_currency -->
+                            <!-- Hidden: amount_untaxed_in_currency_signed_currency -->
+                            <td class="text-start" t-if="data['form']['detailed_report']">
+                                <t t-esc="tex_line['electronic_invoice_return_message']"/>
+                            </td>
+                            <td t-if="not data['form']['detailed_report']">
+                            </td>
+                            <td class="text-end" t-if="not data['form']['detailed_report']">
+                                <t t-esc="tex_line.get('amount_subtotal_without_iva_returned_currency', '')"/>
+                            </td>
+                            <td class="text-end" t-if="not data['form']['detailed_report']">
+                                <t t-esc="tex_line.get('amount_tax_currency', '')"/>
+                            </td>
+                        </tr>
+                        <t t-set="total_base_amount" t-value="total_base_amount + tex_line['base_amount']"/>
+                        <t t-set="total_tax_amount" t-value="total_tax_amount + tex_line['tax_amount']"/>
+                        <t t-set="total_iva_returned" t-value="total_iva_returned + (tex_line.get('iva_returned') or 0)"/>
+                        <t t-if="line_no == (len_tex_inv - 1)">
+                            <tr>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td>
+                                </td>
+                                <td class="fw-bold">
+                                    <t t-if="not data['form']['detailed_report']" t-esc="tax"/>
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                                <td t-att-class="'fw-bold text-end border-top border-black' if data['form']['detailed_report'] else 'text-end'">
+                                    Total
+                                </td>
+                                <td t-att-class="'fw-bold text-end border-top border-black' if data['form']['detailed_report'] else 'text-end'">
+                                    <t t-esc="company.currency_id.format(total_base_amount)"/>
+                                </td>
+                                <td t-att-class="'fw-bold text-end border-top border-black' if data['form']['detailed_report'] else 'text-end'">
+                                    <t t-esc="company.currency_id.format(total_tax_amount)"/>
+                                </td>
+                                <td t-if="data['form']['detailed_report']" t-att-class="'fw-bold text-end border-top border-black'">
+                                    <t t-esc="company.currency_id.format(total_iva_returned)"/>
+                                </td>
+                                <td t-if="data['form']['detailed_report']">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                            </tr>
+                        </t>
+                        <t t-set="line_no" t-value="line_no+1"/>
+                    </t>
+                    <t t-set="grand_total_base_amount" t-value="grand_total_base_amount + total_base_amount"/>
+                    <t t-set="grand_total_tax_amount" t-value="grand_total_tax_amount + total_tax_amount"/>
+                    <t t-set="grand_total_iva_returned" t-value="grand_total_iva_returned + total_iva_returned"/>
+                </t>
+                <t t-set="bal_total_base_amount" t-value="bal_total_base_amount - grand_total_base_amount"/>
+                <t t-set="bal_total_tax_amount" t-value="bal_total_tax_amount - grand_total_tax_amount"/>
+                <t t-set="bal_total_iva_returned" t-value="bal_total_iva_returned - grand_total_iva_returned"/>
+                <tr>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td>
+                    </td>
+                    <td>
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td class="fw-bold text-end" style="background-color: lightgray;">
+                        Total Tax Paid
+                    </td>
+                    <td class="fw-bold text-end" style="background-color: lightgray;">
+                        <t t-esc="company.currency_id.format(grand_total_base_amount)"/>
+                    </td>
+                    <td class="fw-bold text-end" style="background-color: lightgray;">
+                        <t t-esc="company.currency_id.format(grand_total_tax_amount)"/>
+                    </td>
+                    <td t-if="data['form']['detailed_report']" class="fw-bold text-end" style="background-color: lightgray;">
+                        <t t-esc="company.currency_id.format(grand_total_iva_returned)"/>
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                </tr>
+            </t>
+            <t t-set="vandor_bill_render" t-value="False"/>
+            <t t-set="customer_invoice_render" t-value="False"/>
+            <t t-if="vandor_bill">
+                <t t-set="vandor_bill_render" t-value="data['form']['tax_type'] == 'purchases' or not data['form']['tax_type']"/>
+            </t>
+            <t t-if="customer_invoice">
+                <t t-set="customer_invoice_render" t-value="data['form']['tax_type'] == 'sales' or not data['form']['tax_type']"/>
+            </t>
+            <t t-if="vandor_bill_render or customer_invoice_render">
+                <tr>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td>
+                    </td>
+                    <td>
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                    <td class="fw-bold text-end" style="background-color: rgba(135, 90, 123, 1); color: white;">
+                        Balance
+                    </td>
+                    <td class="fw-bold text-end" style="background-color: rgba(135, 90, 123, 1); color: white;">
+                        <t t-esc="company.currency_id.format(bal_total_base_amount)"/>
+                    </td>
+                    <td class="fw-bold text-end" style="background-color: rgba(135, 90, 123, 1); color: white;">
+                        <t t-esc="company.currency_id.format(bal_total_tax_amount)"/>
+                    </td>
+                    <td t-if="data['form']['detailed_report']" class="fw-bold text-end" style="background-color: rgba(135, 90, 123, 1); color: white;">
+                        <t t-esc="company.currency_id.format(bal_total_iva_returned)"/>
+                    </td>
+                    <td t-if="data['form']['detailed_report']">
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                </tr>
+            </t>
+        </t>
+    </template>
+</odoo>

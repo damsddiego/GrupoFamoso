@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title></title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+<body>
+
+	<div class="oe_styling_v8">
+		<br/>
+		<div style="background:#efefef; font-family:LatoOpen Sans !important; color:black;">
+			<section class="oe_container oe_dark">
+				<div style="border-top:#252E64 solid 10px;"></div>
+				<div class="oe_row oe_spaced">
+				    <center>
+				        <span class="btn btn-sm mb-2 mb-lg-0" style="font-size:14px; font-weight:500; background-color:#159bd7; color:#fff"> Supported for</span>
+                        <span class="btn btn-sm mb-2 mb-lg-0" style="font-size:14px; font-weight:500; background-color:#252E64; color:#fff"><i class="fa fa-check"></i> Community</span>
+                        <span class="btn btn-sm mb-2 mb-lg-0" style="font-size:14px; font-weight:500; background-color:#252E64; color:#fff"><i class="fa fa-check"></i> Enterprise</span>
+                        <span class="btn btn-sm mb-2 mb-lg-0" style="font-size:14px; font-weight:500; background-color:#252E64; color:#fff"><i class="fa fa-check"></i> Odoo.sh</span>
+                    </center>
+                    <br/>
+				    <h1 style="padding-top: 0%;text-transform: uppercase;font-weight: 1000;color: #3d3d3d !important;margin-bottom:18px;">
+	                    <center>Sales Commission</center><br/>
+	        </h1>
+				    <center><div style="width: 30%; border-top:#252E64 solid 10px;"></div></center>
+				    <div class="oe_slogan" style="margin:5px 0 !important;">
+                        <a href="https://www.omaxinformatics.com" target="new">
+                            <img src="omax.png" style="width: 190px; margin-bottom: 0px;" class="center-block">
+                        </a>
+                    </div>
+				    
+				</div>
+				<div style="border-top:#252E64 solid 10px;"></div>
+			</section>
+			<section class="oe_container">
+			    <div class="oe_row oe_spaced">
+			        <h2 class="oe_slogan" style="font-size:30px;"><b><u>Overview</u></b></h2>
+			        <p style="font-size: 25px;text-align:center;">
+			           This application allows user to create and manage commissions for salespersons for a specific period.  You can set a sales commission for a specific date internally which helps to generate sales commission for monthly, quarterly or for specific date periods. We have provided option to calculate commission based on sales order confirmation, invoice is validate and invoice is paid. User can print pdf/excel report of commission analysis line with multiple filter options.</p>
+			    </div>
+		    </section>
+		    
+		    <div class="oe_row">
+			    <h2 class="oe_slogan" style="font-size:30px;"><b><u>Commission Calculation flow</u></b></h2>
+			    <div style="font-size: 20px;">
+			        <i class="fa fa-check" style="color:#252E64;"/><b style="color:#252E64;">Calculate Commission in 3 ways for specific period.</b><br/>
+			        <span style="margin-left: 6%;">
+			            <b style="color:#159bd7;">1) On the sales order :</b> When quotation confirm then calculate commission</span><br/>
+			        <span style="margin-left: 6%;">
+			            <b style="color:#159bd7">2) On the Invoice :</b> When invoice validate then calculate commission</span><br/>
+			        <span style="margin-left: 6%;">
+			            <b style="color:#159bd7">3) On the Payment :</b> When invoice paid then calculate commission</span><br/>
+			    </div>
+			    <br/>
+			    <div style="font-size: 20px;">
+			        <i class="fa fa-check" style="color:#252E64;"/><b style="color:#252E64;">Commission types in commission form view.</b><br/>
+			        <span style="margin-left: 6%; color:#00438B;">1)Standard Commission</span><br/>
+			            <p style="margin-left: 9%;">
+			                In the standard commission, you just need to add the percentage of commission you want to give in the total amount.<br/>
+                            <b style="color: brown;">Formula:</b> (Total selling amount x Percentage of commission) = Standard commission.
+			            </p>
+			        <span style="margin-left: 6%; color:#00438B;">2)Partner Based Commission</span><br/>
+			            <p style="margin-left: 9%;">
+			                In the partner based commission, you just need to add the percentage of commission you want to give in the total selling amount. The percentage of commission counted based on the category of a partner is <b>Affiliated</b>(associated or connected) or <b>Non-Affiliated</b>(Not associated) partner.<br/>
+			                <b style="color: brown;">Formula:</b> (Total selling amount x Percentage of commission) = Partner based commission.
+			            </p>
+			        <span style="margin-left: 6%; color:#00438B;">3)Product/ Product Category/ Margin Based Commission</span><br/>
+		            <p style="margin-left: 9%;">
+		                Here you need to define based on field which field and what product or product category you want to define sales commission.
+		                <br/>
+		                If you select "Product/ Product Category/ Margin Based Commission" calculation the commission will be calculated based on below factors,
+		                <br/>
+		                <b style="color:#00438B;">1) Calculation based on the product:</b>
+		                <br/>
+		                <p style="margin-left: 12%;">
+		                    <b>a) With Fix Price:</b> The commission will be applied to fix price that given by the user.
+		                    <p style="margin-left: 15%;">
+	                            If user select Fix Price then must be fill <b>Target price</b> and <b>Above price commission %</b>. If product's <b>Selling price > Target price </b> then get commission of <b>Above price commission %</b>.
+	                            <br/>
+	                            <b>-> Target price :</b> You have to choose the target price, so if the Selling price comes above the target price then you get the commission.<br/>
+	                            <b>-> Above price commission % :</b> You have to choose the above price in percentage to get the commission.<br/>
+	                            <br/>
+	                            <b style="color: brown;">Formula:</b> (Total selling amount x Above price commission %) = commission.
+	                        </p>
+	                    </p>
+	                    <br/>
+	                    <p style="margin-left: 12%;">
+	                        <b>b) With Margin:</b> The commission will be given based on the margin between the sale price and cost price of that product sold.
+		                    <p style="margin-left: 15%;">
+	                            If user select With Margin then must be fill <b>Target price %, Above margin commission % and Below margin commission %</b>.
+	                            <br/><br/>
+	                            <b>-> Target price % :</b> You have to choose the target margin price, so if the price comes above the target price then you get the commission.<br/>
+	                            <b>-> Above margin commission % :</b> You have to choose the margin above price in percentage to get the commission.<br/>
+	                            <b>-> Below margin commission % :</b> You have to choose the margin below price in percentage to get the commission.<br/>
+	                            <br/>
+	                            <b style="color: brown;">Formula as below:</b><br/>
+	                            <p style="margin-left: 16%;"> 
+	                            Margin amount = Difference between sales price and cost price of the product. Then Margin amount convert to Margin %.
+	                            <br/>
+	                            <b>1.</b> if Margin % > Target price %<br/>
+	                                <span style="margin-left: 2%;">(Margin amount x Above margin commission %) = commission.</span>
+	                                <br/>
+	                            <b>2.</b> if Margin % > Target price %<br/>
+	                                <span style="margin-left: 2%;">(Margin amount x Below margin commission %) = commission.</span>
+	                            </p>
+	                        </p>
+	                    </p>
+	                    <p style="margin-left: 12%;">
+	                        <b>c) Commission Exception:</b> You have to just give the percentage of the commission.
+	                    </p>
+		            </p>
+		            <p style="margin-left: 9%;">
+		                <b style="color:#00438B;">2) Calculation based on the product category:</b> The commission calculated the same as the calculation based on the product.
+		            </p>
+			    </div>
+			    <div>
+			    </div>
+			</div>
+				
+		    <section class="oe_container mt-5 mb-5">
+		        <!--div class="col-lg-12 d-flex flex-column justify-content-center align-items-center mt-4">
+                    <h2 class="oe_slogan" style="font-weight: 600; font-size: 30px; color:#00438B !important">
+                        <b><u>Features</u></b>
+                    </h2>
+                </div-->
+                <!--div class="row py-4">
+                    <div class="col-md-6 col-sm-12 p-3">
+                        <div class="d-flex   h-100" style="padding: 30px;border-radius: 12px;
+                                        background: #FFF; box-shadow: 1px 2px 3px 0px rgba(0, 0, 0, 0.25);">
+                            <div style="width: 36px; height: 36px; border-radius: 50%; background: #00438B;
+                                        display: flex; justify-content: center; align-items: center;
+                                        margin-right: 10px;flex-shrink: 0;">
+                                <i class="fa fa-check" style="color: #fff;font-size:14px;"></i>
+                            </div>
+                            <div>
+                                <p style="color: #1A202C;font-weight: 600; font-size: 1.5rem; margin-bottom: 2px;">
+                                    Commission based on Sales Order</p>
+                                <p class="m-0" style="color:#718096; font-size: 18px;">While confirmed quotation commission will be calculated based on sale person.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 col-sm-12 p-3">
+                        <div class="d-flex   h-100" style="padding: 30px;border-radius: 12px;
+                                        background: #FFF; box-shadow: 1px 2px 3px 0px rgba(0, 0, 0, 0.25); ">
+                            <div style="width: 36px; height: 36px; border-radius: 50%; background:#00438B;
+                                        display: flex; justify-content: center; align-items: center;
+                                        margin-right: 10px;flex-shrink: 0;">
+                                <i class="fa fa-check" style="color: #fff;font-size:14px;"></i>
+                            </div>
+                            <div>
+                                <p style="color: #1A202C;font-weight: 600; font-size: 1.5rem; margin-bottom: 2px;">
+                                    Commission based on Invoice.</p>
+                                <p class="m-0" style="color:#718096; font-size: 18px;">While validating invoice commission will be calculated based on sale person.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                
+                    <div class="row py-4">
+                    <div class="col-md-6 col-sm-12 p-3">
+                        <div class="d-flex   h-100" style="padding: 30px;border-radius: 12px;
+                                        background: #FFF; box-shadow: 1px 2px 3px 0px rgba(0, 0, 0, 0.25);">
+                            <div style="width: 36px; height: 36px; border-radius: 50%; background: #00438B;
+                                        display: flex; justify-content: center; align-items: center;
+                                        margin-right: 10px;flex-shrink: 0;">
+                                <i class="fa fa-check" style="color: #fff;font-size:14px;"></i>
+                            </div>
+                            <div>
+                                <p style="color: #1A202C;font-weight: 600; font-size: 1.5rem; margin-bottom: 2px;">
+                                    Commission based on Payment</p>
+                                <p class="m-0" style="color:#718096; font-size: 18px;">While payment is done by customer commission will be calculated based on sales person.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 col-sm-12 p-3">
+                        <div class="d-flex   h-100" style="padding: 30px;border-radius: 12px;
+                                        background: #FFF; box-shadow: 1px 2px 3px 0px rgba(0, 0, 0, 0.25); ">
+                            <div style="width: 36px; height: 36px; border-radius: 50%; background:#00438B;
+                                        display: flex; justify-content: center; align-items: center;
+                                        margin-right: 10px;flex-shrink: 0;">
+                                <i class="fa fa-check" style="color: #fff;font-size:14px;"></i>
+                            </div>
+                            <div>
+                                <p style="color: #1A202C;font-weight: 600; font-size: 1.5rem; margin-bottom: 2px;">
+                                    Different Commission types available in commission form</p>
+                                <p class="m-0" style="color:#718096; font-size: 18px;">
+                                1)Standard Commission.<br/>2) Partner Based Commission <br/>3) Product/ Product Category/ Margin Based Commission
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 col-sm-12 p-3">
+                        <div class="d-flex   h-100" style="padding: 30px;border-radius: 12px;
+                                        background: #FFF; box-shadow: 1px 2px 3px 0px rgba(0, 0, 0, 0.25); ">
+                            <div style="width: 36px; height: 36px; border-radius: 50%; background:#00438B;
+                                        display: flex; justify-content: center; align-items: center;
+                                        margin-right: 10px;flex-shrink: 0;">
+                                <i class="fa fa-check" style="color: #fff;font-size:14px;"></i>
+                            </div>
+                            <div>
+                                <p style="color: #1A202C;font-weight: 600; font-size: 1.5rem; margin-bottom: 2px;">
+                                    Commission analysis Report.</p>
+                                <p class="m-0" style="color:#718096; font-size: 18px;">User can see commission analysis and print commission report in pdf/Excel format for specific sales person between selected dates and also print with different <b>Commission type</b> options.
+.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 col-sm-12 p-3">
+                        <div class="d-flex   h-100" style="padding: 30px;border-radius: 12px;
+                                        background: #FFF; box-shadow: 1px 2px 3px 0px rgba(0, 0, 0, 0.25); ">
+                            <div style="width: 36px; height: 36px; border-radius: 50%; background:#00438B;
+                                        display: flex; justify-content: center; align-items: center;
+                                        margin-right: 10px;flex-shrink: 0;">
+                                <i class="fa fa-check" style="color: #fff;font-size:14px;"></i>
+                            </div>
+                            <div>
+                                <p style="color: #1A202C;font-weight: 600; font-size: 1.5rem; margin-bottom: 2px;">
+                                    Commission Access Rights.</p>
+                                <p class="m-0" style="color:#718096; font-size: 18px;">Manager can create and configure commission, and user can see commission analysis line.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div-->
+                
+				<div class="oe_row">
+				    <h2 class="oe_slogan" style="font-size:30px;"><b><u>Features</u></b></h2>
+				    <div style="font-size: 25px;">
+					    <ul class="list-unstyled mr32 ml32">
+						    <li><i class="fa fa-check" style="color: #252E64;">Commission calculated based on sale order confirmation.</i></li>
+                            <li><i class="fa fa-check" style="color: #252E64;">Commission calculated based on invoice is validate.</i></li>
+                            <li><i class="fa fa-check" style="color: #252E64;">Commission calculated based on invoice is paid.</i></li>
+                            <li><i class="fa fa-check" style="color: #252E64;">User create commission for specific time period.</i></li>
+                            <li><i class="fa fa-check" style="color: #252E64;">Different commission type options available in commisson form.</i></li>
+                            <li><i class="fa fa-check" style="color: #252E64;">Different commission type options available in commisson form like Standard, Partner Based, Product/Product Category/ Margin Based Commissions.</i></li>
+                            <li><i class="fa fa-check" style="color: #252E64;">Calculate the commission based on any product or product category.</i></li>
+                            <li><i class="fa fa-check" style="color: #252E64;">Calculate the commission based on the margin percentage or margin amount.</i></li>
+                            <li><i class="fa fa-check" style="color: #252E64;">Calculate the commission based on partner.</i></li>
+                            
+                            <li><i class="fa fa-check" style="color: #252E64;">User can see commission analysis and print commission report in pdf/excel format for specific sales person between selected dates and different <b>Commission type</b> filter options.</i></li>
+                            <li><i class="fa fa-check" style="color: #252E64;">User can generate invoice from commission line using group by of sales person.</i></li>
+                            <li><i class="fa fa-check" style="color: #252E64;">Easy to track generated invoices by commission line.</i></li>
+            			</ul>
+				    </div>
+			    </div>
+		    </section>
+		    
+		    
+	        <section class="oe_container" style="background-color:white;">
+			    <div>
+			        <h2 class="oe_slogan" style="font-size:30px;"><b><u>How It Works</u></b></h2>
+                    <div class="oe_bg_img">
+                        <!-- Project templates
+                        <p style="font-size:30px;text-align:center;color:#252E64;font-weight:bold;">
+                            Project Templates to Create a Project.
+                        </p>
+                        -->
+			            <p style="font-size:25px;text-align:center;background-color:white;">
+			                Sales Commission Access Rights
+                        </p>
+                        <p style="font-size:18px;text-align:center;background-color:white;">
+                            Sales Commission 'Manager' able to create Sales Commission.  
+                        </p>
+                        <center>
+                            <img src="1.png" style="width:100%;border:5px solid #252E64;">
+                        </center>
+                        <br/><br/>
+                        <p style="font-size:25px;text-align:center;background-color:white;">Sales Commission Menu</p>
+                        <center>
+                            <img src="2.png" style="width:100%;border:5px solid #252E64;">
+                        </center>
+                        <br/><br/>
+                        
+                        <p style="font-size:30px;text-align:center;color:#252E64;font-weight:bold;">
+                            Make Sales Commission.
+                        </p>
+                        <p style="font-size:20px;text-align:center;background-color:white;">
+                            Manager make commission for specific time period and login company's currency auto set in commission and calculate commission based on that currency.
+                        </p>
+                        <p style="font-size:25px;text-align:center;background-color:white;">Commission apply option
+                        <p style="font-size:20px;text-align:center;background-color:white;">
+                            <b>Commission apply on<b/> options</b> available <b>in commissin form</b><br/>
+                            Commission apply on <b>Sale Confirmation, Invoice Validate, Customer Payment.</b>
+                        </p>
+                        </p>
+                        <center>
+                            <img src="3.png" style="width:100%;border:5px solid #252E64;">
+                        </center>
+                        <br/><br/>
+                        <p style="font-size:25px;text-align:center;background-color:white;">
+                            1. Standard Commission
+                        </p>
+                        <p style="font-size:18px;text-align:left;background-color:white;">
+                            In Standard Commission, <b>Standard Commission %</b> must be required and you just need to add the 'percentage of commission' you want to give in the total amount for selected 'Sales Person' for 'specific time period'.
+                        </p>
+                        <center>
+                            <img src="4.png" style="width:100%;border:5px solid #252E64;">
+                        </center>
+                        <br/><br/>
+                        
+                        <p style="font-size:25px;text-align:center;background-color:white;">
+                            2. Partner Based Commission
+                        </p>
+                        <p style="font-size:18px;text-align:left;background-color:white;">
+                            In partner based commission you can define two different percentage of sales commission for "Affiliated" partner and "Non-Affiliated" partner. <b>A partner can be Affiliated or Non-Affiliated not both</b>. In Partner Based Commission, <b>Affiliated Partner Commission %</b> and <b>Non Affiliated Partner Commission %</b> must be required.
+                        </p>
+                        <center>
+                            <img src="5.png" style="width:100%;border:5px solid #252E64;">
+                        </center>
+                        <br/>
+                        <p style="font-size:18px;text-align:center;background-color:white;">
+                            User can set Partner is Affiliated or not.
+                            <b>Path : Customers Form -> Sales & Purchase tab</b>
+                        </p>
+                        <center>
+                            <img src="6.png" style="width:100%;border:5px solid #252E64;">
+                        </center>
+                        <br/><br/>
+
+                        <p style="font-size:25px;text-align:center;background-color:white;">
+                            3. Product/ Product Category/ Margin Based Commission
+                        </p>
+                        <p style="font-size:20px;text-align:left;background-color:white;">
+                            In this commission you need to define based on which field and what product or product category you want to define sales commission. 
+                        </p>
+                        <center>
+                            <img src="7.png" style="width:100%;border:5px solid #252E64;">
+                        </center>
+                        <br/><br/>
+                        <p style="font-size:20px;text-align:center;background-color:white;">
+                            In this commission you need to specify on which factor you want to give sales commission like based on and with.
+                        </p>
+                        <center>
+                            <img src="7_1.png" style="width:100%;border:5px solid #252E64;">
+                            <img src="7_2.png" style="width:100%;border:5px solid #252E64;">
+                        </center>
+                        <br/><br/>
+                        <p style="font-size:22px;text-align:center;background-color:white;">
+                            <b>Based on Product with Fix Price<b>
+                        </p>
+                        <p style="font-size:18px;text-align:center;background-color:white;">
+                            Based on = Product then <b>Product</b> field visible and <b>with = 'Fix Price'</b> then <b>Target price & Above price commission %</b> fields visible. Commission will calculate based on this configuration.
+                        </p>
+                        <center>
+                            <img src="8.png" style="width:100%;border:5px solid #252E64;">
+                        </center>
+                        <br/><br/>
+                        <p style="font-size:22px;text-align:center;background-color:white;">
+                            <b>Based on Product with Margin<b>
+                        </p>
+                        <p style="font-size:18px;text-align:center;background-color:white;">
+                            Based on = Product then <b>Product</b> field visible and <b>with = 'Margin'</b> then <b>Target Margin %, Above Margin Commission % and Below Margin Commission %</b> fields visible. Commission will calculate based on this configuration.
+                        </p>
+                        <center>
+                            <img src="9.png" style="width:100%;border:5px solid #252E64;">
+                        </center>
+                        <br/><br/>
+                        
+                        <p style="font-size:22px;text-align:center;background-color:white;">
+                            <b>Based on Product Category with Commission Exception<b>
+                        </p>
+                        <p style="font-size:18px;text-align:center;background-color:white;">
+                            Based on = Product Category then <b>Product Category</b> field visible and <b>with = 'Commission Exception'</b> then <b>Commission %</b> field visible. Commission will calculate based on this configuration.
+                        </p>
+                        <center>
+                            <img src="10.png" style="width:100%;border:5px solid #252E64;">
+                        </center>
+                        <br/><br/>
+                        
+                        <p style="font-size:30px;text-align:center;color:#252E64;font-weight:bold;">
+                            Make Quotation and Confirm.
+                        </p>
+                        <center>
+                            <img src="11.png" style="width:100%;border:5px solid #252E64;">
+                            <img src="11_1.png" style="width:100%;border:5px solid #252E64;">
+                            <img src="11_2.png" style="width:100%;border:5px solid #252E64;">
+                        </center>
+                        <p style="font-size:20px;text-align:center;">
+                            Confirm Quotation then make sales commission based on configuration.
+                        </p>
+                        <br/>
+                        
+                        <p style="font-size:25px;text-align:center;font-weight:bold;">
+                            Make Quotation with different Currency and Confirm.
+                        </p>
+                        <center>
+                            <img src="12.png" style="width:100%;border:5px solid #252E64;">
+                            <img src="12_1.png" style="width:100%;border:5px solid #252E64;">
+                        </center>
+                        <p style="font-size:20px;text-align:left;">
+                            Confirm Quotation then make sales commission based on configuration. Check the Configuration and generate commission based on commission currency.
+                        </p>
+                        <br/>
+                        
+                        <p style="font-size:30px;text-align:center;color:#252E64;font-weight:bold;">
+                            Make Invoice and Validate.
+                        </p>
+                        <center>
+                            <img src="13.png" style="width:100%;border:5px solid #252E64;">
+                            <img src="13_1.png" style="width:100%;border:5px solid #252E64;">
+                            <img src="13_2.png" style="width:100%;border:5px solid #252E64;">
+                        </center>
+                        <p style="font-size:20px;text-align:center;">
+                            Validate Invoice then make sales commission based on configuration.
+                        </p>
+                        <br/>
+                        
+                        <p style="font-size:30px;text-align:center;color:#252E64;font-weight:bold;">
+                            Make Invoice and Paid.
+                        </p>
+                        <center>
+                            <img src="14.png" style="width:100%;border:5px solid #252E64;">
+                            <img src="14_1.png" style="width:100%;border:5px solid #252E64;">
+                            <img src="14_2.png" style="width:100%;border:5px solid #252E64;">
+                        </center>
+                        <p style="font-size:20px;text-align:center;">
+                            Paid Invoice then make sales commission based on configuration.
+                        </p>
+                        <br/><br/>
+
+                        <p style="font-size:30px;text-align:center;color:#252E64;font-weight:bold;">
+                            Sales Commission Analysis
+                        </p>
+                        <p style="font-size:25px;text-align:center;font-weight:bold;">
+                            Sales Commission Analysis Menu
+                        </p>
+                        <center>
+                            <img src="15.png" style="width:100%;border:5px solid #252E64;">
+                        </center>
+                        <br/><br/>
+                        <p style="font-size:25px;text-align:center;font-weight:bold;">
+                            Sales Commission Analysis Tree view
+                        </p>
+                        <p style="font-size:20px;text-align:center;">
+                            Created sales commissions related every details available in this tree view  
+                        </p>
+                        <center>
+                            <img src="16.png" style="width:100%;border:5px solid #252E64;">
+                        </center>
+                        <br/><br/>
+                        <p style="font-size:25px;text-align:center;font-weight:bold;">
+                            Advance search view of Sales Commission Analysis.
+                            <p style="font-size:20px;text-align:center;">
+                                User can eassy to filter and search data as per requirement.
+                            </p>
+                        </p>
+                        <center>
+                            <img src="17.png" style="width:100%;border:5px solid #252E64;">
+                        </center>
+                        <br/><br/>
+                        
+                        <p style="font-size:25px;text-align:center;font-weight:bold;">
+                            User can create bill based on Sales Commission Analysis.
+                            <p style="font-size:20px;text-align:center;">
+                                Select Sales Commission Analysis and then click on action to create bill.
+                            </p>
+                        </p>
+                        <center>
+                            <img src="18.png" style="width:100%;border:5px solid #252E64;">
+                        </center>
+                        <br/><br/>
+                        <p style="font-size:25px;text-align:center;font-weight:bold;">
+                            Create bill popup.
+                        </p>
+                        <p style="font-size:20px;text-align:left;">
+                                User want to group by commission type then tick checkbox otherwise not and user want to set account that is assign in bill lines after that click on 'Create Bill' then bills will be create.
+                            </p>
+                        <center>
+                            <img src="19.png" style="width:100%;border:5px solid #252E64;">
+                            <img src="20.png" style="width:100%;border:5px solid #252E64;">
+                            <img src="21.png" style="width:100%;border:5px solid #252E64;">
+                        </center>
+                        <br/><br/>
+                        
+                        <p style="font-size:25px;text-align:center;font-weight:bold;">
+                            Created Sales Commission filter in Bill.
+                        </p>
+                        <p style="font-size:20px;text-align:center;">
+                                User can easy to track bill which are created from 'Sales Commission Analysis'.
+                            </p>
+                        <center>
+                            <img src="22.png" style="width:100%;border:5px solid #252E64;">
+                            <img src="23.png" style="width:100%;border:5px solid #252E64;">
+                        </center>
+                        <br/><br/>
+                        
+                        <p style="font-size:30px;text-align:center;color:#252E64;font-weight:bold;">
+                            Sales Commission Report
+                        </p>
+                        <p style="font-size:25px;text-align:center;font-weight:bold;">
+                            Sales Commission Report Menu
+                        </p>
+                        <p style="font-size:20px;text-align:center;">
+                            Sales Commission 'Manager' able to print Sales Commission Report.  
+                        </p>
+                        <center>
+                            <img src="24.png" style="width:100%;border:5px solid #252E64;">
+                        </center>
+                        <br/><br/>
+                        <p style="font-size:25px;text-align:center;font-weight:bold;">
+                            Sales Commission Report Popup
+                        </p>
+                        <center>
+                            <img src="25.png" style="width:100%;border:5px solid #252E64;">
+                        </center>
+                        <p style="font-size:20px;text-align:left;">
+                            Manager enter start/end date, salesperson name and set commission type which you want to print the commission report. Manager can print PDF and Excel Report.
+                        </p>
+                        <br/><br/>
+                        
+                        <p style="font-size:25px;text-align:center;font-weight:bold;">
+                            Sales Commission Pdf Report
+                        </p>
+                        <center>
+                            <img src="26.png" style="width:100%;border:5px solid #252E64;">
+                            <img src="26_1.png" style="width:100%;border:5px solid #252E64;">
+                        </center>
+                        <p style="font-size:20px;text-align:left;">
+                            Print data by Sales Person wise and get Total commission for Sales Person wise.
+                        </p>
+                        <br/><br/>
+                        
+                        <p style="font-size:25px;text-align:center;font-weight:bold;">
+                            Sales Commission Excel Report
+                        </p>
+                        <center>
+                            <img src="27.png" style="width:100%;border:5px solid #252E64;">
+                        </center>
+                        <p style="font-size:20px;text-align:left;">
+                            Print data by Sales Person wise and get Total commission for Sales Person wise.
+                        </p>
+                        <br/><br/>
+                        
+                        
+                        
+                        
+                    </div>
+                </div>
+		    </section>
+		    <section class="oe_container ">
+			    <div class="oe_row oe_spaced">
+				    <h2 class="oe_slogan" style="font-size:30px;"><b><u>Free Support</u></b></h2>
+				    <div style="font-size: 16px;">
+					    <ul class="list-unstyled mr32 ml32">
+                            <center>You will get <b>100 Days</b> free support incase any bugs or issue (Except data recovery).</center><br/>
+                        </ul>
+				    </div>
+			    </div>
+		    </section>
+		    <section class="oe_container ">
+			    <div class="oe_row oe_spaced">
+				    <h2 class="oe_slogan" style="font-size:30px;"><b><u>Get In Touch</u></b></h2>
+				    <div style="border-top:#252E64 solid 10px;"></div>
+				    <div class="oe_slogan" style="margin-top:10px !important;">
+                        <a href="https://www.omaxinformatics.com" target="new">
+                            <img src="omax.png" style="width: 190px; margin-bottom: 20px;" class="center-block">
+                        </a>
+                    </div>
+                    <div class="oe_slogan" style="margin-top:10px !important;">
+                        <a class="btn btn-primary btn-lg mt8" style="color: #FFFFFF !important; background-color: #252E64;"
+                           target="new" href="https://youtu.be/mot4DqBQ6TI">
+                            <i class="fa fa-check-square"></i> Video Tutorial
+                        </a>
+                        <a class="btn btn-primary btn-lg mt8" style="color: #FFFFFF !important; background-color: #252E64;"
+                           target="new"
+                           href="https://apps.odoo.com/apps/modules/browse?search=OMAX+Informatics">
+                            <i class="fa fa-binoculars"></i> More Apps
+                        </a>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table" cellpadding="0" cellspacing="0" border="0" width="100%">
+                            <tbody>
+		                        <tr>
+			                        <td colspan="2" style="font-size:16px; font-weight:bold;" width="100%" align="center">
+			                            <span class="fa fa-certificate fa-1x"> Our Odoo Services</span>
+			                        </td>
+		                        </tr>
+					        </tbody>
+                        </table>
+                        <table class="table" cellpadding="0" cellspacing="0" border="0" width="100%">
+					        <tbody>
+						        <tr>
+							        <td style="background-color: #252E64; color:white; border-radius: 15px; font-weight: bold;"><center><span class="fa fa-globe fa-1x"> Implementation</span></center></td>
+							        <td style="background-color: #252E64; color:white; border-radius: 15px; font-weight: bold;"><center><span class="fa fa-globe fa-1x"> Development</span></center></td>
+							        <td style="background-color: #252E64; color:white; border-radius: 15px; font-weight: bold;"><center><span class="fa fa-globe fa-1x"> Customization</span></center></td>
+							        <td style="background-color: #252E64; color:white; border-radius: 15px; font-weight: bold;"><center><span class="fa fa-globe fa-1x"> Migration</span></center></td>
+						        </tr>
+						        <tr>
+							        <td style="background-color: #252E64; color:white; border-radius: 15px; font-weight: bold;"><center><span class="fa fa-globe fa-1x"> Integration</span></center></td>
+							        <td style="background-color: #252E64; color:white; border-radius: 15px; font-weight: bold;"><center><span class="fa fa-globe fa-1x"> Training</span></center></td>
+							        <td style="background-color: #252E64; color:white; border-radius: 15px; font-weight: bold;"><center><span class="fa fa-globe fa-1x"> Support</span></center></td>
+							        <td style="background-color: #252E64; color:white; border-radius: 15px; font-weight: bold;"><center><span class="fa fa-globe fa-1x"> Hire Developer</span></center></td>
+						        </tr>
+					        </tbody>
+				        </table>
+                        <br/>
+                        <table class="table" cellpadding="0" cellspacing="0" border="0" width="100%">
+                            <tbody>
+		                        <tr>
+			                        <td colspan="2" style="font-size:16px; font-weight:bold;" width="100%" align="center">
+			                            <span class="fa fa-certificate fa-1x"> For support, query and question contact us.</span>
+			                        </td>
+		                        </tr>
+					        </tbody>
+                        </table>
+                        <table class="table" cellpadding="0" cellspacing="0" border="0" width="100%">
+					        <tbody>
+						        <tr>
+							        <td style="background-color: #252E64; color:white; border-radius: 15px; font-weight: bold;"><center><span class="fa fa-envelope fa-1x"> contact@omaxinformatics.com</span></center></td>
+							        <td style="background-color: #252E64; color:white; border-radius: 15px; font-weight: bold;"><center><span class="fa fa-globe fa-1x"> www.omaxinformatics.com</span></center></td>
+						        </tr>
+					        </tbody>
+				        </table>
+                    </div>
+                    <br/>
+                    <div style="border-top:#252E64 solid 10px;"></div>
+			    </div>
+		    </section>
+		    <section class="oe_container ">
+			    <div class="oe_row oe_spaced">
+				    <h2 class="oe_slogan" style="font-size:30px; color:#252E64"><b>Thank you for visiting</b></h2>
+			    </div>
+		    </section>
+		</div>
+	</div>
+</body>
+</html>

@@ -1,0 +1,213 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* purchase_import_lines_sng
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-11-11 23:41+0000\n"
+"PO-Revision-Date: 2025-11-11 17:46-0600\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: es_CR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 3.7\n"
+
+#. module: purchase_import_lines_sng
+#. odoo-python
+#: code:addons/purchase_import_lines_sng/wizard/import_purchase_lines_wizard.py:0
+msgid "%s lines imported successfully!"
+msgstr ""
+
+#. module: purchase_import_lines_sng
+#: model_terms:ir.ui.view,arch_db:purchase_import_lines_sng.view_import_purchase_lines_wizard_form
+msgid "<strong>Excel Format:</strong>"
+msgstr ""
+
+#. module: purchase_import_lines_sng
+#: model_terms:ir.ui.view,arch_db:purchase_import_lines_sng.view_import_purchase_lines_wizard_form
+msgid ""
+"<strong>Note:</strong> All products must exist in the system. If any "
+"product is not found, the import will be stopped."
+msgstr ""
+"<strong>Nota:</strong> Todos los productos deben existir en el sistema. Si "
+"no se encuentra algún producto, la carga se detendrá."
+
+#. module: purchase_import_lines_sng
+#: model_terms:ir.ui.view,arch_db:purchase_import_lines_sng.view_import_purchase_lines_wizard_form
+msgid "Cancel"
+msgstr ""
+
+#. module: purchase_import_lines_sng
+#: model_terms:ir.ui.view,arch_db:purchase_import_lines_sng.view_import_purchase_lines_wizard_form
+msgid "Column A: codigo (Product Internal Reference)"
+msgstr ""
+
+#. module: purchase_import_lines_sng
+#: model_terms:ir.ui.view,arch_db:purchase_import_lines_sng.view_import_purchase_lines_wizard_form
+msgid "Column B: NOMBRE (Product Name - ignored)"
+msgstr ""
+
+#. module: purchase_import_lines_sng
+#: model_terms:ir.ui.view,arch_db:purchase_import_lines_sng.view_import_purchase_lines_wizard_form
+msgid "Column C: CANTIDAD (Quantity)"
+msgstr ""
+
+#. module: purchase_import_lines_sng
+#: model_terms:ir.ui.view,arch_db:purchase_import_lines_sng.view_import_purchase_lines_wizard_form
+msgid "Column D: COSTO_unit (Unit Cost)"
+msgstr ""
+
+#. module: purchase_import_lines_sng
+#: model_terms:ir.ui.view,arch_db:purchase_import_lines_sng.view_import_purchase_lines_wizard_form
+msgid "Column E: totalcompra (Total - ignored)"
+msgstr ""
+
+#. module: purchase_import_lines_sng
+#: model_terms:ir.ui.view,arch_db:purchase_import_lines_sng.view_import_purchase_lines_wizard_form
+msgid "Column F: precio (Sale Price)"
+msgstr ""
+
+#. module: purchase_import_lines_sng
+#: model:ir.model.fields,field_description:purchase_import_lines_sng.field_import_purchase_lines_wizard__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: purchase_import_lines_sng
+#: model:ir.model.fields,field_description:purchase_import_lines_sng.field_import_purchase_lines_wizard__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: purchase_import_lines_sng
+#: model:ir.model.fields,field_description:purchase_import_lines_sng.field_import_purchase_lines_wizard__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: purchase_import_lines_sng
+#. odoo-python
+#: code:addons/purchase_import_lines_sng/wizard/import_purchase_lines_wizard.py:0
+msgid "Error reading Excel file: %s"
+msgstr ""
+
+#. module: purchase_import_lines_sng
+#: model:ir.model.fields,field_description:purchase_import_lines_sng.field_import_purchase_lines_wizard__file
+msgid "Excel File"
+msgstr "Archivo Excel"
+
+#. module: purchase_import_lines_sng
+#: model:ir.model.fields,field_description:purchase_import_lines_sng.field_import_purchase_lines_wizard__filename
+msgid "Filename"
+msgstr ""
+
+#. module: purchase_import_lines_sng
+#: model:ir.model.fields,field_description:purchase_import_lines_sng.field_import_purchase_lines_wizard__id
+msgid "ID"
+msgstr ""
+
+#. module: purchase_import_lines_sng
+#: model_terms:ir.ui.view,arch_db:purchase_import_lines_sng.view_import_purchase_lines_wizard_form
+msgid "Import"
+msgstr "Importar"
+
+#. module: purchase_import_lines_sng
+#: model_terms:ir.ui.view,arch_db:purchase_import_lines_sng.view_purchase_order_form_inherit
+msgid "Import Lines"
+msgstr "Importar Productos"
+
+#. module: purchase_import_lines_sng
+#. odoo-python
+#: code:addons/purchase_import_lines_sng/models/purchase_order.py:0
+#: model_terms:ir.ui.view,arch_db:purchase_import_lines_sng.view_import_purchase_lines_wizard_form
+msgid "Import Purchase Lines"
+msgstr "Importar líneas del archivo"
+
+#. module: purchase_import_lines_sng
+#: model:ir.model,name:purchase_import_lines_sng.model_import_purchase_lines_wizard
+msgid "Import Purchase Lines Wizard"
+msgstr ""
+
+#. module: purchase_import_lines_sng
+#. odoo-python
+#: code:addons/purchase_import_lines_sng/wizard/import_purchase_lines_wizard.py:0
+msgid ""
+"Import failed. Please fix the following errors:\n"
+"\n"
+msgstr ""
+
+#. module: purchase_import_lines_sng
+#: model:ir.model.fields,field_description:purchase_import_lines_sng.field_import_purchase_lines_wizard__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: purchase_import_lines_sng
+#: model:ir.model.fields,field_description:purchase_import_lines_sng.field_import_purchase_lines_wizard__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: purchase_import_lines_sng
+#. odoo-python
+#: code:addons/purchase_import_lines_sng/wizard/import_purchase_lines_wizard.py:0
+msgid "No purchase order found in context."
+msgstr ""
+
+#. module: purchase_import_lines_sng
+#. odoo-python
+#: code:addons/purchase_import_lines_sng/wizard/import_purchase_lines_wizard.py:0
+msgid "No valid lines found in the Excel file."
+msgstr ""
+
+#. module: purchase_import_lines_sng
+#. odoo-python
+#: code:addons/purchase_import_lines_sng/wizard/import_purchase_lines_wizard.py:0
+msgid "Please upload an Excel file."
+msgstr ""
+
+#. module: purchase_import_lines_sng
+#: model:ir.model,name:purchase_import_lines_sng.model_purchase_order
+msgid "Purchase Order"
+msgstr "Orden de compra"
+
+#. module: purchase_import_lines_sng
+#. odoo-python
+#: code:addons/purchase_import_lines_sng/wizard/import_purchase_lines_wizard.py:0
+msgid "Row %s: Invalid quantity for product %s"
+msgstr ""
+
+#. module: purchase_import_lines_sng
+#. odoo-python
+#: code:addons/purchase_import_lines_sng/wizard/import_purchase_lines_wizard.py:0
+msgid "Row %s: Invalid sale price for product %s"
+msgstr ""
+
+#. module: purchase_import_lines_sng
+#. odoo-python
+#: code:addons/purchase_import_lines_sng/wizard/import_purchase_lines_wizard.py:0
+msgid "Row %s: Invalid unit cost for product %s"
+msgstr ""
+
+#. module: purchase_import_lines_sng
+#. odoo-python
+#: code:addons/purchase_import_lines_sng/wizard/import_purchase_lines_wizard.py:0
+msgid "Row %s: Missing product code"
+msgstr ""
+
+#. module: purchase_import_lines_sng
+#. odoo-python
+#: code:addons/purchase_import_lines_sng/wizard/import_purchase_lines_wizard.py:0
+msgid "Row %s: Product with code \"%s\" not found"
+msgstr ""
+
+#. module: purchase_import_lines_sng
+#. odoo-python
+#: code:addons/purchase_import_lines_sng/wizard/import_purchase_lines_wizard.py:0
+msgid "Success"
+msgstr ""
+
+#. module: purchase_import_lines_sng
+#: model:ir.model.fields,help:purchase_import_lines_sng.field_import_purchase_lines_wizard__file
+msgid "Upload Excel file with purchase lines"
+msgstr ""

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <record id="add_commission_view_move_form" model="ir.ui.view">
+            <field name="name">account.move.form.inherit</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="account.view_move_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//sheet/notebook/page[@name='invoice_tab']" position="after">
+                    <page string="Sales Commission" name="sale_commission_analysis" invisible="move_type != 'out_invoice'">
+                        <!--field name="temp_related" readonly="0"/-->
+                        <field name="commission_analysis_line" mode="list,form">
+                            <list string="Sales Commission" create="false" edit="false" delete="false">
+                                <field name="date"/>
+                                <field name="name"/>
+                                <field name="sales_person_id"/>
+                                <field name="commission_amount" widget="monetary"/>
+                            </list>
+                            <form create="false" edit="false" delete="false">
+                                <group>
+                                    <group>
+                                        <field name="date"/>
+                                        <field name="name"/>
+                                    </group>
+                                    <group>
+                                        <field name="sales_person_id"/>
+                                        <field name="currency_id" invisible="1"/>
+                                        <field name="commission_amount" widget="monetary"/>
+                                    </group>
+                                </group>
+                            </form>
+                        </field>
+                    </page>
+                </xpath>
+                <xpath expr="//group/group[1]/field[@name='invoice_vendor_bill_id']" position="after">
+                    <field name="created_by_commission" invisible="1"/>
+                </xpath>
+                <field name="invoice_user_id" position="after">
+                    <field name="salesperson_id" string="Vendedor (Contacto)"/>
+                </field>
+            </field>
+        </record>
+        
+         <record id="add_commisson_filt_view_account_invoice_filter" model="ir.ui.view">
+            <field name="name">account.invoice.select.inherit</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="account.view_account_invoice_filter"/>
+            <field name="arch" type="xml">
+                <xpath expr="//filter[@name='to_check']" position="after">
+                    <separator/>
+                    <filter string="Created from Sale Commission" name="to_sale_commission" domain="[('created_by_commission', '=', True)]"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="view_out_invoice_tree_inherit_commission" model="ir.ui.view">
+            <field name="name">account.out.invoice.tree.inherit.commission</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="account.view_out_invoice_tree"/>
+            <field name="arch" type="xml">
+                <field name="invoice_user_id" position="after">
+                    <field name="salesperson_id" string="Vendedor (Contacto)" optional="show"/>
+                </field>
+            </field>
+        </record>
+    </data>
+</odoo>

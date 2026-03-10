@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="sh_customer_history_form_view" model="ir.ui.view">
+        <field name="name">sh.customer.mail.history</field>
+        <field name="model">sh.customer.mail.history</field>
+        <field name="arch" type="xml">
+            <form string="Mail Log History" create="0" edit="0">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name" invisible="1" />
+                            <field name="sh_partner_id" />
+                            <field name="sh_current_date" />
+                            <field name="sh_statement_type" />
+                        </group>
+                        <group>
+                            <field name="sh_mail_id" />
+                            <field name="sh_mail_status" />
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="sh_customer_history_tree_view" model="ir.ui.view">
+        <field name="name">sh.customer.mail.history</field>
+        <field name="model">sh.customer.mail.history</field>
+        <field name="arch" type="xml">
+            <list string="Mail Log History" create="0" edit="0">
+                <field name="name" column_invisible="1" />
+                <field name="sh_partner_id" />
+                <field name="sh_current_date" />
+                <field name="sh_statement_type" />
+                <field name="sh_mail_id" />
+                <field name="sh_mail_status" />
+            </list>
+        </field>
+    </record>
+    <record id="sh_customer_mail_history_search_view" model="ir.ui.view">
+        <field name="name">sh.customer.mail.history</field>
+        <field name="model">sh.customer.mail.history</field>
+        <field name="arch" type="xml">
+            <search string="Mail Log History">
+                <field name="name" />
+                <filter string="Customer Statement By Date" name="customer_statement_filter_date" domain="[('sh_statement_type','=','customer_statement_filter')]" />
+                <filter string="Customer Statement" name="customer_statement_filter" domain="[('sh_statement_type','=','customer_statement')]" />
+                <filter string="Customer Overdue Statement" name="customer_overdue_statement_filter" domain="[('sh_statement_type','=','customer_overdue_statement')]" />
+                <group expand="0" string="Group By">
+                    <filter string="Statement Type" name="statement_type" context="{'group_by':'sh_statement_type'}" />
+                    <filter string="Mail Sent Status" name="mail_status" context="{'group_by':'sh_mail_status'}" />
+                    <filter string="Customer" name="partner" context="{'group_by':'sh_partner_id'}" />
+                    <separator />
+                    <filter string="Mail Sent Date" name="maildate" context="{'group_by': 'sh_current_date'}" />
+                </group>
+            </search>
+        </field>
+    </record>
+    <record id="sh_customer_mail_history_action" model="ir.actions.act_window">
+        <field name="name">Mail Log History</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">sh.customer.mail.history</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

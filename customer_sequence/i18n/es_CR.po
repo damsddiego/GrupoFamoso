@@ -1,0 +1,72 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* customer_sequence
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-11-21 16:48+0000\n"
+"PO-Revision-Date: 2025-11-21 10:49-0600\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: es_CR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 3.8\n"
+
+#. module: customer_sequence
+#: model:ir.model.fields,help:customer_sequence.field_res_company__customer_code
+msgid "Add the required customer code."
+msgstr ""
+
+#. module: customer_sequence
+#: model:ir.model,name:customer_sequence.model_res_company
+msgid "Companies"
+msgstr "Empresas"
+
+#. module: customer_sequence
+#: model:ir.model,name:customer_sequence.model_res_partner
+msgid "Contact"
+msgstr "Contacto"
+
+#. module: customer_sequence
+#: model:ir.model.fields,field_description:customer_sequence.field_res_company__customer_code
+msgid "Customer code"
+msgstr "Código de cliente"
+
+#. module: customer_sequence
+#: model:ir.model.fields,field_description:customer_sequence.field_res_company__display_name
+#: model:ir.model.fields,field_description:customer_sequence.field_res_partner__display_name
+msgid "Display Name"
+msgstr "Nombre en pantalla"
+
+#. module: customer_sequence
+#: model:ir.model.fields,help:customer_sequence.field_res_company__next_code
+msgid "Expected next code."
+msgstr "Código siguiente esperado."
+
+#. module: customer_sequence
+#: model:ir.model.fields,field_description:customer_sequence.field_res_company__id
+#: model:ir.model.fields,field_description:customer_sequence.field_res_partner__id
+msgid "ID"
+msgstr "ID"
+
+#. module: customer_sequence
+#: model:ir.model.fields,field_description:customer_sequence.field_res_company__next_code
+msgid "Next code"
+msgstr "Siguiente código"
+
+#. module: customer_sequence
+#: model:ir.model.fields,help:customer_sequence.field_res_partner__unique_id
+#: model:ir.model.fields,help:customer_sequence.field_res_users__unique_id
+msgid "The Unique Sequence no"
+msgstr "La secuencia única n.º"
+
+#. module: customer_sequence
+#: model:ir.model.fields,field_description:customer_sequence.field_res_partner__unique_id
+#: model:ir.model.fields,field_description:customer_sequence.field_res_users__unique_id
+msgid "Unique Id"
+msgstr "Identificador único"
