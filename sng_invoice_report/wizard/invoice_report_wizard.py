@@ -108,10 +108,8 @@ class InvoiceReportWizard(models.TransientModel):
             domain.append(('move_type', '=', self.invoice_type))
 
         if self.salesperson_ids:
-            domain.append(('assigned_salesperson_id', 'in', self.salesperson_ids.ids))
-        else:
-            # If no salesperson selected, filter invoices that have a salesperson assigned
-            domain.append(('assigned_salesperson_id', '!=', False))
+            domain.append(('salesperson_id', 'in', self.salesperson_ids.ids))
+        # If no salesperson selected, show ALL invoices (including those without salesperson)
 
         # Filter by payment status
         if self.payment_status != 'all':
@@ -122,7 +120,7 @@ class InvoiceReportWizard(models.TransientModel):
     def _get_invoices(self):
         """Get invoices based on the filters."""
         domain = self._get_invoices_domain()
-        invoices = self.env['account.move'].search(domain, order='assigned_salesperson_id, invoice_date')
+        invoices = self.env['account.move'].search(domain, order='salesperson_id, invoice_date')
         return invoices
 
     def _get_report_data(self):
@@ -154,11 +152,15 @@ class InvoiceReportWizard(models.TransientModel):
         )
 
         for invoice in invoices:
-            salesperson = invoice.assigned_salesperson_id
-            if salesperson.id not in data_by_salesperson:
-                data_by_salesperson[salesperson.id] = {
-                    'salesperson_name': salesperson.name,
-                    'salesperson_id': salesperson.id,
+            salesperson = invoice.salesperson_id
+            # Handle missing salesperson with a default value
+            salesperson_id = salesperson.id if salesperson else False
+            salesperson_name = salesperson.name if salesperson else 'Sin asignar'
+
+            if salesperson_id not in data_by_salesperson:
+                data_by_salesperson[salesperson_id] = {
+                    'salesperson_name': salesperson_name,
+                    'salesperson_id': salesperson_id,
                     'invoices': [],
                     'total_untaxed': 0.0,
                     'total_tax': 0.0,
@@ -193,10 +195,10 @@ class InvoiceReportWizard(models.TransientModel):
                 'payment_state': invoice.payment_state,
                 'is_reversal_line': is_credit_note,  # Credit notes shown in gray/italic style
             }
-            data_by_salesperson[salesperson.id]['invoices'].append(invoice_data)
-            data_by_salesperson[salesperson.id]['total_untaxed'] += amount_untaxed
-            data_by_salesperson[salesperson.id]['total_tax'] += amount_tax
-            data_by_salesperson[salesperson.id]['total'] += amount_total
+            data_by_salesperson[salesperson_id]['invoices'].append(invoice_data)
+            data_by_salesperson[salesperson_id]['total_untaxed'] += amount_untaxed
+            data_by_salesperson[salesperson_id]['total_tax'] += amount_tax
+            data_by_salesperson[salesperson_id]['total'] += amount_total
 
             grand_total_untaxed += amount_untaxed
             grand_total_tax += amount_tax
@@ -226,11 +228,11 @@ class InvoiceReportWizard(models.TransientModel):
                         'payment_state': reversal.payment_state,
                         'is_reversal_line': True,
                     }
-                    data_by_salesperson[salesperson.id]['invoices'].append(reversal_data)
+                    data_by_salesperson[salesperson_id]['invoices'].append(reversal_data)
                     # Subtract reversal amounts from totals
-                    data_by_salesperson[salesperson.id]['total_untaxed'] -= abs(reversal.amount_untaxed)
-                    data_by_salesperson[salesperson.id]['total_tax'] -= abs(reversal.amount_tax)
-                    data_by_salesperson[salesperson.id]['total'] -= abs(reversal.amount_total)
+                    data_by_salesperson[salesperson_id]['total_untaxed'] -= abs(reversal.amount_untaxed)
+                    data_by_salesperson[salesperson_id]['total_tax'] -= abs(reversal.amount_tax)
+                    data_by_salesperson[salesperson_id]['total'] -= abs(reversal.amount_total)
 
                     grand_total_untaxed -= abs(reversal.amount_untaxed)
                     grand_total_tax -= abs(reversal.amount_tax)

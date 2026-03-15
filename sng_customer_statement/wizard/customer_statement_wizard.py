@@ -100,11 +100,12 @@ class CustomerStatementWizard(models.TransientModel):
         default=lambda self: self.env.companies,
     )
     salesperson_ids = fields.Many2many(
-        'res.users',
+        'res.partner',
         'sng_stmt_wizard_sales_rel',
-        'wizard_id', 'user_id',
+        'wizard_id', 'partner_id',
         string='Vendedores',
-        help="Filtra facturas por usuario vendedor (invoice_user_id).",
+        domain="[('is_salesperson', '=', True)]",
+        help="Filtra por vendedor asignado al cliente (assigned_salesperson_id).",
     )
     tag_ids = fields.Many2many(
         'res.partner.category',
@@ -242,7 +243,7 @@ class CustomerStatementWizard(models.TransientModel):
         salesperson_clause = ''
         if self.salesperson_ids:
             params['salesperson_ids'] = tuple(self.salesperson_ids.ids)
-            salesperson_clause = 'AND am.invoice_user_id IN %(salesperson_ids)s'
+            salesperson_clause = 'AND rp.assigned_salesperson_id IN %(salesperson_ids)s'
 
         tag_clause = ''
         if self.tag_ids:
@@ -275,7 +276,7 @@ class CustomerStatementWizard(models.TransientModel):
                 am.partner_id                       AS partner_id,
                 rp.name                             AS partner_name,
                 rp.vat                              AS partner_vat,
-                am.invoice_user_id                  AS salesperson_id,
+                rp.assigned_salesperson_id          AS salesperson_id,
                 rp_sales.name                       AS salesperson_name,
                 am.move_type                        AS move_type,
                 am.state                            AS state,
@@ -290,8 +291,7 @@ class CustomerStatementWizard(models.TransientModel):
                 am.ref                              AS reference
             FROM account_move am
             JOIN  res_partner  rp  ON rp.id = am.partner_id
-            LEFT JOIN res_users   ru       ON ru.id       = am.invoice_user_id
-            LEFT JOIN res_partner rp_sales ON rp_sales.id = ru.partner_id
+            LEFT JOIN res_partner rp_sales ON rp_sales.id = rp.assigned_salesperson_id
             JOIN  res_currency  rc ON rc.id = am.currency_id
             JOIN  account_journal aj ON aj.id = am.journal_id
             WHERE am.move_type   IN %(move_types)s

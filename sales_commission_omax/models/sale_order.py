@@ -9,28 +9,24 @@ class SaleOrder(models.Model):
 
     commission_analysis_line = fields.One2many('sales.commission.analysis','sale_order_id','Sales Commission')
     salesperson_id = fields.Many2one(
-        'res.partner', 'Salesperson', 
-        domain="[('is_salesperson', '=', True)]", 
+        'res.partner', 'Salesperson',
+        domain="[('is_salesperson', '=', True)]",
         help="Salesperson assigned to this order for commission purposes.",
         compute='_compute_salesperson_id',
         store=True,
         readonly=False,
         precompute=True,
-        default=lambda self: self.env.user.partner_id,
     )
 
-    @api.depends('partner_id', 'partner_id.assigned_salesperson_id', 'user_id')
+    @api.depends('partner_id', 'partner_id.assigned_salesperson_id')
     def _compute_salesperson_id(self):
         for order in self:
             if order.partner_id and order.partner_id.assigned_salesperson_id:
                 order.salesperson_id = order.partner_id.assigned_salesperson_id
-            else:
-                # Keep existing value if any, otherwise fallback to the Salesperson user contact.
-                order.salesperson_id = (
-                    order.salesperson_id
-                    or order.user_id.partner_id
-                    or self.env.user.partner_id
-                )
+            elif not order.salesperson_id:
+                # Si no hay vendedor asignado al cliente, dejarlo vacío para que se asigne manualmente
+                # Solo se asignará automáticamente si el cliente tiene un vendedor configurado
+                order.salesperson_id = False
 
     def _prepare_invoice(self):
         """Extend to include salesperson_id in invoice"""

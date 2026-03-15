@@ -75,10 +75,11 @@ class CustomerStatementReport(models.Model):
         string='Clientes filtrados',
     )
     salesperson_ids = fields.Many2many(
-        'res.users',
+        'res.partner',
         'csr_salesperson_rel',
-        'report_id', 'user_id',
+        'report_id', 'partner_id',
         string='Vendedores filtrados',
+        domain="[('is_salesperson', '=', True)]",
     )
     tag_ids = fields.Many2many(
         'res.partner.category',
@@ -193,8 +194,9 @@ class CustomerStatementReportLine(models.Model):
         index=True,
     )
     salesperson_id = fields.Many2one(
-        'res.users',
+        'res.partner',
         string='Vendedor',
+        domain="[('is_salesperson', '=', True)]",
         index=True,
     )
     parent_id = fields.Many2one(
