@@ -102,7 +102,7 @@ class CustomerStatementWizard(models.TransientModel):
     salesperson_ids = fields.Many2many(
         'res.partner',
         'sng_stmt_wizard_sales_rel',
-        'wizard_id', 'partner_id',
+        'wizard_id', 'salesperson_id',
         string='Vendedores',
         domain="[('is_salesperson', '=', True)]",
         help="Filtra por vendedor asignado al cliente (assigned_salesperson_id).",
@@ -267,6 +267,26 @@ class CustomerStatementWizard(models.TransientModel):
             if has_tributacion else ''
         )
 
+        # Detectar si existe salesperson_id en account_move (módulo de comisiones)
+        self.env.cr.execute("""
+            SELECT 1 FROM information_schema.columns
+            WHERE table_name='account_move' AND column_name='salesperson_id'
+        """)
+        has_salesperson_id = bool(self.env.cr.fetchone())
+        
+        salesperson_select = "am.salesperson_id" if has_salesperson_id else "rp.assigned_salesperson_id"
+        salesperson_join = f"LEFT JOIN res_partner rp_sales ON rp_sales.id = {salesperson_select}"
+        
+        # Ajustar el filtro por salesperson si corresponde
+        salesperson_clause = ''
+        if self.salesperson_ids:
+            params['salesperson_ids'] = tuple(self.salesperson_ids.ids)
+            if has_salesperson_id:
+                # Si filramos por vendedor, y el move tiene propio:
+                salesperson_clause = f"AND (am.salesperson_id IN %(salesperson_ids)s OR (am.salesperson_id IS NULL AND rp.assigned_salesperson_id IN %(salesperson_ids)s))"
+            else:
+                salesperson_clause = "AND rp.assigned_salesperson_id IN %(salesperson_ids)s"
+
         query = f"""
             SELECT
                 am.id                               AS move_id,
@@ -276,7 +296,7 @@ class CustomerStatementWizard(models.TransientModel):
                 am.partner_id                       AS partner_id,
                 rp.name                             AS partner_name,
                 rp.vat                              AS partner_vat,
-                rp.assigned_salesperson_id          AS salesperson_id,
+                {salesperson_select}                AS salesperson_id,
                 rp_sales.name                       AS salesperson_name,
                 am.move_type                        AS move_type,
                 am.state                            AS state,
@@ -291,7 +311,7 @@ class CustomerStatementWizard(models.TransientModel):
                 am.ref                              AS reference
             FROM account_move am
             JOIN  res_partner  rp  ON rp.id = am.partner_id
-            LEFT JOIN res_partner rp_sales ON rp_sales.id = rp.assigned_salesperson_id
+            {salesperson_join}
             JOIN  res_currency  rc ON rc.id = am.currency_id
             JOIN  account_journal aj ON aj.id = am.journal_id
             WHERE am.move_type   IN %(move_types)s
@@ -641,6 +661,7 @@ class CustomerStatementWizard(models.TransientModel):
                     'bucket_31_60': bkt_vals['31_60'],
                     'bucket_61_90': bkt_vals['61_90'],
                     'bucket_91_plus': bkt_vals['91_plus'],
+                    'salesperson_id': inv.get('salesperson_id'),
                 })
 
             draft_pmts = draft_by_partner.get(pid, [])
@@ -838,7 +859,7 @@ class CustomerStatementWizard(models.TransientModel):
                         'report_id': report.id,
                         'company_id': company.id,
                         'partner_id': pid,
-                        'salesperson_id': sid,
+                        'salesperson_id': inv.get('salesperson_id') or sid,
                         'date': inv['invoice_date'],
                         'date_due': inv['date_due'],
                         'entry_type': inv['type'],
@@ -915,7 +936,7 @@ class CustomerStatementWizard(models.TransientModel):
                     'report_id': report.id,
                     'company_id': company.id,
                     'partner_id': pid,
-                    'salesperson_id': sid,
+                    'salesperson_id': inv.get('salesperson_id') or sid,
                     'date': inv['invoice_date'],
                     'date_due': inv['date_due'],
                     'entry_type': 'invoice',
@@ -959,7 +980,7 @@ class CustomerStatementWizard(models.TransientModel):
                         'report_id': report.id,
                         'company_id': company.id,
                         'partner_id': pid,
-                        'salesperson_id': sid,
+                        'salesperson_id': inv.get('salesperson_id') or sid,
                         'parent_id': parent.id,
                         'level': 1,
                         'sequence': sequence,

@@ -11,6 +11,7 @@
             <list string="Reporte CxC por Cliente" create="false" edit="false" delete="false">
                 <field name="partner_code"/>
                 <field name="partner_id"/>
+                <field name="assigned_salesperson_id" optional="show"/>
                 <field name="payment_term_id" optional="show"/>
                 <field name="company_id" optional="show" groups="base.group_multi_company"/>
                 <field name="currency_id" column_invisible="True"/>
@@ -51,6 +52,7 @@
             <search string="Buscar Reporte CxC">
                 <field name="partner_code"/>
                 <field name="partner_id"/>
+                <field name="assigned_salesperson_id"/>
                 <field name="company_id" groups="base.group_multi_company"/>
 
                 <!-- Quick date filters using invoice_date_max as proxy -->
@@ -80,6 +82,8 @@
                 <group expand="0" string="Agrupar por">
                     <filter name="groupby_partner" string="Cliente"
                         context="{'group_by': 'partner_id'}"/>
+                    <filter name="groupby_salesperson" string="Vendedor"
+                        context="{'group_by': 'assigned_salesperson_id'}"/>
                     <filter name="groupby_company" string="Compañía"
                         context="{'group_by': 'company_id'}"
                         groups="base.group_multi_company"/>

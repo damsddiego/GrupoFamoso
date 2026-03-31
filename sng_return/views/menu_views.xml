@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_sng_return_root"
+              name="Devoluciones"
+              sequence="66"
+              web_icon="sng_return,static/description/icon.svg"
+              groups="sng_return.group_sng_return_user"/>
+
+    <menuitem id="menu_sng_return"
+              name="Devoluciones de clientes"
+              parent="menu_sng_return_root"
+              action="action_sng_return"
+              sequence="10"
+              groups="sng_return.group_sng_return_user"/>
+
+    <menuitem id="menu_sng_return_config"
+              name="Configuración"
+              parent="menu_sng_return_root"
+              sequence="90"
+              groups="sng_return.group_sng_return_manager"/>
+
+    <menuitem id="menu_sng_return_reason"
+              name="Motivos de Devolución"
+              parent="menu_sng_return_config"
+              action="sng_return.action_sng_return_reason"
+              sequence="10"
+              groups="sng_return.group_sng_return_manager"/>
+</odoo>

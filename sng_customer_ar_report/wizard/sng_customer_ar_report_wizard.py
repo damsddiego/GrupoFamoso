@@ -38,6 +38,7 @@ class CustomerArReportWizard(models.TransientModel):
             'type': 'ir.actions.act_window',
             'res_model': 'customer.ar.report',
             'view_mode': 'list,pivot',
+            'views': [(False, 'list'), (False, 'pivot')],
             'domain': domain,
             'context': dict(self.env.context),
             'target': 'current',

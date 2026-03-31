@@ -109,7 +109,8 @@ class InvoiceReportWizard(models.TransientModel):
 
         if self.salesperson_ids:
             domain.append(('salesperson_id', 'in', self.salesperson_ids.ids))
-        # If no salesperson selected, show ALL invoices (including those without salesperson)
+        # Note: When no salesperson selected, we don't add any filter here
+        # Instead, we filter invalid salespersons in _get_report_data
 
         # Filter by payment status
         if self.payment_status != 'all':
@@ -120,6 +121,7 @@ class InvoiceReportWizard(models.TransientModel):
     def _get_invoices(self):
         """Get invoices based on the filters."""
         domain = self._get_invoices_domain()
+        # Order by salesperson_id first, but we'll handle fallback in _get_report_data
         invoices = self.env['account.move'].search(domain, order='salesperson_id, invoice_date')
         return invoices
 
@@ -152,7 +154,16 @@ class InvoiceReportWizard(models.TransientModel):
         )
 
         for invoice in invoices:
-            salesperson = invoice.salesperson_id
+            # Use salesperson_id first, fallback to assigned_salesperson_id
+            # This handles cases where salesperson_id is empty but customer has assigned salesperson
+            salesperson = invoice.salesperson_id or invoice.assigned_salesperson_id
+
+            # Skip invoices with invalid salespersons (contacts not marked as is_salesperson)
+            # Only if no specific salesperson was selected in the filter
+            if salesperson and not self.salesperson_ids:
+                if not salesperson.is_salesperson:
+                    continue  # Skip this invoice
+
             # Handle missing salesperson with a default value
             salesperson_id = salesperson.id if salesperson else False
             salesperson_name = salesperson.name if salesperson else 'Sin asignar'
@@ -255,6 +266,7 @@ class InvoiceReportWizard(models.TransientModel):
         """Open invoice list view filtered by wizard criteria.
 
         This uses standard Odoo views and respects all security rules.
+        Groups by effective_salesperson_id to show correct salesperson grouping.
         """
         self.ensure_one()
         domain = self._get_invoices_domain()
@@ -264,11 +276,16 @@ class InvoiceReportWizard(models.TransientModel):
         context.update({
             'default_move_type': 'out_invoice',
             'search_default_posted': 1,
+            'search_default_effective_salesperson': 1,  # Auto-group by effective salesperson
         })
 
         # Add allowed companies to context
         if self.company_ids:
             context['allowed_company_ids'] = self.company_ids.ids
+
+        # Get the custom tree view
+        tree_view = self.env.ref('sng_invoice_report.view_invoice_tree_effective_salesperson', False)
+        tree_view_id = tree_view.id if tree_view else False
 
         return {
             'name': _('Invoice Report: %(date_from)s to %(date_to)s',
@@ -277,7 +294,7 @@ class InvoiceReportWizard(models.TransientModel):
             'res_model': 'account.move',
             'view_mode': 'list,pivot,graph,form',
             'views': [
-                (False, 'list'),
+                (tree_view_id, 'list'),
                 (False, 'pivot'),
                 (False, 'graph'),
                 (False, 'form'),

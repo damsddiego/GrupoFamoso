@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Tree view with effective salesperson -->
+    <record id="view_invoice_tree_effective_salesperson" model="ir.ui.view">
+        <field name="name">account.move.tree.effective.salesperson</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_invoice_tree"/>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <xpath expr="//list" position="attributes">
+                <attribute name="default_group_by">effective_salesperson_id</attribute>
+            </xpath>
+            <xpath expr="//field[@name='invoice_user_id']" position="after">
+                <field name="effective_salesperson_id" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Search view with effective salesperson filter and group by -->
+    <record id="view_account_invoice_filter_effective_salesperson" model="ir.ui.view">
+        <field name="name">account.move.select.effective.salesperson</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_account_invoice_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='salesperson']" position="after">
+                <filter string="Effective Salesperson" name="effective_salesperson"
+                        domain="[]" context="{'group_by': 'effective_salesperson_id'}"/>
+            </xpath>
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="effective_salesperson_id"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

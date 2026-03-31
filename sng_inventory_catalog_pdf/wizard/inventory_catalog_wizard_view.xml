@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============================================================
+         Vista formulario del wizard
+         ============================================================ -->
+    <record id="view_inventory_catalog_wizard_form" model="ir.ui.view">
+        <field name="name">inventory.catalog.wizard.form</field>
+        <field name="model">inventory.catalog.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Catálogo de Productos por Categoría">
+
+                <sheet>
+                    <!-- Título descriptivo dentro del wizard -->
+                    <div class="oe_title">
+                        <h4 class="text-muted">
+                            Configurar filtros y generar el reporte PDF
+                        </h4>
+                    </div>
+
+                    <group string="Filtros del Reporte">
+
+                        <group>
+                            <!-- Multiselección de categorías -->
+                            <field
+                                name="category_ids"
+                                widget="many2many_tags"
+                                options="{'no_create': True}"
+                                placeholder="Dejar vacío para incluir todas las categorías"
+                            />
+                            <!-- Checkbox: incluir subcategorías -->
+                            <field name="include_subcategories"/>
+                        </group>
+
+                        <group>
+                            <!-- Checkbox: solo activos -->
+                            <field name="only_active"/>
+                            <!-- Checkbox: incluir sin existencia -->
+                            <field name="include_no_stock"/>
+                            <!-- Checkbox: agrupar por categoría o lista plana -->
+                            <field name="group_by_category"/>
+                        </group>
+
+                    </group>
+
+                    <!-- Nota informativa -->
+                    <div class="alert alert-info" role="alert"
+                         style="margin-top: 8px;">
+                        <i class="fa fa-info-circle" role="img" aria-label="Información"/>
+                        El reporte mostrará: <strong>Código, Nombre, Cantidad disponible
+                        (todos los almacenes) y Precio de venta</strong>, agrupados por
+                        categoría de producto.
+                    </div>
+
+                </sheet>
+
+                <!-- Botones del footer -->
+                <footer>
+                    <button
+                        name="action_generate_report"
+                        string="Generar PDF"
+                        type="object"
+                        class="btn-primary"
+                        data-hotkey="v"
+                    />
+                    <button
+                        name="action_export_excel"
+                        string="Exportar Excel"
+                        type="object"
+                        class="btn-success"
+                        data-hotkey="x"
+                    />
+                    <button
+                        name="action_cancel"
+                        string="Cancelar"
+                        type="object"
+                        class="btn-secondary"
+                        data-hotkey="z"
+                    />
+                </footer>
+
+            </form>
+        </field>
+    </record>
+
+    <!-- ============================================================
+         Acción de ventana para abrir el wizard
+         ============================================================ -->
+    <record id="action_inventory_catalog_wizard" model="ir.actions.act_window">
+        <field name="name">Catálogo de Productos por Categoría</field>
+        <field name="res_model">inventory.catalog.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_inventory_catalog_wizard_form"/>
+        <field name="target">new</field>
+    </record>
+
+</odoo>

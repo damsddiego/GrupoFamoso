@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============================================================
+         MENÚ: Inventario > Reportes > Catálogo de Productos
+         stock.menu_warehouse_management  = menú raíz de Inventario
+         stock.menu_stock_root            = raíz del módulo stock
+
+         Se añade bajo el menú de Reportes de Inventario.
+         En Odoo 18 el menú de Reportes en stock se llama
+         stock.menu_reports (si existe) o se crea un ítem directo
+         bajo el módulo de inventario con sequence alto para que
+         quede al fondo del grupo de reportes.
+         ============================================================ -->
+
+    <!--
+        Se ubica bajo Inventario > Reportes (stock.menu_warehouse_report).
+        El grupo group_stock_manager ya incluye a group_stock_user por herencia,
+        pero se listan ambos para que usuarios normales también accedan.
+    -->
+    <menuitem
+        id="menu_inventory_catalog_pdf"
+        name="Catálogo de Productos por Categoría"
+        parent="stock.menu_warehouse_report"
+        action="action_inventory_catalog_wizard"
+        sequence="50"
+        groups="stock.group_stock_user,stock.group_stock_manager"
+    />
+
+</odoo>

@@ -54,6 +54,22 @@ class ImportPurchaseLinesWizard(models.TransientModel):
             costo_unit = row[3]
             precio_venta = row[5]
 
+            # Convert to proper types
+            try:
+                cantidad = float(cantidad) if cantidad is not None else 0
+            except (ValueError, TypeError):
+                cantidad = 0
+
+            try:
+                costo_unit = float(costo_unit) if costo_unit is not None else 0
+            except (ValueError, TypeError):
+                costo_unit = 0
+
+            try:
+                precio_venta = float(precio_venta) if precio_venta is not None else 0
+            except (ValueError, TypeError):
+                precio_venta = 0
+
             # Validate required fields
             if not codigo:
                 errors.append(_('Row %s: Missing product code') % row_number)

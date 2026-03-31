@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="SNG Return">
+  <defs>
+    <linearGradient id="topLeft" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4cc9f0"/>
+      <stop offset="100%" stop-color="#4895ef"/>
+    </linearGradient>
+    <linearGradient id="topRight" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f9c74f"/>
+      <stop offset="100%" stop-color="#f9844a"/>
+    </linearGradient>
+    <linearGradient id="leftSide" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#43aa8b"/>
+      <stop offset="100%" stop-color="#277da1"/>
+    </linearGradient>
+    <linearGradient id="rightSide" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#9d4edd"/>
+      <stop offset="100%" stop-color="#c77dff"/>
+    </linearGradient>
+    <linearGradient id="frontSide" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f8961e"/>
+      <stop offset="100%" stop-color="#f3722c"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#6d597a" flood-opacity="0.22"/>
+    </filter>
+  </defs>
+
+  <g filter="url(#shadow)">
+    <path d="M64 18 26 36l18 10 38-18Z" fill="url(#topLeft)"/>
+    <path d="M64 18 102 36 84 46 46 28Z" fill="url(#topRight)"/>
+    <path d="M26 36v42l38 22V58L44 46Z" fill="url(#leftSide)"/>
+    <path d="M102 36v42L64 100V58l20-12Z" fill="url(#rightSide)"/>
+    <path d="M44 46v40l20 12V58Z" fill="url(#frontSide)"/>
+
+    <path d="M64 18 26 36l38 22 38-22Z" fill="none" stroke="#ffffff" stroke-opacity=".9" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M26 36v42l38 22 38-22V36" fill="none" stroke="#ffffff" stroke-opacity=".9" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M64 58v42" fill="none" stroke="#ffffff" stroke-opacity=".82" stroke-width="2.5" stroke-linecap="round"/>
+
+    <path d="M35 80h14v17H35z" fill="#ffffff" fill-opacity=".18" stroke="#ffffff" stroke-opacity=".78" stroke-width="2"/>
+    <path d="M42 80v17" fill="none" stroke="#ffffff" stroke-opacity=".68" stroke-width="2"/>
+
+    <path d="m20 33 18 10 14-6-18-10Z" fill="#ffffff" fill-opacity=".12"/>
+    <path d="m76 25 18 10 14-6-18-10Z" fill="#ffffff" fill-opacity=".12"/>
+  </g>
+</svg>

@@ -31,6 +31,8 @@ class CustomerArReport(models.Model):
         'res.partner', string='Cliente', readonly=True)
     partner_code = fields.Char(
         string='Código - Cliente', readonly=True)
+    assigned_salesperson_id = fields.Many2one(
+        'res.partner', string='Vendedor', readonly=True)
     company_id = fields.Many2one(
         'res.company', string='Compañía', readonly=True)
     currency_id = fields.Many2one(
@@ -72,6 +74,7 @@ class CustomerArReport(models.Model):
                     COALESCE(rp.unique_id, ''), ' - ',
                     COALESCE(rp.name, '')
                 )                                                   AS partner_code,
+                rp.assigned_salesperson_id                          AS assigned_salesperson_id,
                 am.company_id                                       AS company_id,
                 rc.currency_id                                      AS currency_id,
 
@@ -122,6 +125,7 @@ class CustomerArReport(models.Model):
                 am.partner_id,
                 rp.unique_id,
                 rp.name,
+                rp.assigned_salesperson_id,
                 am.company_id,
                 rc.currency_id
             """

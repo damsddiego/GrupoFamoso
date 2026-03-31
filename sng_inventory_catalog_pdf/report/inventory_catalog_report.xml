@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============================================================
+         Acción del reporte PDF (ir.actions.report)
+         Vinculada al modelo inventory.catalog.wizard.
+         No tiene binding_model_id porque se invoca explícitamente
+         desde el método action_generate_report() del wizard.
+         ============================================================ -->
+    <record id="action_report_inventory_catalog" model="ir.actions.report">
+        <field name="name">Catálogo de Productos por Categoría</field>
+        <field name="model">inventory.catalog.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <!-- report_name debe coincidir con el t-name de la plantilla principal -->
+        <field name="report_name">sng_inventory_catalog_pdf.report_inventory_catalog</field>
+        <field name="report_file">sng_inventory_catalog_pdf.report_inventory_catalog</field>
+        <!-- Sin binding: no aparece en menú de impresión de otros modelos -->
+        <field name="binding_model_id" eval="False"/>
+        <!-- Formato de papel A4 vertical -->
+        <field name="paperformat_id" ref="base.paperformat_euro"/>
+    </record>
+
+</odoo>

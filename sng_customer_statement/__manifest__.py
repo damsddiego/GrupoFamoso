@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Estado de Cuenta de Clientes',
-    'version': '18.0.1.0.0',
+    'version': '18.0.1.1.0',
     'category': 'Accounting/Accounting',
     'summary': 'Reporte de estado de cuenta por cliente: facturas, pagos aplicados, saldos y aging.',
     'description': """
@@ -19,6 +19,7 @@
         'account',
         'base_setup',
         'customer_sequence',
+        'sales_commission_omax',  # Necesario para is_salesperson y assigned_salesperson_id
     ],
     'data': [
         # 1. Grupos primero — el CSV los necesita

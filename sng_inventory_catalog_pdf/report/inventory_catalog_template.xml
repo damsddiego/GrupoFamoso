@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!--
+        PLANTILLA DEL REPORTE PDF — Catálogo de Productos por Categoría
+        ================================================================
+        Patrón correcto para Odoo 18:
+          web.html_container  → genera <html><body> con la estructura base
+          web.external_layout → aporta header (logo + empresa) y footer (paginación)
+          .page               → contenido real del reporte
+
+        docs = recordset de inventory.catalog.wizard (1 registro por ejecución).
+        Todos los cálculos pesados se hacen en Python (get_grouped_products),
+        la plantilla solo renderiza los datos pre-computados.
+    -->
+    <template id="report_inventory_catalog">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.external_layout">
+
+                    <div class="page">
+
+                        <!-- ============================================
+                             TÍTULO E INFORMACIÓN DEL REPORTE
+                             ============================================ -->
+                        <div style="margin-bottom: 14px;">
+                            <h3 style="
+                                text-align: center;
+                                color: #1a3a5c;
+                                border-bottom: 2px solid #1a3a5c;
+                                padding-bottom: 6px;
+                                margin-bottom: 10px;
+                                font-size: 14pt;
+                                text-transform: uppercase;
+                                letter-spacing: 1px;
+                            ">
+                                Catálogo de Productos por Categoría
+                            </h3>
+
+                            <!-- Metadata: fecha, usuario, filtros -->
+                            <table style="
+                                width: 100%;
+                                font-size: 8.5pt;
+                                color: #444444;
+                                background-color: #f4f7fb;
+                                border: 1px solid #d0dce8;
+                                border-collapse: collapse;
+                            ">
+                                <tr>
+                                    <td style="padding: 4px 10px; width: 50%; border: 1px solid #d0dce8;">
+                                        <strong>Fecha de generación:</strong>&#160;
+                                        <t t-esc="doc.get_report_datetime()"/>
+                                    </td>
+                                    <td style="padding: 4px 10px; width: 50%; border: 1px solid #d0dce8;">
+                                        <strong>Generado por:</strong>&#160;
+                                        <t t-esc="doc.env.user.name"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2" style="padding: 4px 10px; border: 1px solid #d0dce8;">
+                                        <strong>Filtros:</strong>&#160;
+                                        <t t-esc="doc.get_filter_description()"/>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <!-- ============================================
+                             CUERPO: grupos por categoría
+                             ============================================ -->
+                        <t t-set="grouped_data" t-value="doc.get_grouped_products()"/>
+
+                        <!-- Sin resultados -->
+                        <t t-if="not grouped_data">
+                            <div style="
+                                text-align: center;
+                                margin-top: 40px;
+                                padding: 20px;
+                                border: 1px dashed #aaaaaa;
+                                color: #666666;
+                                font-size: 10pt;
+                            ">
+                                No se encontraron productos con los filtros seleccionados.
+                            </div>
+                        </t>
+
+                        <!-- Iterar grupos -->
+                        <t t-foreach="grouped_data" t-as="group">
+
+                            <div style="margin-bottom: 20px; page-break-inside: avoid;">
+
+                                <!-- Cabecera de categoría: solo cuando group_by_category=True -->
+                                <t t-if="doc.group_by_category and group['category_name']">
+                                    <div style="
+                                        background-color: #1a3a5c;
+                                        color: #ffffff;
+                                        padding: 5px 10px;
+                                        font-size: 10pt;
+                                        font-weight: bold;
+                                        border-radius: 2px 2px 0 0;
+                                    ">
+                                        <t t-esc="group['category_name']"/>
+                                        <span style="font-size: 8pt; font-weight: normal; opacity: 0.85; margin-left: 8px;">
+                                            (<t t-esc="len(group['products'])"/> productos)
+                                        </span>
+                                    </div>
+                                </t>
+
+                                <!-- Tabla de productos -->
+                                <table style="
+                                    width: 100%;
+                                    border-collapse: collapse;
+                                    font-size: 8.5pt;
+                                    border: 1px solid #b0c4d8;
+                                ">
+                                    <thead>
+                                        <tr style="background-color: #dde7f0;">
+                                            <th style="border: 1px solid #b0c4d8; padding: 5px 8px; text-align: left;   width: 14%; font-size: 8pt; color: #1a3a5c;">Código</th>
+                                            <th style="border: 1px solid #b0c4d8; padding: 5px 8px; text-align: left;   width: 52%; font-size: 8pt; color: #1a3a5c;">Nombre / Descripción</th>
+                                            <th style="border: 1px solid #b0c4d8; padding: 5px 8px; text-align: right;  width: 17%; font-size: 8pt; color: #1a3a5c;">Cant. Disponible</th>
+                                            <th style="border: 1px solid #b0c4d8; padding: 5px 8px; text-align: right;  width: 17%; font-size: 8pt; color: #1a3a5c;">Precio de Venta</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        <t t-foreach="group['products']" t-as="product">
+                                            <tr t-attf-style="background-color: #{'#f7fafd' if product_index % 2 == 0 else '#ffffff'};">
+                                                <td style="border: 1px solid #ccd9e6; padding: 4px 8px; vertical-align: top; font-family: monospace;">
+                                                    <t t-esc="product['default_code']"/>
+                                                </td>
+                                                <td style="border: 1px solid #ccd9e6; padding: 4px 8px; vertical-align: top;">
+                                                    <t t-esc="product['name']"/>
+                                                </td>
+                                                <td style="border: 1px solid #ccd9e6; padding: 4px 8px; text-align: right; vertical-align: top;">
+                                                    <t t-esc="doc.format_qty(product['qty_available'])"/>
+                                                </td>
+                                                <td style="border: 1px solid #ccd9e6; padding: 4px 8px; text-align: right; vertical-align: top;">
+                                                    <t t-esc="doc.format_price(product['list_price'])"/>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+
+
+                                </table>
+                            </div>
+                            <!-- fin bloque de categoría -->
+
+                        </t>
+                        <!-- fin t-foreach grouped_data -->
+
+                        <!-- ============================================
+                             RESUMEN GENERAL AL FINAL
+                             (solo si hay datos)
+                             ============================================ -->
+                        <t t-if="grouped_data">
+                            <t t-set="grand_total_products" t-value="sum(len(g['products']) for g in grouped_data)"/>
+                            <t t-set="grand_total_value"    t-value="sum(g['subtotal'] for g in grouped_data)"/>
+                            <div style="
+                                margin-top: 10px;
+                                padding: 8px 12px;
+                                background-color: #1a3a5c;
+                                color: white;
+                                font-size: 9pt;
+                                font-weight: bold;
+                                border-radius: 3px;
+                                text-align: right;
+                            ">
+                                Total general:&#160;
+                                <t t-esc="grand_total_products"/> productos&#160;&#160;|&#160;&#160;
+                                Valor inventario:&#160;
+                                <t t-esc="doc.format_price(grand_total_value)"/>
+                            </div>
+                        </t>
+
+                    </div>
+                    <!-- fin .page -->
+
+                </t>
+                <!-- fin web.external_layout -->
+            </t>
+            <!-- fin t-foreach docs -->
+        </t>
+        <!-- fin web.html_container -->
+    </template>
+
+</odoo>

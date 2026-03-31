@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!--
+    FILTRO OPCIONAL: Ocultar órdenes con facturas
+
+    Objetivo:
+    Agregar un filtro opcional en la vista "Orders to Invoice" (Pendiente por facturar)
+    para permitir al usuario decidir si mostrar u ocultar órdenes que ya tienen
+    al menos una factura asociada.
+
+    Lógica:
+    - Por defecto: El filtro está ACTIVADO (oculta órdenes con facturas)
+    - Usuario puede desactivarlo para ver todas las órdenes pendientes
+    - Usa el campo computado 'has_invoice' para filtrar
+
+    Ventajas de usar filtro vs dominio fijo:
+    1. Flexibilidad - usuario decide qué ver
+    2. Por defecto oculta (comportamiento deseado)
+    3. Permite revisar órdenes con facturas parciales cuando sea necesario
+    4. Más transparente - el filtro aparece visible en la UI
+    5. Mantiene toda la funcionalidad del dominio fijo pero con control del usuario
+
+    Casos funcionales:
+    • Filtro ACTIVADO (default): Solo muestra órdenes sin facturas
+    • Filtro DESACTIVADO: Muestra todas las órdenes pendientes (con y sin facturas)
+    -->
+
+    <!--
+    MODIFICACIÓN DE LA ACCIÓN ORIGINAL
+
+    Se actualiza la acción nativa para:
+    1. Mantener el dominio original (solo invoice_status)
+    2. Activar por defecto el filtro 'hide_with_invoices' mediante context
+    -->
+    <record id="sale.action_orders_to_invoice" model="ir.actions.act_window">
+        <!-- Dominio: Solo órdenes pendientes de facturar (sin filtro fijo de has_invoice) -->
+        <field name="domain">[('invoice_status','=','to invoice')]</field>
+
+        <!-- Context: Activa el filtro por defecto usando search_default_<nombre_filtro> -->
+        <field name="context">{
+            'create': False,
+            'search_default_hide_with_invoices': 1
+        }</field>
+    </record>
+
+    <!--
+    HERENCIA DE SEARCH VIEW: Agregar filtro "Ocultar órdenes con facturas"
+
+    Se agrega un filtro en la vista de búsqueda que permite al usuario
+    activar/desactivar la ocultación de órdenes que ya tienen facturas.
+    -->
+    <record id="view_sales_order_filter_hide_with_invoices" model="ir.ui.view">
+        <field name="name">sale.order.filter.hide.with.invoices</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_sales_order_filter"/>
+        <field name="arch" type="xml">
+            <!--
+            Insertar el filtro después del filtro "My Sales Orders"
+            Usamos xpath para ubicar exactamente dónde agregar el filtro
+            -->
+            <xpath expr="//filter[@name='my_sale_orders_filter']" position="after">
+                <!-- Separador visual para agrupar filtros relacionados -->
+                <separator/>
+
+                <!--
+                FILTRO: Ocultar órdenes con facturas
+
+                Parámetros:
+                - string: Texto que aparece en la UI
+                - name: Nombre técnico del filtro (usado en context)
+                - domain: Condición que se aplica cuando el filtro está activo
+                - help: Tooltip explicativo (opcional)
+                -->
+                <filter
+                    string="Sin facturas generadas"
+                    name="hide_with_invoices"
+                    domain="[('has_invoice','=',False)]"
+                    help="Oculta órdenes que ya tienen al menos una factura asociada (incluyendo anticipos, facturas parciales o canceladas)"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!--
+    EXPLICACIÓN TÉCNICA:
+
+    1. Acción modificada (sale.action_orders_to_invoice):
+       - domain: [('invoice_status','=','to invoice')]
+         → Muestra todas las órdenes pendientes
+
+       - context: {'search_default_hide_with_invoices': 1}
+         → Activa automáticamente el filtro 'hide_with_invoices' al abrir la vista
+         → El '1' significa "activado por defecto"
+
+    2. Filtro en search view:
+       - name="hide_with_invoices"
+         → Se relaciona con 'search_default_hide_with_invoices' en el context
+
+       - domain="[('has_invoice','=',False)]"
+         → Cuando está activo, solo muestra órdenes sin facturas
+
+    3. Comportamiento resultante:
+       - Usuario abre "Pendiente por facturar"
+       - El filtro "Sin facturas generadas" está ACTIVADO (checkbox marcado)
+       - Solo ve órdenes sin facturas
+       - Puede DESACTIVAR el filtro para ver todas las órdenes pendientes
+       - Puede ACTIVAR/DESACTIVAR el filtro cuantas veces quiera
+
+    4. Ventajas sobre dominio fijo:
+       - Usuario tiene control total
+       - Comportamiento por defecto es el mismo (oculta órdenes con facturas)
+       - Permite casos especiales donde se necesita ver órdenes con facturas parciales
+       - Más intuitivo y transparente en la interfaz
+    -->
+
+</odoo>

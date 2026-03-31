@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_sng_return_history_wizard_form" model="ir.ui.view">
+        <field name="name">sng.return.history.wizard.form</field>
+        <field name="model">sng.return.history.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Historial de ventas facturadas">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="partner_id" readonly="1" options="{'no_open': True}"/>
+                            <field name="product_id" readonly="1" options="{'no_open': True}"/>
+                        </group>
+                        <group>
+                            <field name="company_id" groups="base.group_multi_company" readonly="1"/>
+                            <field name="order_count" readonly="1"/>
+                            <field name="total_qty" readonly="1"/>
+                        </group>
+                    </group>
+                    <group>
+                        <button name="action_reload_history"
+                                string="Recargar historial"
+                                type="object"
+                                class="btn-secondary"
+                                icon="fa-refresh"/>
+                    </group>
+                    <field name="history_line_ids" nolabel="1">
+                        <list string="Ordenes facturadas" create="false" edit="false" delete="false">
+                            <field name="date_order"/>
+                            <field name="sale_order_id"/>
+                            <field name="partner_id" optional="hide"/>
+                            <field name="product_id"/>
+                            <field name="quantity" sum="total_qty"/>
+                            <field name="uom_id"/>
+                            <field name="price_unit" optional="show"/>
+                            <field name="price_subtotal" sum="total_subtotal"/>
+                            <field name="invoice_status" widget="badge"
+                                   decoration-success="invoice_status == 'invoiced'"/>
+                            <field name="invoice_count" readonly="1"/>
+                            <field name="salesperson_id" optional="show"/>
+                            <button name="action_open_sale_order"
+                                    string="Abrir orden"
+                                    type="object"
+                                    icon="fa-external-link"
+                                    class="btn-link"/>
+                            <button name="action_open_invoices"
+                                    string="Ver facturas"
+                                    type="object"
+                                    icon="fa-file-text-o"
+                                    class="btn-link"/>
+                        </list>
+                    </field>
+                </sheet>
+                <footer>
+                    <button string="Cerrar" class="btn-primary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_sng_return_history_wizard" model="ir.actions.act_window">
+        <field name="name">Historial de ventas facturadas</field>
+        <field name="res_model">sng.return.history.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

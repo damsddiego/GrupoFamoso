@@ -44,6 +44,7 @@
     ],
     'data': [
         'security/ir.model.access.csv',
+        'views/account_move_views.xml',
         'wizard/invoice_report_wizard_view.xml',
         'report/invoice_report.xml',
         'report/invoice_report_template.xml',

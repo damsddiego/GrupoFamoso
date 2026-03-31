@@ -1,0 +1,25 @@
+{
+    "name": "SNG Return",
+    "version": "18.0.1.0.0",
+    "category": "Sales",
+    "summary": "Registro de devoluciones de clientes con historial de ventas facturadas",
+    "author": "SNG",
+    "license": "LGPL-3",
+    "depends": [
+        "base",
+        "sale_management",
+        "account",
+    ],
+    "data": [
+        "security/security.xml",
+        "security/ir.model.access.csv",
+        "data/sequence.xml",
+        "views/sng_return_reason_views.xml",
+        "views/sng_return_views.xml",
+        "wizard/sng_return_history_wizard_views.xml",
+        "wizard/sng_return_invoice_history_wizard_views.xml",
+        "views/menu_views.xml",
+    ],
+    "installable": True,
+    "application": True,
+}
