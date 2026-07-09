@@ -9,9 +9,9 @@ class CustomerArReportWizard(models.TransientModel):
 
     date_from = fields.Date(string='Desde')
     date_to = fields.Date(string='Hasta')
-    company_id = fields.Many2one(
-        'res.company', string='Compañía',
-        default=lambda self: self.env.company)
+    company_ids = fields.Many2many(
+        'res.company', string='Compañías',
+        default=lambda self: self.env.companies)
     partner_id = fields.Many2one(
         'res.partner', string='Cliente')
     only_with_balance = fields.Boolean(
@@ -26,12 +26,15 @@ class CustomerArReportWizard(models.TransientModel):
             domain.append(('invoice_date_max', '>=', self.date_from))
         if self.date_to:
             domain.append(('invoice_date_min', '<=', self.date_to))
-        if self.company_id:
-            domain.append(('company_id', '=', self.company_id.id))
+        if self.company_ids:
+            domain.append(('company_id', 'in', self.company_ids.ids))
         if self.partner_id:
             domain.append(('partner_id', '=', self.partner_id.id))
         if self.only_with_balance:
             domain.append(('amount_due', '>', 0))
+
+        ctx = dict(self.env.context)
+        ctx['allowed_company_ids'] = self.company_ids.ids or self.env.companies.ids
 
         return {
             'name': 'Reporte CxC por Cliente',
@@ -40,6 +43,6 @@ class CustomerArReportWizard(models.TransientModel):
             'view_mode': 'list,pivot',
             'views': [(False, 'list'), (False, 'pivot')],
             'domain': domain,
-            'context': dict(self.env.context),
+            'context': ctx,
             'target': 'current',
         }

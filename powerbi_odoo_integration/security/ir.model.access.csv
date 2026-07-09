@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_powerbi_api_token,powerbi.api.token,model_powerbi_api_token,group_powerbi_api_manager,1,1,1,1
+access_powerbi_model,powerbi.model,model_powerbi_model,group_powerbi_api_manager,1,1,1,1
+access_powerbi_api_audit,access_powerbi_api_audit,model_powerbi_api_audit,group_powerbi_api_manager,1,1,1,1
+

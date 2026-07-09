@@ -1,0 +1,53 @@
+<odoo>
+  <data>
+
+    <record id="view_partner_stock_form_inherit_move_groups" model="ir.ui.view">
+      <field name="name">res.partner.stock.property.form.inherit.move.groups</field>
+      <field name="model">res.partner</field>
+      <!-- Heredamos del formulario base del partner -->
+      <field name="inherit_id" ref="base.view_partner_form"/>
+<!--      <field name="priority" eval="50"/>-->
+      <field name="arch" type="xml">
+
+        <!-- 1) Quitar el atributo groups del contenedor -->
+        <xpath expr="//page[@name='sales_purchases']//group[@name='container_row_stock']" position="attributes">
+          <!-- Dejar vacío/eliminar hace que sea visible para todos -->
+          <attribute name="groups"/>
+        </xpath>
+
+        <!-- 2) Poner groups en los campos -->
+        <xpath expr="//group[@name='container_row_stock']//field[@name='property_stock_customer']" position="attributes">
+          <attribute name="groups">base.group_no_one</attribute>
+        </xpath>
+
+        <xpath expr="//group[@name='container_row_stock']//field[@name='property_stock_supplier']" position="attributes">
+          <attribute name="groups">base.group_no_one</attribute>
+        </xpath>
+
+        <!-- 3) Agregar tu campo debajo de property_stock_supplier -->
+        <xpath expr="//group[@name='container_row_stock']//field[@name='property_stock_supplier']" position="after">
+          <field name="sale_location_id"/>
+        </xpath>
+
+        <field name="user_id" position="after">
+          <field name="team_id"/>
+        </field>
+
+        <xpath expr="//div[@name='button_box']" position="inside">
+          <button
+              name="action_open_current_stock_location_report"
+              type="object"
+              class="oe_stat_button"
+              icon="fa-cubes"
+              invisible="not sale_location_id">
+            <div class="o_stat_info">
+              <span class="o_stat_text">Existencias</span>
+            </div>
+          </button>
+        </xpath>
+
+      </field>
+    </record>
+
+  </data>
+</odoo>

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_sng_commission_payment_line_tree" model="ir.ui.view">
+            <field name="name">sng.commission.payment.line.tree</field>
+            <field name="model">sng.commission.payment.line</field>
+            <field name="arch" type="xml">
+                <list string="Líneas de Comisión por Pago">
+                    <field name="payment_date"/>
+                    <field name="salesperson_id"/>
+                    <field name="partner_id"/>
+                    <field name="invoice_id"/>
+                    <field name="payment_id"/>
+                    <field name="payment_amount"/>
+                    <field name="commission_base"/>
+                    <field name="commission_percentage"/>
+                    <field name="commission_amount"/>
+                    <field name="state"/>
+                    <field name="company_id" groups="base.group_multi_company"/>
+                </list>
+            </field>
+        </record>
+
+        <record id="view_sng_commission_payment_line_form" model="ir.ui.view">
+            <field name="name">sng.commission.payment.line.form</field>
+            <field name="model">sng.commission.payment.line</field>
+            <field name="arch" type="xml">
+                <form string="Línea de Comisión por Pago">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="payment_id"/>
+                                <field name="invoice_id"/>
+                                <field name="partner_id"/>
+                                <field name="salesperson_id"/>
+                                <field name="payment_date"/>
+                            </group>
+                            <group>
+                                <field name="payment_amount"/>
+                                <field name="invoice_amount_untaxed"/>
+                                <field name="invoice_amount_total"/>
+                                <field name="commission_base"/>
+                                <field name="commission_percentage"/>
+                                <field name="commission_amount"/>
+                                <field name="state"/>
+                                <field name="bill_id"/>
+                                <field name="company_id" groups="base.group_multi_company"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_sng_commission_payment_line_search" model="ir.ui.view">
+            <field name="name">sng.commission.payment.line.search</field>
+            <field name="model">sng.commission.payment.line</field>
+            <field name="arch" type="xml">
+                <search string="Buscar líneas de comisión">
+                    <field name="salesperson_id"/>
+                    <field name="partner_id"/>
+                    <field name="invoice_id"/>
+                    <field name="payment_id"/>
+                    <filter string="Pendientes" name="draft" domain="[('state', '=', 'draft')]"/>
+                    <filter string="Facturadas" name="billed" domain="[('state', '=', 'billed')]"/>
+                    <filter string="Pagadas" name="paid" domain="[('state', '=', 'paid')]"/>
+                    <group expand="0" string="Agrupar por">
+                        <filter string="Vendedor" name="group_by_salesperson" context="{'group_by': 'salesperson_id'}"/>
+                        <filter string="Estado" name="group_by_state" context="{'group_by': 'state'}"/>
+                        <filter string="Fecha de pago" name="group_by_payment_date" context="{'group_by': 'payment_date'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="action_sng_commission_payment_line" model="ir.actions.act_window">
+            <field name="name">Líneas de Comisión por Pago</field>
+            <field name="res_model">sng.commission.payment.line</field>
+            <field name="view_mode">list,form,pivot</field>
+            <field name="context">{'search_default_group_by_salesperson': 1}</field>
+        </record>
+
+        <menuitem
+            id="menu_sng_commission_payment_line"
+            name="Líneas de comisión por pago"
+            parent="sales_commission_omax.menu_sale_commission_root"
+            action="action_sng_commission_payment_line"
+            sequence="30"/>
+    </data>
+</odoo>

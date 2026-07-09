@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_sng_commercial_plan_line_search" model="ir.ui.view">
+        <field name="name">sng.commercial.plan.line.search</field>
+        <field name="model">sng.commercial.plan.line</field>
+        <field name="arch" type="xml">
+            <search string="Lineas Plan Comercial">
+                <field name="plan_id"/>
+                <field name="partner_id"/>
+                <field name="assigned_salesperson_id"/>
+                <field name="sales_segment"/>
+                <field name="dpp_segment"/>
+                <field name="final_segment_label"/>
+                <field name="company_id"/>
+                <filter name="segment_a" string="Venta A" domain="[('sales_segment', '=', 'a')]"/>
+                <filter name="segment_b" string="Venta B" domain="[('sales_segment', '=', 'b')]"/>
+                <filter name="segment_c" string="Venta C" domain="[('sales_segment', '=', 'c')]"/>
+                <filter name="dpp_a" string="DPP A" domain="[('dpp_segment', '=', 'a')]"/>
+                <filter name="dpp_b" string="DPP B" domain="[('dpp_segment', '=', 'b')]"/>
+                <filter name="dpp_c" string="DPP C" domain="[('dpp_segment', '=', 'c')]"/>
+                <filter name="sin_dpp" string="Sin DPP" domain="[('dpp_segment', '=', 'no_dpp')]"/>
+                <group expand="0" string="Agrupar por">
+                    <filter name="group_plan" string="Plan" context="{'group_by': 'plan_id'}"/>
+                    <filter name="group_salesperson" string="Vendedor" context="{'group_by': 'assigned_salesperson_id'}"/>
+                    <filter name="group_sales_segment" string="Segmento Venta" context="{'group_by': 'sales_segment'}"/>
+                    <filter name="group_dpp_segment" string="Segmento DPP" context="{'group_by': 'dpp_segment'}"/>
+                    <filter name="group_final_segment" string="Segmento Final" context="{'group_by': 'final_segment_label'}"/>
+                    <filter name="group_company" string="Compania" context="{'group_by': 'company_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_sng_commercial_plan_line_tree" model="ir.ui.view">
+        <field name="name">sng.commercial.plan.line.tree</field>
+        <field name="model">sng.commercial.plan.line</field>
+        <field name="arch" type="xml">
+            <list string="Lineas Plan Comercial">
+                <field name="plan_id"/>
+                <field name="segment_order"/>
+                <field name="customer_code"/>
+                <field name="partner_id"/>
+                <field name="commercial_name"/>
+                <field name="assigned_salesperson_id"/>
+                <field name="company_id" optional="hide"/>
+                <field name="base_sales_amount" sum="Venta Base"/>
+                <field name="participation_percent" widget="percentage"/>
+                <field name="cumulative_percent" widget="percentage"/>
+                <field name="sales_segment"/>
+                <field name="dpp_value"/>
+                <field name="dpp_segment"/>
+                <field name="final_segment_label"/>
+                <field name="target_amount" sum="Meta"/>
+                <field name="monthly_target_amount" sum="Meta Mensual" optional="hide"/>
+                <field name="budget_amount" sum="Presupuesto" optional="hide"/>
+                <field name="increase_amount" sum="Incremento"/>
+                <field name="current_sales_amount" sum="Venta Actual"/>
+                <field name="average_monthly_sales" sum="Promedio Mensual" optional="hide"/>
+                <field name="monthly_gap_amount" sum="Crecimiento" optional="hide"/>
+                <field name="projected_sales_amount" sum="Proyeccion" optional="hide"/>
+                <field name="compliance_percent" widget="percentage"/>
+                <field name="achievement_gap_percent" widget="percentage" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_sng_commercial_plan_line_form" model="ir.ui.view">
+        <field name="name">sng.commercial.plan.line.form</field>
+        <field name="model">sng.commercial.plan.line</field>
+        <field name="arch" type="xml">
+            <form string="Linea Plan Comercial">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="plan_id" readonly="1"/>
+                            <field name="partner_id" readonly="1"/>
+                            <field name="customer_code" readonly="1"/>
+                            <field name="commercial_name" readonly="1"/>
+                            <field name="assigned_salesperson_id" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="sales_segment" readonly="1"/>
+                            <field name="dpp_value" readonly="1"/>
+                            <field name="dpp_segment" readonly="1"/>
+                            <field name="final_segment_label" readonly="1"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group>
+                            <field name="base_sales_amount" readonly="1"/>
+                            <field name="target_amount" readonly="1"/>
+                            <field name="monthly_target_amount" readonly="1"/>
+                            <field name="budget_amount"/>
+                            <field name="increase_amount" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="current_sales_amount" readonly="1"/>
+                            <field name="average_monthly_sales" readonly="1"/>
+                            <field name="monthly_gap_amount" readonly="1"/>
+                            <field name="projected_sales_amount" readonly="1"/>
+                            <field name="compliance_percent" readonly="1" widget="percentage"/>
+                            <field name="achievement_gap_percent" readonly="1" widget="percentage"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="notes"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_sng_commercial_plan_line_pivot" model="ir.ui.view">
+        <field name="name">sng.commercial.plan.line.pivot</field>
+        <field name="model">sng.commercial.plan.line</field>
+        <field name="arch" type="xml">
+            <pivot string="Analisis Plan Comercial">
+                <field name="assigned_salesperson_id" type="row"/>
+                <field name="sales_segment" type="col"/>
+                <field name="base_sales_amount" type="measure"/>
+                <field name="target_amount" type="measure"/>
+                <field name="budget_amount" type="measure"/>
+                <field name="current_sales_amount" type="measure"/>
+                <field name="increase_amount" type="measure"/>
+                <field name="monthly_gap_amount" type="measure"/>
+                <field name="projected_sales_amount" type="measure"/>
+                <field name="compliance_percent" type="measure" widget="percentage"/>
+                <field name="achievement_gap_percent" type="measure" widget="percentage"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_sng_commercial_plan_line_graph" model="ir.ui.view">
+        <field name="name">sng.commercial.plan.line.graph</field>
+        <field name="model">sng.commercial.plan.line</field>
+        <field name="arch" type="xml">
+            <graph string="Analisis Grafico Plan Comercial" type="bar">
+                <field name="sales_segment"/>
+                <field name="base_sales_amount" type="measure"/>
+                <field name="target_amount" type="measure"/>
+                <field name="budget_amount" type="measure"/>
+                <field name="current_sales_amount" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="action_sng_commercial_plan_line" model="ir.actions.act_window">
+        <field name="name">Analisis de Lineas</field>
+        <field name="res_model">sng.commercial.plan.line</field>
+        <field name="view_mode">list,pivot,graph,form</field>
+        <field name="search_view_id" ref="view_sng_commercial_plan_line_search"/>
+        <field name="context">{}</field>
+    </record>
+
+    <menuitem id="menu_sng_commercial_plan_reports"
+              name="Reportes"
+              parent="menu_sng_plan_comercial_root"
+              sequence="20"
+              groups="sng_plan_comercial_clientes.group_sng_plan_comercial_user"/>
+
+    <menuitem id="menu_sng_commercial_plan_line"
+              name="Analisis de Lineas"
+              parent="menu_sng_commercial_plan_reports"
+              action="action_sng_commercial_plan_line"
+              sequence="10"
+              groups="sng_plan_comercial_clientes.group_sng_plan_comercial_user"/>
+</odoo>

@@ -28,16 +28,20 @@ class AccountPayment(models.Model):
         'reconciled_invoice_ids.salesperson_id',
         'move_id.line_ids.matched_debit_ids',
         'move_id.line_ids.matched_credit_ids',
+        'company_id',
     )
     def _compute_salesperson_id(self):
         for payment in self:
             invoices = payment.reconciled_invoice_ids or payment.invoice_ids
             salespersons = invoices.mapped('salesperson_id').filtered(lambda p: p.is_salesperson).sorted(key=lambda p: p.id)
+            assigned = False
+            if payment.partner_id and payment.company_id:
+                assigned = payment.partner_id.with_company(payment.company_id).assigned_salesperson_id
 
             if len(salespersons) == 1:
                 payment.salesperson_id = salespersons
             elif len(salespersons) > 1:
-                payment.salesperson_id = payment.partner_id.assigned_salesperson_id or salespersons[0]
+                payment.salesperson_id = assigned or salespersons[0]
             else:
-                payment.salesperson_id = payment.partner_id.assigned_salesperson_id
+                payment.salesperson_id = assigned
 

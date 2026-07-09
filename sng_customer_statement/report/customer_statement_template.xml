@@ -44,6 +44,7 @@
                                     <th>RUC/NIT</th>
                                     <th class="text-right">Total Facturado</th>
                                     <th class="text-right">Total Pagado</th>
+                                    <th class="text-right">Saldo Inicial</th>
                                     <th class="text-right">Saldo Pendiente</th>
                                     <th class="text-right">Pendiente x Aplicar</th>
                                     <th class="text-right">Venc. 0-30</th>
@@ -64,6 +65,10 @@
                                         </td>
                                         <td class="text-right" style="color:#1F618D;">
                                             <t t-esc="fmt_amount(cust.get('total_applied', 0))"/>
+                                        </td>
+                                        <td class="text-right"
+                                            t-attf-style="color: #{cust.get('opening_balance',0) > 0 and 'C0392B' or '000000'};">
+                                            <t t-esc="fmt_amount(cust.get('opening_balance', 0))"/>
                                         </td>
                                         <td class="text-right"
                                             t-attf-style="color: #{cust.get('total_residual',0) > 0 and 'C0392B' or '000000'}; font-weight:bold;">
@@ -98,6 +103,9 @@
                                     </td>
                                     <td class="text-right">
                                         <t t-esc="fmt_amount(data.get('grand_totals', {}).get('total_applied', 0))"/>
+                                    </td>
+                                    <td class="text-right">
+                                        <t t-esc="fmt_amount(data.get('grand_totals', {}).get('total_opening_balance', 0))"/>
                                     </td>
                                     <td class="text-right">
                                         <t t-esc="fmt_amount(data.get('grand_totals', {}).get('total_residual', 0))"/>
@@ -164,7 +172,7 @@
                             <t t-set="invoice_rows" t-value="[inv for inv in cust.get('invoices', []) if inv.get('type') == 'invoice']"/>
                             <t t-set="subtotal_invoiced" t-value="sum((inv.get('amount_total') or 0.0) for inv in invoice_rows)"/>
                             <t t-set="subtotal_applied" t-value="sum((inv.get('amount_applied') or 0.0) for inv in invoice_rows)"/>
-                            <t t-set="subtotal_residual" t-value="sum((inv.get('amount_residual') or 0.0) for inv in invoice_rows)"/>
+                            <t t-set="subtotal_residual" t-value="(cust.get('opening_balance') or 0.0) + sum((inv.get('amount_residual') or 0.0) for inv in invoice_rows)"/>
                             <table class="table table-sm table-bordered o_report_block mt-1"
                                    style="font-size:8.5pt;">
                                 <thead style="background-color:#4472C4; color:white;">
@@ -182,6 +190,26 @@
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    <t t-if="cust.get('opening_line')">
+                                        <tr>
+                                            <td t-esc="fmt_date(cust.get('opening_line', {}).get('invoice_date'))"/>
+                                            <td>Saldo inicial</td>
+                                            <td>
+                                                <strong t-esc="cust.get('opening_line', {}).get('document_name', '')"/>
+                                            </td>
+                                            <td></td>
+                                            <td t-esc="cust.get('opening_line', {}).get('reference', '')"/>
+                                            <td t-esc="cust.get('opening_line', {}).get('currency_name', '')"/>
+                                            <td class="text-right" t-esc="fmt_amount(0)"/>
+                                            <td class="text-right" style="color:#1F618D;">
+                                                <t t-esc="fmt_amount(0)"/>
+                                            </td>
+                                            <td class="text-right" style="font-weight:bold; color:#C0392B;">
+                                                <t t-esc="fmt_amount(cust.get('opening_balance', 0))"/>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                    </t>
                                     <t t-foreach="invoice_rows" t-as="inv">
                                         <!-- Padre: factura -->
                                         <tr>
@@ -330,6 +358,12 @@
                                     <td><strong>Total Pagado/Aplicado:</strong></td>
                                     <td class="text-right" style="color:#1F618D;">
                                         <t t-esc="fmt_amount(data.get('grand_totals', {}).get('total_applied', 0))"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Saldo Inicial:</strong></td>
+                                    <td class="text-right" style="color:#C0392B;">
+                                        <t t-esc="fmt_amount(data.get('grand_totals', {}).get('total_opening_balance', 0))"/>
                                     </td>
                                 </tr>
                                 <tr>

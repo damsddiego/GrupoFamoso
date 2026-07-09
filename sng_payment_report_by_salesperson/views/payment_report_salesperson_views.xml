@@ -21,7 +21,10 @@
                 <field name="invoice_name" string="Factura" optional="show"/>
                 <field name="invoice_date" string="Fecha Factura" optional="show"/>
                 <field name="invoice_amount_untaxed" string="Monto sin Impuestos" sum="Total" optional="show"/>
+                <field name="invoice_untaxed_pending" string="Pendiente sin Impuestos" optional="show"/>
+                <field name="invoice_untaxed_balance" string="Saldo sin Impuestos" optional="show"/>
                 <field name="days_to_pay" string="Días para Pago" avg="Promedio" optional="show"/>
+                <field name="company_id" optional="show" groups="base.group_multi_company"/>
                 <field name="currency_id" column_invisible="1"/>
             </list>
         </field>
@@ -66,6 +69,7 @@
                 <field name="partner_name" string="Cliente"/>
                 <field name="invoice_name" string="Factura"/>
                 <field name="payment_reference" string="Referencia Pago"/>
+                <field name="company_id" string="Compañía" groups="base.group_multi_company"/>
 
                 <!-- Filtros predefinidos -->
                 <filter string="Este Mes" name="this_month"
@@ -74,7 +78,7 @@
 
                 <filter string="Mes Anterior" name="last_month"
                         domain="[('payment_date', '&gt;=', (context_today() - relativedelta(months=1, day=1)).strftime('%Y-%m-%d')),
-                                 ('payment_date', '&lt;=', (context_today() - relativedelta(day=1)).strftime('%Y-%m-%d'))]"/>
+                                 ('payment_date', '&lt;=', (context_today() - relativedelta(day=1, days=1)).strftime('%Y-%m-%d'))]"/>
 
                 <filter string="Este Año" name="this_year"
                         domain="[('payment_date', '&gt;=', (context_today() - relativedelta(month=1, day=1)).strftime('%Y-%m-%d')),

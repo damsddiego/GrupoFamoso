@@ -13,5 +13,40 @@
                 </group>
             </field>
         </record>
+
+        <record id="add_assigned_salesperson_partner_tree" model="ir.ui.view">
+            <field name="name">res.partner.tree.inherit.salesperson</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_tree"/>
+            <field name="arch" type="xml">
+                <field name="complete_name" position="after">
+                    <field name="assigned_salesperson_id"
+                           string="Vendedor (Contacto)"
+                           optional="show"/>
+                </field>
+            </field>
+        </record>
+
+        <record id="add_assigned_salesperson_partner_search" model="ir.ui.view">
+            <field name="name">res.partner.search.inherit.salesperson</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_res_partner_filter"/>
+            <field name="arch" type="xml">
+                <field name="name" position="before">
+                    <field name="assigned_salesperson_id"
+                           string="Vendedor (Contacto)"
+                           filter_domain="[('assigned_salesperson_id.name', 'ilike', self)]"/>
+                </field>
+                <filter name="customer" position="after">
+                    <separator/>
+                    <filter string="Con vendedor"
+                            name="with_assigned_salesperson"
+                            domain="[('assigned_salesperson_id', '!=', False)]"/>
+                    <filter string="Sin vendedor"
+                            name="without_assigned_salesperson"
+                            domain="[('assigned_salesperson_id', '=', False)]"/>
+                </filter>
+            </field>
+        </record>
     </data>
 </odoo>

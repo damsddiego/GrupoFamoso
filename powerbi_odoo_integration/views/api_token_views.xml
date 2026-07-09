@@ -1,0 +1,181 @@
+<odoo>
+    <record id="view_powerbi_api_token_tree" model="ir.ui.view">
+        <field name="name">powerbi.api.token.tree</field>
+        <field name="model">powerbi.api.token</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="user_id"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+
+   <record id="view_powerbi_api_token_form" model="ir.ui.view">
+    <field name="name">powerbi.api.token.form</field>
+    <field name="model">powerbi.api.token</field>
+    <field name="arch" type="xml">
+        <form string="API Access Token">
+            <sheet>
+                <header>
+                <button name="action_generate_token"
+                                string="Generate Token"
+                                type="object"
+                                class="btn-success"
+                                icon="fa-refresh"
+                                modifiers="{'visible': 'not id'}"/>
+                </header>
+                <h1>
+                    <field name="user_id"/>
+                </h1>
+                <group>
+                    <group>
+                        <field name="name"
+                               readonly="1"
+                               placeholder="No token generated yet"/>
+                        <!-- "Generate" button, only visible on NEW records -->
+
+                    </group>
+                    <group>
+                        <field name="active"/>
+                    </group>
+                </group>
+            </sheet>
+        </form>
+    </field>
+</record>
+
+
+
+<!--    <record id="view_powerbi_api_token_form" model="ir.ui.view">-->
+<!--        <field name="name">powerbi.api.token.form</field>-->
+<!--        <field name="model">powerbi.api.token</field>-->
+<!--        <field name="arch" type="xml">-->
+<!--            <form>-->
+<!--                <field name="name" readonly="1"/>-->
+<!--                <field name="user_id"/>-->
+<!--                <field name="active"/>-->
+<!--                <button name="action_generate_token"-->
+<!--                        string="Generate Token"-->
+<!--                        type="object"-->
+<!--                        class="btn-primary"-->
+<!--                        attrs="{'invisible': [('id', '=', False)]}"/>-->
+<!--            </form>-->
+<!--        </field>-->
+<!--    </record>-->
+
+    <record id="action_powerbi_api_token" model="ir.actions.act_window">
+        <field name="name">API Tokens</field>
+        <field name="res_model">powerbi.api.token</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+
+      <record id="view_powerbi_model_tree" model="ir.ui.view">
+        <field name="name">powerbi.model.tree</field>
+        <field name="model">powerbi.model</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="model_id"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_powerbi_model_form" model="ir.ui.view">
+        <field name="name">powerbi.model.form</field>
+        <field name="model">powerbi.model</field>
+        <field name="arch" type="xml">
+            <form string="Power BI Table Setup">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Display Name (for Power BI)"/>
+                        </h1>
+                        <div class="d-flex align-items-center mt-2">
+                            <field name="active" class="me-2"/>
+                            <label for="active">Active</label>
+                        </div>
+                    </div>
+
+                    <group>
+                        <group>
+                            <field name="model_id" required="1"
+                                   invisible="not active"
+                                   placeholder="Choose Odoo Model..."/>
+                        </group>
+                    </group>
+
+                    <group string="Fields to Expose in Power BI" colspan="2">
+                        <field name="field_ids" widget="many2many_tags"
+                               placeholder="Select fields to expose in Power BI"
+                               options="{'no_create': True, 'no_open': True}"/>
+                    </group>
+
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+
+
+     <record id="action_powerbi_models" model="ir.actions.act_window">
+        <field name="name">Power BI Models</field>
+        <field name="res_model">powerbi.model</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+
+
+    <record id="view_powerbi_api_audit_form" model="ir.ui.view">
+    <field name="name">powerbi.api.audit.form</field>
+    <field name="model">powerbi.api.audit</field>
+    <field name="arch" type="xml">
+        <form string="API Audit Trail">
+            <sheet>
+                <group>
+                    <field name="called_at" readonly="1"/>
+                    <field name="name" readonly="1"/>
+                    <field name="user_id" readonly="1"/>
+                    <field name="token_id" readonly="1"/>
+                    <field name="response_status" readonly="1"/>
+                    <field name="request_info" readonly="1" widget="text"/>
+                </group>
+            </sheet>
+        </form>
+    </field>
+</record>
+
+
+    <record id="view_powerbi_api_audit_tree" model="ir.ui.view">
+    <field name="name">powerbi.api.audit.tree</field>
+    <field name="model">powerbi.api.audit</field>
+    <field name="arch" type="xml">
+        <list string="API Audit Trail">
+            <field name="called_at"/>
+            <field name="name"/>
+            <field name="user_id"/>
+            <field name="token_id"/>
+            <field name="response_status"/>
+        </list>
+    </field>
+</record>
+
+       <record id="action_powerbi_api_audit" model="ir.actions.act_window">
+        <field name="name">API Audit Trail</field>
+        <field name="res_model">powerbi.api.audit</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+
+
+
+        <menuitem id="menu_powerbi_api_root" name="Power BI" web_icon="powerbi_odoo_integration,static/description/icon.png"/>
+    <menuitem id="menu_powerbi_api_token" name="API Tokens" parent="menu_powerbi_api_root" action="action_powerbi_api_token" sequence="10"/>
+    <menuitem id="menu_powerbi_models" name="Models" parent="menu_powerbi_api_root" action="action_powerbi_models" sequence="20"/>
+     <menuitem id="menu_powerbi_api_audit_root" parent="menu_powerbi_api_root" name="Audit Trail" action="action_powerbi_api_audit" sequence="30"/>
+
+
+</odoo>

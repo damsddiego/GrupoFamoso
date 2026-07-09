@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="consign_cxc_report_xlsx_action" model="ir.actions.report">
+        <field name="name">Consignaciones y CxC</field>
+        <field name="model">consign.cxc.wizard</field>
+        <field name="report_type">xlsx</field>
+       <field name="report_name">sale_stock_sng.consign_cxc_xlsx</field>
+        <field name="print_report_name">
+            'Consignaciones_y_CxC_%s' % (object.date_to or '')
+        </field>
+    </record>
+
+    <record id="current_stock_location_report_xlsx_action" model="ir.actions.report">
+        <field name="name">Existencias Actuales por Ubicación</field>
+        <field name="model">current.stock.location.wizard</field>
+        <field name="report_type">xlsx</field>
+        <field name="report_name">sale_stock_sng.current_stock_location_xlsx</field>
+        <field name="print_report_name">
+            'Existencias_Actuales_por_Ubicacion'
+        </field>
+    </record>
+
+</odoo>

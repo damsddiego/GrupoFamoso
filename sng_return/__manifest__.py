@@ -9,6 +9,7 @@
         "base",
         "sale_management",
         "account",
+        "cr_electronic_invoice",
     ],
     "data": [
         "security/security.xml",

@@ -68,5 +68,5 @@ Nota de Descuento: [Promo                    ]
 - Si el descuento se elimina o se pone en 0%, los campos se limpian automáticamente
 - El código de descuento '07' (Descuento Comercial) se crea automáticamente al instalar el módulo
 - Puedes usar **cualquier código de descuento** existente en tu sistema mediante la configuración
-- La configuración es **global** para toda la compañía
+- La configuración es **por compañía**
 - Puedes activar/desactivar la funcionalidad sin desinstalar el módulo

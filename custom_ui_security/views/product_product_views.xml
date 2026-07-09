@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- ============================================ -->
+        <!-- HERENCIA: product.product - FORMULARIO       -->
+        <!-- ============================================ -->
+
+        <record id="product_product_normal_form_view_hide_cost" model="ir.ui.view">
+            <field name="name">product.product.form.hide.cost</field>
+            <field name="model">product.product</field>
+            <field name="inherit_id" ref="product.product_normal_form_view"/>
+            <field name="arch" type="xml">
+
+                <!-- Ocultar campo Costo en variantes -->
+                <xpath expr="//field[@name='standard_price']" position="attributes">
+                    <attribute name="groups">custom_ui_security.group_view_product_cost</attribute>
+                </xpath>
+
+            </field>
+        </record>
+
+        <!-- ============================================ -->
+        <!-- HERENCIA: product.product - LISTA/TREE       -->
+        <!-- ============================================ -->
+
+        <record id="product_product_tree_view_hide_cost" model="ir.ui.view">
+            <field name="name">product.product.tree.hide.cost</field>
+            <field name="model">product.product</field>
+            <field name="inherit_id" ref="product.product_product_tree_view"/>
+            <field name="arch" type="xml">
+
+                <!-- Ocultar columna de costo en lista de variantes -->
+                <xpath expr="//field[@name='standard_price']" position="attributes">
+                    <attribute name="groups">custom_ui_security.group_view_product_cost</attribute>
+                </xpath>
+
+            </field>
+        </record>
+
+    </data>
+</odoo>

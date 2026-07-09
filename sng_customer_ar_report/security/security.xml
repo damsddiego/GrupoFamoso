@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Restrict customer.ar.report records to the user's allowed companies -->
+    <record id="rule_customer_ar_report_company" model="ir.rule">
+        <field name="name">CxC por Cliente: Multi-Compañía</field>
+        <field name="model_id" ref="model_customer_ar_report"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">
+            ['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]
+        </field>
+    </record>
+
+</odoo>

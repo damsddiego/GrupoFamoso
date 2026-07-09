@@ -3,7 +3,7 @@
 {
     'name':'Sales Commission',
     'author': 'OMAX Informatics',
-    'version': '1.1',
+    'version': '1.2',
     'support':'omaxinformatics@gmail.com',
     'website': 'https://www.omaxinformatics.com',
     'category':'Sales,Accounting',

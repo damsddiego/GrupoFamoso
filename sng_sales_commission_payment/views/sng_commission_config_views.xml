@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_sng_commission_config_tree" model="ir.ui.view">
+            <field name="name">sng.commission.config.tree</field>
+            <field name="model">sng.commission.config</field>
+            <field name="arch" type="xml">
+                <list string="Configuración de Comisiones">
+                    <field name="salesperson_id"/>
+                    <field name="percentage"/>
+                    <field name="start_date"/>
+                    <field name="end_date"/>
+                    <field name="company_id" groups="base.group_multi_company"/>
+                    <field name="active"/>
+                </list>
+            </field>
+        </record>
+
+        <record id="view_sng_commission_config_form" model="ir.ui.view">
+            <field name="name">sng.commission.config.form</field>
+            <field name="model">sng.commission.config</field>
+            <field name="arch" type="xml">
+                <form string="Configuración de Comisión">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="salesperson_id"/>
+                                <field name="percentage"/>
+                                <field name="active"/>
+                            </group>
+                            <group>
+                                <field name="start_date"/>
+                                <field name="end_date"/>
+                                <field name="company_id" groups="base.group_multi_company"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_sng_commission_config" model="ir.actions.act_window">
+            <field name="name">Configuración de Comisiones</field>
+            <field name="res_model">sng.commission.config</field>
+            <field name="view_mode">list,form</field>
+        </record>
+
+        <menuitem
+            id="menu_sng_commission_config"
+            name="Configuración de comisiones"
+            parent="sales_commission_omax.menu_sale_commission_root"
+            action="action_sng_commission_config"
+            sequence="20"/>
+    </data>
+</odoo>

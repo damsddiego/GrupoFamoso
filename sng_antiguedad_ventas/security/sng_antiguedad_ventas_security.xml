@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- sng.antiguedad.ventas -->
+        <record id="access_sng_antiguedad_ventas_readonly" model="ir.model.access">
+            <field name="name">sng.antiguedad.ventas readonly</field>
+            <field name="model_id" search="[('model', '=', 'sng.antiguedad.ventas')]" model="ir.model"/>
+            <field name="group_id" ref="account.group_account_readonly"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="0"/>
+            <field name="perm_create" eval="0"/>
+            <field name="perm_unlink" eval="0"/>
+        </record>
+
+        <record id="access_sng_antiguedad_ventas_invoice" model="ir.model.access">
+            <field name="name">sng.antiguedad.ventas invoice</field>
+            <field name="model_id" search="[('model', '=', 'sng.antiguedad.ventas')]" model="ir.model"/>
+            <field name="group_id" ref="account.group_account_invoice"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="0"/>
+            <field name="perm_create" eval="0"/>
+            <field name="perm_unlink" eval="0"/>
+        </record>
+
+        <!-- El snapshot se construye por usuario vía SQL: cada quien solo ve sus propias filas -->
+        <record id="rule_sng_antiguedad_ventas_own_snapshot" model="ir.rule">
+            <field name="name">Antigüedad de Ventas: solo snapshot propio</field>
+            <field name="model_id" ref="model_sng_antiguedad_ventas"/>
+            <field name="domain_force">[('user_id', '=', user.id)]</field>
+            <field name="global" eval="True"/>
+        </record>
+
+        <!-- sng.antiguedad.ventas.wizard -->
+        <record id="access_sng_antiguedad_ventas_wizard_readonly" model="ir.model.access">
+            <field name="name">sng.antiguedad.ventas.wizard readonly</field>
+            <field name="model_id" search="[('model', '=', 'sng.antiguedad.ventas.wizard')]" model="ir.model"/>
+            <field name="group_id" ref="account.group_account_readonly"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="1"/>
+            <field name="perm_create" eval="1"/>
+            <field name="perm_unlink" eval="1"/>
+        </record>
+
+        <record id="access_sng_antiguedad_ventas_wizard_invoice" model="ir.model.access">
+            <field name="name">sng.antiguedad.ventas.wizard invoice</field>
+            <field name="model_id" search="[('model', '=', 'sng.antiguedad.ventas.wizard')]" model="ir.model"/>
+            <field name="group_id" ref="account.group_account_invoice"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="1"/>
+            <field name="perm_create" eval="1"/>
+            <field name="perm_unlink" eval="1"/>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Power BI Connector for Odoo</title>
+      <!-- Font Awesome CDN for Icons -->
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+      <!-- Bootstrap CSS -->
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+      <style>
+        /* General Styles */
+         body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f9fbff;
+         }
+      </style>
+   </head>
+   <body>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.min.js"></script>
+      <div class="main-body">
+
+       <section class="container">
+               <div class="position-relative pt-5 pb-5">
+                <div class="row position-relative justify-content-center">
+                  <h1 class="mb-2 col-12" style="font-weight:700; font-size:50px; line-height:60px; text-align:center; color:#171618">
+                    <span style="color:#be5fa5">Power BI Connector </span>for Odoo
+                  </h1>
+                  <p style="text-align:center; font-weight:400; font-size:16px; line-height:25px; color:#171618" class="mb-4 col-lg-10 col-12">
+                    Easily connect your Odoo data to Power BI and unlock advanced data visualization and reporting capabilities.<br>
+Our Power BI Connector module enables seamless integration between Odoo and Microsoft Power BI, helping businesses transform their raw data into actionable insights. With easy token-based access, selective field exposure, and full API auditing, this module ensures secure, customizable, and efficient reporting.
+                  </p>
+                </div>
+                <div class="position-relative row mx-auto justify-content-center">
+                  <div class="col-9">
+                    <div class="d-flex justify-content-center align-items-center flex-wrap gap-2">
+<div class="d-flex align-items-center" style="justify-content: center; width:30%;background-color:#65488c;border:2px solid #ffffff;border-radius:50px;padding:10px 20px;">
+                        <p style="color:#ffffff; font-size:1.6vw" class="mb-0">Community</p>
+                      </div>
+<div class="d-flex align-items-center" style="justify-content: center; width:30%;background-color:#65488c;border:2px solid #ffffff;border-radius:50px;padding:10px 20px;">
+                        <p style="color:#ffffff; font-size:1.6vw" class="mb-0">Enterprise</p>
+                      </div><div class="d-flex align-items-center" style="justify-content: center; width:30%;background-color:#65488c;border:2px solid #ffffff;border-radius:50px;padding:10px 20px;">
+                        <p style="color:#ffffff; font-size:1.6vw" class="mb-0">Odoo.sh</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+         </section>
+         <section class="container">
+         <!-- Features Highlight Section -->
+         <div class="container features-highlight text-center pt-5">
+            <div class="row my-3 py-2" style="justify-content:center">            
+               <h2 class="pt-5 mb-2 col-12" style="font-size:38px;font-weight:700;line-height: 40px;text-align:center;color:#171618">
+                  <span style="color:#be5fa5">Key Features </span>of Power BI Connector for Odoo
+               </h2>
+               <div class="col-md-6 col-sm-6 feature-item p-1">
+                  <div class="box d-flex" style="padding: 40px;border-radius: 15px;background-color: #c1e0ed36;">
+                     <img class="img img-responsive mx-4 my-4" alt="not found" width="55" height="55" src="./images/responsive.png">
+                     <div class="box-in" style="text-align: left;">
+                         <h5 style="color: #593987;font-size: 24px;letter-spacing: -.4px;">Direct Odoo to Power BI Integration </h5>
+                         <p style="margin: 0px;text-align: justify;">Export your Odoo data models directly into Power BI using built-in connector endpoints. Connect tables from sales, CRM, inventory, accounting, HR, and more – without manual CSV exports or third-party middleware.</p>
+                     </div>
+                  </div>
+               </div>
+               <div class="col-md-6 col-sm-6 feature-item p-1">
+                  <div class="box d-flex" style="padding: 40px;border-radius: 15px;background-color: #c1e0ed36;">
+                     <img class="img img-responsive mx-4 my-4" alt="not found" width="55" height="55" src="./images/technology.png">
+                     <div class="box-in" style="text-align: left;">
+                        <h5 style="color: #593987;font-size: 24px;letter-spacing: -.4px;">Secure REST API Connectivity</h5>
+                        <p style="margin: 0px;text-align: justify;">Our module uses Odoo's native security and authentication systems with token-based REST API architecture, ensuring safe and encrypted data transmission between Odoo and Power BI.</p><br>
+                     </div>                        
+                  </div>
+               </div>
+               <div class="col-md-6 col-sm-6 feature-item p-1">
+                  <div class="box d-flex" style="padding: 40px;border-radius: 15px;background-color: #c1e0ed36;">
+                     <img class="img img-responsive mx-4 my-4" alt="not found" width="55" height="55" src="./images/custom.png">
+                     <div class="box-in" style="text-align: left;">
+                        <h5 style="color: #593987;font-size: 24px;letter-spacing: -.4px;">Customizable Data Models</h5>
+                        <p style="margin: 0px;text-align: justify;">Choose the exact Odoo models (and fields) you want to analyze in Power BI. Whether it's revenue by region, inventory trends, or employee performance, you stay in control of your metrics.</p>
+                      </div>
+                 </div>
+               </div>
+               <div class="col-md-6 col-sm-6 feature-item p-1">
+                  <div class="box d-flex" style="padding: 40px;border-radius: 15px;background-color: #c1e0ed36;">
+                     <img class="img img-responsive mx-4 my-4" alt="not found" width="55" height="55" src="./images/schedule.png">
+                     <div class="box-in" style="text-align: left;">
+                        <h5 style="color: #593987;font-size: 24px;letter-spacing: -.4px;">No External Tools Required</h5>
+                        <p style="margin: 0px;text-align: justify;">Unlike other connectors, our app is built to work independently within Odoo and Power BI. No need for additional ETL tools, middleware, or server configurations.</p>
+                     </div>
+                  </div>
+               </div>
+               <div class="col-md-6 col-sm-6 feature-item p-1">
+                  <div class="box d-flex" style="padding: 40px;border-radius: 15px;background-color: #c1e0ed36;">
+                     <img class="img img-responsive mx-4 my-4" alt="not found" width="55" height="55" src="./images/consultant.png">
+                     <div class="box-in" style="text-align: left;">
+                        <h5 style="color: #593987;font-size: 24px;letter-spacing: -.4px;">Role-Based Access Control</h5>
+                        <p style="margin: 0px;text-align: justify;">Maintain strict control over what data is exposed to Power BI. Define access levels based on user roles or departments to prevent unauthorized exposure of sensitive business data.</p>
+                     </div>
+                  </div>
+               </div>               
+               <div class="col-md-6 col-sm-6 feature-item p-1">
+                  <div class="box d-flex" style="padding: 40px;border-radius: 15px;background-color: #c1e0ed36;">
+                     <img class="img img-responsive mx-4 my-4" alt="not found" width="55" height="55" src="./images/direction.png">
+                     <div class="box-in" style="text-align: left;">
+                        <h5 style="color: #593987;font-size: 24px;letter-spacing: -.4px;">Easy API Token Management</h5>
+                        <p style="margin: 0px;text-align: justify;">Generate, manage, and revoke API tokens for different users or services through the user-friendly Odoo backend.</p><br>
+                     </div>
+                  </div>
+               </div>
+                <div class="col-md-6 col-sm-6 feature-item p-1">
+                  <div class="box d-flex" style="padding: 40px;border-radius: 15px;background-color: #c1e0ed36;">
+                     <img class="img img-responsive mx-4 my-4" alt="not found" width="55" height="55" src="./images/user.png">
+                     <div class="box-in" style="text-align: left;">
+                        <h5 style="color: #593987;font-size: 24px;letter-spacing: -.4px;">Developer Friendly</h5>
+                        <p style="margin: 0px;text-align: justify;">Our module is fully extensible for developers. Need to add custom fields, or connect to custom models? It's easily done through standard Odoo development practices.</p>
+                      </div>
+                 </div>
+               </div>
+               <div class="col-md-6 col-sm-6 feature-item p-1">
+                  <div class="box d-flex" style="padding: 40px;border-radius: 15px;background-color: #c1e0ed36;">
+                     <img class="img img-responsive mx-4 my-4" alt="not found" width="55" height="55" src="./images/cloud-server.png">
+                     <div class="box-in" style="text-align: left;">
+                         <h5 style="color: #593987;font-size: 24px;letter-spacing: -.4px;">Multi-Company Support</h5>
+                         <p style="margin: 0px;text-align: justify;">Built to handle Odoo's multi-company environments. Fetch and analyze data specific to one or multiple companies based on your access rights.</p>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+         </section>         
+         <section class="container pt-5">
+            <div class="row pt-5 pb-5" style="background-image: linear-gradient(to right, rgb(191 228 255 / 34%), rgb(198 209 255 / 14%)); border-radius: 30px;">
+              <div class="row_box" style="width: 1000px;margin-left: auto;margin-right: auto;justify-content: center;">
+               <div class="row pt-5 pb-5">
+                  <h3 class="pb-3 mb-2 col-12" style="font-size:30px;font-weight:300;line-height: 40px;text-align:center;color:#674a83">
+                     --- HOW IT WORKS ---
+                  </h3>   
+                  <h2 class="mb-2 col-12" style="font-size:44px;font-weight:700;line-height: 40px;text-align:center;color:#171618">
+                    <span style="color:#be5fa5">Power BI Menu </span>Integration
+                  </h2>
+                  <p style="font-size:18px;text-align:center;color:#5c5f6e">
+                    A dedicated Power BI menu added to your Odoo interface for easy access and configuration.
+                  </p>
+                  <h3 class="mt-5 col-12" style="font-size:34px;font-weight:700;line-height: 30px;text-align:center;color:#171618">
+                    <span style="color:#be5fa5">API </span>Tokens:
+                  </h3>                  
+                  <h5 style="text-align:center;"></h5>
+                  <p style="font-size:18px;text-align:center;color:#5c5f6e">Generate secure API tokens per user for connecting Power BI to Odoo.<br>
+                     Control access with active/inactive token status<br>
+                  Token-based access ensures data protection and user-level control.</p>
+                  <img class="mt-3" src="token_form.png" alt="" style="padding: 0px;box-shadow: 0px 0px 10px 0px #9ec6ba75;"/>
+                  <img class="mt-5" src="token.png" alt="" style="padding: 0px;box-shadow: 0px 0px 10px 0px #9ec6ba75;"/>
+               </div>
+               <div class="row pt-5 pb-5">
+                  <h3 class="mb-2 col-12" style="font-size:34px;font-weight:700;line-height: 30px;text-align:center;color:#171618">
+                    <span style="color:#be5fa5">Power BI </span>Models
+                  </h3>
+                  <p style="font-size:18px;text-align:center;color:#5c5f6e;">Choose specific models (Odoo objects) to expose for Power BI reporting.<br>
+                  Flexibility to select only required models, avoiding unnecessary data load.</p>
+                  <img class="mt-3" src="models.png" alt="" style="padding: 0px;box-shadow: 0px 0px 10px 0px #9ec6ba75;"/>
+               </div>
+               <div class="row pt-5 pb-5">
+                  <h3 class="mb-2 col-12" style="font-size:34px;font-weight:700;line-height: 30px;text-align:center;color:#171618">
+                    <span style="color:#be5fa5">Field </span>Selection
+                  </h3>
+                  <p style="font-size:18px;text-align:center;color:#5c5f6e;"" class="mb-0">Select specific fields to be shown in Power BI from the chosen models.<br>
+                <p style="font-size:18px;text-align:center;color:#5c5f6e;">Customize the dataset based on your reporting requirements.</p>
+                  <img class="mt-3" src="models_form.png" alt="" style="padding: 0px;box-shadow: 0px 0px 10px 0px #9ec6ba75;"/>
+               </div>
+               <div class="row pt-5 pb-5">
+                  <h3 class="mb-2 col-12" style="font-size:34px;font-weight:700;line-height: 30px;text-align:center;color:#171618">
+                    <span style="color:#be5fa5">API </span>Audit Trail 
+                  </h3>
+                  <p style="font-size:18px;text-align:center;color:#5c5f6e;" class="mb-0">Monitor all API calls with detailed logs.<br>
+                  Logs include:</p>
+                  <div class="d-flex align-items-center gap-2" style="justify-content: center;font-size: 18px;color: #604471;">
+                     <li>API Endpoint</li><br>
+                     <li>Timestamp (Called at)</li><br>
+                     <li>User</li><br>
+                     <li>Associated API Token</li><br>
+                     <li>Call Status (Success/Failure)</li><br>
+                  </div>                 
+                  <img class="mt-5" src="audit_trail.png" alt="" style="padding: 0px;box-shadow: 0px 0px 10px 0px #9ec6ba75;"/>
+               </div>
+               </div>
+             </div>
+         </section>
+         <section class="container pt-5">
+            <div class="row pt-5 pb-5" style="background-image: linear-gradient(to right, rgb(191 228 255 / 34%), rgb(198 209 255 / 14%)); border-radius: 30px;">
+               <div class="row_box" style="width: 1000px;margin-left: auto;margin-right: auto;justify-content: center;">
+               <div class="row pt-5 pb-5">  
+                  <h2 class="mb-2 col-12" style="font-size:44px;font-weight:700;line-height: 40px;text-align:center;color:#171618">
+                    <span style="color:#be5fa5">Odoo – Power BI </span>Connector
+                  </h2>
+                  <p style="font-size:18px;text-align:center;color:#5c5f6e">
+                   Easily connect your Odoo data with Power BI for real-time reporting and dynamic visualizations.<br><br>
+                   Install the Power BI Integrator Module from Infintor & install Custom Connector
+                  </p>
+                  <h3 class="mt-3 col-12" style="font-size:34px;font-weight:700;line-height: 30px;text-align:center;color:#171618">
+                    <span style="color:#be5fa5;font-size: larger;">Power BI </span>Functional Flow:
+                  </h3>                  
+                  <h5 style="text-align:center;"></h5>
+                  <p style="font-size:18px;text-align:center;color:#5c5f6e"><span style="color: #2c3148;font-size: larger;"">Navigation:</span> Power BI – Get Data<br><br>
+                     <span style="color: #2c3148;font-size: larger;">Open Power BI Desktop</span><br>
+                     Go to Home > Get Data > Odoo<br><br>
+                     <span style="color: #2c3148;font-size: larger;">Odoo Enhancement Connector Wizard:</span><br>
+                     In Odoo, click on  Odoo Enhanced (custom)  and enter the details<br><br>
+                     <span style="color: #2c3148;font-size: larger;">Enter the following details:</span><br>
+                     IP Address<br>
+                     API Token<br>
+                     Click the OK button to activate the connection<br>
+                      Note: Connector Delivery: Once the module is purchased, we will send you the Power BI Connector file compatible with Windows systems.
+                  </p>
+                  <img class="mt-3" src="connection.png" alt="" style="padding: 0px;box-shadow: 0px 0px 10px 0px #9ec6ba75;"/>
+               </div>
+               <div class="row pt-5 pb-5">
+                  <h3 class="mb-2 col-12" style="font-size:34px;font-weight:700;line-height: 30px;text-align:center;color:#171618">
+                    <span style="color:#be5fa5">Model Navigation </span>in Power BI
+                  </h3>
+                  <p style="font-size:18px;text-align:center;color:#5c5f6e;">In Power BI, under the Navigator, you will see all models selected in Odoo<br>
+Choose your desired model</p>
+                  <img class="mt-3" src="Navigation.png" alt="" style="padding: 0px;box-shadow: 0px 0px 10px 0px #9ec6ba75;"/>
+                   <p style="font-size:18px;text-align:center;color:#5c5f6e; padding-top:40px;">Power BI will show a preview of the table, including the selected Odoo fields.</p>                 
+               </div>
+               <hr>
+               <div class="row pt-5 pb-3">
+                  <h3 class="mt-3 mb-3 col-12" style="font-size:34px;font-weight:700;line-height: 30px;text-align:center;color:#171618">
+                    <span style="color:#be5fa5">Sample Graphs </span> & Visuals
+                  </h3>
+                  <p style="font-size:18px;text-align:center;color:#5c5f6e;"" class="mb-0">Below is a example screenshot to showcase how your data can be visualized once connected and configured.</p>
+                  <img class="mt-3" src="connector-4.png" alt="" style="padding: 0px;box-shadow: 0px 0px 10px 0px #9ec6ba75;"/>
+               </div>
+               <div class="row pt-3 pb-3">
+                  <img class="mt-3" src="connector-5.png" alt="" style="padding: 0px;box-shadow: 0px 0px 10px 0px #9ec6ba75;"/>
+               </div>
+               <div class="row pt-3 pb-3">
+                  <img class="mt-3" src="connector-6.png" alt="" style="padding: 0px;box-shadow: 0px 0px 10px 0px #9ec6ba75;"/>
+               </div>
+               <div class="row pt-3 pb-5">
+                  <img class="mt-3" src="connector-7.png" alt="" style="padding: 0px;box-shadow: 0px 0px 10px 0px #9ec6ba75;"/>
+               </div>
+               </div>
+             </div>
+         </section>         
+         <div class="container services-section text-center py-5 my-5">
+            <h3>Our Services</h3>
+            <div class="services-container row my-3 py-2" style="justify-content: center">
+               <div class="row">
+               <div class="col-md-3 col-sm-6 feature-item p-1">
+                  <div class="box" style="padding:15px; background-color:#f9fcfd;">
+                     <img class="img img-responsive mx-4 my-4" alt="not found" width="55" height="55" src="./images/custom.png">
+                     <h4>Odoo Implementation</h4>
+                     <p>End-to-end Odoo implementation to meet your business needs.</p>
+                  </div>
+               </div>
+               <div class="col-md-3 col-sm-6 feature-item p-1">
+                  <div class="box" style="padding:15px; background-color:#f9fcfd;">
+                     <img class="img img-responsive mx-4 my-4" alt="not found" width="55" height="55" src="./images/implementation.png">
+                     <h4>Odoo Customization</h4>
+                     <p>Custom solutions tailored to your unique requirements.</p>
+                  </div>
+               </div>
+               <div class="col-md-3 col-sm-6 feature-item p-1">
+                  <div class="box" style="padding:15px; background-color:#f9fcfd;">
+                     <img class="img img-responsive mx-4 my-4" alt="not found" width="55" height="55" src="./images/customer-service.png">
+                     <h4>Odoo Support & Training</h4>
+                     <p>Comprehensive support and training to enhance your Odoo usage.</p>
+                  </div>
+               </div>
+               <div class="col-md-3 col-sm-6 feature-item p-1">
+                  <div class="box" style="padding:15px; background-color:#f9fcfd;">
+                     <img class="img img-responsive mx-4 my-4" alt="not found" width="55" height="55" src="./images/hired.png">
+                     <h4>Hire an Odoo Developer</h4>
+                     <p>Get access to skilled Odoo developers for your project needs.</p>
+                  </div>
+               </div>
+               <div class="col-md-3 col-sm-6 feature-item p-1">
+                  <div class="box" style="padding:15px; background-color:#f9fcfd;">
+                     <img class="img img-responsive mx-4 my-4" alt="not found" width="55" height="55" src="./images/technology.png">
+                     <h4>Odoo Integration</h4>
+                     <p>Integrate Odoo seamlessly with third-party apps and systems.</p>
+                  </div>
+               </div>
+               <div class="col-md-3 col-sm-6 feature-item p-1">
+                  <div class="box" style="padding:15px; background-color:#f9fcfd;">
+                     <img class="img img-responsive mx-4 my-4" alt="not found" width="55" height="55" src="./images/cloud-server.png">
+                     <h4>Odoo Hosting & Cloud</h4>
+                     <p>Secure and scalable Odoo hosting solutions.</p>
+                  </div>
+               </div>
+               <div class="col-md-3 col-sm-6 feature-item p-1">
+                  <div class="box" style="padding:15px; background-color:#f9fcfd;">
+                     <img class="img img-responsive mx-4 my-4" alt="not found" width="55" height="55" src="./images/schedule.png">
+                     <h4>Odoo Maintenance</h4>
+                     <p>Ensure smooth and uninterrupted operations.</p>
+                  </div>
+               </div>
+               <div class="col-md-3 col-sm-6 feature-item p-1">
+                  <div class="box" style="padding:15px; background-color:#f9fcfd;">
+                     <img class="img img-responsive mx-4 my-4" alt="not found" width="55" height="55" src="./images/consultant.png">
+                     <h4>Odoo Consulting</h4>
+                     <p>Expert consulting to help you leverage Odoo for maximum efficiency.</p>
+                  </div>
+               </div>
+            </div>
+         </div>
+         <div class="support-section support-section text-center pb-5">
+            <h3>Support &amp; Demo</h3>
+            <div class="support-content" style="display: inline-block; text-align: center;">
+               <div class="support-item" style="padding:10px 30px; margin:2px; background-color: #f9fcfd; width:500px;">
+                  <i class="fas fa-shield-alt"></i>
+                  <span>90 Days Free Support Available</span>
+               </div>
+               <div class="support-item" style="padding: 10px 30px; margin: 2px; background-color: #f9fcfd; width: 500px;">
+                  <i class="fas fa-ticket-alt"></i>
+                  <span>Create a support ticket <a href="https://people.infintor.com/contactus" target="_blank">people.infintor.com/contactus</a> </span>
+               </div>
+               <div class="support-item" style="padding: 10px 30px; margin: 2px; background-color: #f9fcfd; width: 500px;">
+                  <i class="fas fa-envelope"></i>
+                  <span>Send an email to <a href="mailto:odoo@infintor.com">odoo@infintor.com</a></span>
+               </div>
+               <div class="support-item" style="padding: 10px 30px; margin: 2px; background-color: #f9fcfd; width: 500px;">
+                  <i class="fas fa-globe"></i>
+                  <span>Visit <a href="https://www.infintor.com" target="_blank">www.infintor.com</a></span>
+               </div>
+            </div>
+         </div>
+      </div>
+   </body>
+</html>

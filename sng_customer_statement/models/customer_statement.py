@@ -21,6 +21,7 @@ from odoo import api, fields, models
 ENTRY_TYPE_SELECTION = [
     ('invoice',          'Factura'),
     ('credit_note',      'Nota de Crédito'),
+    ('opening_balance',  'Saldo Inicial'),
     ('payment_applied',  'Pago Aplicado'),
     ('payment_draft',    'Pago en Borrador'),   # Informativo — no afecta saldo
 ]
@@ -119,6 +120,10 @@ class CustomerStatementReport(models.Model):
         string='Saldo Pendiente',
         compute='_compute_totals',
     )
+    total_opening_balance = fields.Float(
+        string='Saldo Inicial',
+        compute='_compute_totals',
+    )
     total_draft_pending = fields.Float(
         string='Pendiente por Aplicar',
         compute='_compute_totals',
@@ -135,16 +140,26 @@ class CustomerStatementReport(models.Model):
             rec.line_count = len(rec.line_ids)
 
     @api.depends('line_ids.amount_total', 'line_ids.amount_applied',
-                 'line_ids.residual', 'line_ids.amount_pending_draft',
+                 'line_ids.residual', 'line_ids.opening_balance',
+                 'line_ids.amount_pending_draft',
                  'line_ids.entry_type', 'line_ids.level')
     def _compute_totals(self):
         for rec in self:
             inv_lines = rec.line_ids.filtered(
                 lambda l: l.level == 0 and l.entry_type in ('invoice', 'credit_note')
             )
+            opening_lines = rec.line_ids.filtered(
+                lambda l: l.level == 0 and l.entry_type == 'opening_balance'
+            )
             rec.total_invoiced = sum(inv_lines.mapped('amount_total'))
             rec.total_applied = sum(inv_lines.mapped('amount_applied'))
-            rec.total_residual = sum(inv_lines.mapped('residual'))
+            rec.total_opening_balance = sum(
+                (line.opening_balance or line.residual) for line in opening_lines
+            ) + sum(inv_lines.mapped('opening_balance'))
+            rec.total_residual = (
+                sum(inv_lines.mapped('residual')) +
+                sum(opening_lines.mapped('residual'))
+            )
             draft_lines = rec.line_ids.filtered(
                 lambda l: l.level == 0 and l.entry_type == 'payment_draft'
             )
@@ -287,6 +302,12 @@ class CustomerStatementReportLine(models.Model):
         digits='Account',
         help="Monto del pago en borrador (solo informativo). "
              "NO se suma al aplicado ni afecta el saldo contable.",
+    )
+    opening_balance = fields.Float(
+        string='Saldo Inicial',
+        digits='Account',
+        help="Saldo abierto previo al período. "
+             "No forma parte de la facturación del período ni del aging.",
     )
 
     # ── Clasificación aging ──────────────────────────────────────────────────

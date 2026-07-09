@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_stock_adjustment_reject_wizard_form" model="ir.ui.view">
+        <field name="name">stock.adjustment.reject.wizard.form</field>
+        <field name="model">stock.adjustment.reject.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Rechazar Solicitud">
+                <group>
+                    <field name="request_id" invisible="1"/>
+                    <field name="rejection_reason" placeholder="Indique el motivo del rechazo..."/>
+                </group>
+                <footer>
+                    <button name="action_confirm_reject" string="Confirmar Rechazo"
+                            type="object" class="btn-primary"/>
+                    <button string="Cancelar" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

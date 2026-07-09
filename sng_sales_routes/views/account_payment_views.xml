@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_account_payment_tree_inherit_sales_route" model="ir.ui.view">
+        <field name="name">account.payment.list.inherit.sales.route</field>
+        <field name="model">account.payment</field>
+        <field name="inherit_id" ref="account.view_account_payment_tree"/>
+        <field name="arch" type="xml">
+            <field name="partner_id" position="after">
+                <field name="sales_route_id" string="Ruta/Territorio" optional="show"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_account_payment_form_inherit_sales_route" model="ir.ui.view">
+        <field name="name">account.payment.form.inherit.sales.route</field>
+        <field name="model">account.payment</field>
+        <field name="inherit_id" ref="account.view_account_payment_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='group1']/field[@name='memo']" position="after">
+                <field name="sales_route_id" string="Ruta/Territorio"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_account_payment_search_inherit_sales_route" model="ir.ui.view">
+        <field name="name">account.payment.search.inherit.sales.route</field>
+        <field name="model">account.payment</field>
+        <field name="inherit_id" ref="account.view_account_payment_search"/>
+        <field name="arch" type="xml">
+            <field name="partner_id" position="after">
+                <field name="sales_route_id"/>
+            </field>
+            <filter name="partner" position="after">
+                <filter string="Ruta/Territorio" name="sales_route" domain="[]" context="{'group_by': 'sales_route_id'}"/>
+            </filter>
+        </field>
+    </record>
+</odoo>

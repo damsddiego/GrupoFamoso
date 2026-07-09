@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_recompute_customer_metrics_server" model="ir.actions.server">
+        <field name="name">Recalcular métricas de clientes</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="binding_model_id" ref="base.model_res_partner"/>
+        <field name="binding_view_types">list,form</field>
+        <field name="state">code</field>
+        <field name="groups_id" eval="[(4, ref('account.group_account_readonly'))]"/>
+        <field name="code">records.action_recompute_customer_metrics()</field>
+    </record>
+
+    <record id="action_export_customer_metrics_xlsx_server" model="ir.actions.server">
+        <field name="name">Exportar métricas de clientes XLSX</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="binding_model_id" ref="base.model_res_partner"/>
+        <field name="binding_view_types">list,form</field>
+        <field name="state">code</field>
+        <field name="groups_id" eval="[(4, ref('account.group_account_readonly'))]"/>
+        <field name="code">action = records.action_export_customer_metrics_xlsx()</field>
+    </record>
+</odoo>

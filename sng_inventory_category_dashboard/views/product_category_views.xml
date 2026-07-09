@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="product_category_form_view_inventory_dashboard" model="ir.ui.view">
+        <field name="name">product.category.form.inventory.dashboard</field>
+        <field name="model">product.category</field>
+        <field name="inherit_id" ref="product.product_category_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='first']" position="after">
+                <group string="Dashboard de Inventario" col="2">
+                    <field name="inventory_dashboard_target_days"/>
+                    <field name="inventory_dashboard_buy_threshold"/>
+                    <field name="inventory_dashboard_liquidate_threshold"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>

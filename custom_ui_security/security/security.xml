@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+
+        <!-- ============================================ -->
+        <!-- CATEGORÍA DE GRUPOS - UI SECURITY            -->
+        <!-- ============================================ -->
+
+        <record id="module_category_ui_security" model="ir.module.category">
+            <field name="name">UI Security</field>
+            <field name="description">Control de visibilidad de interfaz por grupos</field>
+            <field name="sequence">100</field>
+        </record>
+
+        <!-- ============================================ -->
+        <!-- FASE 1: GRUPOS ACTUALES                      -->
+        <!-- ============================================ -->
+
+        <!-- Grupo: Puede ver costos de producto -->
+        <record id="group_view_product_cost" model="res.groups">
+            <field name="name">Puede ver costos de producto</field>
+            <field name="category_id" ref="module_category_ui_security"/>
+            <field name="comment">
+                Los usuarios en este grupo pueden ver el campo 'Costo' (standard_price)
+                en productos y variantes. Este grupo controla la visibilidad del costo
+                en formularios, listas, variantes y búsquedas.
+            </field>
+        </record>
+
+        <!-- ============================================ -->
+        <!-- FASE 2: GRUPOS FUTUROS (PREPARACIÓN)         -->
+        <!-- ============================================ -->
+
+        <!--
+        Los siguientes grupos están documentados como preparación para Fase 2.
+        Descomenta cuando se necesiten:
+
+        <record id="group_can_confirm_sale_order" model="res.groups">
+            <field name="name">Puede confirmar pedidos de venta</field>
+            <field name="category_id" ref="module_category_ui_security"/>
+        </record>
+
+        <record id="group_can_validate_picking" model="res.groups">
+            <field name="name">Puede validar albaranes</field>
+            <field name="category_id" ref="module_category_ui_security"/>
+        </record>
+
+        <record id="group_can_post_invoice" model="res.groups">
+            <field name="name">Puede contabilizar facturas</field>
+            <field name="category_id" ref="module_category_ui_security"/>
+        </record>
+
+        <record id="group_can_view_margin" model="res.groups">
+            <field name="name">Puede ver márgenes</field>
+            <field name="category_id" ref="module_category_ui_security"/>
+        </record>
+        -->
+
+        <!-- ============================================ -->
+        <!-- ASIGNACIÓN AUTOMÁTICA A ADMINISTRADORES      -->
+        <!-- ============================================ -->
+
+        <!-- Los administradores del sistema deben ver costos por defecto -->
+        <record id="base.group_system" model="res.groups">
+            <field name="implied_ids" eval="[(4, ref('group_view_product_cost'))]"/>
+        </record>
+
+    </data>
+</odoo>

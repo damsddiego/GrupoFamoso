@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- ============================================ -->
+        <!-- HERENCIA: stock.quant - LISTA (READONLY)     -->
+        <!-- ============================================ -->
+
+        <record id="stock_quant_tree_hide_cost" model="ir.ui.view">
+            <field name="name">stock.quant.tree.hide.cost</field>
+            <field name="model">stock.quant</field>
+            <field name="inherit_id" ref="stock_account.view_stock_quant_tree_inherit"/>
+            <field name="arch" type="xml">
+
+                <!-- Ocultar columna Total Value (value) -->
+                <xpath expr="//field[@name='value']" position="attributes">
+                    <attribute name="groups">custom_ui_security.group_view_product_cost</attribute>
+                </xpath>
+
+            </field>
+        </record>
+
+        <!-- ============================================ -->
+        <!-- HERENCIA: stock.quant - LISTA EDITABLE       -->
+        <!-- ============================================ -->
+
+        <record id="stock_quant_tree_editable_hide_cost" model="ir.ui.view">
+            <field name="name">stock.quant.tree.editable.hide.cost</field>
+            <field name="model">stock.quant</field>
+            <field name="inherit_id" ref="stock_account.view_stock_quant_tree_editable_inherit"/>
+            <field name="arch" type="xml">
+
+                <!-- Ocultar columna Total Value (value) -->
+                <xpath expr="//field[@name='value']" position="attributes">
+                    <attribute name="groups">custom_ui_security.group_view_product_cost</attribute>
+                </xpath>
+
+            </field>
+        </record>
+
+    </data>
+</odoo>

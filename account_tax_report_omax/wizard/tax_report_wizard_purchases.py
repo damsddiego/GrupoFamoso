@@ -84,7 +84,8 @@ class TaxReportWizardPurchases(models.TransientModel):
         Retorna un dict con las tasas y montos base y tax
         """
         in_out_refund = inv.move_type in ['in_refund']
-        multiplier = 1 if not in_out_refund else -1
+        is_rejected = getattr(inv, 'state_tributacion', '') == 'rechazado'
+        multiplier = 1 if not (in_out_refund or is_rejected) else -1
 
         # Diccionario para almacenar montos por tasa de impuesto
         tax_breakdown = {}
@@ -183,15 +184,17 @@ class TaxReportWizardPurchases(models.TransientModel):
 
             for inv in invoice:
                 in_out_refund = inv.move_type in ['in_refund']
+                is_rejected = getattr(inv, 'state_tributacion', '') == 'rechazado'
+                is_negative = in_out_refund or is_rejected
                 taxes = inv.tax_totals
                 if taxes.get('subtotals'):
                     if taxes['subtotals'][0]['tax_groups']:
                         tax_groups_lst = taxes['subtotals'][0]['tax_groups']
                         # Valores positivos para compras normales, negativos para notas de crédito
-                        bal_total_untax += abs(inv.amount_untaxed) if not in_out_refund else -abs(inv.amount_untaxed)
+                        bal_total_untax += abs(inv.amount_untaxed) if not is_negative else -abs(inv.amount_untaxed)
                         for tax_group in tax_groups_lst:
                             tex_gr_names.append(tax_group.get('group_name'))
-                            tax_amount = abs(tax_group.get('tax_amount')) if not in_out_refund else -abs(tax_group.get('tax_amount'))
+                            tax_amount = abs(tax_group.get('tax_amount')) if not is_negative else -abs(tax_group.get('tax_amount'))
                             balance_total_tax += tax_amount
                             total_tax_paid += tax_amount
 
@@ -236,15 +239,17 @@ class TaxReportWizardPurchases(models.TransientModel):
 
             for inv in invoice:
                 in_out_refund = inv.move_type in ['in_refund']
+                is_rejected = getattr(inv, 'state_tributacion', '') == 'rechazado'
+                is_negative = in_out_refund or is_rejected
                 taxes = inv.tax_totals
                 if taxes.get('subtotals'):
                     if taxes['subtotals'][0]['tax_groups']:
                         tax_groups_lst = taxes['subtotals'][0]['tax_groups']
                         # Valores positivos para compras normales, negativos para notas de crédito
-                        bal_total_untax += abs(inv.amount_untaxed) if not in_out_refund else -abs(inv.amount_untaxed)
+                        bal_total_untax += abs(inv.amount_untaxed) if not is_negative else -abs(inv.amount_untaxed)
                         for tax_group in tax_groups_lst:
                             tex_gr_names.append(tax_group.get('group_name'))
-                            tax_amount = abs(tax_group.get('tax_amount')) if not in_out_refund else -abs(tax_group.get('tax_amount'))
+                            tax_amount = abs(tax_group.get('tax_amount')) if not is_negative else -abs(tax_group.get('tax_amount'))
                             balance_total_tax += tax_amount
                             total_tax_paid += tax_amount
 

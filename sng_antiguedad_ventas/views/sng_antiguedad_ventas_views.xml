@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_sng_antiguedad_ventas_list" model="ir.ui.view">
+        <field name="name">sng.antiguedad.ventas.list</field>
+        <field name="model">sng.antiguedad.ventas</field>
+        <field name="arch" type="xml">
+            <list string="Antigüedad de Ventas" create="0" edit="0" delete="0"
+                  default_order="partner_commercial_name">
+                <field name="partner_unique_id" string="Código"/>
+                <field name="partner_commercial_name" string="Nombre Comercial"/>
+                <field name="currency_id" column_invisible="1"/>
+                <field name="credit_check" column_invisible="1"/>
+                <field name="payment_term_id" string="Plazo"/>
+                <field name="credit_blocking" string="Límite de crédito" sum="Total límite de crédito"
+                    widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                <field name="last_invoice_date" string="F Ultima Factura"/>
+                <field name="last_payment_date" string="F Ultimo Pago"/>
+                <field name="sales_route_id" string="Ruta"/>
+                <field name="assigned_salesperson_name" string="Vendedor"/>
+                <field name="total_receivable" string="Total" sum="Total general"
+                    widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                <field name="not_due_amount" string="No vencido" sum="Total no vencido" optional="hide"
+                    widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                <!-- Meses 1-6: visibles por defecto -->
+                <field name="bucket_0_30"    string="0-30"    sum="Total 0-30"    widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                <field name="bucket_31_60"   string="31-60"   sum="Total 31-60"   widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                <field name="bucket_61_90"   string="61-90"   sum="Total 61-90"   widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                <field name="bucket_91_120"  string="91-120"  sum="Total 91-120"  widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                <field name="bucket_121_150" string="121-150" sum="Total 121-150" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                <field name="bucket_151_180" string="151-180" sum="Total 151-180" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                <!-- Meses 7-12: ocultos por defecto, activables -->
+                <field name="bucket_181_210" string="181-210" sum="Total 181-210" optional="hide" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                <field name="bucket_211_240" string="211-240" sum="Total 211-240" optional="hide" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                <field name="bucket_241_270" string="241-270" sum="Total 241-270" optional="hide" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                <field name="bucket_271_300" string="271-300" sum="Total 271-300" optional="hide" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                <field name="bucket_301_330" string="301-330" sum="Total 301-330" optional="hide" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                <field name="bucket_331_360" string="331-360" sum="Total 331-360" optional="hide" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                <field name="bucket_360_plus" string="360+"   sum="Total 360+"   optional="hide" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                <field name="company_id" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_sng_antiguedad_ventas_search" model="ir.ui.view">
+        <field name="name">sng.antiguedad.ventas.search</field>
+        <field name="model">sng.antiguedad.ventas</field>
+        <field name="arch" type="xml">
+            <search string="Buscar Antigüedad de Ventas">
+                <field name="partner_unique_id" string="Código"/>
+                <field name="partner_commercial_name" string="Nombre comercial"/>
+                <field name="payment_term_id" string="Plazo"/>
+                <field name="assigned_salesperson_name" string="Vendedor"/>
+                <field name="sales_route_id" string="Ruta"/>
+
+                <filter name="filter_with_balance" string="Solo con saldo"
+                    domain="[('total_receivable', '!=', 0)]"/>
+                <filter name="filter_overdue" string="Solo vencidos"
+                    domain="['|', ('bucket_0_30', '!=', 0),
+                             '|', ('bucket_31_60', '!=', 0),
+                             '|', ('bucket_61_90', '!=', 0),
+                             '|', ('bucket_91_120', '!=', 0),
+                             '|', ('bucket_121_150', '!=', 0),
+                             '|', ('bucket_151_180', '!=', 0),
+                             '|', ('bucket_181_210', '!=', 0),
+                             '|', ('bucket_211_240', '!=', 0),
+                             '|', ('bucket_241_270', '!=', 0),
+                             '|', ('bucket_271_300', '!=', 0),
+                             '|', ('bucket_301_330', '!=', 0),
+                             '|', ('bucket_331_360', '!=', 0),
+                                  ('bucket_360_plus', '!=', 0)]"/>
+
+                <group expand="0" string="Agrupar por">
+                    <filter name="group_by_salesperson" string="Vendedor"
+                        context="{'group_by': 'assigned_salesperson_name'}"/>
+                    <filter name="group_by_route" string="Ruta"
+                        context="{'group_by': 'sales_route_id'}"/>
+                    <filter name="group_by_payment_term" string="Plazo"
+                        context="{'group_by': 'payment_term_id'}"/>
+                    <filter name="group_by_company" string="Compañía"
+                        context="{'group_by': 'company_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+</odoo>

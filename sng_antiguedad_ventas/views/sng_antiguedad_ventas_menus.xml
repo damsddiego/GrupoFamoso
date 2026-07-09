@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem
+        id="menu_sng_antiguedad_ventas_wizard"
+        name="Antigüedad de Ventas"
+        parent="account.menu_finance_reports"
+        action="action_sng_antiguedad_ventas_wizard"
+        sequence="37"
+        groups="account.group_account_invoice,account.group_account_readonly"/>
+</odoo>

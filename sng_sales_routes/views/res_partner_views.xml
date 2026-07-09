@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_partner_form_inherit_sales_route" model="ir.ui.view">
+        <field name="name">res.partner.form.inherit.sales.route</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <group name="sale" position="inside">
+                <field name="sales_route_id"/>
+            </group>
+        </field>
+    </record>
+
+    <record id="view_partner_tree_inherit_sales_route" model="ir.ui.view">
+        <field name="name">res.partner.list.inherit.sales.route</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_tree"/>
+        <field name="arch" type="xml">
+            <field name="user_id" position="after">
+                <field name="sales_route_id" optional="show"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_res_partner_filter_inherit_sales_route" model="ir.ui.view">
+        <field name="name">res.partner.search.inherit.sales.route</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_res_partner_filter"/>
+        <field name="arch" type="xml">
+            <field name="user_id" position="after">
+                <field name="sales_route_id"/>
+            </field>
+            <filter name="salesperson" position="after">
+                <filter string="Ruta/Territorio" name="group_sales_route" context="{'group_by': 'sales_route_id'}"/>
+            </filter>
+        </field>
+    </record>
+</odoo>

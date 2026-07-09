@@ -20,11 +20,14 @@ class AccountMove(models.Model):
         default=lambda self: self.env.user.partner_id,
     )
 
-    @api.depends('partner_id', 'partner_id.assigned_salesperson_id', 'invoice_user_id')
+    @api.depends('partner_id', 'partner_id.assigned_salesperson_id', 'invoice_user_id', 'company_id')
     def _compute_salesperson_id(self):
         for move in self:
-            if move.partner_id and move.partner_id.assigned_salesperson_id:
-                move.salesperson_id = move.partner_id.assigned_salesperson_id
+            assigned = False
+            if move.partner_id and move.company_id:
+                assigned = move.partner_id.with_company(move.company_id).assigned_salesperson_id
+            if assigned:
+                move.salesperson_id = assigned
             else:
                 move.salesperson_id = (
                     move.salesperson_id

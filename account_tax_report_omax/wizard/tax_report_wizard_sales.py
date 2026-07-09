@@ -90,6 +90,8 @@ class TaxReportWizardSales(models.TransientModel):
         line = []
         for inv in invoice:
             in_out_refund = inv.move_type in ['out_refund']
+            is_rejected = getattr(inv, 'state_tributacion', '') == 'rechazado'
+            is_negative = in_out_refund or is_rejected
             taxes = inv.tax_totals
             if taxes['subtotals'][0]['tax_groups']:
                 for tax_group in taxes['subtotals'][0]['tax_groups']:
@@ -103,8 +105,8 @@ class TaxReportWizardSales(models.TransientModel):
                         state_tributacion = getattr(inv, 'state_tributacion', '') or ''
 
                         # Apply refund logic to amounts
-                        discount_adjusted = amount_discount_electronic_invoice if not in_out_refund else -abs(amount_discount_electronic_invoice)
-                        total_signed_adjusted = amount_total_signed if not in_out_refund else -abs(amount_total_signed)
+                        discount_adjusted = amount_discount_electronic_invoice if not is_negative else -abs(amount_discount_electronic_invoice)
+                        total_signed_adjusted = amount_total_signed if not is_negative else -abs(amount_total_signed)
 
                         # Calculate Sub Total (Total Signed + Discount Electronic Invoice)
                         sub_total = total_signed_adjusted + discount_adjusted
@@ -115,9 +117,9 @@ class TaxReportWizardSales(models.TransientModel):
                             'inv_date': inv.invoice_date.strftime("%d/%m/%y"),
                             'sub_total': sub_total,
                             'amount_discount_electronic_invoice': discount_adjusted,
-                            'amount_iva_returned': amount_iva_returned if not in_out_refund else -abs(amount_iva_returned),
-                            'amount_subtotal_without_iva_returned': amount_subtotal_without_iva_returned if not in_out_refund else -abs(amount_subtotal_without_iva_returned),
-                            'amount_tax_signed': amount_tax_signed if not in_out_refund else -abs(amount_tax_signed),
+                            'amount_iva_returned': amount_iva_returned if not is_negative else -abs(amount_iva_returned),
+                            'amount_subtotal_without_iva_returned': amount_subtotal_without_iva_returned if not is_negative else -abs(amount_subtotal_without_iva_returned),
+                            'amount_tax_signed': amount_tax_signed if not is_negative else -abs(amount_tax_signed),
                             'amount_total_signed': total_signed_adjusted,
                             'state_tributacion': state_tributacion,
                         }
@@ -159,15 +161,17 @@ class TaxReportWizardSales(models.TransientModel):
 
             for inv in invoice:
                 in_out_refund = inv.move_type in ['out_refund']
+                is_rejected = getattr(inv, 'state_tributacion', '') == 'rechazado'
+                is_negative = in_out_refund or is_rejected
                 taxes = inv.tax_totals
                 if taxes.get('subtotals'):
                     if taxes['subtotals'][0]['tax_groups']:
                         tax_groups_lst = taxes['subtotals'][0]['tax_groups']
-                        bal_total_untax += inv.amount_untaxed if not in_out_refund else -abs(inv.amount_untaxed)
+                        bal_total_untax += inv.amount_untaxed if not is_negative else -abs(inv.amount_untaxed)
                         for tax_group in tax_groups_lst:
                             tex_gr_names.append(tax_group.get('group_name'))
-                            balance_total_tax += tax_group.get('tax_amount') if not in_out_refund else -abs(tax_group.get('tax_amount'))
-                            total_tax_collected += tax_group.get('tax_amount') if not in_out_refund else -abs(tax_group.get('tax_amount'))
+                            balance_total_tax += tax_group.get('tax_amount') if not is_negative else -abs(tax_group.get('tax_amount'))
+                            total_tax_collected += tax_group.get('tax_amount') if not is_negative else -abs(tax_group.get('tax_amount'))
 
             tex_gr_names_set = list(set(tex_gr_names))
             for tex_gr_name in tex_gr_names_set:
@@ -210,15 +214,17 @@ class TaxReportWizardSales(models.TransientModel):
 
             for inv in invoice:
                 in_out_refund = inv.move_type in ['out_refund']
+                is_rejected = getattr(inv, 'state_tributacion', '') == 'rechazado'
+                is_negative = in_out_refund or is_rejected
                 taxes = inv.tax_totals
                 if taxes.get('subtotals'):
                     if taxes['subtotals'][0]['tax_groups']:
                         tax_groups_lst = taxes['subtotals'][0]['tax_groups']
-                        bal_total_untax += inv.amount_untaxed if not in_out_refund else -abs(inv.amount_untaxed)
+                        bal_total_untax += inv.amount_untaxed if not is_negative else -abs(inv.amount_untaxed)
                         for tax_group in tax_groups_lst:
                             tex_gr_names.append(tax_group.get('group_name'))
-                            balance_total_tax += tax_group.get('tax_amount') if not in_out_refund else -abs(tax_group.get('tax_amount'))
-                            total_tax_collected += tax_group.get('tax_amount') if not in_out_refund else -abs(tax_group.get('tax_amount'))
+                            balance_total_tax += tax_group.get('tax_amount') if not is_negative else -abs(tax_group.get('tax_amount'))
+                            total_tax_collected += tax_group.get('tax_amount') if not is_negative else -abs(tax_group.get('tax_amount'))
 
             tex_gr_names_set = list(set(tex_gr_names))
             for tex_gr_name in tex_gr_names_set:

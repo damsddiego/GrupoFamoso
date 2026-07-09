@@ -18,14 +18,15 @@ class SaleOrder(models.Model):
         precompute=True,
     )
 
-    @api.depends('partner_id', 'partner_id.assigned_salesperson_id')
+    @api.depends('partner_id', 'partner_id.assigned_salesperson_id', 'company_id')
     def _compute_salesperson_id(self):
         for order in self:
-            if order.partner_id and order.partner_id.assigned_salesperson_id:
-                order.salesperson_id = order.partner_id.assigned_salesperson_id
+            assigned = False
+            if order.partner_id and order.company_id:
+                assigned = order.partner_id.with_company(order.company_id).assigned_salesperson_id
+            if assigned:
+                order.salesperson_id = assigned
             elif not order.salesperson_id:
-                # Si no hay vendedor asignado al cliente, dejarlo vacío para que se asigne manualmente
-                # Solo se asignará automáticamente si el cliente tiene un vendedor configurado
                 order.salesperson_id = False
 
     def _prepare_invoice(self):

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Payment Report',
-    'version': '18.0.2.1.0',
+    'version': '18.0.2.3.0',
     'category': 'Accounting/Accounting',
     'summary': 'Reporte de pagos con información de facturas',
     'description': """
@@ -21,6 +21,7 @@
     'website': '',
     'depends': ['account'],
     'data': [
+        'security/security.xml',
         'security/ir.model.access.csv',
         'views/payment_report_salesperson_views.xml',
     ],

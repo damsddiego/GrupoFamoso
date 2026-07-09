@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Botón inteligente en product.product -->
+    <record id="view_product_form_inherit_kardex" model="ir.ui.view">
+        <field name="name">product.product.form.inherit.kardex</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="stock.product_form_view_procurement_button"/>
+        <field name="arch" type="xml">
+            <div name="button_box" position="inside">
+                <button type="action"
+                    name="%(action_stock_kardex_from_product)d"
+                    class="oe_stat_button"
+                    icon="fa-list-alt"
+                    groups="stock.group_stock_user"
+                    invisible="not is_storable">
+                    <div class="o_stat_info">
+                        <span class="o_stat_text">Kardex</span>
+                    </div>
+                </button>
+            </div>
+        </field>
+    </record>
+</odoo>

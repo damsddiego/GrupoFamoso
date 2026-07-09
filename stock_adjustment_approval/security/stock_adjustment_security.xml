@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <!-- Grupos -->
+        <record id="group_stock_adjustment_requester" model="res.groups">
+            <field name="name">Solicitante de Ajuste de Inventario</field>
+            <field name="category_id" ref="base.module_category_inventory_inventory"/>
+            <field name="implied_ids" eval="[(4, ref('stock.group_stock_user'))]"/>
+        </record>
+
+        <record id="group_stock_adjustment_approver" model="res.groups">
+            <field name="name">Aprobador de Ajuste de Inventario</field>
+            <field name="category_id" ref="base.module_category_inventory_inventory"/>
+            <field name="implied_ids" eval="[(4, ref('stock.group_stock_user'))]"/>
+        </record>
+    </data>
+
+    <data noupdate="1">
+        <!-- Regla multi-compañía para solicitudes -->
+        <record id="stock_adjustment_request_comp_rule" model="ir.rule">
+            <field name="name">Solicitud de Ajuste: multi-compañía</field>
+            <field name="model_id" ref="model_stock_adjustment_request"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">[('company_id', 'in', company_ids + [False])]</field>
+        </record>
+
+        <!-- Regla multi-compañía para líneas -->
+        <record id="stock_adjustment_request_line_comp_rule" model="ir.rule">
+            <field name="name">Línea de Solicitud de Ajuste: multi-compañía</field>
+            <field name="model_id" ref="model_stock_adjustment_request_line"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">[('company_id', 'in', company_ids + [False])]</field>
+        </record>
+    </data>
+</odoo>

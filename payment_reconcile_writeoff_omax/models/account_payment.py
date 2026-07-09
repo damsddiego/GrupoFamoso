@@ -1,8 +1,23 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+import logging
+
+from datetime import date
+
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError, ValidationError
+
+
+_logger = logging.getLogger(__name__)
+
+
+TEMP_PAYMENT_COMPANY_CHECK_BYPASS_DATES = {
+    date(2026, 5, 26),
+    date(2026, 5, 27),
+}
+TEMP_PAYMENT_COMPANY_CHECK_BYPASS_COMPANY_ID = 2
+TEMP_PAYMENT_COMPANY_CHECK_BYPASS_FIELDS = {"partner_id"}
 
 
 class AccountPayment(models.Model):
@@ -15,6 +30,40 @@ class AccountPayment(models.Model):
         check_company=True)
     writeoff_notes = fields.Char('Writeoff Notes')
 
+    def _check_company(self, fnames=None):
+        today = fields.Date.context_today(self)
+        if today not in TEMP_PAYMENT_COMPANY_CHECK_BYPASS_DATES:
+            return super()._check_company(fnames=fnames)
+
+        bypass_payments = self.filtered(
+            lambda payment: payment.company_id.id == TEMP_PAYMENT_COMPANY_CHECK_BYPASS_COMPANY_ID
+        )
+        regular_payments = self - bypass_payments
+
+        if regular_payments:
+            super(AccountPayment, regular_payments)._check_company(fnames=fnames)
+
+        if not bypass_payments:
+            return
+
+        if fnames is None or {"company_id", "company_ids"} & set(fnames):
+            checked_fields = set(self._fields)
+        else:
+            checked_fields = set(fnames)
+
+        remaining_fields = list(checked_fields - TEMP_PAYMENT_COMPANY_CHECK_BYPASS_FIELDS)
+        if remaining_fields:
+            super(AccountPayment, bypass_payments)._check_company(fnames=remaining_fields)
+
+        _logger.warning(
+            "Temporary company check bypass applied on %s for account.payment "
+            "ids %s in company %s. Skipped fields: %s",
+            sorted(TEMP_PAYMENT_COMPANY_CHECK_BYPASS_DATES),
+            bypass_payments.ids,
+            TEMP_PAYMENT_COMPANY_CHECK_BYPASS_COMPANY_ID,
+            sorted(TEMP_PAYMENT_COMPANY_CHECK_BYPASS_FIELDS),
+        )
+
     def _load_outstanding_moves(self):
         """Populate outstanding_move_lines with open documents for the partner."""
         self.ensure_one()
@@ -25,6 +74,7 @@ class AccountPayment(models.Model):
         move_type = ['out_invoice'] if self.payment_type == 'inbound' else ['in_invoice']
         moves = self.env["account.move"].search([
             ('state', '=', 'posted'),
+            ('company_id', '=', self.company_id.id),
             ('partner_id', '=', self.partner_id.id),
             ('move_type', 'in', move_type),
             ('amount_residual', '!=', 0),
@@ -222,7 +272,7 @@ class AccountPayment(models.Model):
                             ##Add new Write-Off line
                             converted_balance = self.currency_id._convert(
                                 apply_discount_amount,
-                                self.env.company.currency_id,
+                                self.company_id.currency_id,
                                 self.company_id,
                                 self.date
                             )
@@ -282,7 +332,7 @@ class AccountPayment(models.Model):
                         if ln.currency_id != move.currency_id:
                                 ln.amount_residual = amount_residual
                         else:
-                            if ln.currency_id.id != self.env.company.currency_id.id:
+                            if ln.currency_id.id != self.company_id.currency_id.id:
                                 amount_residual = ln.currency_id._convert(amount_residual, self.env.company.currency_id, self.company_id, self.date)
                                 ln.amount_residual = amount_residual
                         move.js_assign_outstanding_line(opp_reconcile_id)
@@ -309,6 +359,7 @@ class AccountPayment(models.Model):
 class OutStandingAccountMove(models.Model):
     _name = 'outstanding.account.move'
     _description = 'Outstanding Account Moves'
+    _check_company_auto = True
 
     pyament_id = fields.Many2one('account.payment', string='Payment', required=True)#O2M
     select_to_pay = fields.Boolean('Select', copy=0)

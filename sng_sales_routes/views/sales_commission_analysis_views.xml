@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="sales_commission_analysis_form_inherit_sales_route" model="ir.ui.view">
+        <field name="name">sales.commission.analysis.form.inherit.sales.route</field>
+        <field name="model">sales.commission.analysis</field>
+        <field name="inherit_id" ref="sales_commission_omax.sales_commission_analysis_view_form_omax"/>
+        <field name="arch" type="xml">
+            <field name="sales_person_id" position="after">
+                <field name="sales_route_id"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="sales_commission_analysis_list_inherit_sales_route" model="ir.ui.view">
+        <field name="name">sales.commission.analysis.list.inherit.sales.route</field>
+        <field name="model">sales.commission.analysis</field>
+        <field name="inherit_id" ref="sales_commission_omax.sales_commission_analysis_view_list_omax"/>
+        <field name="arch" type="xml">
+            <field name="sales_person_id" position="after">
+                <field name="sales_route_id" optional="show"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="sales_commission_analysis_search_inherit_sales_route" model="ir.ui.view">
+        <field name="name">sales.commission.analysis.search.inherit.sales.route</field>
+        <field name="model">sales.commission.analysis</field>
+        <field name="inherit_id" ref="sales_commission_omax.sales_target_search_omax"/>
+        <field name="arch" type="xml">
+            <field name="sales_person_id" position="after">
+                <field name="sales_route_id"/>
+            </field>
+            <filter name="salesperson" position="after">
+                <filter string="Ruta/Territorio" name="sales_route" domain="[]" context="{'group_by': 'sales_route_id'}"/>
+            </filter>
+        </field>
+    </record>
+</odoo>

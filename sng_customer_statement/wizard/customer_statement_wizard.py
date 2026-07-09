@@ -4,7 +4,7 @@ Wizard principal del reporte "Estado de Cuenta de Clientes".
 
 Responsabilidades:
   1. Capturar filtros del usuario.
-  2. Ejecutar consultas SQL optimizadas (máx. 3 queries para todo el reporte).
+  2. Ejecutar consultas SQL optimizadas (máx. 4 queries para todo el reporte).
   3. Proveer datos a tres salidas:
        a) _build_report_lines()  → genera registros persistentes (Ver en pantalla)
        b) _get_report_data()     → dict para PDF (QWeb) y XLSX
@@ -14,9 +14,10 @@ Responsabilidades:
 
 Estrategia de performance (anti N+1):
   - Query 1: todas las facturas válidas del período/filtros → 1 SQL.
-  - Query 2: todas las reconciliaciones de esas facturas → 1 SQL con IN(ids).
-  - Query 3: todos los pagos draft de los partners → 1 SQL.
-  Total = 3 queries independiente del número de clientes o facturas.
+  - Query 2: todos los saldos iniciales previos por cliente → 1 SQL.
+  - Query 3: todas las reconciliaciones de esas facturas → 1 SQL con IN(ids).
+  - Query 4: todos los pagos draft de los partners → 1 SQL.
+  Total = 4 queries independiente del número de clientes o facturas.
 """
 
 import io
@@ -148,6 +149,12 @@ class CustomerStatementWizard(models.TransientModel):
     excel_file = fields.Binary('Archivo Excel', readonly=True)
     excel_filename = fields.Char('Nombre Excel', readonly=True)
 
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            vals.pop('company_id', None)
+        return super().create(vals_list)
+
     # ── Validaciones ────────────────────────────────────────────────────────
     @api.constrains('date_from', 'date_to')
     def _check_dates(self):
@@ -165,6 +172,37 @@ class CustomerStatementWizard(models.TransientModel):
         if self.company_ids:
             return list((self.company_ids & allowed).ids)
         return list(allowed.ids)
+
+    def _get_report_company(self):
+        """
+        Retorna la empresa que debe gobernar encabezado, moneda y contexto.
+
+        Cuando el usuario selecciona una única empresa en el wizard, esa empresa
+        debe prevalecer sobre `env.company`; de lo contrario Odoo renderiza el
+        PDF con el layout de la compañía activa aunque los datos estén filtrados
+        por otra compañía.
+        """
+        self.ensure_one()
+        allowed = self.env.companies
+        selected = self.company_ids & allowed
+        if len(selected) == 1:
+            return selected
+        if selected and self.env.company in selected:
+            return self.env.company
+        if selected:
+            return selected.sorted('id')[:1]
+        return self.env.company
+
+    def _get_report_context(self, company=None):
+        """Contexto multi-compañía consistente para calcular/renderizar."""
+        self.ensure_one()
+        company = company or self._get_report_company()
+        company_ids = self._get_company_ids() or [company.id]
+        return {
+            'allowed_company_ids': company_ids,
+            'company_id': company.id,
+            'force_company': company.id,
+        }
 
     def _coerce_translated_text(self, value):
         """
@@ -204,6 +242,29 @@ class CustomerStatementWizard(models.TransientModel):
             parsed = fields.Date.from_string(raw)
             return parsed.strftime('%d/%m/%Y') if parsed else raw
         return str(value)
+
+    def _get_partner_sp_sql_expr(self, alias='rp', company_id_expr=None):
+        """
+        Returns SQL expression for res_partner.assigned_salesperson_id.
+        In Odoo 18, company-dependent fields are stored as JSONB, requiring
+        extraction by company key before joining to res_partner as integer.
+        """
+        self.env.cr.execute("""
+            SELECT data_type FROM information_schema.columns
+            WHERE table_name = 'res_partner' AND column_name = 'assigned_salesperson_id'
+        """)
+        row = self.env.cr.fetchone()
+        if row and row[0] == 'jsonb':
+            if company_id_expr:
+                return (
+                    f"NULLIF({alias}.assigned_salesperson_id->>"
+                    f"(({company_id_expr})::text), '')::integer"
+                )
+            return (
+                f"NULLIF({alias}.assigned_salesperson_id->>"
+                f"('{self.env.company.id}'), '')::integer"
+            )
+        return f"{alias}.assigned_salesperson_id"
 
     # ======================================================================
     # QUERY 1 — Facturas válidas (sin rechazadas por tributación)
@@ -274,18 +335,21 @@ class CustomerStatementWizard(models.TransientModel):
         """)
         has_salesperson_id = bool(self.env.cr.fetchone())
         
-        salesperson_select = "am.salesperson_id" if has_salesperson_id else "rp.assigned_salesperson_id"
+        rp_sp_expr = self._get_partner_sp_sql_expr('rp', 'am.company_id')
+        salesperson_select = (
+            f"COALESCE(am.salesperson_id, {rp_sp_expr})"
+            if has_salesperson_id else rp_sp_expr
+        )
         salesperson_join = f"LEFT JOIN res_partner rp_sales ON rp_sales.id = {salesperson_select}"
-        
+
         # Ajustar el filtro por salesperson si corresponde
         salesperson_clause = ''
         if self.salesperson_ids:
             params['salesperson_ids'] = tuple(self.salesperson_ids.ids)
             if has_salesperson_id:
-                # Si filramos por vendedor, y el move tiene propio:
-                salesperson_clause = f"AND (am.salesperson_id IN %(salesperson_ids)s OR (am.salesperson_id IS NULL AND rp.assigned_salesperson_id IN %(salesperson_ids)s))"
+                salesperson_clause = f"AND (am.salesperson_id IN %(salesperson_ids)s OR (am.salesperson_id IS NULL AND {rp_sp_expr} IN %(salesperson_ids)s))"
             else:
-                salesperson_clause = "AND rp.assigned_salesperson_id IN %(salesperson_ids)s"
+                salesperson_clause = f"AND {rp_sp_expr} IN %(salesperson_ids)s"
 
         query = f"""
             SELECT
@@ -459,7 +523,91 @@ class CustomerStatementWizard(models.TransientModel):
         return result
 
     # ======================================================================
-    # QUERY 3 — Pagos en borrador (solo informativos)
+    # QUERY 3 — Saldos iniciales por cliente (solo líneas receivable con partner)
+    # ======================================================================
+    def _fetch_opening_balances_sql(self):
+        """
+        Trae el saldo inicial abierto por cliente a partir de asientos tipo `entry`
+        posteados antes del inicio del período.
+
+        Reglas:
+          - Solo líneas receivable (`asset_receivable`)
+          - Solo con partner_id
+          - Solo movimientos `entry`, `posted`
+          - Fecha contable anterior a `date_from`
+          - Se consolida una sola fila por cliente
+          - El saldo inicial NO participa en aging
+        """
+        company_ids = self._get_company_ids()
+        if not company_ids:
+            return []
+
+        sp_expr = self._get_partner_sp_sql_expr('rp', 'am.company_id')
+
+        params = {
+            'date_from': self.date_from,
+            'company_ids': tuple(company_ids),
+        }
+
+        partner_clause = ''
+        if self.partner_ids:
+            params['partner_ids'] = tuple(self.partner_ids.ids)
+            partner_clause = 'AND aml.partner_id IN %(partner_ids)s'
+
+        salesperson_clause = ''
+        if self.salesperson_ids:
+            params['salesperson_ids'] = tuple(self.salesperson_ids.ids)
+            salesperson_clause = f'AND {sp_expr} IN %(salesperson_ids)s'
+
+        tag_clause = ''
+        if self.tag_ids:
+            params['tag_ids'] = tuple(self.tag_ids.ids)
+            tag_clause = """
+                AND aml.partner_id IN (
+                    SELECT partner_id
+                    FROM res_partner_res_partner_category_rel
+                    WHERE category_id IN %(tag_ids)s
+                )
+            """
+
+        query = f"""
+            SELECT
+                aml.partner_id                      AS partner_id,
+                rp.name                            AS partner_name,
+                rp.vat                             AS partner_vat,
+                {sp_expr}                          AS salesperson_id,
+                rp_sales.name                      AS salesperson_name,
+                MIN(am.date)                       AS opening_date,
+                SUM(aml.amount_residual)           AS opening_balance
+            FROM account_move_line aml
+            JOIN account_move am ON am.id = aml.move_id
+            JOIN account_account aa ON aa.id = aml.account_id
+            JOIN res_partner rp ON rp.id = aml.partner_id
+            LEFT JOIN res_partner rp_sales
+                   ON rp_sales.id = {sp_expr}
+            WHERE aa.account_type = 'asset_receivable'
+              AND aml.partner_id IS NOT NULL
+              AND am.move_type = 'entry'
+              AND am.state = 'posted'
+              AND am.date < %(date_from)s
+              AND am.company_id IN %(company_ids)s
+              {partner_clause}
+              {salesperson_clause}
+              {tag_clause}
+            GROUP BY
+                aml.partner_id,
+                rp.name,
+                rp.vat,
+                {sp_expr},
+                rp_sales.name
+            HAVING ABS(SUM(aml.amount_residual)) > 0.00001
+            ORDER BY aml.partner_id
+        """
+        self.env.cr.execute(query, params)
+        return self.env.cr.dictfetchall()
+
+    # ======================================================================
+    # QUERY 4 — Pagos en borrador (solo informativos)
     # ======================================================================
     def _fetch_draft_payments_sql(self, partner_ids, company_ids):
         """
@@ -569,37 +717,76 @@ class CustomerStatementWizard(models.TransientModel):
         }
         """
         invoices_raw = self._fetch_invoices_sql()
-        if not invoices_raw:
+        opening_raw = self._fetch_opening_balances_sql()
+        if not invoices_raw and not opening_raw:
             raise UserError(_(
-                "No se encontraron facturas con los filtros seleccionados.\n"
-                "Verifique el rango de fechas, clientes y estado de las facturas."
+                "No se encontraron facturas ni saldos iniciales con los filtros "
+                "seleccionados.\nVerifique el rango de fechas, clientes y estado "
+                "de los documentos."
             ))
 
         # Agrupar por partner y recolectar todos los move_ids
         invoices_by_partner = {}
+        opening_by_partner = {}
         all_move_ids = []
         for inv in invoices_raw:
             pid = inv['partner_id']
             invoices_by_partner.setdefault(pid, []).append(inv)
             all_move_ids.append(inv['move_id'])
+        for row in opening_raw:
+            opening_by_partner[row['partner_id']] = row
 
         reconciliations = self._fetch_reconciliations_sql(all_move_ids)
 
-        partner_ids_list = list(invoices_by_partner.keys())
+        partner_ids_list = sorted(
+            set(invoices_by_partner.keys()) | set(opening_by_partner.keys())
+        )
         company_ids = self._get_company_ids()
         draft_by_partner = self._fetch_draft_payments_sql(partner_ids_list, company_ids)
 
         today = date.today()
         customers = []
 
-        for pid, inv_list in invoices_by_partner.items():
+        for pid in partner_ids_list:
+            inv_list = invoices_by_partner.get(pid, [])
+            opening = opening_by_partner.get(pid, {})
             total_invoiced = 0.0
             total_applied = 0.0
-            total_residual = 0.0
+            opening_balance = opening.get('opening_balance', 0.0) or 0.0
+            total_residual = opening_balance
             buckets = {'0_30': 0.0, '31_60': 0.0, '61_90': 0.0, '91_plus': 0.0}
             last_invoice_date = None
             last_payment_date = None
             invoice_lines = []
+            opening_line = False
+
+            if opening_balance:
+                opening_line = {
+                    'type': 'opening_balance',
+                    'move_id': False,
+                    'document_name': _('Saldo inicial'),
+                    'invoice_date': opening.get('opening_date'),
+                    'date_due': None,
+                    'journal_id': False,
+                    'journal_name': '',
+                    'reference': _('Asientos previos al período'),
+                    'currency_id': self.env.company.currency_id.id,
+                    'currency_name': self._coerce_translated_text(
+                        self.env.company.currency_id.name
+                    ),
+                    'amount_total': 0.0,
+                    'amount_applied': 0.0,
+                    'amount_residual': opening_balance,
+                    'applied_lines': [],
+                    'payment_state': '',
+                    'bucket': 'na',
+                    'bucket_0_30': 0.0,
+                    'bucket_31_60': 0.0,
+                    'bucket_61_90': 0.0,
+                    'bucket_91_plus': 0.0,
+                    'salesperson_id': opening.get('salesperson_id'),
+                    'opening_balance': opening_balance,
+                }
 
             for inv in inv_list:
                 is_cn = inv['move_type'] == 'out_refund'
@@ -662,6 +849,7 @@ class CustomerStatementWizard(models.TransientModel):
                     'bucket_61_90': bkt_vals['61_90'],
                     'bucket_91_plus': bkt_vals['91_plus'],
                     'salesperson_id': inv.get('salesperson_id'),
+                    'opening_balance': 0.0,
                 })
 
             draft_pmts = draft_by_partner.get(pid, [])
@@ -670,14 +858,29 @@ class CustomerStatementWizard(models.TransientModel):
             if self.only_with_balance and total_residual <= 0:
                 continue
 
-            p0 = inv_list[0]
+            # "Solo con saldo pendiente": en el detalle, mostrar únicamente las
+            # facturas que aún deben dinero (residual > 0), conservando sus pagos
+            # parciales ya aplicados. Las facturas pagadas al 100% se ocultan.
+            # Los totales agregados NO cambian (las pagadas aportan 0 al saldo).
+            display_invoices = invoice_lines
+            if self.only_with_balance:
+                display_invoices = [
+                    il for il in invoice_lines
+                    if il['type'] != 'invoice' or il['amount_residual'] > 0.005
+                ]
+
+            p0 = inv_list[0] if inv_list else opening
             customers.append({
                 'partner_id': pid,
-                'partner_name': p0['partner_name'],
+                'partner_name': self._coerce_translated_text(p0['partner_name']),
                 'partner_vat': p0['partner_vat'] or '',
                 'salesperson_id': p0['salesperson_id'],
-                'salesperson_name': p0['salesperson_name'] or '',
-                'invoices': invoice_lines,
+                'salesperson_name': (
+                    self._coerce_translated_text(p0['salesperson_name']) or ''
+                ),
+                'opening_balance': opening_balance,
+                'opening_line': opening_line,
+                'invoices': display_invoices,
                 'draft_payments': draft_pmts,
                 'total_invoiced': total_invoiced,
                 'total_applied': total_applied,
@@ -691,6 +894,10 @@ class CustomerStatementWizard(models.TransientModel):
                 'last_payment_date': last_payment_date,
             })
 
+        customers.sort(
+            key=lambda c: (self._coerce_translated_text(c.get('partner_name')) or '').lower()
+        )
+
         if not customers:
             raise UserError(_(
                 "No hay datos para mostrar con los filtros seleccionados. "
@@ -701,6 +908,7 @@ class CustomerStatementWizard(models.TransientModel):
         grand_totals = {
             'total_invoiced':      sum(c['total_invoiced'] for c in customers),
             'total_applied':       sum(c['total_applied'] for c in customers),
+            'total_opening_balance': sum(c['opening_balance'] for c in customers),
             'total_residual':      sum(c['total_residual'] for c in customers),
             'total_draft_pending': sum(c['total_draft_pending'] for c in customers),
             'bucket_0_30':         sum(c['bucket_0_30'] for c in customers),
@@ -726,49 +934,52 @@ class CustomerStatementWizard(models.TransientModel):
           4. Retornar ir.actions.act_window abriendo las líneas.
         """
         self.ensure_one()
-        structure = self._compute_report_structure()
-        company = self.env.company
+        company = self._get_report_company()
+        report_ctx = self._get_report_context(company)
+        wizard = self.with_context(**report_ctx).with_company(company)
+        structure = wizard._compute_report_structure()
 
         # Limpiar reportes viejos del usuario (borra líneas por cascade)
-        old_reports = self.env['customer.statement.report'].search([
-            ('create_uid', '=', self.env.uid),
+        old_reports = wizard.env['customer.statement.report'].search([
+            ('create_uid', '=', wizard.env.uid),
         ])
         old_reports.unlink()
 
         # Crear cabecera
-        report = self.env['customer.statement.report'].create({
-            'date_from': self.date_from,
-            'date_to': self.date_to,
+        report = wizard.env['customer.statement.report'].create({
+            'date_from': wizard.date_from,
+            'date_to': wizard.date_to,
             'company_id': company.id,
-            'mode': self.report_mode,
-            'currency_mode': self.currency_display,
-            'include_credit_notes': self.include_credit_notes,
-            'show_draft_payments': self.show_draft_payments,
-            'only_with_balance': self.only_with_balance,
-            'partner_ids': [(6, 0, self.partner_ids.ids)],
-            'salesperson_ids': [(6, 0, self.salesperson_ids.ids)],
-            'tag_ids': [(6, 0, self.tag_ids.ids)],
+            'mode': wizard.report_mode,
+            'currency_mode': wizard.currency_display,
+            'include_credit_notes': wizard.include_credit_notes,
+            'show_draft_payments': wizard.show_draft_payments,
+            'only_with_balance': wizard.only_with_balance,
+            'partner_ids': [(6, 0, wizard.partner_ids.ids)],
+            'salesperson_ids': [(6, 0, wizard.salesperson_ids.ids)],
+            'tag_ids': [(6, 0, wizard.tag_ids.ids)],
         })
 
         # Generar líneas
-        if self.report_mode == 'detail':
-            self._create_detail_report_lines(report, structure, company)
+        if wizard.report_mode == 'detail':
+            wizard._create_detail_report_lines(report, structure, company)
         else:
-            lines_to_create = self._build_report_lines(report, structure, company)
+            lines_to_create = wizard._build_report_lines(report, structure, company)
             if lines_to_create:
                 # create() en bulk — una sola INSERT masiva
-                self.env['customer.statement.report.line'].create(lines_to_create)
+                wizard.env['customer.statement.report.line'].create(lines_to_create)
 
         # Abrir vista de líneas
         return {
             'type': 'ir.actions.act_window',
-            'name': _('Estado de Cuenta — %s al %s') % (self.date_from, self.date_to),
+            'name': _('Estado de Cuenta — %s al %s') % (wizard.date_from, wizard.date_to),
             'res_model': 'customer.statement.report.line',
             'view_mode': 'list,pivot,graph,form',
             'domain': [('report_id', '=', report.id)],
             'context': {
                 'default_report_id': report.id,
                 'search_default_group_partner': 1,
+                **report_ctx,
             },
             'target': 'current',
         }
@@ -811,6 +1022,7 @@ class CustomerStatementWizard(models.TransientModel):
                     'amount_total': cust['total_invoiced'],
                     'amount_applied': cust['total_applied'],
                     'residual': cust['total_residual'],
+                    'opening_balance': cust['opening_balance'],
                     'amount_pending_draft': cust['total_draft_pending'],
                     'legend': '',
                     'bucket_aging': 'na',
@@ -839,6 +1051,7 @@ class CustomerStatementWizard(models.TransientModel):
                         'amount_total': 0.0,
                         'amount_applied': 0.0,    # NUNCA modifica saldo
                         'residual': 0.0,
+                        'opening_balance': 0.0,
                         'amount_pending_draft': cust['total_draft_pending'],
                         'legend': _('Pendiente por aplicar'),
                         'bucket_aging': 'na',
@@ -871,6 +1084,7 @@ class CustomerStatementWizard(models.TransientModel):
                         'amount_total': inv['amount_total'],
                         'amount_applied': inv['amount_applied'],
                         'residual': inv['amount_residual'],
+                        'opening_balance': inv.get('opening_balance', 0.0),
                         'amount_pending_draft': 0.0,
                         'legend': '',
                         'bucket_aging': inv['bucket'] if inv['bucket'] != 'na' else 'na',
@@ -902,6 +1116,7 @@ class CustomerStatementWizard(models.TransientModel):
                             'amount_total': 0.0,
                             'amount_applied': 0.0,
                             'residual': 0.0,
+                            'opening_balance': 0.0,
                             'amount_pending_draft': dp['amount'],
                             'legend': _('Pendiente por aplicar'),
                             'bucket_aging': 'na',
@@ -928,6 +1143,38 @@ class CustomerStatementWizard(models.TransientModel):
             pid = cust['partner_id']
             sid = cust['salesperson_id']
 
+            opening_line = cust.get('opening_line')
+            if opening_line:
+                line_obj.create({
+                    'report_id': report.id,
+                    'company_id': company.id,
+                    'partner_id': pid,
+                    'salesperson_id': opening_line.get('salesperson_id') or sid,
+                    'date': opening_line.get('invoice_date'),
+                    'date_due': None,
+                    'entry_type': 'opening_balance',
+                    'move_id': False,
+                    'journal_id': False,
+                    'document': opening_line.get('document_name') or _('Saldo inicial'),
+                    'reference': opening_line.get('reference') or '',
+                    'currency_id': company.currency_id.id,
+                    'amount_total': 0.0,
+                    'amount_applied': 0.0,
+                    'residual': opening_line.get('amount_residual') or 0.0,
+                    'opening_balance': opening_line.get('opening_balance') or 0.0,
+                    'amount_pending_draft': 0.0,
+                    'legend': _('Saldo previo al período'),
+                    'bucket_aging': 'na',
+                    'bucket_0_30': 0.0,
+                    'bucket_31_60': 0.0,
+                    'bucket_61_90': 0.0,
+                    'bucket_91_plus': 0.0,
+                    'payment_state': '',
+                    'level': 0,
+                    'sequence': sequence,
+                })
+                sequence += 1
+
             invoices = [inv for inv in cust['invoices'] if inv['type'] == 'invoice']
             invoices.sort(key=lambda inv: (inv.get('invoice_date') or date.min, inv.get('move_id') or 0))
 
@@ -948,6 +1195,7 @@ class CustomerStatementWizard(models.TransientModel):
                     'amount_total': inv['amount_total'],
                     'amount_applied': inv['amount_applied'],
                     'residual': inv['amount_residual'],
+                    'opening_balance': 0.0,
                     'amount_pending_draft': 0.0,
                     'legend': '',
                     'bucket_aging': inv['bucket'] if inv['bucket'] != 'na' else 'na',
@@ -996,6 +1244,7 @@ class CustomerStatementWizard(models.TransientModel):
                         'amount_total': 0.0,
                         'amount_applied': applied.get('applied_amount') or 0.0,
                         'residual': 0.0,
+                        'opening_balance': 0.0,
                         'amount_pending_draft': 0.0,
                         'legend': legend,
                         'bucket_aging': 'na',
@@ -1026,6 +1275,7 @@ class CustomerStatementWizard(models.TransientModel):
                         'amount_total': 0.0,
                         'amount_applied': 0.0,
                         'residual': 0.0,
+                        'opening_balance': 0.0,
                         'amount_pending_draft': dp['amount'],
                         'legend': _('Pendiente por aplicar'),
                         'bucket_aging': 'na',
@@ -1044,16 +1294,26 @@ class CustomerStatementWizard(models.TransientModel):
     # ======================================================================
     def _get_report_data(self):
         """Construye el dict serializable para PDF y XLSX."""
+        company = self._get_report_company()
+        if self.env.company != company:
+            report_ctx = self._get_report_context(company)
+            return (
+                self.with_context(**report_ctx)
+                .with_company(company)
+                ._get_report_data()
+            )
         structure = self._compute_report_structure()
         return {
             'wizard_id': self.id,
+            'company_id': company.id,
+            'company_name': company.name,
             'date_from': self._format_date_dmy(self.date_from),
             'date_to': self._format_date_dmy(self.date_to),
             'report_mode': self.report_mode,
             'show_draft_payments': self.show_draft_payments,
             'include_credit_notes': self.include_credit_notes,
             'currency_display': self.currency_display,
-            'company': self.env.company,
+            'company': company,
             'customers': structure['customers'],
             'grand_totals': structure['grand_totals'],
         }
@@ -1065,11 +1325,21 @@ class CustomerStatementWizard(models.TransientModel):
         if report_mode_ctx in ('summary', 'detail') and self.report_mode != report_mode_ctx:
             # Asegura coherencia con el modo seleccionado en el formulario.
             self.write({'report_mode': report_mode_ctx})
+        company = self._get_report_company()
+        report_ctx = self._get_report_context(company)
+        wizard = self.with_context(**report_ctx).with_company(company)
         # Se envía solo wizard_id (payload pequeño) y el parser recalcula datos.
         # Evita URLs enormes en /report/download y mantiene filtros consistentes.
         return self.env.ref(
             'sng_customer_statement.action_report_customer_statement'
-        ).report_action(self, data={'wizard_id': self.id})
+        ).with_context(**report_ctx).report_action(
+            wizard,
+            data={
+                'wizard_id': self.id,
+                'company_id': company.id,
+                'allowed_company_ids': report_ctx['allowed_company_ids'],
+            },
+        )
 
     # ======================================================================
     # ACCIÓN 3: XLSX
@@ -1086,8 +1356,11 @@ class CustomerStatementWizard(models.TransientModel):
         if report_mode_ctx in ('summary', 'detail') and self.report_mode != report_mode_ctx:
             # Asegura que el backend use el modo seleccionado en el formulario.
             self.write({'report_mode': report_mode_ctx})
-        data = self._get_report_data()
-        output = self._build_excel(data)
+        company = self._get_report_company()
+        report_ctx = self._get_report_context(company)
+        wizard = self.with_context(**report_ctx).with_company(company)
+        data = wizard._get_report_data()
+        output = wizard._build_excel(data)
         filename = f"estado_cuenta_{self.report_mode}_{self.date_from}_{self.date_to}.xlsx"
         self.write({
             'excel_file': base64.b64encode(output.getvalue()),
@@ -1148,14 +1421,15 @@ class CustomerStatementWizard(models.TransientModel):
         ws = wb.add_worksheet('Resumen')
         ws.set_column('A:A', 35); ws.set_column('B:B', 14); ws.set_column('C:C', 15)
         ws.set_column('D:D', 15); ws.set_column('E:E', 15); ws.set_column('F:F', 15)
-        ws.set_column('G:G', 11); ws.set_column('H:H', 11); ws.set_column('I:I', 11)
-        ws.set_column('J:J', 11); ws.set_column('K:K', 12); ws.set_column('L:L', 12)
+        ws.set_column('G:G', 15); ws.set_column('H:H', 11); ws.set_column('I:I', 11)
+        ws.set_column('J:J', 11); ws.set_column('K:K', 11); ws.set_column('L:L', 12)
+        ws.set_column('M:M', 12)
         row = 0
-        ws.merge_range(row, 0, row, 11, f"ESTADO DE CUENTA DE CLIENTES — {company.name}", fmt_title); row += 1
-        ws.merge_range(row, 0, row, 11, f"Período: {data['date_from']} al {data['date_to']}", fmt_subtitle); row += 2
-        headers = ['Cliente','RUC/NIT','Total Facturado','Total Pagado','Saldo Pendiente',
-                   'Pendiente x Aplicar','Venc. 0-30','Venc. 31-60','Venc. 61-90','Venc. 91+',
-                   'Últ. Factura','Últ. Pago']
+        ws.merge_range(row, 0, row, 12, f"ESTADO DE CUENTA DE CLIENTES — {company.name}", fmt_title); row += 1
+        ws.merge_range(row, 0, row, 12, f"Período: {data['date_from']} al {data['date_to']}", fmt_subtitle); row += 2
+        headers = ['Cliente','RUC/NIT','Total Facturado','Total Pagado','Saldo Inicial',
+                   'Saldo Pendiente','Pendiente x Aplicar','Venc. 0-30','Venc. 31-60',
+                   'Venc. 61-90','Venc. 91+','Últ. Factura','Últ. Pago']
         for col, h in enumerate(headers):
             ws.write(row, col, h, fmt_header)
         row += 1
@@ -1164,23 +1438,26 @@ class CustomerStatementWizard(models.TransientModel):
             ws.write(row, 1, cust['partner_vat'], fmt_cell)
             ws.write(row, 2, cust['total_invoiced'], fmt_num)
             ws.write(row, 3, cust['total_applied'], fmt_num_blue)
-            ws.write(row, 4, cust['total_residual'], fmt_num_red if cust['total_residual'] > 0 else fmt_num)
-            ws.write(row, 5, cust['total_draft_pending'], fmt_draft_num)
-            ws.write(row, 6, cust['bucket_0_30'], fmt_num)
-            ws.write(row, 7, cust['bucket_31_60'], fmt_num)
-            ws.write(row, 8, cust['bucket_61_90'], fmt_num)
-            ws.write(row, 9, cust['bucket_91_plus'], fmt_num_red if cust['bucket_91_plus'] > 0 else fmt_num)
-            ws.write(row, 10, self._format_date_dmy(cust.get('last_invoice_date')), fmt_cell)
-            ws.write(row, 11, self._format_date_dmy(cust.get('last_payment_date')), fmt_cell)
+            ws.write(row, 4, cust['opening_balance'], fmt_num_red if cust['opening_balance'] > 0 else fmt_num)
+            ws.write(row, 5, cust['total_residual'], fmt_num_red if cust['total_residual'] > 0 else fmt_num)
+            ws.write(row, 6, cust['total_draft_pending'], fmt_draft_num)
+            ws.write(row, 7, cust['bucket_0_30'], fmt_num)
+            ws.write(row, 8, cust['bucket_31_60'], fmt_num)
+            ws.write(row, 9, cust['bucket_61_90'], fmt_num)
+            ws.write(row, 10, cust['bucket_91_plus'], fmt_num_red if cust['bucket_91_plus'] > 0 else fmt_num)
+            ws.write(row, 11, self._format_date_dmy(cust.get('last_invoice_date')), fmt_cell)
+            ws.write(row, 12, self._format_date_dmy(cust.get('last_payment_date')), fmt_cell)
             row += 1
         gt = data['grand_totals']
         row += 1
         ws.merge_range(row, 0, row, 1, 'TOTAL GENERAL', fmt_total_lbl)
-        for col, key in enumerate(['total_invoiced','total_applied','total_residual',
-                                    'total_draft_pending','bucket_0_30','bucket_31_60',
-                                    'bucket_61_90','bucket_91_plus'], start=2):
+        for col, key in enumerate(['total_invoiced', 'total_applied',
+                                    'total_opening_balance', 'total_residual',
+                                    'total_draft_pending', 'bucket_0_30',
+                                    'bucket_31_60', 'bucket_61_90',
+                                    'bucket_91_plus'], start=2):
             ws.write(row, col, gt[key], fmt_total)
-        ws.write(row, 10, '', fmt_total); ws.write(row, 11, '', fmt_total)
+        ws.write(row, 11, '', fmt_total); ws.write(row, 12, '', fmt_total)
 
     def _write_excel_detail_sheet(self, wb, cust, data, company,
                                    fmt_title, fmt_header, fmt_partner,
@@ -1209,7 +1486,21 @@ class CustomerStatementWizard(models.TransientModel):
 
         subtotal_invoiced = 0.0
         subtotal_applied = 0.0
-        subtotal_residual = 0.0
+        subtotal_residual = cust.get('opening_balance', 0.0)
+
+        opening_line = cust.get('opening_line')
+        if opening_line:
+            ws.write(row, 0, self._format_date_dmy(opening_line.get('invoice_date')), fmt_cell)
+            ws.write(row, 1, 'Saldo inicial', fmt_cell)
+            ws.write(row, 2, self._coerce_translated_text(opening_line.get('document_name')), fmt_partner)
+            ws.write(row, 3, '', fmt_cell)
+            ws.write(row, 4, self._coerce_translated_text(opening_line.get('reference')) or '', fmt_cell)
+            ws.write(row, 5, self._coerce_translated_text(opening_line.get('currency_name')), fmt_cell)
+            ws.write(row, 6, 0.0, fmt_num)
+            ws.write(row, 7, 0.0, fmt_num_blue)
+            ws.write(row, 8, opening_line.get('amount_residual') or 0.0, fmt_num_red)
+            ws.write(row, 9, '', fmt_cell)
+            row += 1
 
         for inv in invoices:
             ws.write(row, 0, self._format_date_dmy(inv.get('invoice_date')), fmt_cell)

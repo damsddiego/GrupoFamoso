@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- ============================================ -->
+        <!-- VISTAS PARA ui.security.rule (FASE 2)        -->
+        <!-- ============================================ -->
+
+        <!-- FORMULARIO -->
+        <record id="view_ui_security_rule_form" model="ir.ui.view">
+            <field name="name">ui.security.rule.form</field>
+            <field name="model">ui.security.rule</field>
+            <field name="arch" type="xml">
+                <form string="Regla de Seguridad UI">
+                    <header>
+                        <button name="action_view_affected_users"
+                                string="Ver Usuarios Afectados"
+                                type="object"
+                                class="oe_highlight"
+                                invisible="effective_users_count == 0"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button name="action_view_affected_users"
+                                    type="object"
+                                    class="oe_stat_button"
+                                    icon="fa-users">
+                                <field name="effective_users_count" widget="statinfo" string="Usuarios"/>
+                            </button>
+                        </div>
+
+                        <widget name="web_ribbon" title="Inactiva" bg_color="text-bg-danger" invisible="active"/>
+
+                        <div class="oe_title">
+                            <label for="name" class="oe_edit_only"/>
+                            <h1>
+                                <field name="name" placeholder="ej: Ocultar costo de producto"/>
+                            </h1>
+                        </div>
+
+                        <group>
+                            <group name="target_info">
+                                <field name="active"/>
+                                <field name="sequence"/>
+                                <field name="model_id"/>
+                                <field name="model_name" invisible="1"/>
+                            </group>
+                            <group name="rule_config">
+                                <field name="target_type"/>
+                                <field name="target_name" placeholder="ej: standard_price"/>
+                                <field name="rule_type"/>
+                                <field name="view_types"/>
+                            </group>
+                        </group>
+
+                        <group name="security_groups">
+                            <group>
+                                <field name="group_mode" widget="radio"/>
+                            </group>
+                            <field name="group_ids" widget="many2many_tags" nolabel="1"/>
+                        </group>
+
+                        <group name="notes">
+                            <field name="note" placeholder="Documentación sobre el propósito de esta regla..." nolabel="1"/>
+                        </group>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids"/>
+                        <field name="message_ids"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <!-- LISTA/TREE -->
+        <record id="view_ui_security_rule_tree" model="ir.ui.view">
+            <field name="name">ui.security.rule.tree</field>
+            <field name="model">ui.security.rule</field>
+            <field name="arch" type="xml">
+                <tree string="Reglas de Seguridad UI"
+                      decoration-muted="not active"
+                      default_order="sequence, model_id">
+                    <field name="sequence" widget="handle"/>
+                    <field name="name"/>
+                    <field name="model_id"/>
+                    <field name="target_type"/>
+                    <field name="target_name"/>
+                    <field name="rule_type"/>
+                    <field name="view_types"/>
+                    <field name="group_ids" widget="many2many_tags"/>
+                    <field name="effective_users_count"/>
+                    <field name="active"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- BÚSQUEDA -->
+        <record id="view_ui_security_rule_search" model="ir.ui.view">
+            <field name="name">ui.security.rule.search</field>
+            <field name="model">ui.security.rule</field>
+            <field name="arch" type="xml">
+                <search string="Buscar Reglas">
+                    <field name="name"/>
+                    <field name="model_id"/>
+                    <field name="target_name"/>
+                    <field name="group_ids"/>
+
+                    <filter string="Activas" name="active" domain="[('active', '=', True)]"/>
+                    <filter string="Inactivas" name="inactive" domain="[('active', '=', False)]"/>
+
+                    <separator/>
+                    <filter string="Ocultar Campo" name="hide_field" domain="[('rule_type', '=', 'hide'), ('target_type', '=', 'field')]"/>
+                    <filter string="Solo Lectura" name="readonly" domain="[('rule_type', '=', 'readonly')]"/>
+                    <filter string="Ocultar Botón" name="hide_button" domain="[('target_type', '=', 'button')]"/>
+
+                    <group expand="0" string="Agrupar Por">
+                        <filter string="Modelo" name="group_model" context="{'group_by': 'model_id'}"/>
+                        <filter string="Tipo de Regla" name="group_rule_type" context="{'group_by': 'rule_type'}"/>
+                        <filter string="Tipo de Elemento" name="group_target_type" context="{'group_by': 'target_type'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- ACCIÓN -->
+        <record id="action_ui_security_rule" model="ir.actions.act_window">
+            <field name="name">Reglas de Seguridad UI</field>
+            <field name="res_model">ui.security.rule</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{'search_default_active': 1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Crear una nueva regla de seguridad de interfaz
+                </p>
+                <p>
+                    Las reglas de seguridad UI permiten controlar qué elementos
+                    de la interfaz son visibles para cada grupo de usuarios.
+                </p>
+            </field>
+        </record>
+
+        <!-- MENÚ -->
+        <menuitem id="menu_ui_security_root"
+                  name="UI Security"
+                  sequence="100"
+                  web_icon="custom_ui_security,static/description/icon.png"
+                  groups="base.group_system"/>
+
+        <menuitem id="menu_ui_security_config"
+                  name="Configuración"
+                  parent="menu_ui_security_root"
+                  sequence="10"/>
+
+        <menuitem id="menu_ui_security_rules"
+                  name="Reglas de Seguridad"
+                  parent="menu_ui_security_config"
+                  action="action_ui_security_rule"
+                  sequence="10"/>
+
+    </data>
+</odoo>

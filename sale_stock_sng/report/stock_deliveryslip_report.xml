@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="paperformat_deliveryslip_sng" model="report.paperformat">
+        <field name="name">Delivery Slip SNG</field>
+        <field name="default" eval="False"/>
+        <field name="format">A4</field>
+        <field name="page_height">0</field>
+        <field name="page_width">0</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">5</field>
+        <field name="margin_bottom">10</field>
+        <field name="margin_left">7</field>
+        <field name="margin_right">7</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">0</field>
+        <field name="dpi">90</field>
+    </record>
+
+    <record id="stock.action_report_delivery" model="ir.actions.report">
+        <field name="paperformat_id" ref="sale_stock_sng.paperformat_deliveryslip_sng"/>
+    </record>
+
+    <template id="report_delivery_document_sng_header" inherit_id="stock.report_delivery_document">
+        <xpath expr="//div[@class='page']/h2[1]" position="before">
+            <t t-set="company_display_name"
+               t-value="o.company_id.commercial_name if 'commercial_name' in o.company_id._fields and o.company_id.commercial_name else o.company_id.name"/>
+            <t t-set="origin_warehouse"
+               t-value="o.location_id.warehouse_id.display_name or o.location_id.display_name"/>
+            <t t-set="destination_warehouse"
+               t-value="o.location_dest_id.warehouse_id.display_name or o.location_dest_id.display_name"/>
+            <div class="row mb-4 align-items-center">
+                <div class="col-4">
+                    <img t-if="o.company_id.logo"
+                         t-att-src="image_data_uri(o.company_id.logo)"
+                         alt="Logo"
+                         style="max-height:75px; max-width:220px;"/>
+                </div>
+                <div class="col-8 text-end">
+                    <div style="font-size:20px; font-weight:700;">
+                        <span t-esc="company_display_name"/>
+                    </div>
+                    <t t-if="company_display_name != o.company_id.name">
+                        <div>
+                            <span t-esc="o.company_id.name"/>
+                        </div>
+                    </t>
+                    <t t-if="o.company_id.street">
+                        <div>
+                            <span t-esc="o.company_id.street"/>
+                        </div>
+                    </t>
+                    <t t-if="o.company_id.phone">
+                        <div>
+                            <span t-esc="o.company_id.phone"/>
+                        </div>
+                    </t>
+                    <t t-if="o.company_id.email">
+                        <div>
+                            <span t-esc="o.company_id.email"/>
+                        </div>
+                    </t>
+                </div>
+            </div>
+            <div class="row mb-3" t-if="o.picking_type_id.code == 'internal'">
+                <div class="col-6">
+                    <strong>Bodega origen:</strong>
+                    <span t-esc="origin_warehouse"/>
+                </div>
+                <div class="col-6">
+                    <strong>Bodega destino:</strong>
+                    <span t-esc="destination_warehouse"/>
+                </div>
+            </div>
+        </xpath>
+    </template>
+
+    <template id="report_delivery_document_sng_internal_contact" inherit_id="stock.report_delivery_document">
+        <xpath expr="//div[@name='div_incoming_address']/div[@name='customer_address']" position="after">
+            <div name="internal_contact_address" t-if="o.picking_type_id.code == 'internal' and partner">
+                <strong>Contact</strong>
+                <t t-set="show_partner" t-value="True"/>
+            </div>
+        </xpath>
+    </template>
+
+    <template id="report_delivery_document_sng_prices_not_done" inherit_id="stock.report_delivery_document">
+        <xpath expr="//table[@name='stock_move_table']" position="before">
+            <t t-set="delivery_report_totals" t-value="o._get_delivery_report_totals()"/>
+        </xpath>
+        <xpath expr="//table[@name='stock_move_table']/tbody/tr/td[@class='o_td_quantity text-end'][1]" position="replace">
+            <td class="o_td_quantity text-end">
+                <span t-esc="move.product_uom_qty" t-options="{'widget': 'integer'}"/>
+            </td>
+        </xpath>
+        <xpath expr="//table[@name='stock_move_table']/tbody/tr/td[@class='o_td_quantity text-end'][last()]" position="replace">
+            <td class="o_td_quantity text-end">
+                <span t-esc="move.quantity" t-options="{'widget': 'integer'}"/>
+            </td>
+        </xpath>
+        <xpath expr="//table[@name='stock_move_table']/thead/tr/th[@name='th_sm_quantity']" position="after">
+            <th name="th_sm_price" class="text-end"><strong>Precio unitario</strong></th>
+            <th name="th_sm_subtotal" class="text-end"><strong>Subtotal</strong></th>
+        </xpath>
+        <xpath expr="//table[@name='stock_move_table']/tbody/tr/td[@class='o_td_quantity text-end'][last()]" position="after">
+            <td class="text-end">
+                <span t-esc="move.price_unit" t-options="{'widget': 'monetary', 'display_currency': o.company_id.currency_id}"/>
+            </td>
+            <td class="text-end">
+                <span t-esc="(move.product_uom_qty or 0.0) * (move.price_unit or 0.0)" t-options="{'widget': 'monetary', 'display_currency': o.company_id.currency_id}"/>
+            </td>
+        </xpath>
+        <xpath expr="//table[@name='stock_move_table']/tbody" position="after">
+            <tfoot>
+                <tr>
+                    <td class="text-end">
+                        <strong>Total</strong>
+                    </td>
+                    <td class="text-end">
+                        <strong>
+                            <span t-esc="delivery_report_totals['qty_ordered']" t-options="{'widget': 'integer'}"/>
+                        </strong>
+                    </td>
+                    <td class="text-end">
+                        <strong>
+                            <span t-esc="delivery_report_totals['qty_delivered']" t-options="{'widget': 'integer'}"/>
+                        </strong>
+                    </td>
+                    <td></td>
+                    <td class="text-end">
+                        <strong>
+                            <span t-esc="delivery_report_totals['subtotal']" t-options="{'widget': 'monetary', 'display_currency': o.company_id.currency_id}"/>
+                        </strong>
+                    </td>
+                </tr>
+            </tfoot>
+        </xpath>
+    </template>
+
+    <template id="report_delivery_document_sng_prices_done" inherit_id="stock.report_delivery_document">
+        <xpath expr="//table[@name='stock_move_line_table']" position="before">
+            <t t-set="delivery_report_totals" t-value="o._get_delivery_report_totals()"/>
+        </xpath>
+        <xpath expr="//table[@name='stock_move_line_table']/thead/tr/th[@name='th_sml_quantity']" position="after">
+            <th name="th_sml_price" class="text-end">Precio unitario</th>
+            <th name="th_sml_subtotal" class="text-end">Subtotal</th>
+        </xpath>
+        <xpath expr="//table[@name='stock_move_line_table']/tbody" position="after">
+            <tfoot>
+                <tr t-if="not has_serial_number">
+                    <td class="text-end">
+                        <strong>Total</strong>
+                    </td>
+                    <td class="text-center">
+                        <strong>
+                            <span t-esc="delivery_report_totals['qty_ordered']" t-options="{'widget': 'integer'}"/>
+                        </strong>
+                    </td>
+                    <td class="text-center">
+                        <strong>
+                            <span t-esc="delivery_report_totals['qty_delivered']" t-options="{'widget': 'integer'}"/>
+                        </strong>
+                    </td>
+                    <td></td>
+                    <td class="text-end">
+                        <strong>
+                            <span t-esc="delivery_report_totals['subtotal']" t-options="{'widget': 'monetary', 'display_currency': o.company_id.currency_id}"/>
+                        </strong>
+                    </td>
+                </tr>
+                <tr t-else="">
+                    <td colspan="2" class="text-end">
+                        <strong>Total</strong>
+                    </td>
+                    <td class="text-center">
+                        <strong>
+                            <span t-esc="delivery_report_totals['qty_delivered']" t-options="{'widget': 'integer'}"/>
+                        </strong>
+                    </td>
+                    <td></td>
+                    <td class="text-end">
+                        <strong>
+                            <span t-esc="delivery_report_totals['subtotal']" t-options="{'widget': 'monetary', 'display_currency': o.company_id.currency_id}"/>
+                        </strong>
+                    </td>
+                </tr>
+            </tfoot>
+        </xpath>
+    </template>
+
+    <template id="stock_report_delivery_has_serial_move_line_sng_quantity" inherit_id="stock.stock_report_delivery_has_serial_move_line">
+        <xpath expr="//td[@name='move_line_lot_quantity']" position="replace">
+            <td class="text-center" name="move_line_lot_quantity">
+                <span t-esc="move_line.quantity" t-options="{'widget': 'integer'}"/>
+            </td>
+        </xpath>
+    </template>
+
+    <template id="stock_report_delivery_aggregated_move_lines_sng_quantities" inherit_id="stock.stock_report_delivery_aggregated_move_lines">
+        <xpath expr="//td[@name='move_line_aggregated_qty_ordered']" position="replace">
+            <td class="text-center" name="move_line_aggregated_qty_ordered">
+                <span t-esc="aggregated_lines[line]['qty_ordered']" t-options="{'widget': 'integer'}"/>
+            </td>
+        </xpath>
+        <xpath expr="//td[@name='move_line_aggregated_quantity']" position="replace">
+            <td class="text-center" name="move_line_aggregated_quantity">
+                <span t-if="aggregated_lines[line]['quantity']" t-esc="aggregated_lines[line]['quantity']" t-options="{'widget': 'integer'}"/>
+            </td>
+        </xpath>
+    </template>
+
+    <template id="stock_report_delivery_has_serial_move_line_sng_prices" inherit_id="stock.stock_report_delivery_has_serial_move_line">
+        <xpath expr="//td[@name='move_line_lot_quantity']" position="after">
+            <td class="text-end">
+                <span t-esc="move_line.move_id.price_unit" t-options="{'widget': 'monetary', 'display_currency': move_line.company_id.currency_id}"/>
+            </td>
+            <td class="text-end">
+                <span t-esc="(move_line.quantity or 0.0) * (move_line.move_id.price_unit or 0.0)" t-options="{'widget': 'monetary', 'display_currency': move_line.company_id.currency_id}"/>
+            </td>
+        </xpath>
+    </template>
+
+    <template id="stock_report_delivery_aggregated_move_lines_sng_prices" inherit_id="stock.stock_report_delivery_aggregated_move_lines">
+        <xpath expr="//td[@name='move_line_aggregated_quantity']" position="after">
+            <td class="text-end">
+                <span t-esc="aggregated_lines[line]['price_unit']" t-options="{'widget': 'monetary', 'display_currency': o.company_id.currency_id}"/>
+            </td>
+            <td class="text-end">
+                <span t-esc="aggregated_lines[line]['subtotal']" t-options="{'widget': 'monetary', 'display_currency': o.company_id.currency_id}"/>
+            </td>
+        </xpath>
+    </template>
+
+    <template id="report_delivery_document_sng_total" inherit_id="stock.report_delivery_document">
+        <xpath expr="//div[@name='signature']" position="after">
+            <t t-set="delivery_report_totals" t-value="o._get_delivery_report_totals()"/>
+            <div class="row mt-3">
+                <div class="col-6"/>
+                <div class="col-6 text-end">
+                    <div>
+                        <strong>Subtotal:</strong>
+                        <span t-esc="delivery_report_totals['subtotal']" t-options="{'widget': 'monetary', 'display_currency': o.company_id.currency_id}"/>
+                    </div>
+                    <div>
+                        <strong>Impuesto:</strong>
+                        <span t-esc="delivery_report_totals['tax']" t-options="{'widget': 'monetary', 'display_currency': o.company_id.currency_id}"/>
+                    </div>
+                    <div>
+                        <strong>Total:</strong>
+                        <span t-esc="delivery_report_totals['total']" t-options="{'widget': 'monetary', 'display_currency': o.company_id.currency_id}"/>
+                    </div>
+                </div>
+            </div>
+        </xpath>
+    </template>
+</odoo>

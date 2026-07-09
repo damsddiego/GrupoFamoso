@@ -1,0 +1,36 @@
+<odoo>
+  <record id="view_consign_cxc_wizard_form" model="ir.ui.view">
+    <field name="name">consign.cxc.wizard.form</field>
+    <field name="model">consign.cxc.wizard</field>
+    <field name="arch" type="xml">
+      <form string="Reporte Consignaciones y CxC">
+        <group>
+          <group>
+            <field name="date_from"/>
+            <field name="date_to" required="1"/>
+          </group>
+          <group>
+            <field name="user_id" options="{'no_create_edit': True, 'no_open': True}"/>
+            <field name="location_ids" domain="[('usage','=','internal')]" widget="many2many_tags" options="{'no_create_edit': True}"/>
+          </group>
+        </group>
+        <footer>
+          <button string="Cancelar" class="btn-secondary" special="cancel"/>
+          <button string="Imprimir" type="object" name="action_print" class="btn-primary"/>
+        </footer>
+      </form>
+    </field>
+  </record>
+
+  <!-- Acción para abrir el wizard (puedes ubicarlo en Ventas > Informes) -->
+  <record id="action_consign_cxc_wizard" model="ir.actions.act_window">
+    <field name="name">Consignaciones y CxC</field>
+    <field name="res_model">consign.cxc.wizard</field>
+    <field name="view_mode">form</field>
+    <field name="target">new</field>
+  </record>
+
+  <!-- Menú opcional -->
+  <menuitem id="menu_consign_cxc_root" name="Reportes Personalizados" parent="sale.menu_sale_report"/>
+  <menuitem id="menu_consign_cxc_wizard" name="Consignaciones y CxC" parent="menu_consign_cxc_root" action="action_consign_cxc_wizard"/>
+</odoo>

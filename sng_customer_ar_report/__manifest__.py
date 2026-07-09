@@ -23,6 +23,7 @@ Características:
     'depends': ['account', 'customer_sequence'],
     'data': [
         'security/ir.model.access.csv',
+        'security/security.xml',
         'views/sng_customer_ar_report_views.xml',
         'views/sng_customer_ar_report_wizard_views.xml',
     ],

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_sng_antiguedad_ventas_wizard_form" model="ir.ui.view">
+        <field name="name">sng.antiguedad.ventas.wizard.form</field>
+        <field name="model">sng.antiguedad.ventas.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Antigüedad de Ventas">
+                <group>
+                    <group string="Parámetros">
+                        <field name="cutoff_date"/>
+                        <field name="num_months"/>
+                    </group>
+                </group>
+                <footer>
+                    <button name="action_open_report" string="Ver Reporte"
+                        type="object" class="btn-primary"/>
+                    <button name="action_export_xlsx" string="Exportar Excel"
+                        type="object" class="btn-secondary"/>
+                    <button string="Cancelar" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_sng_antiguedad_ventas_wizard" model="ir.actions.act_window">
+        <field name="name">Antigüedad de Ventas</field>
+        <field name="res_model">sng.antiguedad.ventas.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

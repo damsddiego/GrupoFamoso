@@ -21,7 +21,7 @@
                 <field name="entry_type" string="Tipo" optional="show" widget="badge"
                        decoration-success="entry_type == 'payment_applied'"
                        decoration-info="entry_type == 'credit_note'"
-                       decoration-warning="entry_type == 'payment_draft'"
+                       decoration-warning="entry_type in ('payment_draft', 'opening_balance')"
                        decoration-primary="entry_type == 'invoice'"/>
                 <field name="display_document" string="Documento" optional="show"/>
                 <field name="journal_id" optional="show"/>
@@ -30,6 +30,7 @@
                 <field name="currency_id" optional="show"/>
                 <field name="amount_total" optional="show" sum="Total Facturado"/>
                 <field name="amount_applied" optional="show"/>
+                <field name="opening_balance" optional="show" sum="Saldo Inicial"/>
                 <field name="residual" optional="show" sum="Saldo Pendiente"/>
                 <!-- Campo informativo: nunca se suma al saldo contable -->
                 <field name="amount_pending_draft" optional="show" sum="Pendiente x Aplicar"/>
@@ -84,6 +85,7 @@
                             <field name="currency_id"/>
                             <field name="amount_total"/>
                             <field name="amount_applied"/>
+                            <field name="opening_balance"/>
                             <field name="residual"/>
                         </group>
                         <group>
@@ -127,6 +129,9 @@
                 <filter name="filter_credit_notes"
                         string="Notas de Crédito"
                         domain="[('entry_type', '=', 'credit_note')]"/>
+                <filter name="filter_opening_balance"
+                        string="Saldo Inicial"
+                        domain="[('entry_type', '=', 'opening_balance')]"/>
                 <filter name="filter_with_balance"
                         string="Con Saldo Pendiente"
                         domain="[('residual', '&gt;', 0)]"/>
@@ -190,6 +195,7 @@
                 <field name="entry_type" type="col"/>
                 <field name="amount_total" type="measure" string="Facturado"/>
                 <field name="amount_applied" type="measure" string="Pagado"/>
+                <field name="opening_balance" type="measure" string="Saldo Inicial"/>
                 <field name="residual" type="measure" string="Saldo"/>
                 <field name="amount_pending_draft" type="measure" string="Pend. x Aplicar"/>
                 <field name="bucket_0_30" type="measure" string="0-30"/>
@@ -271,6 +277,7 @@
                             <field name="total_applied"/>
                         </group>
                         <group>
+                            <field name="total_opening_balance"/>
                             <field name="total_residual"/>
                             <field name="total_draft_pending"/>
                         </group>
@@ -302,6 +309,7 @@
                 <field name="line_count" string="# Líneas"/>
                 <field name="total_invoiced"/>
                 <field name="total_applied"/>
+                <field name="total_opening_balance"/>
                 <field name="total_residual"/>
                 <field name="create_date"/>
                 <field name="create_uid"/>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- ============================================ -->
+        <!-- DATOS DE DEMOSTRACIÓN (OPCIONAL)             -->
+        <!-- ============================================ -->
+
+        <!-- Ejemplo de regla configurada para Fase 2 -->
+        <!--
+        <record id="demo_rule_hide_product_cost" model="ui.security.rule">
+            <field name="name">Demo: Ocultar costo de producto</field>
+            <field name="active">True</field>
+            <field name="sequence">10</field>
+            <field name="model_id" ref="product.model_product_template"/>
+            <field name="target_type">field</field>
+            <field name="target_name">standard_price</field>
+            <field name="rule_type">hide</field>
+            <field name="view_types">all</field>
+            <field name="group_mode">show_only_for</field>
+            <field name="group_ids" eval="[(6, 0, [ref('group_view_product_cost')])]"/>
+            <field name="note">Esta es una regla de demostración que replica la funcionalidad de Fase 1 pero usando el motor dinámico.</field>
+        </record>
+        -->
+
+    </data>
+</odoo>

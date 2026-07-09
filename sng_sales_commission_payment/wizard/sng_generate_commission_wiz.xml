@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_sng_generate_commission_wiz_form" model="ir.ui.view">
+            <field name="name">sng.generate.commission.wiz.form</field>
+            <field name="model">sng.generate.commission.wiz</field>
+            <field name="arch" type="xml">
+                <form string="Generar Comisiones Masivamente">
+                    <group>
+                        <group>
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                            <field name="salesperson_id"/>
+                        </group>
+                        <group>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="replace_existing_draft"/>
+                        </group>
+                    </group>
+                    <footer>
+                        <button
+                            name="action_generate"
+                            string="Generar Comisiones"
+                            type="object"
+                            class="oe_highlight"/>
+                        <button string="Cancelar" class="oe_link" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_sng_generate_commission_wiz" model="ir.actions.act_window">
+            <field name="name">Generar Comisiones por Rango</field>
+            <field name="res_model">sng.generate.commission.wiz</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+
+        <menuitem
+            id="menu_sng_generate_commission_wiz"
+            name="Generar comisiones por rango"
+            parent="sales_commission_omax.menu_sale_commission_root"
+            action="action_sng_generate_commission_wiz"
+            sequence="25"/>
+    </data>
+</odoo>

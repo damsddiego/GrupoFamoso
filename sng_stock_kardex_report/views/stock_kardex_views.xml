@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_stock_kardex_report_line_list" model="ir.ui.view">
+        <field name="name">stock.kardex.report.line.list</field>
+        <field name="model">stock.kardex.report.line</field>
+        <field name="arch" type="xml">
+            <list string="Kardex" create="false" edit="false" delete="false">
+                <field name="date"/>
+                <field name="reference" optional="show"/>
+                <field name="origin" optional="hide"/>
+                <field name="picking_type_id" optional="show"/>
+                <field name="location_id" optional="show"/>
+                <field name="location_dest_id" optional="show"/>
+                <field name="qty_in" sum="Total Entradas"/>
+                <field name="qty_out" sum="Total Salidas"/>
+                <field name="balance"/>
+                <field name="reserved_qty" string="Reservado" optional="show"/>
+                <field name="product_uom_id" options="{'no_create': True}" groups="uom.group_uom"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_stock_kardex_report_line_search" model="ir.ui.view">
+        <field name="name">stock.kardex.report.line.search</field>
+        <field name="model">stock.kardex.report.line</field>
+        <field name="arch" type="xml">
+            <search string="Kardex">
+                <field name="reference"/>
+                <field name="origin"/>
+                <field name="picking_type_id"/>
+                <field name="location_id"/>
+                <field name="location_dest_id"/>
+                <group expand="0" string="Agrupar por">
+                    <filter string="Tipo de operación" name="group_picking_type" context="{'group_by': 'picking_type_id'}"/>
+                    <filter string="Ubicación origen" name="group_location" context="{'group_by': 'location_id'}"/>
+                    <filter string="Ubicación destino" name="group_location_dest" context="{'group_by': 'location_dest_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Acción contextual desde producto -->
+    <record id="action_stock_kardex_from_product" model="ir.actions.act_window">
+        <field name="name">Kardex de Inventario</field>
+        <field name="res_model">stock.kardex.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'default_product_id': active_id}</field>
+    </record>
+</odoo>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- ============================================ -->
+        <!-- HERENCIA: product.template - LISTA           -->
+        <!-- ============================================ -->
+
+        <record id="product_template_tree_view_hide_cost" model="ir.ui.view">
+            <field name="name">product.template.tree.hide.cost</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_tree_view"/>
+            <field name="arch" type="xml">
+
+                <!-- Ocultar columna Cost en lista de productos -->
+                <xpath expr="//field[@name='standard_price']" position="attributes">
+                    <attribute name="groups">custom_ui_security.group_view_product_cost</attribute>
+                </xpath>
+
+            </field>
+        </record>
+
+        <!-- ============================================ -->
+        <!-- HERENCIA: product.template - FORMULARIO      -->
+        <!-- ============================================ -->
+
+        <record id="product_template_form_view_hide_cost" model="ir.ui.view">
+            <field name="name">product.template.form.hide.cost</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_only_form_view"/>
+            <field name="arch" type="xml">
+
+                <!-- Ocultar campo Costo en la pestaña Información General -->
+                <xpath expr="//field[@name='standard_price']" position="attributes">
+                    <attribute name="groups">custom_ui_security.group_view_product_cost</attribute>
+                </xpath>
+
+            </field>
+        </record>
+
+        <!-- ============================================ -->
+        <!-- HERENCIA: Vista de Variantes desde Template  -->
+        <!-- ============================================ -->
+
+        <!-- Esta vista se usa cuando se accede a variantes desde el template -->
+        <record id="product_variant_easy_edit_view_hide_cost" model="ir.ui.view">
+            <field name="name">product.product.variant.hide.cost</field>
+            <field name="model">product.product</field>
+            <field name="inherit_id" ref="product.product_variant_easy_edit_view"/>
+            <field name="arch" type="xml">
+
+                <!-- Ocultar costo en formulario rápido de variantes -->
+                <xpath expr="//field[@name='standard_price']" position="attributes">
+                    <attribute name="groups">custom_ui_security.group_view_product_cost</attribute>
+                </xpath>
+
+            </field>
+        </record>
+
+    </data>
+</odoo>

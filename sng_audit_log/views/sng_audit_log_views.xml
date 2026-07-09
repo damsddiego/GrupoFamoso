@@ -1,0 +1,96 @@
+<odoo>
+    <record id="view_sng_audit_log_list" model="ir.ui.view">
+        <field name="name">sng.audit.log.list</field>
+        <field name="model">sng.audit.log</field>
+        <field name="arch" type="xml">
+            <list string="Audit Logs" create="0" edit="0" delete="0">
+                <field name="event_date"/>
+                <field name="action"/>
+                <field name="model_name"/>
+                <field name="res_id"/>
+                <field name="record_name"/>
+                <field name="user_id"/>
+                <field name="company_id"/>
+                <field name="changed_fields"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_sng_audit_log_search" model="ir.ui.view">
+        <field name="name">sng.audit.log.search</field>
+        <field name="model">sng.audit.log</field>
+        <field name="arch" type="xml">
+            <search string="Audit Logs">
+                <field name="model_name"/>
+                <field name="res_id"/>
+                <field name="record_name"/>
+                <field name="user_id"/>
+                <filter name="create" string="Creates" domain="[('action', '=', 'create')]"/>
+                <filter name="write" string="Updates" domain="[('action', '=', 'write')]"/>
+                <filter name="unlink" string="Deletes" domain="[('action', '=', 'unlink')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_action" string="Action" context="{'group_by': 'action'}"/>
+                    <filter name="group_model" string="Model" context="{'group_by': 'model_name'}"/>
+                    <filter name="group_user" string="User" context="{'group_by': 'user_id'}"/>
+                    <filter name="group_company" string="Company" context="{'group_by': 'company_id'}"/>
+                    <filter name="group_date" string="Date" context="{'group_by': 'event_date:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_sng_audit_log_form" model="ir.ui.view">
+        <field name="name">sng.audit.log.form</field>
+        <field name="model">sng.audit.log</field>
+        <field name="arch" type="xml">
+            <form string="Audit Log" create="0" edit="0" delete="0">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="event_date" readonly="1"/>
+                            <field name="action" readonly="1"/>
+                            <field name="model_name" readonly="1"/>
+                            <field name="res_id" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="record_name" readonly="1"/>
+                            <field name="user_id" readonly="1"/>
+                            <field name="company_id" readonly="1"/>
+                            <field name="changed_fields" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Old Values">
+                            <field name="old_values" readonly="1" nolabel="1"/>
+                        </page>
+                        <page string="New Values">
+                            <field name="new_values" readonly="1" nolabel="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_sng_audit_log" model="ir.actions.act_window">
+        <field name="name">Audit Logs</field>
+        <field name="res_model">sng.audit.log</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_unlink': 1}</field>
+    </record>
+
+    <menuitem
+        id="menu_sng_audit_log_root"
+        name="SNG Audit"
+        parent="base.menu_administration"
+        groups="base.group_system"
+        sequence="90"/>
+
+    <menuitem
+        id="menu_sng_audit_log"
+        name="Audit Logs"
+        parent="menu_sng_audit_log_root"
+        action="action_sng_audit_log"
+        groups="base.group_system"
+        sequence="10"/>
+</odoo>

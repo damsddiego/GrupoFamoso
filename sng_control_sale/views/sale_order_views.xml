@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_order_form_revert_to_editable" model="ir.ui.view">
+        <field name="name">sale.order.form.revert.to.editable</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <field name="can_revert_to_editable" invisible="1"/>
+                <button
+                    name="action_revert_to_editable"
+                    type="object"
+                    string="Reversar para editar"
+                    class="btn-secondary"
+                    invisible="not can_revert_to_editable"
+                />
+            </xpath>
+        </field>
+    </record>
+</odoo>

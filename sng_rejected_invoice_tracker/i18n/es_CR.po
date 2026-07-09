@@ -1,0 +1,296 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* sng_rejected_invoice_tracker
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-27 03:30+0000\n"
+"PO-Revision-Date: 2026-05-27 03:30+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: sng_rejected_invoice_tracker
+#: model:ir.model.fields,field_description:sng_rejected_invoice_tracker.field_rejected_invoice_replacement_history__link_date
+msgid "Fecha de Vinculación"
+msgstr "Fecha de Vinculación"
+
+#. module: sng_rejected_invoice_tracker
+#: model:ir.model.fields,field_description:sng_rejected_invoice_tracker.field_rejected_invoice_replacement_history__linked_by_user_id
+msgid "Vinculado por"
+msgstr "Vinculado por"
+
+#. module: sng_rejected_invoice_tracker
+#: model:ir.model.fields,field_description:sng_rejected_invoice_tracker.field_rejected_invoice_replacement_history__is_current
+msgid "Reemplazo Actual"
+msgstr "Reemplazo Actual"
+
+#. module: sng_rejected_invoice_tracker
+#: model:ir.model.fields,help:sng_rejected_invoice_tracker.field_rejected_invoice_replacement_history__is_current
+msgid "Indica si este es el reemplazo activo actual."
+msgstr "Indica si este es el reemplazo activo actual."
+
+#. module: sng_rejected_invoice_tracker
+#: model:ir.model.fields,field_description:sng_rejected_invoice_tracker.field_rejected_invoice_replacement_history__notes
+msgid "Notas"
+msgstr "Notas"
+
+#. module: sng_rejected_invoice_tracker
+#: model:ir.model.fields,field_description:sng_rejected_invoice_tracker.field_rejected_invoice_replacement_history__company_id
+msgid "Compañía"
+msgstr "Compañía"
+
+#. module: sng_rejected_invoice_tracker
+#: model:ir.model.fields,field_description:sng_rejected_invoice_tracker.field_rejected_invoice_replacement_history__rejected_invoice_id
+msgid "Factura Rechazada"
+msgstr "Factura Rechazada"
+
+#. module: sng_rejected_invoice_tracker
+#: model:ir.model.fields,help:sng_rejected_invoice_tracker.field_rejected_invoice_replacement_history__rejected_invoice_id
+msgid "La factura original que fue rechazada por Hacienda."
+msgstr "La factura original que fue rechazada por Hacienda."
+
+#. module: sng_rejected_invoice_tracker
+#: model:ir.model.fields,field_description:sng_rejected_invoice_tracker.field_rejected_invoice_replacement_history__replacement_invoice_id
+msgid "Factura de Reemplazo"
+msgstr "Factura de Reemplazo"
+
+#. module: sng_rejected_invoice_tracker
+#: model:ir.model.fields,help:sng_rejected_invoice_tracker.field_rejected_invoice_replacement_history__replacement_invoice_id
+msgid "La factura que reemplaza a la factura rechazada."
+msgstr "La factura que reemplaza a la factura rechazada."
+
+#. module: sng_rejected_invoice_tracker
+#: model:ir.model.fields,field_description:sng_rejected_invoice_tracker.field_rejected_invoice_replacement_history__sequence
+msgid "Intento #"
+msgstr "Intento #"
+
+#. module: sng_rejected_invoice_tracker
+#: model:ir.model.fields,help:sng_rejected_invoice_tracker.field_rejected_invoice_replacement_history__sequence
+msgid "Número secuencial del intento de reemplazo."
+msgstr "Número secuencial del intento de reemplazo."
+
+#. module: sng_rejected_invoice_tracker
+#: model:ir.model.fields,field_description:sng_rejected_invoice_tracker.field_rejected_invoice_replacement_history__state
+msgid "Estado del Reemplazo"
+msgstr "Estado del Reemplazo"
+
+#. module: sng_rejected_invoice_tracker
+#: model:ir.model.fields.selection,name:sng_rejected_invoice_tracker.selection__rejected_invoice_replacement_history__state__draft
+msgid "Borrador"
+msgstr "Borrador"
+
+#. module: sng_rejected_invoice_tracker
+#: model:ir.model.fields.selection,name:sng_rejected_invoice_tracker.selection__rejected_invoice_replacement_history__state__linked
+msgid "Vinculado"
+msgstr "Vinculado"
+
+#. module: sng_rejected_invoice_tracker
+#: model:ir.model.fields.selection,name:sng_rejected_invoice_tracker.selection__rejected_invoice_replacement_history__state__accepted
+msgid "Aceptado por Hacienda"
+msgstr "Aceptado por Hacienda"
+
+#. module: sng_rejected_invoice_tracker
+#: model:ir.model.fields.selection,name:sng_rejected_invoice_tracker.selection__rejected_invoice_replacement_history__state__rejected
+msgid "Rechazado por Hacienda"
+msgstr "Rechazado por Hacienda"
+
+#. module: sng_rejected_invoice_tracker
+#: model:ir.model.fields.selection,name:sng_rejected_invoice_tracker.selection__rejected_invoice_replacement_history__state__cancelled
+msgid "Cancelado"
+msgstr "Cancelado"
+
+#. module: sng_rejected_invoice_tracker
+#: model:ir.model.constraint,message:sng_rejected_invoice_tracker.constraint_rejected_invoice_replacement_history_unique_current_per_rejected
+msgid "Solo puede haber un reemplazo 'actual' por factura rechazada."
+msgstr "Solo puede haber un reemplazo 'actual' por factura rechazada."
+
+#. module: sng_rejected_invoice_tracker
+#: code:addons/sng_rejected_invoice_tracker/models/replacement_history.py:0
+msgid "Una factura no puede ser reemplazo de sí misma."
+msgstr "Una factura no puede ser reemplazo de sí misma."
+
+#. module: sng_rejected_invoice_tracker
+#: code:addons/sng_rejected_invoice_tracker/models/replacement_history.py:0
+#, python-format
+msgid "La factura de reemplazo '%s' debe estar 'Aceptada' por Hacienda. Estado actual: %s"
+msgstr "La factura de reemplazo '%s' debe estar 'Aceptada' por Hacienda. Estado actual: %s"
+
+#. module: sng_rejected_invoice_tracker
+#: code:addons/sng_rejected_invoice_tracker/models/replacement_history.py:0
+msgid "Reemplazo de Factura Rechazada"
+msgstr "Reemplazo de Factura Rechazada"
+
+#. module: sng_rejected_invoice_tracker
+#: code:addons/sng_rejected_invoice_tracker/models/replacement_history.py:0
+msgid "Vinculación con Factura Rechazada"
+msgstr "Vinculación con Factura Rechazada"
+
+#. module: sng_rejected_invoice_tracker
+#: model:ir.model.fields,field_description:sng_rejected_invoice_tracker.field_account_move__rejected_invoice_history_ids
+msgid "Historial de Reemplazos"
+msgstr "Historial de Reemplazos"
+
+#. module: sng_rejected_invoice_tracker
+#: model:ir.model.fields,help:sng_rejected_invoice_tracker.field_account_move__rejected_invoice_history_ids
+msgid "Historial completo de intentos de reemplazo para esta factura rechazada."
+msgstr "Historial completo de intentos de reemplazo para esta factura rechazada."
+
+#. module: sng_rejected_invoice_tracker
+#: model:ir.model.fields,field_description:sng_rejected_invoice_tracker.field_account_move__replaced_by_invoice_id
+msgid "Reemplazada por"
+msgstr "Reemplazada por"
+
+#. module: sng_rejected_invoice_tracker
+#: model:ir.model.fields,help:sng_rejected_invoice_tracker.field_account_move__replaced_by_invoice_id
+msgid "La factura de reemplazo actual (más reciente)."
+msgstr "La factura de reemplazo actual (más reciente)."
+
+#. module: sng_rejected_invoice_tracker
+#: model:ir.model.fields,field_description:sng_rejected_invoice_tracker.field_account_move__replaces_invoice_id
+msgid "Reemplaza a"
+msgstr "Reemplaza a"
+
+#. module: sng_rejected_invoice_tracker
+#: model:ir.model.fields,help:sng_rejected_invoice_tracker.field_account_move__replaces_invoice_id
+msgid "Si esta factura es un reemplazo, apunta a la factura rechazada original."
+msgstr "Si esta factura es un reemplazo, apunta a la factura rechazada original."
+
+#. module: sng_rejected_invoice_tracker
+#: model:ir.model.fields,field_description:sng_rejected_invoice_tracker.field_account_move__fe_replacement_status
+msgid "Estado de Reemplazo"
+msgstr "Estado de Reemplazo"
+
+#. module: sng_rejected_invoice_tracker
+#: model:ir.model.fields.selection,name:sng_rejected_invoice_tracker.selection__account_move__fe_replacement_status__no_aplica
+msgid "No Aplica"
+msgstr "No Aplica"
+
+#. module: sng_rejected_invoice_tracker
+#: model:ir.model.fields.selection,name:sng_rejected_invoice_tracker.selection__account_move__fe_replacement_status__pendiente
+msgid "Pendiente de Reemplazo"
+msgstr "Pendiente de Reemplazo"
+
+#. module: sng_rejected_invoice_tracker
+#: model:ir.model.fields.selection,name:sng_rejected_invoice_tracker.selection__account_move__fe_replacement_status__reemplazada
+msgid "Reemplazada"
+msgstr "Reemplazada"
+
+#. module: sng_rejected_invoice_tracker
+#: model:ir.model.fields,field_description:sng_rejected_invoice_tracker.field_account_move__fe_replacement_status_display
+msgid "Estado Reemplazo (Texto)"
+msgstr "Estado Reemplazo (Texto)"
+
+#. module: sng_rejected_invoice_tracker
+#: model:ir.model.fields,field_description:sng_rejected_invoice_tracker.field_account_move__fe_replacement_attempt_count
+msgid "Intentos de Reemplazo"
+msgstr "Intentos de Reemplazo"
+
+#. module: sng_rejected_invoice_tracker
+#: code:addons/sng_rejected_invoice_tracker/models/account_move.py:0
+msgid "Solo se pueden crear reemplazos para facturas de cliente rechazadas por Hacienda."
+msgstr "Solo se pueden crear reemplazos para facturas de cliente rechazadas por Hacienda."
+
+#. module: sng_rejected_invoice_tracker
+#: code:addons/sng_rejected_invoice_tracker/models/account_move.py:0
+msgid "No se pudo crear la factura de reemplazo. Intente nuevamente."
+msgstr "No se pudo crear la factura de reemplazo. Intente nuevamente."
+
+#. module: sng_rejected_invoice_tracker
+#: code:addons/sng_rejected_invoice_tracker/models/account_move.py:0
+msgid "Factura de Reemplazo Creada"
+msgstr "Factura de Reemplazo Creada"
+
+#. module: sng_rejected_invoice_tracker
+#: code:addons/sng_rejected_invoice_tracker/models/account_move.py:0
+#, python-format
+msgid "Historial de Reemplazos - %s"
+msgstr "Historial de Reemplazos - %s"
+
+#. module: sng_rejected_invoice_tracker
+#: code:addons/sng_rejected_invoice_tracker/models/account_move.py:0
+msgid "Una factura no puede reemplazarse a sí misma."
+msgstr "Una factura no puede reemplazarse a sí misma."
+
+#. module: sng_rejected_invoice_tracker
+#: code:addons/sng_rejected_invoice_tracker/models/account_move.py:0
+#, python-format
+msgid "La factura de reemplazo '%s' debe pertenecer a la misma compañía."
+msgstr "La factura de reemplazo '%s' debe pertenecer a la misma compañía."
+
+#. module: sng_rejected_invoice_tracker
+#: code:addons/sng_rejected_invoice_tracker/wizard/link_replacement_wizard.py:0
+msgid "Solo se pueden vincular reemplazos para facturas de cliente rechazadas por Hacienda."
+msgstr "Solo se pueden vincular reemplazos para facturas de cliente rechazadas por Hacienda."
+
+#. module: sng_rejected_invoice_tracker
+#: code:addons/sng_rejected_invoice_tracker/wizard/link_replacement_wizard.py:0
+#, python-format
+msgid "La factura '%s' no está aceptada por Hacienda. Estado actual: %s"
+msgstr "La factura '%s' no está aceptada por Hacienda. Estado actual: %s"
+
+#. module: sng_rejected_invoice_tracker
+#: code:addons/sng_rejected_invoice_tracker/wizard/link_replacement_wizard.py:0
+msgid "La factura de reemplazo debe pertenecer a la misma compañía que la factura rechazada."
+msgstr "La factura de reemplazo debe pertenecer a la misma compañía que la factura rechazada."
+
+#. module: sng_rejected_invoice_tracker
+#: code:addons/sng_rejected_invoice_tracker/wizard/link_replacement_wizard.py:0
+#, python-format
+msgid "La factura '%s' ya está vinculada como reemplazo de '%s'. Una factura solo puede reemplazar a una factura rechazada."
+msgstr "La factura '%s' ya está vinculada como reemplazo de '%s'. Una factura solo puede reemplazar a una factura rechazada."
+
+#. module: sng_rejected_invoice_tracker
+#: code:addons/sng_rejected_invoice_tracker/wizard/link_replacement_wizard.py:0
+msgid "Debe seleccionar una factura de reemplazo."
+msgstr "Debe seleccionar una factura de reemplazo."
+
+#. module: sng_rejected_invoice_tracker
+#: model_terms:ir.ui.view,arch_db:sng_rejected_invoice_tracker.view_move_form_rejected_tracker
+msgid "Crear Factura de Reemplazo"
+msgstr "Crear Factura de Reemplazo"
+
+#. module: sng_rejected_invoice_tracker
+#: model_terms:ir.ui.view,arch_db:sng_rejected_invoice_tracker.view_move_form_rejected_tracker
+msgid "Vincular Factura Existente"
+msgstr "Vincular Factura Existente"
+
+#. module: sng_rejected_invoice_tracker
+#: model_terms:ir.ui.view,arch_db:sng_rejected_invoice_tracker.view_move_form_rejected_tracker
+msgid "Ver Historial Completo"
+msgstr "Ver Historial Completo"
+
+#. module: sng_rejected_invoice_tracker
+#: model:ir.actions.act_window,name:sng_rejected_invoice_tracker.action_rejected_invoices
+msgid "Facturas Rechazadas por Hacienda"
+msgstr "Facturas Rechazadas por Hacienda"
+
+#. module: sng_rejected_invoice_tracker
+#: model:ir.ui.menu,name:sng_rejected_invoice_tracker.menu_rejected_invoices_root
+msgid "Facturas Rechazadas Hacienda"
+msgstr "Facturas Rechazadas Hacienda"
+
+#. module: sng_rejected_invoice_tracker
+#: model:ir.ui.menu,name:sng_rejected_invoice_tracker.menu_rejected_invoices_list
+msgid "Facturas Rechazadas"
+msgstr "Facturas Rechazadas"
+
+#. module: sng_rejected_invoice_tracker
+#: model:ir.ui.menu,name:sng_rejected_invoice_tracker.menu_replacement_history
+msgid "Historial de Reemplazos"
+msgstr "Historial de Reemplazos"
+
+#. module: sng_rejected_invoice_tracker
+#: model:ir.model,name:sng_rejected_invoice_tracker.model_rejected_invoice_replacement_history
+msgid "Rejected Invoice Replacement History"
+msgstr "Historial de Reemplazo de Factura Rechazada"
+
+#. module: sng_rejected_invoice_tracker
+#: model:ir.model,name:sng_rejected_invoice_tracker.model_rejected_invoice_replacement_wizard
+msgid "Wizard to Link Replacement Invoice"
+msgstr "Asistente para Vincular Factura de Reemplazo"

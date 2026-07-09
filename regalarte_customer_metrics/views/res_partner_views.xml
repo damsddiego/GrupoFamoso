@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_partner_form_regalarte_customer_metrics" model="ir.ui.view">
+        <field name="name">res.partner.form.regalarte.customer.metrics</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button
+                    name="action_open_customer_metrics_dashboard"
+                    type="object"
+                    class="oe_stat_button"
+                    icon="fa-bar-chart"
+                    groups="account.group_account_readonly">
+                    <div class="o_stat_info">
+                        <span class="o_stat_text">Dashboard</span>
+                        <span class="o_stat_text">Métricas</span>
+                    </div>
+                </button>
+
+                <button
+                    name="action_recompute_customer_metrics"
+                    type="object"
+                    class="oe_stat_button"
+                    icon="fa-line-chart"
+                    groups="account.group_account_readonly">
+                    <div class="o_stat_info">
+                        <span class="o_stat_text">Actualizar</span>
+                        <span class="o_stat_text">Métricas</span>
+                    </div>
+                </button>
+
+                <button
+                    name="action_export_customer_metrics_xlsx"
+                    type="object"
+                    class="oe_stat_button"
+                    icon="fa-download"
+                    groups="account.group_account_readonly">
+                    <div class="o_stat_info">
+                        <span class="o_stat_text">Exportar</span>
+                        <span class="o_stat_text">XLSX</span>
+                    </div>
+                </button>
+            </xpath>
+
+            <xpath expr="//page[@name='sales_purchases']" position="after">
+                <page name="customer_metrics" string="Indicadores del Cliente">
+                    <field name="customer_metric_current_id" invisible="1"/>
+                    <field name="customer_metric_currency_id" invisible="1"/>
+                    <group col="2">
+                        <group string="Ventas">
+                            <field name="customer_company_previous_month_sales" readonly="1"/>
+                            <field name="customer_company_current_month_sales" readonly="1"/>
+                            <field name="customer_company_quarterly_avg_sales" readonly="1"/>
+                            <field name="customer_company_semiannual_avg_sales" readonly="1"/>
+                            <field name="customer_company_annual_avg_sales" readonly="1"/>
+                        </group>
+                        <group string="Pago y Cobranza">
+                            <field name="customer_company_dpp_days" readonly="1"/>
+                            <field name="customer_company_monthly_collection_avg" readonly="1"/>
+                            <field name="customer_company_quarterly_collection_avg" readonly="1"/>
+                            <field name="customer_company_metrics_last_update" readonly="1"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

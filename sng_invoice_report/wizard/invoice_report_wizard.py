@@ -1,5 +1,6 @@
-import io
 import base64
+import io
+from collections import OrderedDict
 from datetime import date
 
 from odoo import api, fields, models, _
@@ -82,6 +83,7 @@ class InvoiceReportWizard(models.TransientModel):
         Respects multi-company access rules by filtering on company_ids.
         Only returns invoices from companies the user has access to.
         """
+        allowed_companies = self._get_selected_companies()
         domain = [
             ('invoice_date', '>=', self.date_from),
             ('invoice_date', '<=', self.date_to),
@@ -90,27 +92,17 @@ class InvoiceReportWizard(models.TransientModel):
 
         # Multi-company filter: only show invoices from selected companies
         # that are within user's allowed companies
-        if self.company_ids:
-            # Intersect selected companies with user's allowed companies
-            allowed_companies = self.company_ids & self.env.companies
-            if allowed_companies:
-                domain.append(('company_id', 'in', allowed_companies.ids))
-            else:
-                # If no intersection, return empty domain
-                domain.append(('id', '=', False))
+        if allowed_companies:
+            domain.append(('company_id', 'in', allowed_companies.ids))
         else:
-            # If no companies selected, use user's allowed companies
-            domain.append(('company_id', 'in', self.env.companies.ids))
+            domain.append(('id', '=', False))
 
-        if self.invoice_type == 'all':
-            domain.append(('move_type', 'in', ['out_invoice', 'out_refund']))
-        else:
-            domain.append(('move_type', '=', self.invoice_type))
+        domain.append(('move_type', 'in', self._get_report_move_types()))
 
         if self.salesperson_ids:
             domain.append(('salesperson_id', 'in', self.salesperson_ids.ids))
-        # Note: When no salesperson selected, we don't add any filter here
-        # Instead, we filter invalid salespersons in _get_report_data
+        # Note: When no salesperson selected, we don't add any filter here.
+        # Invalid salespersons are removed in the shared report helper.
 
         # Filter by payment status
         if self.payment_status != 'all':
@@ -118,12 +110,135 @@ class InvoiceReportWizard(models.TransientModel):
 
         return domain
 
+    def _get_selected_companies(self):
+        """Return the companies effectively available to the report."""
+        self.ensure_one()
+        if self.company_ids:
+            return self.company_ids & self.env.companies
+        return self.env.companies
+
+    def _get_report_move_types(self):
+        """Return the move types included in the current report."""
+        self.ensure_one()
+        if self.invoice_type == 'out_refund':
+            return ['out_refund']
+        return ['out_invoice', 'out_refund']
+
+    def _get_grouping_salesperson(self, invoice):
+        """Return the salesperson used for grouping and export headers."""
+        self.ensure_one()
+        return invoice.salesperson_id or invoice.assigned_salesperson_id
+
+    def _is_report_invoice(self, invoice):
+        """Apply export-level filtering that cannot be expressed in the domain."""
+        self.ensure_one()
+        salesperson = self._get_grouping_salesperson(invoice)
+        if salesperson and not self.salesperson_ids and not salesperson.is_salesperson:
+            return False
+        return True
+
     def _get_invoices(self):
-        """Get invoices based on the filters."""
+        """Get the final document universe shared by screen and export."""
         domain = self._get_invoices_domain()
-        # Order by salesperson_id first, but we'll handle fallback in _get_report_data
-        invoices = self.env['account.move'].search(domain, order='salesperson_id, invoice_date')
-        return invoices
+        invoices = self.env['account.move'].search(
+            domain,
+            order='salesperson_id, invoice_date, id',
+        )
+
+        unique_invoice_ids = OrderedDict()
+        for invoice in invoices:
+            if self._is_report_invoice(invoice):
+                unique_invoice_ids.setdefault(invoice.id, None)
+
+        return self.env['account.move'].browse(list(unique_invoice_ids))
+
+    def _get_salesperson_entries(self, invoices, salesperson_id):
+        """Order one salesperson block, keeping linked refunds after the source invoice."""
+        self.ensure_one()
+        ordered_invoices = invoices.sorted(
+            key=lambda invoice: (invoice.invoice_date or date.min, invoice.id)
+        )
+        invoice_ids = set(ordered_invoices.ids)
+        inline_refunds_by_origin = {}
+
+        for invoice in ordered_invoices:
+            if invoice.move_type != 'out_refund' or not invoice.reversed_entry_id:
+                continue
+
+            origin_salesperson = self._get_grouping_salesperson(invoice.reversed_entry_id)
+            origin_salesperson_id = origin_salesperson.id if origin_salesperson else False
+            if (
+                invoice.reversed_entry_id.id in invoice_ids
+                and origin_salesperson_id == salesperson_id
+            ):
+                inline_refunds_by_origin.setdefault(
+                    invoice.reversed_entry_id.id,
+                    [],
+                ).append(invoice)
+
+        entries = []
+        emitted_ids = set()
+
+        for invoice in ordered_invoices:
+            if invoice.id in emitted_ids:
+                continue
+
+            if invoice.move_type == 'out_refund' and invoice.reversed_entry_id:
+                origin_salesperson = self._get_grouping_salesperson(invoice.reversed_entry_id)
+                origin_salesperson_id = origin_salesperson.id if origin_salesperson else False
+                if (
+                    invoice.reversed_entry_id.id in invoice_ids
+                    and origin_salesperson_id == salesperson_id
+                ):
+                    continue
+
+            entries.append((invoice, False))
+            emitted_ids.add(invoice.id)
+
+            for refund in inline_refunds_by_origin.get(invoice.id, []):
+                if refund.id not in emitted_ids:
+                    entries.append((refund, True))
+                    emitted_ids.add(refund.id)
+
+        for invoice in ordered_invoices:
+            if invoice.id not in emitted_ids:
+                entries.append((invoice, False))
+                emitted_ids.add(invoice.id)
+
+        return entries
+
+    def _prepare_invoice_data(self, invoice, inline_after_origin=False):
+        """Convert one document into the structure consumed by PDF and Excel."""
+        self.ensure_one()
+        is_credit_note = invoice.move_type == 'out_refund'
+
+        if is_credit_note:
+            amount_untaxed = -abs(invoice.amount_untaxed)
+            amount_tax = -abs(invoice.amount_tax)
+            amount_total = -abs(invoice.amount_total)
+        else:
+            amount_untaxed = abs(invoice.amount_untaxed)
+            amount_tax = abs(invoice.amount_tax)
+            amount_total = abs(invoice.amount_total)
+
+        number = invoice.name
+        if is_credit_note and inline_after_origin:
+            number = f"↳ {number}"
+
+        return {
+            'number': number,
+            'date': str(invoice.invoice_date) if invoice.invoice_date else '',
+            'partner': invoice.partner_id.name,
+            'partner_vat': invoice.partner_id.vat or '',
+            'currency': invoice.currency_id.name,
+            'company': invoice.company_id.name,
+            'amount_untaxed': amount_untaxed,
+            'amount_tax': amount_tax,
+            'amount_total': amount_total,
+            'move_type': dict(invoice._fields['move_type'].selection).get(invoice.move_type),
+            'payment_state': invoice.payment_state,
+            'is_reversal_line': is_credit_note,
+        }
 
     def _get_report_data(self):
         """Prepare data for the report grouped by salesperson.
@@ -136,33 +251,21 @@ class InvoiceReportWizard(models.TransientModel):
         if not invoices:
             raise UserError(_("No invoices found with the selected filters."))
 
-        # Collect IDs of reversals already in the invoice set to avoid duplicates
-        reversal_ids_in_set = set()
-        for invoice in invoices:
-            if invoice.move_type == 'out_refund' and invoice.reversed_entry_id:
-                reversal_ids_in_set.add(invoice.id)
-
         # Group invoices by salesperson
         data_by_salesperson = {}
+        invoices_by_salesperson = {}
         grand_total_untaxed = 0.0
         grand_total_tax = 0.0
         grand_total = 0.0
 
         # Get company names for display
-        company_names = ', '.join(self.company_ids.mapped('name')) if len(self.company_ids) > 1 else (
-            self.company_ids.name if self.company_ids else self.env.company.name
+        selected_companies = self._get_selected_companies()
+        company_names = ', '.join(selected_companies.mapped('name')) if len(selected_companies) > 1 else (
+            selected_companies.name if selected_companies else self.env.company.name
         )
 
         for invoice in invoices:
-            # Use salesperson_id first, fallback to assigned_salesperson_id
-            # This handles cases where salesperson_id is empty but customer has assigned salesperson
-            salesperson = invoice.salesperson_id or invoice.assigned_salesperson_id
-
-            # Skip invoices with invalid salespersons (contacts not marked as is_salesperson)
-            # Only if no specific salesperson was selected in the filter
-            if salesperson and not self.salesperson_ids:
-                if not salesperson.is_salesperson:
-                    continue  # Skip this invoice
+            salesperson = self._get_grouping_salesperson(invoice)
 
             # Handle missing salesperson with a default value
             salesperson_id = salesperson.id if salesperson else False
@@ -177,77 +280,29 @@ class InvoiceReportWizard(models.TransientModel):
                     'total_tax': 0.0,
                     'total': 0.0,
                 }
+                invoices_by_salesperson[salesperson_id] = self.env['account.move']
 
-            # Credit notes (out_refund) should always show negative values
-            is_credit_note = invoice.move_type == 'out_refund'
+            invoices_by_salesperson[salesperson_id] |= invoice
 
-            if is_credit_note:
-                # Credit notes: negative values to subtract from totals
-                amount_untaxed = -abs(invoice.amount_untaxed)
-                amount_tax = -abs(invoice.amount_tax)
-                amount_total = -abs(invoice.amount_total)
-            else:
-                # Regular invoices: positive values
-                amount_untaxed = abs(invoice.amount_untaxed)
-                amount_tax = abs(invoice.amount_tax)
-                amount_total = abs(invoice.amount_total)
+        for salesperson_id, salesperson_data in data_by_salesperson.items():
+            salesperson_invoices = invoices_by_salesperson[salesperson_id]
 
-            invoice_data = {
-                'number': invoice.name,
-                'date': str(invoice.invoice_date) if invoice.invoice_date else '',
-                'partner': invoice.partner_id.name,
-                'partner_vat': invoice.partner_id.vat or '',
-                'currency': invoice.currency_id.name,
-                'company': invoice.company_id.name,
-                'amount_untaxed': amount_untaxed,
-                'amount_tax': amount_tax,
-                'amount_total': amount_total,
-                'move_type': dict(invoice._fields['move_type'].selection).get(invoice.move_type),
-                'payment_state': invoice.payment_state,
-                'is_reversal_line': is_credit_note,  # Credit notes shown in gray/italic style
-            }
-            data_by_salesperson[salesperson_id]['invoices'].append(invoice_data)
-            data_by_salesperson[salesperson_id]['total_untaxed'] += amount_untaxed
-            data_by_salesperson[salesperson_id]['total_tax'] += amount_tax
-            data_by_salesperson[salesperson_id]['total'] += amount_total
+            for invoice, inline_after_origin in self._get_salesperson_entries(
+                salesperson_invoices,
+                salesperson_id,
+            ):
+                invoice_data = self._prepare_invoice_data(
+                    invoice,
+                    inline_after_origin=inline_after_origin,
+                )
+                salesperson_data['invoices'].append(invoice_data)
+                salesperson_data['total_untaxed'] += invoice_data['amount_untaxed']
+                salesperson_data['total_tax'] += invoice_data['amount_tax']
+                salesperson_data['total'] += invoice_data['amount_total']
 
-            grand_total_untaxed += amount_untaxed
-            grand_total_tax += amount_tax
-            grand_total += amount_total
-
-            # If invoice is reversed, add its credit note(s) right after
-            # BUT only if they are NOT already in the main invoice set (to avoid duplicates)
-            if invoice.payment_state == 'reversed' and invoice.reversal_move_ids:
-                for reversal in invoice.reversal_move_ids.filtered(lambda r: r.state == 'posted'):
-                    # Skip if this reversal is already in our main invoice list
-                    if reversal.id in reversal_ids_in_set:
-                        continue
-
-                    # Credit notes should show negative values (to subtract from totals)
-                    # Use negative absolute values to ensure they always subtract
-                    reversal_data = {
-                        'number': f"↳ {reversal.name}",
-                        'date': str(reversal.invoice_date) if reversal.invoice_date else '',
-                        'partner': reversal.partner_id.name,
-                        'partner_vat': reversal.partner_id.vat or '',
-                        'currency': reversal.currency_id.name,
-                        'company': reversal.company_id.name,
-                        'amount_untaxed': -abs(reversal.amount_untaxed),
-                        'amount_tax': -abs(reversal.amount_tax),
-                        'amount_total': -abs(reversal.amount_total),
-                        'move_type': dict(reversal._fields['move_type'].selection).get(reversal.move_type),
-                        'payment_state': reversal.payment_state,
-                        'is_reversal_line': True,
-                    }
-                    data_by_salesperson[salesperson_id]['invoices'].append(reversal_data)
-                    # Subtract reversal amounts from totals
-                    data_by_salesperson[salesperson_id]['total_untaxed'] -= abs(reversal.amount_untaxed)
-                    data_by_salesperson[salesperson_id]['total_tax'] -= abs(reversal.amount_tax)
-                    data_by_salesperson[salesperson_id]['total'] -= abs(reversal.amount_total)
-
-                    grand_total_untaxed -= abs(reversal.amount_untaxed)
-                    grand_total_tax -= abs(reversal.amount_tax)
-                    grand_total -= abs(reversal.amount_total)
+                grand_total_untaxed += invoice_data['amount_untaxed']
+                grand_total_tax += invoice_data['amount_tax']
+                grand_total += invoice_data['amount_total']
 
         return {
             'date_from': str(self.date_from),
@@ -258,7 +313,7 @@ class InvoiceReportWizard(models.TransientModel):
             'grand_total': grand_total,
             'company': self.env.company,
             'company_names': company_names,
-            'companies_count': len(self.company_ids) if self.company_ids else 1,
+            'companies_count': len(selected_companies) if selected_companies else 1,
             'invoice_count': len(invoices),
         }
 
@@ -269,7 +324,9 @@ class InvoiceReportWizard(models.TransientModel):
         Groups by effective_salesperson_id to show correct salesperson grouping.
         """
         self.ensure_one()
-        domain = self._get_invoices_domain()
+        invoices = self._get_invoices()
+        selected_companies = self._get_selected_companies()
+        domain = [('id', 'in', invoices.ids or [False])]
 
         # Build context with proper multi-company and grouping
         context = dict(self.env.context)
@@ -280,8 +337,8 @@ class InvoiceReportWizard(models.TransientModel):
         })
 
         # Add allowed companies to context
-        if self.company_ids:
-            context['allowed_company_ids'] = self.company_ids.ids
+        if selected_companies:
+            context['allowed_company_ids'] = selected_companies.ids
 
         # Get the custom tree view
         tree_view = self.env.ref('sng_invoice_report.view_invoice_tree_effective_salesperson', False)

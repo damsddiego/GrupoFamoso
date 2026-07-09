@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_sng_create_commission_bill_wiz_form" model="ir.ui.view">
+            <field name="name">sng.create.commission.bill.wiz.form</field>
+            <field name="model">sng.create.commission.bill.wiz</field>
+            <field name="arch" type="xml">
+                <form string="Generar Factura de Comisión">
+                    <group>
+                        <field name="date"/>
+                        <field name="company_id" groups="base.group_multi_company"/>
+                        <field name="account_id"/>
+                        <field name="group_by_salesperson"/>
+                    </group>
+                    <footer>
+                        <button
+                            name="action_create_bills"
+                            string="Generar Factura"
+                            type="object"
+                            class="oe_highlight"/>
+                        <button string="Cancelar" class="oe_link" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_sng_create_commission_bill_wiz" model="ir.actions.act_window">
+            <field name="name">Generar Factura de Comisión</field>
+            <field name="res_model">sng.create.commission.bill.wiz</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+            <field name="binding_model_id" ref="model_sng_commission_payment_line"/>
+            <field name="binding_view_types">list</field>
+        </record>
+    </data>
+</odoo>

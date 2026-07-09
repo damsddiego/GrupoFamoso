@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ==================== VISTA TREE DE DESGLOSE POR BODEGA ==================== -->
+    <record id="view_stock_location_report_warehouse_line_tree" model="ir.ui.view">
+        <field name="name">stock.location.report.warehouse.line.tree</field>
+        <field name="model">stock.location.report.warehouse.line</field>
+        <field name="arch" type="xml">
+            <list string="Desglose por Bodega">
+                <field name="report_id" invisible="1"/>
+                <field name="default_code"/>
+                <field name="product_name"/>
+                <field name="warehouse_name"/>
+                <field name="uom_id"/>
+                <field name="saldo_inicial_qty" sum="Total"/>
+                <field name="entradas_qty" sum="Total"/>
+                <field name="salidas_qty" sum="Total"/>
+                <field name="fisico_qty" sum="Total"/>
+                <field name="reservado_qty" sum="Total"/>
+                <field name="disponible_qty" sum="Total"/>
+            </list>
+        </field>
+    </record>
+</odoo>

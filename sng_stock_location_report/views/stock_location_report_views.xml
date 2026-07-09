@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ==================== VISTA FORM DEL REPORTE ==================== -->
+    <record id="view_stock_location_report_form" model="ir.ui.view">
+        <field name="name">stock.location.report.form</field>
+        <field name="model">stock.location.report</field>
+        <field name="arch" type="xml">
+            <form string="Reporte de Movimientos por Ubicación">
+                <header>
+                    <button name="action_generate_report"
+                            string="Generar Reporte"
+                            type="object"
+                            class="oe_highlight"
+                            invisible="state != 'draft'"/>
+                    <button name="action_reset_to_draft"
+                            string="Volver a Borrador"
+                            type="object"
+                            invisible="state != 'generated'"/>
+                    <button name="action_export_excel"
+                            string="Exportar a Excel"
+                            type="object"
+                            class="oe_highlight"
+                            invisible="state != 'generated'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,generated"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Filtros">
+                            <field name="warehouse_ids"
+                                   widget="many2many_tags"
+                                   options="{'no_create': True}"
+                                   readonly="state == 'generated'"/>
+                            <field name="location_id"
+                                   options="{'no_create': True}"
+                                   readonly="state == 'generated'"/>
+                            <field name="product_id"
+                                   options="{'no_create': True}"
+                                   readonly="state == 'generated'"/>
+                            <field name="date_from" readonly="state == 'generated'"/>
+                            <field name="date_to" readonly="state == 'generated'"/>
+                        </group>
+                        <group string="Totales" invisible="state != 'generated'">
+                            <field name="total_saldo_inicial" readonly="1"/>
+                            <field name="total_entradas" readonly="1"/>
+                            <field name="total_salidas" readonly="1"/>
+                            <field name="total_fisico" readonly="1"/>
+                            <field name="total_reservado" readonly="1"/>
+                            <field name="total_disponible" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <notebook invisible="state != 'generated'">
+                        <page string="Detalle por Producto">
+                            <field name="line_ids" readonly="1"/>
+                        </page>
+                        <page string="Por Bodega">
+                            <field name="warehouse_line_ids" readonly="1">
+                                <list>
+                                    <field name="default_code" string="Código"/>
+                                    <field name="product_name" string="Producto"/>
+                                    <field name="warehouse_name" string="Almacén"/>
+                                    <field name="uom_id" string="Unidad"/>
+                                    <field name="saldo_inicial_qty" string="Saldo Inicial" sum="Total"/>
+                                    <field name="entradas_qty" string="Entradas" sum="Total"/>
+                                    <field name="salidas_qty" string="Salidas" sum="Total"/>
+                                    <field name="fisico_qty" string="Cant. Física" sum="Total"/>
+                                    <field name="reservado_qty" string="Reservado" sum="Total"/>
+                                    <field name="disponible_qty" string="Disponible" sum="Total"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- ==================== VISTA TREE DEL REPORTE ==================== -->
+    <record id="view_stock_location_report_tree" model="ir.ui.view">
+        <field name="name">stock.location.report.tree</field>
+        <field name="model">stock.location.report</field>
+        <field name="arch" type="xml">
+            <list string="Reportes de Movimientos" decoration-muted="state == 'draft'">
+                <field name="name"/>
+                <field name="warehouse_ids" widget="many2many_tags"/>
+                <field name="location_id"/>
+                <field name="product_id"/>
+                <field name="date_from"/>
+                <field name="date_to"/>
+                <field name="total_saldo_inicial"/>
+                <field name="total_entradas"/>
+                <field name="total_salidas"/>
+                <field name="total_fisico"/>
+                <field name="total_disponible"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'generated'"
+                       decoration-muted="state == 'draft'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ==================== VISTA SEARCH DEL REPORTE ==================== -->
+    <record id="view_stock_location_report_search" model="ir.ui.view">
+        <field name="name">stock.location.report.search</field>
+        <field name="model">stock.location.report</field>
+        <field name="arch" type="xml">
+            <search string="Buscar Reportes">
+                <field name="name"/>
+                <field name="warehouse_ids"/>
+                <field name="location_id"/>
+                <field name="product_id"/>
+                <filter string="Borrador" name="draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Generado" name="generated" domain="[('state', '=', 'generated')]"/>
+                <group expand="0" string="Agrupar Por">
+                    <filter string="Almacén" name="group_warehouse" context="{'group_by': 'warehouse_ids'}"/>
+                    <filter string="Estado" name="group_state" context="{'group_by': 'state'}"/>
+                    <filter string="Fecha Desde" name="group_date_from" context="{'group_by': 'date_from'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- ==================== ACCIÓN DEL REPORTE ==================== -->
+    <record id="action_stock_location_report" model="ir.actions.act_window">
+        <field name="name">Reporte de Movimientos por Ubicación</field>
+        <field name="res_model">stock.location.report</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_stock_location_report_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Crear un nuevo reporte de movimientos
+            </p>
+            <p>
+                Seleccione uno o más almacenes, una ubicación (opcional), un producto (opcional)
+                y un rango de fechas para generar un reporte detallado de entradas, salidas y reservas.
+            </p>
+        </field>
+    </record>
+
+    <!-- ==================== MENÚ ==================== -->
+    <menuitem id="menu_stock_location_report_root"
+              name="Reporte por Ubicación"
+              parent="stock.menu_warehouse_report"
+              sequence="50"
+              action="action_stock_location_report"
+              groups="stock.group_stock_user"/>
+</odoo>

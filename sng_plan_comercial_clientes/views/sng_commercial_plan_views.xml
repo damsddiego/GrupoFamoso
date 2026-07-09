@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_sng_commercial_plan_search" model="ir.ui.view">
+        <field name="name">sng.commercial.plan.search</field>
+        <field name="model">sng.commercial.plan</field>
+        <field name="arch" type="xml">
+            <search string="Planes Comerciales">
+                <field name="name"/>
+                <field name="company_id"/>
+                <field name="base_year"/>
+                <field name="target_year"/>
+                <filter name="filter_draft" string="Borrador" domain="[('state', '=', 'draft')]"/>
+                <filter name="filter_calculated" string="Calculado" domain="[('state', '=', 'calculated')]"/>
+                <filter name="filter_closed" string="Cerrado" domain="[('state', '=', 'closed')]"/>
+                <group expand="0" string="Agrupar por">
+                    <filter name="group_company" string="Compania" context="{'group_by': 'company_id'}"/>
+                    <filter name="group_state" string="Estado" context="{'group_by': 'state'}"/>
+                    <filter name="group_target_year" string="Ano Objetivo" context="{'group_by': 'target_year'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_sng_commercial_plan_tree" model="ir.ui.view">
+        <field name="name">sng.commercial.plan.tree</field>
+        <field name="model">sng.commercial.plan</field>
+        <field name="arch" type="xml">
+            <list string="Planes Comerciales">
+                <field name="name"/>
+                <field name="company_id"/>
+                <field name="base_year"/>
+                <field name="target_year"/>
+                <field name="state"/>
+                <field name="line_count"/>
+                <field name="total_base_sales" sum="Venta Base"/>
+                <field name="total_target_sales" sum="Meta Total"/>
+                <field name="total_current_sales" sum="Venta Actual"/>
+                <field name="total_compliance_percent" widget="percentage"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_sng_commercial_plan_form" model="ir.ui.view">
+        <field name="name">sng.commercial.plan.form</field>
+        <field name="model">sng.commercial.plan</field>
+        <field name="arch" type="xml">
+            <form string="Plan Comercial">
+                <header>
+                    <button name="action_load_customers"
+                            string="Cargar clientes"
+                            type="object"
+                            class="btn-secondary"
+                            groups="sng_plan_comercial_clientes.group_sng_plan_comercial_manager"
+                            invisible="state == 'closed'"/>
+                    <button name="action_calculate_plan"
+                            string="Calcular plan"
+                            type="object"
+                            class="btn-primary"
+                            groups="sng_plan_comercial_clientes.group_sng_plan_comercial_manager"
+                            invisible="state == 'closed'"/>
+                    <button name="action_recalculate_metrics"
+                            string="Recalcular metricas"
+                            type="object"
+                            class="btn-secondary"
+                            groups="sng_plan_comercial_clientes.group_sng_plan_comercial_manager"
+                            invisible="state == 'closed'"/>
+                    <button name="action_open_export_wizard"
+                            string="Exportar Excel"
+                            type="object"
+                            class="btn-secondary"
+                            groups="sng_plan_comercial_clientes.group_sng_plan_comercial_manager"/>
+                    <button name="action_set_draft"
+                            string="Pasar a borrador"
+                            type="object"
+                            class="btn-secondary"
+                            groups="sng_plan_comercial_clientes.group_sng_plan_comercial_manager"
+                            invisible="state == 'draft'"/>
+                    <button name="action_close"
+                            string="Cerrar plan"
+                            type="object"
+                            class="btn-secondary"
+                            groups="sng_plan_comercial_clientes.group_sng_plan_comercial_manager"
+                            invisible="state == 'closed'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,calculated,closed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="company_id"/>
+                            <field name="base_year"/>
+                            <field name="target_year"/>
+                            <field name="active"/>
+                        </group>
+                        <group>
+                            <field name="budget_total"/>
+                            <field name="target_total_manual"/>
+                            <field name="protected_target_total" readonly="1"/>
+                            <field name="effective_growth_factor" readonly="1"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+
+                    <group string="Resumen">
+                        <group>
+                            <field name="total_base_sales" widget="monetary"/>
+                            <field name="total_target_sales" widget="monetary"/>
+                            <field name="total_current_sales" widget="monetary"/>
+                        </group>
+                        <group>
+                            <field name="total_compliance_percent" widget="percentage"/>
+                            <field name="line_count"/>
+                            <field name="segment_a_count"/>
+                            <field name="segment_b_count"/>
+                            <field name="segment_c_count"/>
+                            <field name="no_dpp_count"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Configuracion">
+                            <group>
+                                <group string="Metas">
+                                    <field name="use_global_factor"/>
+                                    <field name="global_growth_factor" invisible="not use_global_factor"/>
+                                    <field name="growth_factor_a" invisible="use_global_factor"/>
+                                    <field name="growth_factor_b" invisible="use_global_factor"/>
+                                    <field name="growth_factor_c" invisible="use_global_factor"/>
+                                </group>
+                                <group string="Segmentacion">
+                                    <field name="a_limit_percent" widget="percentage"/>
+                                    <field name="b_limit_percent" widget="percentage"/>
+                                    <field name="dpp_limit_a"/>
+                                    <field name="dpp_limit_b"/>
+                                    <field name="empty_dpp_label"/>
+                                </group>
+                            </group>
+                            <separator string="Notas tecnicas"/>
+                            <div class="text-muted">
+                                <p>Ventas: el plan usa `account.move` publicado, `move_type in (out_invoice, out_refund)`, `amount_total_signed` y resta notas de credito del periodo.</p>
+                                <p>DPP: el plan reutiliza la logica del modulo de metricas del cliente y toma la ultima fecha de cobro que deja saldada cada factura pagada.</p>
+                                <p>Meta protegida: si define una meta total manual o presupuesto total, el factor real se calcula automaticamente contra la venta base total.</p>
+                            </div>
+                        </page>
+                        <page string="Lineas">
+                            <field name="line_ids" nolabel="1" readonly="1">
+                                <list string="Clientes" create="0" delete="0">
+                                    <field name="segment_order"/>
+                                    <field name="customer_code"/>
+                                    <field name="partner_id"/>
+                                    <field name="commercial_name"/>
+                                    <field name="assigned_salesperson_id"/>
+                                    <field name="base_sales_amount" sum="Venta Base"/>
+                                    <field name="participation_percent" widget="percentage"/>
+                                    <field name="cumulative_percent" widget="percentage"/>
+                                    <field name="sales_segment"/>
+                                    <field name="dpp_value"/>
+                                    <field name="dpp_segment"/>
+                                    <field name="final_segment_label"/>
+                                    <field name="target_amount" sum="Meta"/>
+                                    <field name="monthly_target_amount" sum="Meta Mensual"/>
+                                    <field name="budget_amount" sum="Presupuesto"/>
+                                    <field name="current_sales_amount" sum="Venta Actual"/>
+                                    <field name="compliance_percent" widget="percentage"/>
+                                    <field name="achievement_gap_percent" widget="percentage" optional="hide"/>
+                                    <field name="monthly_gap_amount" sum="Crecimiento" optional="hide"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_sng_commercial_plan" model="ir.actions.act_window">
+        <field name="name">Planes Comerciales</field>
+        <field name="res_model">sng.commercial.plan</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_sng_commercial_plan_search"/>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p>Cree un plan comercial anual por cliente y calcule ventas, DPP, metas y cumplimiento.</p>
+        </field>
+    </record>
+
+    <menuitem id="menu_sng_plan_comercial_root"
+              name="Plan Comercial"
+              parent="sale.sale_menu_root"
+              sequence="90"
+              groups="sng_plan_comercial_clientes.group_sng_plan_comercial_user"/>
+
+    <menuitem id="menu_sng_commercial_plan"
+              name="Planes Comerciales"
+              parent="menu_sng_plan_comercial_root"
+              action="action_sng_commercial_plan"
+              sequence="10"
+              groups="sng_plan_comercial_clientes.group_sng_plan_comercial_user"/>
+</odoo>

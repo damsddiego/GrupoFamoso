@@ -79,7 +79,7 @@ class SaleOrder(models.Model):
         total_amount = self.amount_due
         if partner_id.credit_check:
             existing_move = self.env['account.move'].search(
-                [('partner_id', '=', self.partner_id.id), ('state', '=', 'posted')])
+                [('partner_id', '=', self.partner_id.id), ('state', '=', 'posted'), ('company_id', '=', self.company_id.id)])
             if (self.amount_due + self.amount_total) > self.customer_blocking_limit and\
              not self.is_credit_limit_final_approved:
                 difference_amount = round((self.amount_due + self.amount_total) - self.customer_blocking_limit, 2)

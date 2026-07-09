@@ -11,12 +11,14 @@
     'website': 'https://www.sngcloud.com',
     'depends': [
         'sale',
+        'sale_stock',
         'stock',
         'sale_account_manager_customer_credit_limit_approval',
     ],
     'data': [
         'security/security.xml',
         'views/res_config_settings_views.xml',
+        'views/sale_order_views.xml',
     ],
     'installable': True,
     'auto_install': False,

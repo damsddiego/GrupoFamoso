@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============================================================
+         ACCIÓN DE VENTANA: FACTURAS RECHAZADAS POR HACIENDA
+         ============================================================ -->
+    <record id="action_rejected_invoices" model="ir.actions.act_window">
+        <field name="name">Documentos Rechazados por Hacienda</field>
+        <field name="res_model">account.move</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="view_rejected_invoice_tree"/>
+        <field name="search_view_id" ref="account.view_account_invoice_filter"/>
+        <field name="domain">[
+            ("move_type", "in", ("out_invoice", "out_refund")),
+            "|", ("state_tributacion", "=", "rechazado"), ("einvoice_had_rejection", "=", True),
+        ]</field>
+        <field name="context">{
+            'search_default_hacienda_rejected': 1,
+        }</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No hay documentos rechazados por Hacienda
+            </p>
+            <p>
+                Aquí se muestran las facturas y notas de crédito rechazadas por Hacienda.
+                Puede crear un nuevo documento de reemplazo o vincular uno existente.
+            </p>
+        </field>
+    </record>
+
+    <!-- ============================================================
+         ACCIÓN DE VENTANA: HISTORIAL DE REEMPLAZOS
+         ============================================================ -->
+    <record id="action_replacement_history" model="ir.actions.act_window">
+        <field name="name">Historial de Reemplazos</field>
+        <field name="res_model">rejected.invoice.replacement.history</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'create': False}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No hay registros de reemplazo
+            </p>
+            <p>
+                El historial se genera automáticamente al crear o vincular una factura de reemplazo.
+            </p>
+        </field>
+    </record>
+
+    <!-- ============================================================
+         MENÚS
+         ============================================================ -->
+    <menuitem
+        id="menu_rejected_invoices_root"
+        name="Documentos Rechazados Hacienda"
+        parent="account.menu_finance_receivables"
+        sequence="50"
+    />
+
+    <menuitem
+        id="menu_rejected_invoices_list"
+        name="Documentos Rechazados"
+        parent="menu_rejected_invoices_root"
+        action="action_rejected_invoices"
+        sequence="10"
+    />
+
+    <menuitem
+        id="menu_replacement_history"
+        name="Historial de Reemplazos"
+        parent="menu_rejected_invoices_root"
+        action="action_replacement_history"
+        sequence="20"
+    />
+
+</odoo>

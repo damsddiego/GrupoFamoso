@@ -10,6 +10,7 @@ class Partner(models.Model):
     affiliated = fields.Boolean('Affiliated')
     is_salesperson = fields.Boolean('Is Salesperson', help="Check this box if this contact is a salesperson for commission purposes.")
     assigned_salesperson_id = fields.Many2one('res.partner', 'Assigned Salesperson',
+        company_dependent=True,
         domain="[('is_salesperson', '=', True)]",
         help="Default salesperson assigned to this customer. This will be automatically set on new sales orders.")
 

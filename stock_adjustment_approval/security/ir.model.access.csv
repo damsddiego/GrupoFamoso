@@ -1,0 +1,9 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_stock_adjustment_request_requester,Solicitud Ajuste - Solicitante,model_stock_adjustment_request,group_stock_adjustment_requester,1,1,1,0
+access_stock_adjustment_request_approver,Solicitud Ajuste - Aprobador,model_stock_adjustment_request,group_stock_adjustment_approver,1,1,1,0
+access_stock_adjustment_request_manager,Solicitud Ajuste - Manager,model_stock_adjustment_request,stock.group_stock_manager,1,1,1,1
+access_stock_adjustment_request_line_requester,Línea Ajuste - Solicitante,model_stock_adjustment_request_line,group_stock_adjustment_requester,1,1,1,0
+access_stock_adjustment_request_line_approver,Línea Ajuste - Aprobador,model_stock_adjustment_request_line,group_stock_adjustment_approver,1,1,1,0
+access_stock_adjustment_request_line_manager,Línea Ajuste - Manager,model_stock_adjustment_request_line,stock.group_stock_manager,1,1,1,1
+access_stock_adjustment_reject_wizard_approver,Wizard Rechazo - Aprobador,model_stock_adjustment_reject_wizard,group_stock_adjustment_approver,1,1,1,0
+access_stock_adjustment_reject_wizard_manager,Wizard Rechazo - Manager,model_stock_adjustment_reject_wizard,stock.group_stock_manager,1,1,1,0

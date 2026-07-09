@@ -2,7 +2,7 @@
 # Part of Odoo. See COPYRIGHT & LICENSE files for full copyright and licensing details.
 {
     'name': "Customer Credit Limit With Approval",
-    'version': '18.0.0.0',
+    'version': '18.0.0.1',
     'summary': """ Configure Credit Limit for Customers and approve from sales and account manager
     
         

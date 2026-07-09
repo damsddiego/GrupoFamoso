@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_sng_sales_route_partner_report_list" model="ir.ui.view">
+        <field name="name">sng.sales.route.partner.report.list</field>
+        <field name="model">sng.sales.route.partner.report</field>
+        <field name="arch" type="xml">
+            <list string="Reporte Clientes por Ruta" create="false" edit="false" delete="false">
+                <field name="unique_id"/>
+                <field name="name"/>
+                <field name="commercial_name" optional="show"/>
+                <field name="route_code"/>
+                <field name="route_name"/>
+                <field name="salesperson_name"/>
+                <field name="phone"/>
+                <field name="payment_term_name"/>
+                <field name="pricelist_name"/>
+                <field name="last_invoice_date"/>
+                <field name="address"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_sng_sales_route_partner_report_search" model="ir.ui.view">
+        <field name="name">sng.sales.route.partner.report.search</field>
+        <field name="model">sng.sales.route.partner.report</field>
+        <field name="arch" type="xml">
+            <search string="Reporte Clientes por Ruta">
+                <field name="unique_id"/>
+                <field name="partner_id"/>
+                <field name="commercial_name"/>
+                <field name="sales_route_id"/>
+                <field name="salesperson_id"/>
+                <filter string="Con ruta" name="with_route" domain="[('sales_route_id', '!=', False)]"/>
+                <filter string="Sin ruta" name="without_route" domain="[('sales_route_id', '=', False)]"/>
+                <separator/>
+                <filter string="Con factura" name="with_invoice" domain="[('last_invoice_date', '!=', False)]"/>
+                <filter string="Sin factura" name="without_invoice" domain="[('last_invoice_date', '=', False)]"/>
+                <group expand="0" string="Agrupar por">
+                    <filter string="Ruta" name="group_route" context="{'group_by': 'sales_route_id'}"/>
+                    <filter string="Vendedor" name="group_salesperson" context="{'group_by': 'salesperson_id'}"/>
+                    <filter string="Compañía" name="group_company" context="{'group_by': 'company_id'}" groups="base.group_multi_company"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_sng_sales_route_partner_report_pivot" model="ir.ui.view">
+        <field name="name">sng.sales.route.partner.report.pivot</field>
+        <field name="model">sng.sales.route.partner.report</field>
+        <field name="arch" type="xml">
+            <pivot string="Clientes por Ruta">
+                <field name="sales_route_id" type="row"/>
+                <field name="salesperson_id" type="col"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_sng_sales_route_partner_report" model="ir.actions.act_window">
+        <field name="name">Reporte Clientes por Ruta</field>
+        <field name="res_model">sng.sales.route.partner.report</field>
+        <field name="view_mode">list,pivot</field>
+        <field name="search_view_id" ref="view_sng_sales_route_partner_report_search"/>
+        <field name="context">{'search_default_group_route': 1}</field>
+    </record>
+
+    <menuitem id="menu_sng_sales_route_partner_report"
+              name="Reporte Clientes por Ruta"
+              parent="contacts.menu_contacts"
+              action="action_sng_sales_route_partner_report"
+              sequence="136"/>
+</odoo>

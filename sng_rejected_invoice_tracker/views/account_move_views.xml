@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============================================================
+         EXTENSIÓN DEL FORMULARIO DE ACCOUNT.MOVE
+         ============================================================ -->
+    <record id="view_move_form_rejected_tracker" model="ir.ui.view">
+        <field name="name">account.move.form.rejected.tracker</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+
+            <!-- Agregar pestaña de reemplazos después de la última pestaña existente -->
+            <xpath expr="//notebook" position="inside">
+                <page
+                    string="Reemplazo Hacienda"
+                    name="hacienda_replacement"
+                    invisible="move_type not in ('out_invoice', 'out_refund') or (not einvoice_had_rejection and state_tributacion != 'rechazado')"
+                >
+                    <group>
+                        <group string="Estado de Reemplazo">
+                            <field name="fe_replacement_status" readonly="1"/>
+                            <field name="fe_replacement_attempt_count" readonly="1"/>
+                            <field
+                                name="replaced_by_invoice_id"
+                                readonly="1"
+                                invisible="fe_replacement_status != 'reemplazada'"
+                            />
+                        </group>
+                        <group string="Detalle del Rechazo" invisible="not fe_rejection_detail">
+                            <field
+                                name="fe_rejection_detail"
+                                readonly="1"
+                                nolabel="1"
+                                widget="text"
+                            />
+                        </group>
+                        <group string="Acciones">
+                            <button
+                                name="action_create_replacement_invoice"
+                                type="object"
+                                string="Crear Factura de Reemplazo"
+                                class="btn-primary"
+                                invisible="fe_replacement_status != 'pendiente'"
+                            />
+                            <button
+                                name="action_open_link_replacement_wizard"
+                                type="object"
+                                string="Vincular Factura Existente"
+                                class="btn-secondary"
+                                invisible="fe_replacement_status != 'pendiente'"
+                            />
+                            <button
+                                name="action_transfer_payments_to_replacement"
+                                type="object"
+                                string="Trasladar Pagos al Reemplazo"
+                                class="btn-warning"
+                                invisible="fe_replacement_status != 'reemplazada' or payment_state == 'not_paid'"
+                                confirm="¿Desea trasladar los pagos de este documento a la factura de reemplazo? Esta acción desaplicará los pagos del documento rechazado y los aplicará al reemplazo."
+                            />
+                            <button
+                                name="action_view_replacement_history"
+                                type="object"
+                                string="Ver Historial Completo"
+                                class="btn-link"
+                            />
+                        </group>
+                    </group>
+
+                    <!-- Lista de historial de reemplazos -->
+                    <field name="rejected_invoice_history_ids" readonly="1">
+                        <list string="Historial de Reemplazos">
+                            <field name="sequence"/>
+                            <field name="replacement_invoice_id"/>
+                            <field name="state"/>
+                            <field name="is_current"/>
+                            <field name="link_date"/>
+                            <field name="linked_by_user_id"/>
+                            <field name="notes"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+
+            <!-- Mostrar "Reemplaza a" en facturas que son reemplazo de otra -->
+            <xpath expr="//group[@id='header_left_group']" position="inside">
+                <field
+                    name="replaces_invoice_id"
+                    readonly="1"
+                    invisible="not replaces_invoice_id"
+                />
+            </xpath>
+
+        </field>
+    </record>
+
+    <!-- ============================================================
+         VISTA LISTA DEDICADA: FACTURAS RECHAZADAS POR HACIENDA
+         ============================================================ -->
+    <record id="view_rejected_invoice_tree" model="ir.ui.view">
+        <field name="name">rejected.invoice.tree</field>
+        <field name="model">account.move</field>
+        <field name="arch" type="xml">
+            <list string="Documentos Rechazados por Hacienda" decoration-muted="fe_replacement_status == 'reemplazada'">
+                <field name="move_type" optional="show" string="Tipo"/>
+                <field name="name" optional="show"/>
+                <field name="partner_id" optional="show"/>
+                <field name="invoice_date" optional="show"/>
+                <field name="amount_total" optional="show"/>
+                <field name="number_electronic" optional="show"/>
+                <field name="state_tributacion" optional="show"/>
+                <field name="fe_replacement_status" optional="show"/>
+                <field name="replaced_by_invoice_id" optional="show"/>
+                <field name="fe_replacement_attempt_count" optional="hide"/>
+                <field name="fe_rejection_detail" optional="hide" string="Motivo de Rechazo"/>
+                <field name="company_id" groups="base.group_multi_company" optional="show"/>
+                <button
+                    name="action_create_replacement_invoice"
+                    type="object"
+                    string="Crear Reemplazo"
+                    class="btn-primary"
+                    invisible="fe_replacement_status != 'pendiente'"
+                />
+                <button
+                    name="action_open_link_replacement_wizard"
+                    type="object"
+                    string="Vincular"
+                    class="btn-secondary"
+                    invisible="fe_replacement_status != 'pendiente'"
+                />
+            </list>
+        </field>
+    </record>
+
+    <!-- ============================================================
+         BÚSQUEDA EXTENDIDA PARA ACCOUNT.MOVE
+         ============================================================ -->
+    <record id="view_account_move_rejected_search" model="ir.ui.view">
+        <field name="name">account.move.rejected.search</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_account_invoice_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <separator/>
+                <filter
+                    string="Rechazados por Hacienda"
+                    name="hacienda_rejected"
+                    domain="[('move_type', 'in', ('out_invoice', 'out_refund')), '|', ('state_tributacion', '=', 'rechazado'), ('einvoice_had_rejection', '=', True)]"
+                />
+                <filter
+                    string="Pendientes de Reemplazo"
+                    name="pending_replacement"
+                    domain="[('move_type', 'in', ('out_invoice', 'out_refund')), ('fe_replacement_status', '=', 'pendiente')]"
+                />
+                <filter
+                    string="Reemplazados"
+                    name="replaced"
+                    domain="[('move_type', 'in', ('out_invoice', 'out_refund')), ('fe_replacement_status', '=', 'reemplazada')]"
+                />
+                <filter
+                    string="Solo Facturas"
+                    name="only_invoices"
+                    domain="[('move_type', '=', 'out_invoice')]"
+                />
+                <filter
+                    string="Solo Notas de Crédito"
+                    name="only_credit_notes"
+                    domain="[('move_type', '=', 'out_refund')]"
+                />
+                <group expand="0" string="Agrupar por">
+                    <filter
+                        string="Estado de Reemplazo"
+                        name="groupby_replacement_status"
+                        context="{'group_by': 'fe_replacement_status'}"
+                    />
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ============================================================
+         VISTAS PARA EL HISTORIAL DE REEMPLAZOS
+         ============================================================ -->
+    <record id="view_rejected_invoice_replacement_history_tree" model="ir.ui.view">
+        <field name="name">rejected.invoice.replacement.history.tree</field>
+        <field name="model">rejected.invoice.replacement.history</field>
+        <field name="arch" type="xml">
+            <list string="Historial de Reemplazos" decoration-success="is_current" decoration-muted="state == 'cancelled'">
+                <field name="sequence"/>
+                <field name="rejected_invoice_id"/>
+                <field name="replacement_invoice_id"/>
+                <field name="state"/>
+                <field name="is_current"/>
+                <field name="link_date"/>
+                <field name="linked_by_user_id"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_rejected_invoice_replacement_history_form" model="ir.ui.view">
+        <field name="name">rejected.invoice.replacement.history.form</field>
+        <field name="model">rejected.invoice.replacement.history</field>
+        <field name="arch" type="xml">
+            <form string="Historial de Reemplazo">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="rejected_invoice_id"/>
+                            <field name="replacement_invoice_id"/>
+                            <field name="sequence"/>
+                            <field name="state"/>
+                            <field name="is_current"/>
+                        </group>
+                        <group>
+                            <field name="link_date"/>
+                            <field name="linked_by_user_id"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <field name="notes" placeholder="Notas adicionales..."/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+</odoo>

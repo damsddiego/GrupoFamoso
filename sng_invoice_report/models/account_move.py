@@ -8,7 +8,8 @@ class AccountMove(models.Model):
         'res.partner',
         string='Effective Salesperson',
         compute='_compute_effective_salesperson_id',
-        store=False,
+        store=True,
+        index=True,
         help="Shows salesperson_id if set, otherwise falls back to assigned_salesperson_id from customer"
     )
 

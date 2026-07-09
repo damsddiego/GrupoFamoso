@@ -5,6 +5,5 @@
         <field name="code">sng.return</field>
         <field name="prefix">RET/%(year)s/</field>
         <field name="padding">4</field>
-        <field name="company_id" eval="False"/>
     </record>
 </odoo>

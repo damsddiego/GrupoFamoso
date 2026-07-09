@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_stock_kardex">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.internal_layout">
+                    <div class="page">
+                        <h2 class="text-center">Kardex de Inventario</h2>
+                        <div class="row mt32 mb32">
+                            <div class="col-6">
+                                <strong>Producto:</strong>
+                                <span t-field="o.product_id.display_name"/>
+                                <br/>
+                                <strong>UdM:</strong>
+                                <span t-field="o.product_id.uom_id.name"/>
+                            </div>
+                            <div class="col-6">
+                                <strong>Ubicación:</strong>
+                                <span t-if="o.location_id" t-field="o.location_id.display_name"/>
+                                <span t-if="not o.location_id">Todas las ubicaciones</span>
+                                <br/>
+                                <strong>Periodo:</strong>
+                                <span t-field="o.date_from" t-options="{'widget': 'datetime'}"/>
+                                -
+                                <span t-field="o.date_to" t-options="{'widget': 'datetime'}"/>
+                            </div>
+                        </div>
+
+                        <table class="table table-sm table-bordered">
+                            <thead>
+                                <tr class="text-center">
+                                    <th>Fecha</th>
+                                    <th>Referencia</th>
+                                    <th>Origen</th>
+                                    <th>Tipo</th>
+                                    <th>Ubicación Origen</th>
+                                    <th>Ubicación Destino</th>
+                                    <th class="text-end">Entrada</th>
+                                    <th class="text-end">Salida</th>
+                                    <th class="text-end">Saldo</th>
+                                    <th class="text-end">Reservado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="8" class="text-end"><strong>Saldo Inicial</strong></td>
+                                    <td class="text-end">
+                                        <strong t-esc="o._get_balance_start()" t-options="{'widget': 'float', 'precision': 2}"/>
+                                    </td>
+                                    <td></td>
+                                </tr>
+                                <t t-foreach="o.line_ids" t-as="line">
+                                    <tr>
+                                        <td>
+                                            <span t-field="line.date" t-options="{'widget': 'datetime'}"/>
+                                        </td>
+                                        <td>
+                                            <span t-field="line.reference"/>
+                                        </td>
+                                        <td>
+                                            <span t-field="line.origin"/>
+                                        </td>
+                                        <td>
+                                            <span t-field="line.picking_type_id.name"/>
+                                        </td>
+                                        <td>
+                                            <span t-field="line.location_id.complete_name"/>
+                                        </td>
+                                        <td>
+                                            <span t-field="line.location_dest_id.complete_name"/>
+                                        </td>
+                                        <td class="text-end">
+                                            <span t-field="line.qty_in"/>
+                                        </td>
+                                        <td class="text-end">
+                                            <span t-field="line.qty_out"/>
+                                        </td>
+                                        <td class="text-end">
+                                            <strong t-field="line.balance"/>
+                                        </td>
+                                        <td class="text-end">
+                                            <span t-field="line.reserved_qty"/>
+                                        </td>
+                                    </tr>
+                                </t>
+                                <tr>
+                                    <td colspan="6" class="text-end"><strong>Totales</strong></td>
+                                    <td class="text-end">
+                                        <strong t-esc="sum(o.line_ids.mapped('qty_in'))" t-options="{'widget': 'float', 'precision': 2}"/>
+                                    </td>
+                                    <td class="text-end">
+                                        <strong t-esc="sum(o.line_ids.mapped('qty_out'))" t-options="{'widget': 'float', 'precision': 2}"/>
+                                    </td>
+                                    <td class="text-end">
+                                        <strong t-esc="o._get_balance_start() + sum(o.line_ids.mapped('qty_in')) - sum(o.line_ids.mapped('qty_out'))" t-options="{'widget': 'float', 'precision': 2}"/>
+                                    </td>
+                                    <td class="text-end">
+                                        <strong t-esc="o.line_ids and o.line_ids[0].reserved_qty or 0.0" t-options="{'widget': 'float', 'precision': 2}"/>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

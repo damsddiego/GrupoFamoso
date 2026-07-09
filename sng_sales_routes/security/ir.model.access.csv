@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_sng_sales_route_user,sng.sales.route user,model_sng_sales_route,base.group_user,1,0,0,0
+access_sng_sales_route_sale_manager,sng.sales.route sale manager,model_sng_sales_route,sales_team.group_sale_manager,1,1,1,1
+access_sng_sales_route_commission_manager,sng.sales.route commission manager,model_sng_sales_route,sales_commission_omax.group_sales_commission_manager,1,1,1,1
+access_sng_sales_route_partner_report_user,sng.sales.route.partner.report user,model_sng_sales_route_partner_report,base.group_user,1,0,0,0

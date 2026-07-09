@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_order_form" model="ir.ui.view">
+        <field name="name">sale.order.form.packing</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@class='oe_title']" position="after">
+                <group>
+                    <group>
+                        <field name="atado"/>
+                        <field name="caja"/>
+                    </group>
+                    <group>
+                        <field name="paquete"/>
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_sng_pricelist_promotion_import_wizard_user,sng.pricelist.promotion.import.wizard.user,model_sng_pricelist_promotion_import_wizard,product.group_product_pricelist,1,1,1,1

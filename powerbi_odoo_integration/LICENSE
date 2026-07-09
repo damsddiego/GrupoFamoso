@@ -1,0 +1,101 @@
+**Software License Agreement**
+
+
+
+This Software License Agreement ("Agreement") is made by and between Infintor Solutions ("Licensor") and any purchaser or user of the software ("Licensee").
+
+
+
+1. **Grant of License** 
+
+   Infintor Solutions hereby grants Licensee a non-exclusive, non-transferable license to use the software product (the "Software") purchased from the Odoo Apps Store under the terms and conditions set forth in this Agreement.
+
+
+
+2. **Scope of Use**
+
+   2.1 Licensee may install and use the Software on one production instance and one development instance, as applicable. Any additional usage must be covered by separate licenses.
+
+
+
+   2.2 The Software and associated files may only be used (executed, modified, executed after modifications) if a valid license has been purchased from Licensor, typically via Odoo Apps, or if written agreement has been received from Licensor.
+
+
+
+   2.3 Licensees may develop Odoo modules that use the Software as a library (typically by depending on it, importing it, and using its resources), but without copying any source code or material from the Software. Licensees may distribute those modules under the license of their choice, provided that this license is compatible with the terms of the Odoo Proprietary License (e.g., LGPL, MIT, or proprietary licenses similar to this one).
+
+
+
+   2.4 Licensee may not publish, distribute, sublicense, sell, or provide copies of the Software to third parties, except as explicitly permitted under this Agreement.
+
+
+
+3. **Ownership** 
+
+   The Software and any associated documentation are the sole property of Infintor Solutions. Licensee acknowledges that no title or ownership of the Software is transferred by this Agreement.
+
+
+
+4. **Restrictions** 
+
+   Licensee shall not:
+
+   - Copy, modify, or create derivative works of the Software;
+
+   - Reverse engineer, decompile, or disassemble the Software;
+
+   - Rent, lease, or sublicense the Software to any third party;
+
+   - Use the Software in any manner that violates applicable laws or regulations;
+
+   - Remove, alter, or obscure any proprietary notices (including copyright and trademark notices) from the Software.
+
+
+
+5. **Confidentiality**
+
+   Licensee acknowledges that the Software and any associated documentation contain proprietary and confidential information of Infintor Solutions. Licensee agrees to maintain the confidentiality of such information and not to disclose it to any third party without the prior written consent of Infintor Solutions.
+
+
+
+6. **Updates and Support** 
+
+   Infintor Solutions may provide updates to the Software at its discretion. Any updates provided shall be governed by the terms of this Agreement. Support services, if offered, shall be subject to separate terms.
+
+
+
+7. **Termination** 
+
+   7.1 This Agreement shall remain in effect until terminated. 
+
+   7.2 Infintor Solutions may terminate this Agreement immediately if Licensee fails to comply with any of its terms. Upon termination, Licensee must cease all use of the Software and destroy all copies.
+
+
+
+8. **Limitation of Liability** 
+
+   In no event shall Infintor Solutions be liable for any indirect, incidental, special, or consequential damages arising out of or in connection with the use of the Software, even if Infintor Solutions has been advised of the possibility of such damages.
+
+
+
+9. **Indemnification**
+
+   Licensee agrees to indemnify, defend, and hold harmless Infintor Solutions from and against any claims, damages, losses, liabilities, and expenses arising out of or in connection with Licensee's use of the Software.
+
+
+
+10. **Governing Law** 
+
+   This Agreement shall be governed by and construed in accordance with the laws of India.
+
+
+
+11. **Entire Agreement** 
+
+   This Agreement constitutes the entire understanding between the parties with respect to the Software and supersedes all prior agreements, understandings, and communications.
+
+
+
+12. **Severability**
+
+   If any provision of this Agreement is found to be invalid or unenforceable, the remainder of this Agreement shall remain in full force and effect.

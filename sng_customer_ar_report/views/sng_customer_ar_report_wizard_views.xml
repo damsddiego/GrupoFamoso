@@ -15,7 +15,7 @@
                         <field name="date_to"/>
                     </group>
                     <group string="Filtros">
-                        <field name="company_id" groups="base.group_multi_company"/>
+                        <field name="company_ids" widget="many2many_tags" groups="base.group_multi_company"/>
                         <field name="partner_id"/>
                         <field name="only_with_balance"/>
                     </group>

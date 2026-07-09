@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vista de lista para res.partner: columna Nombre Comercial -->
+    <record id="view_partner_tree_inherit_sng" model="ir.ui.view">
+        <field name="name">res.partner.tree.inherit.sng.custom.name</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='complete_name']" position="after">
+                <field name="commercial_name" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Vista de formulario para res.partner -->
+    <record id="view_partner_form_inherit_sng" model="ir.ui.view">
+        <field name="name">res.partner.form.inherit.sng.custom.name</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='vat']" position="after">
+                <field name="commercial_name" placeholder="Nombre Comercial..."/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Vista de búsqueda para res.partner -->
+    <record id="view_partner_search_inherit_sng" model="ir.ui.view">
+        <field name="name">res.partner.search.inherit.sng.custom.name</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_res_partner_filter"/>
+        <field name="arch" type="xml">
+            <!-- Modificar el campo name para que también busque por commercial_name -->
+            <xpath expr="//field[@name='name']" position="attributes">
+                <attribute name="filter_domain">['|', '|', '|', '|', '|', ('complete_name', 'ilike', self), ('ref', 'ilike', self), ('email', 'ilike', self), ('vat', 'ilike', self), ('company_registry', 'ilike', self), ('commercial_name', 'ilike', self)]</attribute>
+            </xpath>
+            <!-- Agregar campo de búsqueda explícito por Nombre Comercial -->
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="commercial_name" string="Nombre Comercial"
+                       filter_domain="[('commercial_name', 'ilike', self)]"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

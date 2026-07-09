@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- ============================================ -->
+        <!-- HERENCIA: stock.valuation.layer - LISTA      -->
+        <!-- ============================================ -->
+
+        <record id="stock_valuation_layer_tree_hide_cost" model="ir.ui.view">
+            <field name="name">stock.valuation.layer.tree.hide.cost</field>
+            <field name="model">stock.valuation.layer</field>
+            <field name="inherit_id" ref="stock_account.stock_valuation_layer_tree"/>
+            <field name="arch" type="xml">
+
+                <!-- Ocultar columna Unit Cost -->
+                <xpath expr="//field[@name='unit_cost']" position="attributes">
+                    <attribute name="groups">custom_ui_security.group_view_product_cost</attribute>
+                </xpath>
+
+                <!-- Ocultar columna Total Value -->
+                <xpath expr="//field[@name='value']" position="attributes">
+                    <attribute name="groups">custom_ui_security.group_view_product_cost</attribute>
+                </xpath>
+
+            </field>
+        </record>
+
+        <!-- ============================================ -->
+        <!-- HERENCIA: stock.valuation.layer - FORMULARIO -->
+        <!-- ============================================ -->
+
+        <record id="stock_valuation_layer_form_hide_cost" model="ir.ui.view">
+            <field name="name">stock.valuation.layer.form.hide.cost</field>
+            <field name="model">stock.valuation.layer</field>
+            <field name="inherit_id" ref="stock_account.stock_valuation_layer_form"/>
+            <field name="arch" type="xml">
+
+                <!-- Ocultar campo Unit Cost en formulario -->
+                <xpath expr="//field[@name='unit_cost']" position="attributes">
+                    <attribute name="groups">custom_ui_security.group_view_product_cost</attribute>
+                </xpath>
+
+                <!-- Ocultar campo Value en formulario -->
+                <xpath expr="//field[@name='value']" position="attributes">
+                    <attribute name="groups">custom_ui_security.group_view_product_cost</attribute>
+                </xpath>
+
+            </field>
+        </record>
+
+    </data>
+</odoo>

@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_purchase_suggestion_report_form" model="ir.ui.view">
+        <field name="name">purchase.suggestion.report.form</field>
+        <field name="model">purchase.suggestion.report</field>
+        <field name="arch" type="xml">
+            <form string="Reporte de Sugerido de Compras">
+                <header>
+                    <button name="action_generate_report"
+                            string="Generar Reporte"
+                            type="object"
+                            class="oe_highlight"
+                            invisible="state != 'draft'"/>
+                    <button name="action_reset_to_draft"
+                            string="Volver a Borrador"
+                            type="object"
+                            invisible="state != 'generated'"/>
+                    <button name="action_export_excel"
+                            string="Exportar Excel"
+                            type="object"
+                            class="oe_highlight"
+                            invisible="state != 'generated'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,generated"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Filtros">
+                            <field name="company_id" readonly="state == 'generated'"/>
+                            <field name="warehouse_ids"
+                                   widget="many2many_tags"
+                                   domain="[('company_id', '=', company_id)]"
+                                   options="{'no_create': True}"
+                                   readonly="state == 'generated'"/>
+                            <field name="category_ids"
+                                   widget="many2many_tags"
+                                   options="{'no_create': True}"
+                                   readonly="state == 'generated'"/>
+                            <field name="product_ids"
+                                   widget="many2many_tags"
+                                   domain="[('is_storable', '=', True)]"
+                                   options="{'no_create': True}"
+                                   readonly="state == 'generated'"/>
+                            <field name="sales_history_months" readonly="state == 'generated'"/>
+                            <field name="coverage_months" readonly="state == 'generated'"/>
+                            <field name="date_to" readonly="state == 'generated'"/>
+                            <field name="date_from" readonly="1"/>
+                        </group>
+                        <group string="Totales" invisible="state != 'generated'">
+                            <field name="total_available_qty" readonly="1"/>
+                            <field name="total_sale_qty" readonly="1"/>
+                            <field name="total_demand_qty" readonly="1"/>
+                            <field name="total_suggested_purchase_qty" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook invisible="state != 'generated'">
+                        <page string="Detalle">
+                            <field name="line_ids" readonly="1">
+                                <list string="Detalle Sugerido de Compras">
+                                    <field name="default_code" string="Codigo"/>
+                                    <field name="product_name" string="Nombre"/>
+                                    <field name="uom_id" string="Unidad"/>
+                                    <field name="available_qty" string="Cantidad" sum="Total"/>
+                                    <field name="total_sale_qty" string="Total Venta" sum="Total"/>
+                                    <field name="average_monthly_qty" string="Promedio Mensual"/>
+                                    <field name="supply_months" string="Meses Abastecimiento"/>
+                                    <field name="demand_qty" string="Demanda" sum="Total"/>
+                                    <field name="suggested_purchase_qty" string="Sugerido de Compras" sum="Total"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_purchase_suggestion_report_list" model="ir.ui.view">
+        <field name="name">purchase.suggestion.report.list</field>
+        <field name="model">purchase.suggestion.report</field>
+        <field name="arch" type="xml">
+            <list string="Reportes de Sugerido de Compras" decoration-muted="state == 'draft'">
+                <field name="name"/>
+                <field name="company_id"/>
+                <field name="warehouse_ids" widget="many2many_tags"/>
+                <field name="sales_history_months"/>
+                <field name="coverage_months"/>
+                <field name="date_from"/>
+                <field name="date_to"/>
+                <field name="total_available_qty"/>
+                <field name="total_sale_qty"/>
+                <field name="total_demand_qty"/>
+                <field name="total_suggested_purchase_qty"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'generated'"
+                       decoration-muted="state == 'draft'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_purchase_suggestion_report_search" model="ir.ui.view">
+        <field name="name">purchase.suggestion.report.search</field>
+        <field name="model">purchase.suggestion.report</field>
+        <field name="arch" type="xml">
+            <search string="Buscar Reportes">
+                <field name="name"/>
+                <field name="company_id"/>
+                <field name="warehouse_ids"/>
+                <field name="category_ids"/>
+                <field name="product_ids"/>
+                <filter string="Borrador" name="draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Generado" name="generated" domain="[('state', '=', 'generated')]"/>
+                <group expand="0" string="Agrupar Por">
+                    <filter string="Compania" name="group_company" context="{'group_by': 'company_id'}"/>
+                    <filter string="Estado" name="group_state" context="{'group_by': 'state'}"/>
+                    <filter string="Fecha Final" name="group_date_to" context="{'group_by': 'date_to'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_purchase_suggestion_report" model="ir.actions.act_window">
+        <field name="name">Sugerido de Compras</field>
+        <field name="res_model">purchase.suggestion.report</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_purchase_suggestion_report_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Crear un reporte de sugerido de compras
+            </p>
+            <p>
+                Configure los meses de ventas y los meses a cubrir para calcular la demanda
+                y el sugerido de compras por producto.
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="menu_purchase_suggestion_report"
+              name="Sugerido de Compras"
+              parent="stock.menu_warehouse_report"
+              action="action_purchase_suggestion_report"
+              sequence="270"
+              groups="stock.group_stock_user"/>
+</odoo>

@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_customer_metric_search" model="ir.ui.view">
+        <field name="name">regalarte.customer.metric.search</field>
+        <field name="model">regalarte.customer.metric</field>
+        <field name="arch" type="xml">
+            <search string="Metricas de Clientes">
+                <field name="partner_id"/>
+                <field name="salesperson_partner_id"/>
+                <field name="company_id"/>
+                <field name="country_id"/>
+                <separator/>
+                <filter
+                    name="filter_customer_metrics_dpp_low"
+                    string="DPP 0-30"
+                    domain="[('customer_dpp_days', '&gt;=', 0), ('customer_dpp_days', '&lt;', 30)]"/>
+                <filter
+                    name="filter_customer_metrics_dpp_mid"
+                    string="DPP 30-60"
+                    domain="[('customer_dpp_days', '&gt;=', 30), ('customer_dpp_days', '&lt;=', 60)]"/>
+                <filter
+                    name="filter_customer_metrics_dpp_high"
+                    string="DPP &gt; 60"
+                    domain="[('customer_dpp_days', '&gt;', 60)]"/>
+                <filter
+                    name="filter_customer_metrics_updated"
+                    string="Metricas Actualizadas"
+                    domain="[('customer_metrics_last_update', '!=', False)]"/>
+                <group expand="0" string="Agrupar Por">
+                    <filter name="group_by_company" string="Compania" context="{'group_by': 'company_id'}"/>
+                    <filter name="group_by_salesperson" string="Vendedor" context="{'group_by': 'salesperson_partner_id'}"/>
+                    <filter name="group_by_country" string="Pais" context="{'group_by': 'country_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_customer_metric_tree" model="ir.ui.view">
+        <field name="name">regalarte.customer.metric.tree</field>
+        <field name="model">regalarte.customer.metric</field>
+        <field name="arch" type="xml">
+            <list string="Dashboard Métricas Clientes" default_order="customer_dpp_days desc">
+                <field name="company_id"/>
+                <field name="partner_id"/>
+                <field name="salesperson_partner_id" optional="show"/>
+                <field name="customer_dpp_days"/>
+                <field name="customer_previous_month_sales" optional="show"/>
+                <field name="customer_current_month_sales"/>
+                <field name="customer_quarterly_avg_sales" optional="show"/>
+                <field name="customer_annual_avg_sales"/>
+                <field name="customer_monthly_collection_avg"/>
+                <field name="customer_quarterly_collection_avg" optional="show"/>
+                <field name="customer_metrics_last_update" optional="show"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_customer_metric_pivot" model="ir.ui.view">
+        <field name="name">regalarte.customer.metric.pivot</field>
+        <field name="model">regalarte.customer.metric</field>
+        <field name="arch" type="xml">
+            <pivot string="Dashboard Métricas Clientes">
+                <field name="company_id" type="row"/>
+                <field name="salesperson_partner_id" type="row"/>
+                <field name="country_id" type="col"/>
+                <field name="customer_dpp_days" type="measure"/>
+                <field name="customer_previous_month_sales" type="measure"/>
+                <field name="customer_current_month_sales" type="measure"/>
+                <field name="customer_annual_avg_sales" type="measure"/>
+                <field name="customer_monthly_collection_avg" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_customer_metric_graph" model="ir.ui.view">
+        <field name="name">regalarte.customer.metric.graph</field>
+        <field name="model">regalarte.customer.metric</field>
+        <field name="arch" type="xml">
+            <graph string="Dashboard Métricas Clientes" type="bar">
+                <field name="salesperson_partner_id"/>
+                <field name="customer_previous_month_sales" type="measure"/>
+                <field name="customer_current_month_sales" type="measure"/>
+                <field name="customer_monthly_collection_avg" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_customer_metric_form" model="ir.ui.view">
+        <field name="name">regalarte.customer.metric.form</field>
+        <field name="model">regalarte.customer.metric</field>
+        <field name="arch" type="xml">
+            <form string="Metrica de Cliente">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="company_id" readonly="1"/>
+                            <field name="partner_id" readonly="1"/>
+                            <field name="salesperson_partner_id" readonly="1"/>
+                            <field name="country_id" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="customer_dpp_days" readonly="1"/>
+                            <field name="customer_metrics_last_update" readonly="1"/>
+                        </group>
+                    </group>
+                    <group col="2">
+                        <group string="Ventas">
+                            <field name="customer_previous_month_sales" readonly="1"/>
+                            <field name="customer_current_month_sales" readonly="1"/>
+                            <field name="customer_quarterly_avg_sales" readonly="1"/>
+                            <field name="customer_semiannual_avg_sales" readonly="1"/>
+                            <field name="customer_annual_avg_sales" readonly="1"/>
+                        </group>
+                        <group string="Cobranza">
+                            <field name="customer_monthly_collection_avg" readonly="1"/>
+                            <field name="customer_quarterly_collection_avg" readonly="1"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_customer_metrics_dashboard" model="ir.actions.act_window">
+        <field name="name">Dashboard Métricas Clientes</field>
+        <field name="res_model">regalarte.customer.metric</field>
+        <field name="view_mode">list,pivot,graph,form</field>
+        <field name="search_view_id" ref="view_customer_metric_search"/>
+        <field name="domain">[]</field>
+        <field name="context">{'search_default_filter_customer_metrics_updated': 1}</field>
+    </record>
+
+    <record id="action_customer_metrics_dashboard_tree_view" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="view_customer_metric_tree"/>
+        <field name="act_window_id" ref="action_customer_metrics_dashboard"/>
+    </record>
+
+    <record id="action_customer_metrics_dashboard_pivot_view" model="ir.actions.act_window.view">
+        <field name="sequence" eval="2"/>
+        <field name="view_mode">pivot</field>
+        <field name="view_id" ref="view_customer_metric_pivot"/>
+        <field name="act_window_id" ref="action_customer_metrics_dashboard"/>
+    </record>
+
+    <record id="action_customer_metrics_dashboard_graph_view" model="ir.actions.act_window.view">
+        <field name="sequence" eval="3"/>
+        <field name="view_mode">graph</field>
+        <field name="view_id" ref="view_customer_metric_graph"/>
+        <field name="act_window_id" ref="action_customer_metrics_dashboard"/>
+    </record>
+
+    <record id="action_customer_metrics_dashboard_form_view" model="ir.actions.act_window.view">
+        <field name="sequence" eval="4"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_customer_metric_form"/>
+        <field name="act_window_id" ref="action_customer_metrics_dashboard"/>
+    </record>
+
+    <menuitem
+        id="menu_customer_metrics_dashboard"
+        name="Dashboard Métricas"
+        parent="contacts.menu_contacts"
+        action="action_customer_metrics_dashboard"
+        groups="account.group_account_readonly"
+        sequence="90"/>
+</odoo>

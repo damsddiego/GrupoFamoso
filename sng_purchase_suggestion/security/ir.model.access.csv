@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_purchase_suggestion_report_user,purchase.suggestion.report.user,model_purchase_suggestion_report,stock.group_stock_user,1,1,1,1
+access_purchase_suggestion_report_line_user,purchase.suggestion.report.line.user,model_purchase_suggestion_report_line,stock.group_stock_user,1,1,1,1

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_category_inventory_dashboard_wizard_form" model="ir.ui.view">
+        <field name="name">category.inventory.dashboard.wizard.form</field>
+        <field name="model">category.inventory.dashboard.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Dashboard de Inventario por Categorias">
+                <sheet>
+                    <group col="2">
+                        <field name="company_id"/>
+                        <field name="period_mode"/>
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                        <field name="include_child_categories"/>
+                        <field name="category_ids" widget="many2many_tags" options="{'no_create_edit': True}"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_export_excel" type="object" string="Exportar XLSX" class="btn-primary"/>
+                    <button string="Cancelar" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_category_inventory_dashboard_wizard" model="ir.actions.act_window">
+        <field name="name">Dashboard de Inventario por Categorias</field>
+        <field name="res_model">category.inventory.dashboard.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="view_id" ref="view_category_inventory_dashboard_wizard_form"/>
+    </record>
+
+    <menuitem
+        id="menu_category_inventory_dashboard_wizard"
+        name="Dashboard de Inventario por Categorias"
+        parent="stock.menu_warehouse_report"
+        action="action_category_inventory_dashboard_wizard"
+        sequence="260"
+        groups="stock.group_stock_manager"
+    />
+</odoo>

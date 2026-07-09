@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ==================== VISTA TREE DE LÍNEAS ==================== -->
+    <record id="view_stock_location_report_line_tree" model="ir.ui.view">
+        <field name="name">stock.location.report.line.tree</field>
+        <field name="model">stock.location.report.line</field>
+        <field name="arch" type="xml">
+            <list string="Líneas de Reporte" editable="bottom">
+                <field name="report_id" invisible="1"/>
+                <field name="default_code"/>
+                <field name="product_name"/>
+                <field name="uom_id"/>
+                <field name="saldo_inicial_qty" sum="Total"/>
+                <field name="entradas_qty" sum="Total"/>
+                <field name="salidas_qty" sum="Total"/>
+                <field name="movimiento_net"/>
+                <field name="fisico_qty" sum="Total"/>
+                <field name="reservado_qty" sum="Total"/>
+                <field name="disponible_qty" sum="Total"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ==================== VISTA SEARCH DE LÍNEAS ==================== -->
+    <record id="view_stock_location_report_line_search" model="ir.ui.view">
+        <field name="name">stock.location.report.line.search</field>
+        <field name="model">stock.location.report.line</field>
+        <field name="arch" type="xml">
+            <search string="Buscar Líneas">
+                <field name="product_name"/>
+                <field name="default_code"/>
+                <field name="report_id"/>
+                <filter string="Con Entradas" name="con_entradas" domain="[('entradas_qty', '>', 0)]"/>
+                <filter string="Con Salidas" name="con_salidas" domain="[('salidas_qty', '>', 0)]"/>
+                <filter string="Con Reservas" name="con_reservas" domain="[('reservado_qty', '>', 0)]"/>
+                <group expand="0" string="Agrupar Por">
+                    <filter string="Reporte" name="group_report" context="{'group_by': 'report_id'}"/>
+                    <filter string="Unidad de Medida" name="group_uom" context="{'group_by': 'uom_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- ==================== ACCIÓN DE LÍNEAS ==================== -->
+    <record id="action_stock_location_report_line" model="ir.actions.act_window">
+        <field name="name">Líneas de Reporte</field>
+        <field name="res_model">stock.location.report.line</field>
+        <field name="view_mode">list</field>
+        <field name="search_view_id" ref="view_stock_location_report_line_search"/>
+    </record>
+</odoo>

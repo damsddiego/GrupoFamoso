@@ -82,6 +82,15 @@ class CustomerStatementReport(models.AbstractModel):
             return docs[:1], docs
         return wizard_model.browse(), wizard_model.browse()
 
+    def _resolve_report_company(self, wizard, data):
+        """Obtiene la empresa que debe usarse para el layout del PDF."""
+        company = self.env['res.company'].browse()
+        if isinstance(data, dict) and data.get('company_id'):
+            company = self.env['res.company'].browse(data['company_id']).exists()
+        if not company and wizard:
+            company = wizard._get_report_company()
+        return company or self.env.company
+
     @api.model
     def _get_report_values(self, docids, data=None):
         """
@@ -94,9 +103,22 @@ class CustomerStatementReport(models.AbstractModel):
         Returns:
             dict con 'docs', 'data', 'company', 'report_mode', etc.
         """
-        wizard, docs = self._resolve_wizard_for_report(docids, data or {})
+        data = data or {}
+        wizard, docs = self._resolve_wizard_for_report(docids, data)
+        report_company = self._resolve_report_company(wizard, data)
         report_data = {}
         if wizard:
+            allowed_company_ids = (
+                data.get('allowed_company_ids')
+                if isinstance(data, dict) else False
+            ) or wizard._get_company_ids() or [report_company.id]
+            report_ctx = {
+                'allowed_company_ids': allowed_company_ids,
+                'company_id': report_company.id,
+                'force_company': report_company.id,
+            }
+            wizard = wizard.with_context(**report_ctx).with_company(report_company)
+            docs = docs.with_context(**report_ctx).with_company(report_company)
             # Recalcula siempre desde el wizard para respetar filtros/modo activos
             # y evitar PDFs con payload incompleto.
             report_data = wizard._get_report_data()
@@ -107,7 +129,8 @@ class CustomerStatementReport(models.AbstractModel):
             'doc_model': 'sng.customer.statement.wizard',
             'docs': docs,
             'data': report_data,
-            'company': self.env.company,
+            'company': report_company,
+            'company_id': report_company,
             # Helpers de formato para el template
             'formatLang': self.env['ir.qweb.field.float'].value_to_html,
             'fmt_date': self._format_date_dmy,

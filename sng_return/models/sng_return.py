@@ -98,7 +98,19 @@ class SngReturn(models.Model):
     def create(self, vals_list):
         for vals in vals_list:
             if vals.get("name", _("Nuevo")) == _("Nuevo"):
-                vals["name"] = self.env["ir.sequence"].next_by_code("sng.return") or _("Nuevo")
+                company_id = vals.get("company_id", self.env.company.id)
+                seq_env = self.env["ir.sequence"].with_company(company_id)
+                seq = seq_env.next_by_code("sng.return")
+                if not seq:
+                    self.env["ir.sequence"].sudo().create({
+                        "name": "SNG Return",
+                        "code": "sng.return",
+                        "prefix": "RET/%(year)s/",
+                        "padding": 4,
+                        "company_id": company_id,
+                    })
+                    seq = seq_env.next_by_code("sng.return")
+                vals["name"] = seq or _("Nuevo")
         return super().create(vals_list)
 
     def _check_supervisor_access(self):
@@ -155,13 +167,20 @@ class SngReturn(models.Model):
             "target": "new",
         }
 
+    # Mapeo de tipo_documento de la factura original al código de reference.document
+    _TIPO_DOC_TO_REF_DOC_CODE = {
+        "FE": "01",   # Factura Electrónica
+        "FEE": "01",  # Factura Electrónica de Exportación
+        "TE": "04",   # Tiquete Electrónico
+        "ND": "02",   # Nota de Débito
+        "NC": "03",   # Nota de Crédito
+    }
+
     def action_generate_credit_note(self):
         self.ensure_one()
         if self.state != "confirmed":
             raise UserError(_("La devolución debe estar confirmada para generar la nota de crédito."))
-        
-        # Agrupar líneas por factura para crear una NC por cada factura original si es necesario
-        # o una sola NC global si se prefiere. Por estándar de CR, suele ser 1 a 1 con la factura.
+
         lines_with_invoice = self.line_ids.filtered(lambda l: l.invoice_id)
         if not lines_with_invoice:
             raise UserError(_("Ninguna línea tiene una factura asociada para generar la nota de crédito."))
@@ -169,26 +188,39 @@ class SngReturn(models.Model):
         invoices = lines_with_invoice.mapped("invoice_id")
         created_moves = self.env["account.move"]
 
+        # Código 06 = Devolución de mercancía (correcto para devoluciones)
+        ref_code = self.env["reference.code"].search([("code", "=", "06")], limit=1)
+
         for invoice in invoices:
             return_lines = lines_with_invoice.filtered(lambda l: l.invoice_id == invoice)
-            
-            # Valores base para la NC
+
+            # Derivar reference_document desde tipo_documento de la factura original
+            inv_tipo = invoice.tipo_documento or "FE"
+            ref_doc_code = self._TIPO_DOC_TO_REF_DOC_CODE.get(inv_tipo, "01")
+            ref_document = self.env["reference.document"].search(
+                [("code", "=", ref_doc_code)], limit=1
+            )
+
             move_vals = {
                 "move_type": "out_refund",
                 "partner_id": self.partner_id.id,
                 "invoice_origin": self.name,
                 "company_id": self.company_id.id,
                 "reversed_entry_id": invoice.id,
-                # Campos específicos de l10n_cr (basados en análisis previo)
                 "tipo_documento": "NC",
-                "reference_code_id": self.env["reference.code"].search([("code", "=", "01")], limit=1).id or False, # 01 = Anula documento de referencia
+                # Campos requeridos por cr_electronic_invoice para generar el XML a Hacienda
+                "invoice_id": invoice.id,
+                "reference_code_id": ref_code.id if ref_code else False,
+                "reference_document_id": ref_document.id if ref_document else False,
+                "economic_activity_id": invoice.economic_activity_id.id if invoice.economic_activity_id else False,
+                "payment_methods_id": invoice.payment_methods_id.id if invoice.payment_methods_id else False,
                 "invoice_line_ids": [],
             }
 
             for line in return_lines:
-                # Buscar la línea de la factura original para copiar impuestos y precios
-                inv_line = invoice.invoice_line_ids.filtered(lambda il: il.product_id == line.product_id)[:1]
-                
+                inv_line = invoice.invoice_line_ids.filtered(
+                    lambda il: il.product_id == line.product_id
+                )[:1]
                 line_vals = {
                     "product_id": line.product_id.id,
                     "quantity": line.quantity,
@@ -199,7 +231,7 @@ class SngReturn(models.Model):
                     "account_id": inv_line.account_id.id if inv_line else False,
                 }
                 move_vals["invoice_line_ids"].append((0, 0, line_vals))
-            
+
             new_move = self.env["account.move"].create(move_vals)
             created_moves |= new_move
 

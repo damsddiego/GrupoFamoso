@@ -32,14 +32,33 @@ class CustomerArReport(models.Model):
     partner_code = fields.Char(
         string='Código - Cliente', readonly=True)
     assigned_salesperson_id = fields.Many2one(
-        'res.partner', string='Vendedor', readonly=True)
+        'res.partner', string='Vendedor', readonly=True,
+        compute='_compute_assigned_salesperson_id')
+
+    @api.depends('partner_id', 'company_id')
+    def _compute_assigned_salesperson_id(self):
+        for rec in self:
+            if rec.partner_id and rec.company_id:
+                partner = rec.partner_id.with_company(rec.company_id)
+                rec.assigned_salesperson_id = partner.assigned_salesperson_id
+            else:
+                rec.assigned_salesperson_id = False
     company_id = fields.Many2one(
         'res.company', string='Compañía', readonly=True)
     currency_id = fields.Many2one(
         'res.currency', string='Moneda', readonly=True)
     payment_term_id = fields.Many2one(
-        'account.payment.term', string='Plazo de Crédito',
-        related='partner_id.property_payment_term_id', readonly=True)
+        'account.payment.term', string='Plazo de Crédito', readonly=True,
+        compute='_compute_payment_term_id')
+
+    @api.depends('partner_id', 'company_id')
+    def _compute_payment_term_id(self):
+        for rec in self:
+            if rec.partner_id and rec.company_id:
+                partner = rec.partner_id.with_company(rec.company_id)
+                rec.payment_term_id = partner.property_payment_term_id
+            else:
+                rec.payment_term_id = False
     amount_invoiced = fields.Monetary(
         string='Total Facturado', readonly=True,
         currency_field='currency_id')
@@ -74,7 +93,6 @@ class CustomerArReport(models.Model):
                     COALESCE(rp.unique_id, ''), ' - ',
                     COALESCE(rp.name, '')
                 )                                                   AS partner_code,
-                rp.assigned_salesperson_id                          AS assigned_salesperson_id,
                 am.company_id                                       AS company_id,
                 rc.currency_id                                      AS currency_id,
 
@@ -125,7 +143,6 @@ class CustomerArReport(models.Model):
                 am.partner_id,
                 rp.unique_id,
                 rp.name,
-                rp.assigned_salesperson_id,
                 am.company_id,
                 rc.currency_id
             """

@@ -2,14 +2,32 @@
 # Part of Odoo. See COPYRIGHT & LICENSE files for full copyright and licensing details.
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
+from psycopg2.extras import Json as PsycopgJson
+
+
+class CompanyDependentMonetary(fields.Monetary):
+    def convert_to_column_insert(self, value, record, values=None, validate=True):
+        value = super().convert_to_column_insert(value, record, values, validate)
+        if not self.company_dependent:
+            return value
+
+        fallback = record.env['ir.default']._get_model_defaults(
+            record._name
+        ).get(self.name)
+        fallback = super().convert_to_column_insert(
+            fallback, record, values, validate
+        )
+        if value == fallback:
+            return None
+        return PsycopgJson({record.env.company.id: value})
 
 
 class ResPartner(models.Model):
     _inherit = 'res.partner'
 
-    credit_check = fields.Boolean('Active Credit', help='Activate the credit limit feature')
-    credit_warning = fields.Monetary('Warning Amount')
-    credit_blocking = fields.Monetary('Blocking Amount')
+    credit_check = fields.Boolean('Active Credit', company_dependent=True, help='Activate the credit limit feature')
+    credit_warning = CompanyDependentMonetary('Warning Amount', company_dependent=True)
+    credit_blocking = CompanyDependentMonetary('Blocking Amount', company_dependent=True)
     amount_due = fields.Monetary('Due Amount', compute='_compute_amount_due')
     has_overdue_invoices = fields.Boolean('Has Overdue Invoices', compute='_compute_has_overdue_invoices')
     overdue_amount = fields.Monetary('Overdue Amount', compute='_compute_overdue_amount', help='Total amount of overdue invoices')
@@ -18,7 +36,7 @@ class ResPartner(models.Model):
     def _compute_amount_due(self):
         for rec in self:
             rec.amount_due = rec.credit - rec.debit
-            partner_so = self.env['sale.order'].search([('partner_id', '=', rec.id), ('state', '=', 'sale')])
+            partner_so = self.env['sale.order'].search([('partner_id', '=', rec.id), ('state', '=', 'sale'), ('company_id', '=', self.env.company.id)])
             for order in partner_so:
                 if not order.invoice_ids:
                     rec.amount_due = rec.amount_due + order.amount_total
@@ -40,6 +58,7 @@ class ResPartner(models.Model):
                     ('payment_state', 'in', ['not_paid', 'partial']),
                     ('move_type', 'in', ['out_invoice', 'out_refund']),
                     ('invoice_date_due', '<', today),
+                    ('company_id', '=', self.env.company.id),
                 ], limit=1)
                 rec.has_overdue_invoices = bool(overdue_invoices)
 
@@ -57,6 +76,7 @@ class ResPartner(models.Model):
                     ('payment_state', 'in', ['not_paid', 'partial']),
                     ('move_type', 'in', ['out_invoice', 'out_refund']),
                     ('invoice_date_due', '<', today),
+                    ('company_id', '=', self.env.company.id),
                 ])
                 rec.overdue_amount = sum(overdue_invoices.mapped('amount_residual'))
 

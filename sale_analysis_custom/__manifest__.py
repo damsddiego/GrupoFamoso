@@ -16,6 +16,7 @@ This module extends the standard Odoo Sales Analysis (sale.report) to:
     """,
     'depends': [
         'sale',
+        'sale_stock',
         'sales_commission_omax',  # Required for salesperson_id field
     ],
     'data': [

@@ -1,0 +1,31 @@
+# -*- coding: utf-8 -*-
+{
+    "name": "SNG Rutas y Territorios de Venta",
+    "version": "18.0.1.0.0",
+    "summary": "Clasificación de clientes y documentos por rutas o territorios de venta",
+    "author": "SNG Cloud SRL",
+    "website": "https://sngcloud.cr",
+    "category": "Sales",
+    "license": "LGPL-3",
+    "depends": [
+        "contacts",
+        "customer_sequence",
+        "sng_custom_name_partner",
+        "sales_commission_omax",
+        "account_reports",
+    ],
+    "data": [
+        "security/ir.model.access.csv",
+        "security/sales_route_rules.xml",
+        "views/sales_route_views.xml",
+        "views/res_partner_views.xml",
+        "views/sale_order_views.xml",
+        "views/account_move_views.xml",
+        "views/account_payment_views.xml",
+        "views/sales_commission_analysis_views.xml",
+        "views/sales_route_partner_report_views.xml",
+        "views/aged_receivable_report_views.xml",
+    ],
+    "installable": True,
+    "application": False,
+}

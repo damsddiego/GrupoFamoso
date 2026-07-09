@@ -28,6 +28,16 @@ class PaymentReportSalesperson(models.Model):
     invoice_name = fields.Char(string='Número de Factura', readonly=True)
     invoice_date = fields.Date(string='Fecha de Factura', readonly=True)
     invoice_amount_untaxed = fields.Monetary(string='Monto sin Impuestos', readonly=True, currency_field='currency_id')
+    invoice_untaxed_pending = fields.Monetary(
+        string='Pendiente sin Impuestos', readonly=True, currency_field='currency_id',
+        help='Saldo pendiente sin impuestos de la factura justo antes de aplicar este pago. '
+             'En el primer pago equivale al monto total sin impuestos; en los pagos posteriores '
+             'disminuye proporcionalmente a lo abonado, en lugar de repetir el monto completo.')
+    invoice_untaxed_balance = fields.Monetary(
+        string='Saldo sin Impuestos', readonly=True, currency_field='currency_id',
+        help='Saldo real de la factura (sin impuestos) DESPUÉS de aplicar este pago. '
+             'El pago incluye impuestos y el saldo no, por lo que se descuenta la parte '
+             'proporcional neta del pago. Cuando la factura queda totalmente pagada, el saldo es 0.')
 
     # Cálculos
     days_to_pay = fields.Integer(string='Días para Pago', readonly=True,
@@ -72,8 +82,8 @@ class PaymentReportSalesperson(models.Model):
                     rp.id as partner_id,
                     rp.name as partner_name,
 
-                    -- Vendedor (del cliente)
-                    rp.assigned_salesperson_id as salesperson_id,
+                    -- Vendedor (del cliente, por empresa del pago)
+                    (rp.assigned_salesperson_id->>(ap.company_id::text))::integer as salesperson_id,
                     rp_salesperson.name as salesperson_name,
 
                     -- Pago
@@ -87,6 +97,31 @@ class PaymentReportSalesperson(models.Model):
                     am.name as invoice_name,
                     am.invoice_date as invoice_date,
                     am.amount_untaxed as invoice_amount_untaxed,
+
+                    -- Pendiente sin impuestos ANTES de este pago (saldo decreciente).
+                    -- En el primer abono es el total sin impuestos; en los siguientes
+                    -- baja proporcionalmente a lo ya abonado (incluyendo IVA).
+                    am.amount_untaxed * (
+                        1 - COALESCE(
+                            SUM(apr.amount) OVER (
+                                PARTITION BY am.id
+                                ORDER BY ap.date, ap.id, apr.id
+                                ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
+                            ), 0
+                        ) / NULLIF(am.amount_total, 0)
+                    ) as invoice_untaxed_pending,
+
+                    -- Saldo sin impuestos DESPUÉS de este pago (incluye el abono actual).
+                    -- Concilia el pago (con IVA) contra el saldo neto: queda 0 al saldar.
+                    am.amount_untaxed * (
+                        1 - COALESCE(
+                            SUM(apr.amount) OVER (
+                                PARTITION BY am.id
+                                ORDER BY ap.date, ap.id, apr.id
+                                ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+                            ), 0
+                        ) / NULLIF(am.amount_total, 0)
+                    ) as invoice_untaxed_balance,
 
                     -- Cálculo de días
                     (ap.date - am.invoice_date) as days_to_pay,
@@ -109,7 +144,7 @@ class PaymentReportSalesperson(models.Model):
 
                 -- Vendedor del cliente (LEFT JOIN para incluir pagos sin vendedor)
                 LEFT JOIN res_partner rp_salesperson
-                    ON rp_salesperson.id = rp.assigned_salesperson_id
+                    ON rp_salesperson.id = (rp.assigned_salesperson_id->>(ap.company_id::text))::integer
 
                 -- Relación payment -> move (a través de account.partial.reconcile)
                 INNER JOIN account_move_line aml_payment
@@ -140,8 +175,8 @@ class PaymentReportSalesperson(models.Model):
                     rp.id as partner_id,
                     rp.name as partner_name,
 
-                    -- Vendedor (del cliente)
-                    rp.assigned_salesperson_id as salesperson_id,
+                    -- Vendedor (del cliente, por empresa del pago)
+                    (rp.assigned_salesperson_id->>(ap.company_id::text))::integer as salesperson_id,
                     rp_salesperson.name as salesperson_name,
 
                     -- Pago
@@ -155,6 +190,8 @@ class PaymentReportSalesperson(models.Model):
                     NULL::varchar as invoice_name,
                     NULL::date as invoice_date,
                     NULL::numeric as invoice_amount_untaxed,
+                    NULL::numeric as invoice_untaxed_pending,
+                    NULL::numeric as invoice_untaxed_balance,
 
                     -- Sin días de pago
                     NULL::integer as days_to_pay,
@@ -177,7 +214,7 @@ class PaymentReportSalesperson(models.Model):
 
                 -- Vendedor del cliente (LEFT JOIN para incluir pagos sin vendedor)
                 LEFT JOIN res_partner rp_salesperson
-                    ON rp_salesperson.id = rp.assigned_salesperson_id
+                    ON rp_salesperson.id = (rp.assigned_salesperson_id->>(ap.company_id::text))::integer
 
                 WHERE
                     ap.payment_type = 'inbound'

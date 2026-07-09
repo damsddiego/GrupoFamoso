@@ -1,0 +1,16 @@
+<odoo>
+  <data>
+    <record id="view_stock_quant_search_inherit_my_location" model="ir.ui.view">
+      <field name="name">stock.quant.search.my.location</field>
+      <field name="model">stock.quant</field>
+      <field name="inherit_id" ref="stock.quant_search_view"/>
+      <field name="arch" type="xml">
+        <xpath expr="//search" position="inside">
+          <filter name="my_loc"
+                  string="Mi bodega"
+                  domain="[('in_my_location','=',True)]"/>
+        </xpath>
+      </field>
+    </record>
+  </data>
+</odoo>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="rule_sng_sales_route_company" model="ir.rule">
+        <field name="name">Rutas/Territorios por compañía</field>
+        <field name="model_id" ref="model_sng_sales_route"/>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        <field name="domain_force">[]</field>
+    </record>
+</odoo>

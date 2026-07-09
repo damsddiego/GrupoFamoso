@@ -1,0 +1,1 @@
+from . import sng_partner_model

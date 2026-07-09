@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+        Este módulo no crea modelos nuevos ni reglas adicionales.
+        La seguridad efectiva se hereda de res.partner y de los modelos contables consultados.
+    -->
+</odoo>

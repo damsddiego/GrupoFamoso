@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_regalarte_customer_metric_account_readonly,access.regalarte.customer.metric.account.readonly,model_regalarte_customer_metric,account.group_account_readonly,1,0,0,0
+access_regalarte_customer_metric_account_user,access.regalarte.customer.metric.account.user,model_regalarte_customer_metric,account.group_account_invoice,1,0,0,0
