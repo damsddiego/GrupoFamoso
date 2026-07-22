@@ -6,7 +6,7 @@ from odoo.exceptions import UserError
 
 class SngGenerateCommissionWiz(models.TransientModel):
     _name = 'sng.generate.commission.wiz'
-    _description = 'Generar Comisiones Masivamente'
+    _description = 'Generar Comisiones Mensuales'
 
     date_from = fields.Date(string='Desde', required=True)
     date_to = fields.Date(string='Hasta', required=True)
@@ -21,11 +21,6 @@ class SngGenerateCommissionWiz(models.TransientModel):
         string='Compañía',
         required=True,
         default=lambda self: self.env.company,
-    )
-    replace_existing_draft = fields.Boolean(
-        string='Reemplazar comisiones en borrador',
-        default=False,
-        help='Si está marcado, elimina las líneas de comisión en borrador existentes de los pagos seleccionados y las vuelve a calcular.',
     )
 
     def action_generate(self):
@@ -44,27 +39,25 @@ class SngGenerateCommissionWiz(models.TransientModel):
         if not payments:
             raise UserError(_('No se encontraron pagos en el rango y compañía seleccionados.'))
 
-        generated = 0
         for payment in payments:
-            if self.replace_existing_draft:
-                draft_lines = payment.sng_commission_line_ids.filtered(lambda l: l.state == 'draft')
-                draft_lines.unlink()
             payment._generate_commission_lines()
-            generated += len(payment.sng_commission_line_ids)
 
-        # Filtrar por vendedor si se especificó.
+        # Recuperamos las comisiones mensuales de los pagos procesados.
         lines = self.env['sng.commission.payment.line'].search([
             ('payment_id', 'in', payments.ids),
         ])
+        monthlies = lines.mapped('monthly_id')
         if self.salesperson_id:
-            lines = lines.filtered(lambda l: l.salesperson_id == self.salesperson_id)
+            monthlies = monthlies.filtered(lambda m: m.salesperson_id == self.salesperson_id)
 
-        if not lines:
+        if not monthlies:
             raise UserError(_(
-                'No se generaron comisiones. Verifique que existan configuraciones de comisión vigentes para los vendedores de los pagos en el rango seleccionado.'
+                'No se generaron comisiones. Verifique que exista un cuadro de comisiones (tramos) '
+                'para la compañía y que los pagos tengan vendedor asignado.'
             ))
 
-        action = self.env['ir.actions.actions']._for_xml_id('sng_sales_commission_payment.action_sng_commission_payment_line')
-        action['domain'] = [('id', 'in', lines.ids)]
-        action['context'] = {'search_default_group_by_salesperson': 1}
+        action = self.env['ir.actions.actions']._for_xml_id(
+            'sng_sales_commission_payment.action_sng_commission_monthly'
+        )
+        action['domain'] = [('id', 'in', monthlies.ids)]
         return action

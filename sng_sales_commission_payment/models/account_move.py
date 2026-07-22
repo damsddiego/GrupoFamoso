@@ -9,9 +9,10 @@ class AccountMove(models.Model):
     sng_commission_line_ids = fields.One2many(
         'sng.commission.payment.line',
         'invoice_id',
-        string='Líneas de Comisión del Pago',
+        string='Detalle de Comisión del Pago',
         readonly=True,
         copy=False,
+        groups='sales_commission_omax.group_sales_commission_user',
     )
 
     def button_draft(self):
@@ -25,7 +26,12 @@ class AccountMove(models.Model):
         return res
 
     def _sng_unlink_draft_commission_lines(self):
-        for move in self:
-            draft_lines = move.sng_commission_line_ids.filtered(lambda l: l.state == 'draft')
-            if draft_lines:
-                draft_lines.unlink()
+        """Elimina el detalle de comisión de meses aún en borrador y recalcula.
+
+        Se usa sudo() para que un usuario de contabilidad sin permisos sobre los
+        modelos de comisión pueda pasar una factura a borrador o cancelarla.
+        """
+        lines = self.sudo().sng_commission_line_ids.filtered(lambda l: l.monthly_id.state == 'draft')
+        monthlies = lines.mapped('monthly_id')
+        lines.unlink()
+        monthlies._recompute_commission()

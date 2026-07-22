@@ -6,14 +6,20 @@
         <record id="sales_commission_omax.group_sales_commission_manager" model="res.groups"/>
 
         <!-- Reglas de registro por compañía -->
-        <record id="rule_sng_commission_config_multi_company" model="ir.rule">
-            <field name="name">Configuración de comisión: multicompañía</field>
-            <field name="model_id" ref="model_sng_commission_config"/>
+        <record id="rule_sng_commission_tier_multi_company" model="ir.rule">
+            <field name="name">Cuadro de comisiones: multicompañía</field>
+            <field name="model_id" ref="model_sng_commission_tier"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="rule_sng_commission_monthly_multi_company" model="ir.rule">
+            <field name="name">Comisión mensual: multicompañía</field>
+            <field name="model_id" ref="model_sng_commission_monthly"/>
             <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
         </record>
 
         <record id="rule_sng_commission_payment_line_multi_company" model="ir.rule">
-            <field name="name">Línea de comisión por pago: multicompañía</field>
+            <field name="name">Detalle de comisión por pago: multicompañía</field>
             <field name="model_id" ref="model_sng_commission_payment_line"/>
             <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
         </record>

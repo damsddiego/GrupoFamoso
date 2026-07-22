@@ -12,6 +12,7 @@
                         string="Generar comisiones"
                         type="object"
                         class="oe_highlight"
+                        groups="sales_commission_omax.group_sales_commission_user"
                         invisible="state != 'posted' or payment_type != 'inbound'"
                         confirm="Esto regenerará las líneas de comisión en borrador para este pago. ¿Desea continuar?"/>
                 </button>
@@ -21,6 +22,7 @@
                         type="action"
                         class="oe_stat_button"
                         icon="fa-money"
+                        groups="sales_commission_omax.group_sales_commission_user"
                         invisible="sng_commission_count == 0">
                         <field name="sng_commission_count" widget="statinfo" string="Comisiones"/>
                     </button>

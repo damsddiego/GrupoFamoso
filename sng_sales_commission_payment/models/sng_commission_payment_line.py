@@ -5,7 +5,7 @@ from odoo import _, api, fields, models
 
 class SngCommissionPaymentLine(models.Model):
     _name = 'sng.commission.payment.line'
-    _description = 'Línea de Comisión por Pago'
+    _description = 'Detalle de Base de Comisión por Pago'
     _order = 'payment_date desc, id desc'
 
     name = fields.Char(
@@ -24,6 +24,12 @@ class SngCommissionPaymentLine(models.Model):
         'account.move',
         string='Factura',
         required=True,
+        index=True,
+        ondelete='cascade',
+    )
+    monthly_id = fields.Many2one(
+        'sng.commission.monthly',
+        string='Comisión Mensual',
         index=True,
         ondelete='cascade',
     )
@@ -46,6 +52,13 @@ class SngCommissionPaymentLine(models.Model):
         related='payment_id.date',
         store=True,
         index=True,
+    )
+    period = fields.Date(
+        string='Periodo',
+        compute='_compute_period',
+        store=True,
+        index=True,
+        help='Primer día del mes al que pertenece el pago.',
     )
     company_id = fields.Many2one(
         'res.company',
@@ -79,41 +92,28 @@ class SngCommissionPaymentLine(models.Model):
         string='Base de Comisión',
         currency_field='currency_id',
         required=True,
-        help='Monto sin impuestos pagado proporcionalmente por este pago.',
-    )
-    commission_percentage = fields.Float(
-        string='% Comisión',
-        required=True,
-    )
-    commission_amount = fields.Monetary(
-        string='Monto de Comisión',
-        currency_field='currency_id',
-        required=True,
-    )
-    state = fields.Selection(
-        [
-            ('draft', 'Pendiente'),
-            ('billed', 'Facturado'),
-            ('paid', 'Pagado'),
-        ],
-        string='Estado',
-        default='draft',
-        required=True,
-        index=True,
-    )
-    bill_id = fields.Many2one(
-        'account.move',
-        string='Factura de Comisión',
-        index=True,
-        ondelete='set null',
+        help='Monto sin impuestos pagado proporcionalmente por este pago. '
+             'Se acumula en la comisión mensual del vendedor.',
     )
 
-    @api.depends('commission_percentage', 'salesperson_id', 'invoice_id')
+    _sql_constraints = [
+        (
+            'unique_payment_invoice',
+            'UNIQUE(payment_id, invoice_id)',
+            'Ya existe una línea de comisión para este pago y factura.',
+        ),
+    ]
+
+    @api.depends('payment_date')
+    def _compute_period(self):
+        for line in self:
+            line.period = line.payment_date.replace(day=1) if line.payment_date else False
+
+    @api.depends('salesperson_id', 'invoice_id', 'commission_base')
     def _compute_name(self):
         for line in self:
             line.name = _(
-                "Comisión %(percentage).2f%% - %(salesperson)s - Factura %(invoice)s",
-                percentage=line.commission_percentage,
+                "Base %(salesperson)s - Factura %(invoice)s",
                 salesperson=line.salesperson_id.name or '',
                 invoice=line.invoice_id.name or '',
             )

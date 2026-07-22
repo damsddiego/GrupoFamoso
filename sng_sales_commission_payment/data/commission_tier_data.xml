@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Cuadro de comisiones por defecto (compañía principal).
+             Escala sobre el acumulado mensual sin impuestos, tasa única del tramo alcanzado. -->
+        <record id="sng_commission_tier_0" model="sng.commission.tier">
+            <field name="company_id" ref="base.main_company"/>
+            <field name="min_amount">0</field>
+            <field name="percentage">0</field>
+        </record>
+        <record id="sng_commission_tier_1" model="sng.commission.tier">
+            <field name="company_id" ref="base.main_company"/>
+            <field name="min_amount">12000000</field>
+            <field name="percentage">2.75</field>
+        </record>
+        <record id="sng_commission_tier_2" model="sng.commission.tier">
+            <field name="company_id" ref="base.main_company"/>
+            <field name="min_amount">20000000</field>
+            <field name="percentage">3.0</field>
+        </record>
+        <record id="sng_commission_tier_3" model="sng.commission.tier">
+            <field name="company_id" ref="base.main_company"/>
+            <field name="min_amount">30000000</field>
+            <field name="percentage">3.5</field>
+        </record>
+    </data>
+</odoo>

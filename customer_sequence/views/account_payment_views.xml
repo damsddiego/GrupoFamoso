@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_account_payment_tree_inherit_customer_sequence" model="ir.ui.view">
+        <field name="name">account.payment.list.inherit.customer.sequence</field>
+        <field name="model">account.payment</field>
+        <field name="inherit_id" ref="account.view_account_payment_tree"/>
+        <field name="arch" type="xml">
+            <field name="partner_id" position="after">
+                <field name="partner_unique_id" optional="show"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_account_payment_search_inherit_customer_sequence" model="ir.ui.view">
+        <field name="name">account.payment.search.inherit.customer.sequence</field>
+        <field name="model">account.payment</field>
+        <field name="inherit_id" ref="account.view_account_payment_search"/>
+        <field name="arch" type="xml">
+            <field name="name" position="attributes">
+                <attribute name="filter_domain">['|', '|', '|', '|', '|', ('name', 'ilike', self), ('partner_id', 'ilike', self), ('partner_unique_id', 'ilike', self), ('memo', 'ilike', self), ('amount_company_currency_signed', 'ilike', self), ('amount', 'ilike', self)]</attribute>
+            </field>
+            <field name="partner_id" position="after">
+                <field name="partner_unique_id" string="Código cliente"
+                       filter_domain="[('partner_unique_id', 'ilike', self)]"/>
+            </field>
+        </field>
+    </record>
+</odoo>

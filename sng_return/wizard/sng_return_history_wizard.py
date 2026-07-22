@@ -61,21 +61,36 @@ class SngReturnHistoryWizard(models.TransientModel):
         return res
 
     @api.model
-    def _build_history_commands(self, partner_id, product_id=False, company_id=False):
+    def _build_history_commands(self, partner_id, product_id=False, company_id=False, limit=100):
         partner = self.env["res.partner"].browse(partner_id)
         company_id = company_id or self.env.company.id
-        domain = [
-            ("order_id.partner_id", "child_of", partner.commercial_partner_id.id),
-            ("order_id.state", "in", ["sale", "done"]),
-            ("order_id.invoice_status", "=", "invoiced"),
+
+        # Buscar primero las ordenes (con limite y orden en SQL) y luego sus
+        # lineas, en lugar de traer todo el historial del cliente.
+        order_domain = [
+            ("partner_id", "child_of", partner.commercial_partner_id.id),
+            ("state", "in", ["sale", "done"]),
             ("company_id", "=", company_id),
-            ("display_type", "=", False),
+            ("order_line.qty_invoiced", ">", 0),
         ]
         if product_id:
-            domain.append(("product_id", "=", product_id))
+            order_domain.append(("order_line.product_id", "=", product_id))
+        orders = self.env["sale.order"].search(
+            order_domain, order="date_order desc, id desc", limit=limit
+        )
 
-        sale_lines = self.env["sale.order.line"].search(domain)
-        sale_lines = sale_lines.sorted(lambda line: line.order_id.date_order or fields.Datetime.now(), reverse=True)
+        line_domain = [
+            ("order_id", "in", orders.ids),
+            ("display_type", "=", False),
+            ("qty_invoiced", ">", 0),
+        ]
+        if product_id:
+            line_domain.append(("product_id", "=", product_id))
+        sale_lines = self.env["sale.order.line"].search(line_domain)
+        sale_lines = sale_lines.sorted(
+            lambda line: (line.order_id.date_order or fields.Datetime.now(), line.order_id.id),
+            reverse=True,
+        )
 
         commands = []
         for sale_line in sale_lines:
@@ -84,7 +99,8 @@ class SngReturnHistoryWizard(models.TransientModel):
                 "date_order": sale_line.order_id.date_order,
                 "partner_id": sale_line.order_id.partner_id.id,
                 "product_id": sale_line.product_id.id,
-                "quantity": sale_line.product_uom_qty,
+                # Cantidad realmente facturada, no la ordenada.
+                "quantity": sale_line.qty_invoiced,
                 "uom_id": sale_line.product_uom.id,
                 "price_unit": sale_line.price_unit,
                 "price_subtotal": sale_line.price_subtotal,
@@ -153,12 +169,14 @@ class SngReturnHistoryWizardLine(models.TransientModel):
         compute="_compute_invoice_count",
     )
 
-    @api.depends("sale_order_id")
+    @api.depends("sale_order_id.invoice_ids")
     def _compute_invoice_count(self):
-        invoice_wizard_model = self.env["sng.return.invoice.history.wizard"]
+        # Solo las facturas vinculadas directamente: evita 2-3 search por fila.
+        # La busqueda extendida (por origen, etc.) se hace al abrir el detalle.
         for line in self:
-            invoices = invoice_wizard_model._get_related_invoices(line.sale_order_id)
-            line.invoice_count = len(invoices)
+            line.invoice_count = len(line.sale_order_id.invoice_ids.filtered(
+                lambda move: move.move_type in ("out_invoice", "out_refund")
+            ))
 
     def action_open_sale_order(self):
         self.ensure_one()

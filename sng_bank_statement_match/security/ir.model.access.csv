@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_sng_bank_statement_match_wizard,sng.bank.statement.match.wizard,model_sng_bank_statement_match_wizard,account.group_account_invoice,1,1,1,1
+access_sng_bank_statement_match_line,sng.bank.statement.match.line,model_sng_bank_statement_match_line,account.group_account_invoice,1,1,1,1

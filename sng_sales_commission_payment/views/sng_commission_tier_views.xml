@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_sng_commission_tier_tree" model="ir.ui.view">
+            <field name="name">sng.commission.tier.tree</field>
+            <field name="model">sng.commission.tier</field>
+            <field name="arch" type="xml">
+                <list string="Cuadro de Comisiones" editable="bottom">
+                    <field name="currency_id" column_invisible="1"/>
+                    <field name="min_amount"/>
+                    <field name="percentage"/>
+                    <field name="company_id" groups="base.group_multi_company"/>
+                    <field name="active" column_invisible="1"/>
+                </list>
+            </field>
+        </record>
+
+        <record id="view_sng_commission_tier_form" model="ir.ui.view">
+            <field name="name">sng.commission.tier.form</field>
+            <field name="model">sng.commission.tier</field>
+            <field name="arch" type="xml">
+                <form string="Tramo de Comisión">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="currency_id" invisible="1"/>
+                                <field name="min_amount"/>
+                                <field name="percentage"/>
+                            </group>
+                            <group>
+                                <field name="company_id" groups="base.group_multi_company"/>
+                                <field name="active"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_sng_commission_tier" model="ir.actions.act_window">
+            <field name="name">Cuadro de Comisiones</field>
+            <field name="res_model">sng.commission.tier</field>
+            <field name="view_mode">list,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">Defina los tramos del cuadro de comisiones</p>
+                <p>El tramo aplicable es el de mayor "Monto Mínimo" que no supere el acumulado mensual
+                   sin impuestos del vendedor. La tasa se aplica sobre todo el acumulado del mes.</p>
+            </field>
+        </record>
+
+        <menuitem
+            id="menu_sng_commission_tier"
+            name="Cuadro de comisiones"
+            parent="sales_commission_omax.menu_sale_commission_root"
+            action="action_sng_commission_tier"
+            sequence="20"/>
+    </data>
+</odoo>

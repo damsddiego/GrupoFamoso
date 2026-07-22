@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_sng_bank_statement_match_wizard_form" model="ir.ui.view">
+        <field name="name">sng.bank.statement.match.wizard.form</field>
+        <field name="model">sng.bank.statement.match.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Conciliar extracto bancario">
+                <group invisible="state != 'upload'">
+                    <group>
+                        <field name="company_id" options="{'no_create': True, 'no_open': True}"
+                               placeholder="Todas las companias permitidas"/>
+                        <field name="journal_id" options="{'no_create': True}"/>
+                        <field name="date_tolerance_days"/>
+                    </group>
+                    <group>
+                        <field name="file" filename="filename" widget="binary"/>
+                        <field name="filename" invisible="1"/>
+                    </group>
+                </group>
+
+                <group invisible="state != 'upload'">
+                    <div class="alert alert-info" role="alert">
+                        <strong>Formato esperado (.xlsx o .csv):</strong>
+                        <ul>
+                            <li>Columna Fecha: fecha del movimiento.</li>
+                            <li>Columna Monto, o bien columnas separadas Debitos/Creditos (formato tipico de
+                                extractos bancarios, p.ej. BAC).</li>
+                            <li>Columna Referencia y/o Descripcion (opcional): ayudan a desambiguar coincidencias.</li>
+                            <li>Columna Beneficiario/Cliente (opcional): ayuda a desambiguar coincidencias.</li>
+                        </ul>
+                        <p>El sistema detecta automaticamente en cuál fila empiezan los encabezados, por lo que
+                            puedes subir el extracto tal cual lo descargas del banco (con su bloque de datos de
+                            cuenta y saldos al inicio, y el resumen de totales al final) sin necesidad de recortarlo.</p>
+                        <p>Solo se comparan pagos en estado Borrador. Los pagos coincidentes se marcan
+                            automaticamente para aplicarse; puedes revisar y ajustar antes de confirmar.</p>
+                    </div>
+                </group>
+
+                <field name="state" invisible="1"/>
+
+                <group invisible="state != 'review'">
+                    <group string="Resultado de la comparacion" col="4">
+                        <field name="matched_count" string="Coinciden"/>
+                        <field name="ambiguous_count" string="Ambiguas"/>
+                        <field name="no_match_count" string="Sin coincidencia"/>
+                    </group>
+                </group>
+
+                <field name="line_ids" invisible="state != 'review'">
+                    <list editable="bottom" decoration-success="match_status == 'matched'"
+                          decoration-warning="match_status == 'ambiguous'"
+                          decoration-muted="match_status == 'no_match'">
+                        <field name="date" string="Fecha extracto"/>
+                        <field name="amount" string="Monto extracto"/>
+                        <field name="reference" string="Referencia extracto"/>
+                        <field name="partner_name" string="Beneficiario extracto"/>
+                        <field name="match_status"/>
+                        <field name="payment_id"/>
+                        <field name="payment_date"/>
+                        <field name="payment_amount"/>
+                        <field name="payment_partner_id"/>
+                        <field name="currency_id" column_invisible="1"/>
+                        <field name="apply"/>
+                    </list>
+                </field>
+
+                <footer>
+                    <button name="action_import" string="Importar y comparar" type="object"
+                            class="btn-primary" invisible="state != 'upload'"/>
+                    <button name="action_apply" string="Aplicar seleccionados" type="object"
+                            class="btn-primary" invisible="state != 'review'"
+                            confirm="Se posteran todos los pagos borrador seleccionados. ¿Continuar?"/>
+                    <button string="Cancelar" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_sng_bank_statement_match_wizard" model="ir.actions.act_window">
+        <field name="name">Conciliar Extracto Bancario</field>
+        <field name="res_model">sng.bank.statement.match.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'dialog_size': 'extra-large'}</field>
+    </record>
+
+    <menuitem
+        id="menu_sng_bank_statement_match_wizard"
+        name="Conciliar Extracto Bancario"
+        parent="account.menu_finance_entries"
+        action="action_sng_bank_statement_match_wizard"
+        sequence="15"
+        groups="account.group_account_invoice"/>
+
+</odoo>

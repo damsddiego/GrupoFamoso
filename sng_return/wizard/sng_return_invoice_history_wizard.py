@@ -75,12 +75,19 @@ class SngReturnInvoiceHistoryWizard(models.TransientModel):
             ("line_ids.sale_line_ids.order_id", "=", sale_order.id),
         ])
         if sale_order.name:
-            invoices |= move_model.search([
+            candidates = move_model.search([
                 ("move_type", "in", ("out_invoice", "out_refund")),
                 ("company_id", "=", sale_order.company_id.id),
                 ("partner_id", "child_of", commercial_partner.id),
                 ("invoice_origin", "ilike", sale_order.name),
             ])
+            # invoice_origin puede contener varios origenes separados por coma;
+            # se compara el token exacto para que S00001 no haga match con S000010.
+            invoices |= candidates.filtered(
+                lambda move: sale_order.name in [
+                    origin.strip() for origin in (move.invoice_origin or "").split(",")
+                ]
+            )
         return invoices.sorted(lambda move: move.invoice_date or move.date or fields.Date.today(), reverse=True)
 
     @api.model

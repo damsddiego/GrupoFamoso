@@ -1,23 +1,25 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Comisiones por Pagos de Facturas',
-    'version': '18.0.1.0.0',
+    'version': '18.0.2.0.0',
     'category': 'Accounting/Accounting',
-    'summary': 'Cálculo de comisiones por pagos parciales o totales de facturas de cliente',
+    'summary': 'Comisión mensual por vendedor con escala por tramos sobre pagos recibidos',
     'description': """
         Comisiones por Pagos de Facturas
         ==================================
 
-        Este módulo calcula comisiones de vendedor a partir de los pagos recibidos
-        sobre facturas de cliente, permitiendo generar comisión incluso cuando el
-        pago es parcial.
+        Este módulo calcula la comisión de cada vendedor a partir del total de pagos
+        recibidos durante el mes sobre facturas de cliente, aplicando un cuadro de
+        comisiones por tramos (escala).
 
         Características:
-        - Configuración de porcentaje de comisión por vendedor (contacto).
-        - Cálculo automático al confirmar/reconciliar un pago.
-        - Base de cálculo: monto sin impuestos pagado (proporcional al pago).
-        - Generación de facturas de compra al vendedor para el pago de comisiones.
-        - Reporte y seguimiento de líneas de comisión por estado.
+        - Cuadro de comisiones global por tramos (monto mínimo mensual → %).
+        - Acumulado mensual por vendedor sobre el monto sin impuestos pagado
+          (proporcional a cada pago, incluso parciales).
+        - La tasa del tramo alcanzado se aplica a todo el acumulado del mes.
+        - Una comisión consolidada por vendedor y mes, con el detalle de pagos.
+        - Generación de facturas de compra al vendedor y seguimiento de estado
+          (pendiente / facturado / pagado).
     """,
     'author': 'SNG',
     'website': '',
@@ -31,7 +33,9 @@
         'security/group_security.xml',
         'security/ir.model.access.csv',
         'data/product_data.xml',
-        'views/sng_commission_config_views.xml',
+        'data/commission_tier_data.xml',
+        'views/sng_commission_tier_views.xml',
+        'views/sng_commission_monthly_views.xml',
         'views/sng_commission_payment_line_views.xml',
         'views/account_payment_views.xml',
         'wizard/sng_create_commission_bill_wiz.xml',

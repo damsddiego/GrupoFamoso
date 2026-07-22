@@ -37,6 +37,7 @@
         'views/res_partner_views.xml',
         'views/sale_order_views.xml',
         'views/account_move_views.xml',
+        'views/account_payment_views.xml',
     ],
     'images': ['static/description/banner.png'],
     'license': 'AGPL-3',
@@ -44,4 +45,3 @@
     'auto_install': False,
     'application': False
 }
-

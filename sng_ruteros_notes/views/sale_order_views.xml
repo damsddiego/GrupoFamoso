@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Heredar la vista formulario de sale.order para mostrar sng_line_note en las líneas -->
+    <record id="view_order_form_inherit_sng_ruteros_note" model="ir.ui.view">
+        <field name="name">sale.order.form.sng.ruteros.note</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <!-- Agregar el campo después del nombre del producto en la lista de líneas -->
+            <xpath expr="//field[@name='order_line']/list/field[@name='name']" position="after">
+                <field name="sng_line_note" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

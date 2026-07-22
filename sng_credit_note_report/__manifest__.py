@@ -29,6 +29,7 @@
     ],
     'data': [
         'security/ir.model.access.csv',
+        'security/ir_rules.xml',
         'views/sng_credit_note_report_views.xml',
         'wizard/sng_credit_note_export_wizard_views.xml',
     ],

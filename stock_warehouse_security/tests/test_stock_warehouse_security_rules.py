@@ -169,6 +169,38 @@ class TestStockWarehouseAccess(TestStockCommon):
     @users(
         "stock_user_c12_wh2",
     )
+    def test_read_stock_warehouse_wh2_only(self):
+        self.assertEqual(
+            self.env["stock.warehouse"].search([]),
+            (self.warehouse_2),
+        )
+
+    @users(
+        "stock_user_c12_wh23",
+    )
+    def test_read_stock_warehouse_wh23(self):
+        self.assertEqual(
+            self.env["stock.warehouse"].search([]),
+            (self.warehouse_2 | self.warehouse_3),
+        )
+
+    @users(
+        "stock_user_c1_wh12",
+    )
+    @allowed_companies()
+    def test_read_stock_warehouse_unlimited_sees_all(self):
+        # Unlimited user (empty warehouse_ids) must still see every warehouse
+        # of the companies he is allowed to.
+        self.assertEqual(
+            self.env["stock.warehouse"].search(
+                [("id", "!=", self.warehouse_3.id)]
+            ),
+            (self.warehouse_0 | self.warehouse_1 | self.warehouse_2),
+        )
+
+    @users(
+        "stock_user_c12_wh2",
+    )
     def test_read_stock_warehouse_orderpoint_wh2_only(self):
         self.assertEqual(
             self.env["stock.warehouse.orderpoint"].search([]).mapped("warehouse_id"),
@@ -324,5 +356,105 @@ class TestStockWarehouseAccessWithReceivedPackedGoods(TestStockCommon):
             self.env["stock.quant.package"]
             .search([("location_id.warehouse_id", "!=", self.warehouse_0.id)])
             .mapped("location_id.warehouse_id"),
+            (self.warehouse_1 | self.warehouse_2),
+        )
+
+
+class TestStockWarehouseAccessScrap(TestStockCommon):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.scraps = cls.env["stock.scrap"]
+        for wh in cls.warehouses:
+            cls.scraps |= (
+                cls.env["stock.scrap"]
+                .with_company(wh.company_id)
+                .create(
+                    {
+                        "product_id": cls.product.id,
+                        "product_uom_id": cls.product.uom_id.id,
+                        "scrap_qty": 1.0,
+                        "location_id": wh.lot_stock_id.id,
+                    }
+                )
+            )
+
+    @users(
+        "stock_user_c12_wh2",
+    )
+    def test_read_stock_scrap_wh2_only(self):
+        self.assertEqual(
+            self.env["stock.scrap"].search([]).mapped("location_id.warehouse_id"),
+            (self.warehouse_2),
+        )
+
+    @users(
+        "stock_user_c12_wh23",
+    )
+    def test_read_stock_scrap_wh23(self):
+        self.assertEqual(
+            self.env["stock.scrap"].search([]).mapped("location_id.warehouse_id"),
+            (self.warehouse_2 | self.warehouse_3),
+        )
+
+    @users(
+        "stock_user_c1_wh12",
+    )
+    @allowed_companies()
+    def test_read_stock_scrap_wh12(self):
+        self.assertEqual(
+            self.env["stock.scrap"]
+            .search([("location_id.warehouse_id", "!=", self.warehouse_0.id)])
+            .mapped("location_id.warehouse_id"),
+            (self.warehouse_1 | self.warehouse_2),
+        )
+
+
+class TestStockWarehouseAccessReport(TestStockCommon):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        pickings = (
+            cls.stock_picking_wh_1 | cls.stock_picking_wh_2 | cls.stock_picking_wh_3
+        )
+        pickings.action_assign()
+        pickings.move_ids.write({"quantity": 5})
+        pickings.button_validate()
+
+    @users(
+        "stock_user_c12_wh2",
+    )
+    def test_read_report_stock_quantity_wh2_only(self):
+        self.assertEqual(
+            self.env["report.stock.quantity"]
+            .search([("warehouse_id", "!=", False)])
+            .mapped("warehouse_id"),
+            (self.warehouse_2),
+        )
+
+    @users(
+        "stock_user_c12_wh23",
+    )
+    def test_read_report_stock_quantity_wh23(self):
+        self.assertEqual(
+            self.env["report.stock.quantity"]
+            .search([("warehouse_id", "!=", False)])
+            .mapped("warehouse_id"),
+            (self.warehouse_2 | self.warehouse_3),
+        )
+
+    @users(
+        "stock_user_c1_wh12",
+    )
+    @allowed_companies()
+    def test_read_report_stock_quantity_wh12(self):
+        self.assertEqual(
+            self.env["report.stock.quantity"]
+            .search(
+                [
+                    ("warehouse_id", "not in", (False, self.warehouse_0.id)),
+                ]
+            )
+            .mapped("warehouse_id"),
             (self.warehouse_1 | self.warehouse_2),
         )

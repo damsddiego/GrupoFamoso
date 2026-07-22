@@ -7,6 +7,8 @@ access_sng_return_line_supervisor,sng.return.line supervisor,model_sng_return_li
 access_sng_return_line_manager,sng.return.line manager,model_sng_return_line,sng_return.group_sng_return_manager,1,1,1,1
 access_sng_return_reason_user,sng.return.reason user,model_sng_return_reason,sng_return.group_sng_return_user,1,0,0,0
 access_sng_return_reason_manager,sng.return.reason manager,model_sng_return_reason,sng_return.group_sng_return_manager,1,1,1,1
+access_sng_return_confirm_wizard_supervisor,sng.return.confirm.wizard supervisor,model_sng_return_confirm_wizard,sng_return.group_sng_return_supervisor,1,1,1,1
+access_sng_return_confirm_wizard_manager,sng.return.confirm.wizard manager,model_sng_return_confirm_wizard,sng_return.group_sng_return_manager,1,1,1,1
 access_sng_return_history_wizard_user,sng.return.history.wizard user,model_sng_return_history_wizard,sng_return.group_sng_return_user,1,1,1,1
 access_sng_return_history_wizard_supervisor,sng.return.history.wizard supervisor,model_sng_return_history_wizard,sng_return.group_sng_return_supervisor,1,1,1,1
 access_sng_return_history_wizard_manager,sng.return.history.wizard manager,model_sng_return_history_wizard,sng_return.group_sng_return_manager,1,1,1,1

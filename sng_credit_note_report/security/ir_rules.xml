@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Regla multi-compañía para el reporte de notas de crédito -->
+        <record id="sng_credit_note_report_comp_rule" model="ir.rule">
+            <field name="name">SNG Credit Note Report: multi-compañía</field>
+            <field name="model_id" ref="model_sng_credit_note_report"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field name="global" eval="True"/>
+        </record>
+    </data>
+</odoo>

@@ -17,7 +17,10 @@
         <record id="group_sng_return_supervisor" model="res.groups">
             <field name="name">Supervisor de Devoluciones</field>
             <field name="category_id" ref="module_category_sng_return"/>
-            <field name="implied_ids" eval="[(4, ref('sng_return.group_sng_return_user'))]"/>
+            <field name="implied_ids" eval="[
+                (4, ref('sng_return.group_sng_return_user')),
+                (4, ref('stock.group_stock_user'))
+            ]"/>
             <field name="comment">Puede confirmar, cancelar y ver devoluciones de toda su compania.</field>
         </record>
 

@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- Formulario account.payment: bloque con los datos del recibo de la app -->
+    <record id="view_account_payment_form_inherit_sng_ruteros" model="ir.ui.view">
+        <field name="name">account.payment.form.sng.ruteros</field>
+        <field name="model">account.payment</field>
+        <field name="inherit_id" ref="account.view_account_payment_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_sng_aplicar_a_facturas"
+                        type="object"
+                        string="Aplicar a facturas"
+                        class="btn-primary"
+                        invisible="not sng_from_app or state not in ('in_process', 'paid') or not invoice_ids"/>
+                <button name="action_sng_ia_matching"
+                        type="object"
+                        string="Buscar facturas con IA"
+                        invisible="not sng_from_app or (not sng_ia_estado and invoice_ids)"/>
+            </xpath>
+            <xpath expr="//sheet" position="inside">
+                <group string="Recibo Ruteros (app)"
+                       invisible="not sng_from_app" col="4">
+                    <field name="sng_from_app" invisible="1"/>
+                    <field name="sng_metodo_pago"/>
+                    <field name="sng_referencia"/>
+                    <field name="sng_vendedor_id"/>
+                    <field name="sng_saldo_anterior"/>
+                    <field name="sng_saldo_proyectado"/>
+                    <field name="sng_observaciones" colspan="4"/>
+                    <field name="sng_ia_estado" readonly="1"
+                           invisible="not sng_ia_estado"/>
+                    <field name="sng_ia_numeros_pendientes" readonly="1"
+                           invisible="not sng_ia_numeros_pendientes"/>
+                    <field name="invoice_ids" colspan="4"
+                           string="Facturas a pagar"
+                           domain="[('move_type', '=', 'out_invoice'),
+                                    ('partner_id', 'child_of', partner_id),
+                                    ('state', '=', 'posted'),
+                                    ('payment_state', 'in', ('not_paid', 'partial'))]">
+                        <list>
+                            <field name="name" string="Factura"/>
+                            <field name="invoice_date" optional="show"/>
+                            <field name="partner_id" string="Empresa"/>
+                            <field name="amount_total" string="Monto" sum="Total"/>
+                            <field name="amount_residual" string="Pendiente" sum="Total pendiente"/>
+                            <field name="payment_state" string="Estado de pago"
+                                   widget="badge"
+                                   decoration-danger="payment_state == 'not_paid'"
+                                   decoration-warning="payment_state == 'partial'"
+                                   decoration-success="payment_state in ('paid', 'in_payment')"/>
+                            <field name="currency_id" column_invisible="1"/>
+                        </list>
+                    </field>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Lista propia de recibos de ruteros -->
+    <record id="view_ruteros_recibo_list" model="ir.ui.view">
+        <field name="name">account.payment.ruteros.list</field>
+        <field name="model">account.payment</field>
+        <field name="arch" type="xml">
+            <list string="Recibos Ruteros">
+                <field name="date"/>
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="partner_unique_id" optional="show"/>
+                <field name="sng_vendedor_id"/>
+                <field name="sng_metodo_pago"/>
+                <field name="sng_referencia"/>
+                <field name="amount"/>
+                <field name="journal_id"/>
+                <field name="sng_ia_estado" optional="show" widget="badge"
+                       decoration-warning="sng_ia_estado == 'pendiente'"
+                       decoration-info="sng_ia_estado == 'sugerido'"
+                       decoration-danger="sng_ia_estado in ('sin_match', 'error')"/>
+                <field name="state"
+                       decoration-muted="state == 'draft'"
+                       decoration-info="state == 'in_process'"
+                       decoration-success="state == 'paid'"
+                       decoration-danger="state in ('canceled', 'rejected')"
+                       widget="badge"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="currency_id" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Búsqueda con filtros por estado y agrupaciones -->
+    <record id="view_ruteros_recibo_search" model="ir.ui.view">
+        <field name="name">account.payment.ruteros.search</field>
+        <field name="model">account.payment</field>
+        <field name="arch" type="xml">
+            <search string="Recibos Ruteros">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="partner_unique_id" string="Código cliente"
+                       filter_domain="[('partner_unique_id', 'ilike', self)]"/>
+                <field name="sng_vendedor_id"/>
+                <field name="sng_referencia"/>
+                <filter name="borrador" string="Borrador"
+                        domain="[('state', '=', 'draft')]"/>
+                <filter name="confirmado" string="Confirmado"
+                        domain="[('state', 'in', ('in_process', 'paid'))]"/>
+                <separator/>
+                <filter name="hoy" string="Hoy"
+                        domain="[('date', '=', context_today().strftime('%Y-%m-%d'))]"/>
+                <separator/>
+                <filter name="ia_pendiente" string="Matching IA pendiente"
+                        domain="[('sng_ia_estado', '=', 'pendiente')]"/>
+                <filter name="ia_sugerido" string="Sugerencia IA lista"
+                        domain="[('sng_ia_estado', '=', 'sugerido')]"/>
+                <filter name="ia_revisar" string="IA sin coincidencia / error"
+                        domain="[('sng_ia_estado', 'in', ('sin_match', 'error'))]"/>
+                <group expand="0" string="Agrupar por">
+                    <filter name="group_state" string="Estado"
+                            context="{'group_by': 'state'}"/>
+                    <filter name="group_vendedor" string="Vendedor"
+                            context="{'group_by': 'sng_vendedor_id'}"/>
+                    <filter name="group_partner" string="Cliente"
+                            context="{'group_by': 'partner_id'}"/>
+                    <filter name="group_journal" string="Diario"
+                            context="{'group_by': 'journal_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Acción: solo pagos creados por la app -->
+    <record id="action_ruteros_recibos" model="ir.actions.act_window">
+        <field name="name">Recibos Ruteros</field>
+        <field name="res_model">account.payment</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('sng_from_app', '=', True)]</field>
+        <field name="context">{}</field>
+        <field name="search_view_id" ref="view_ruteros_recibo_search"/>
+        <field name="view_id" ref="view_ruteros_recibo_list"/>
+    </record>
+
+    <!-- Menú propio -->
+    <menuitem id="menu_ruteros_root"
+              name="Ruteros"
+              sequence="90"
+              groups="account.group_account_invoice"/>
+    <menuitem id="menu_ruteros_recibos"
+              name="Recibos"
+              parent="menu_ruteros_root"
+              action="action_ruteros_recibos"
+              sequence="10"/>
+
+</odoo>
