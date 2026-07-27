@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_sng_dashboard_gerencial,sng.dashboard.gerencial,model_sng_dashboard_gerencial,group_sng_dashboard_gerencial,1,0,0,0
+access_sng_dashboard_analisis,sng.dashboard.analisis,model_sng_dashboard_analisis,group_sng_dashboard_gerencial,1,0,0,1
+access_sng_dashboard_gerencial_inv,sng.dashboard.gerencial inventario,model_sng_dashboard_gerencial,group_sng_dashboard_inventario,1,0,0,0
+access_sng_dashboard_analisis_inv,sng.dashboard.analisis inventario,model_sng_dashboard_analisis,group_sng_dashboard_inventario,1,0,0,0
+access_sng_dashboard_gerencial_est,sng.dashboard.gerencial estrategia,model_sng_dashboard_gerencial,group_sng_dashboard_estrategia,1,0,0,0
+access_sng_dashboard_analisis_est,sng.dashboard.analisis estrategia,model_sng_dashboard_analisis,group_sng_dashboard_estrategia,1,0,0,0

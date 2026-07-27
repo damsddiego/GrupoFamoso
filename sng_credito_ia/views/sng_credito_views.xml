@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_sng_credito_solicitud_list" model="ir.ui.view">
+        <field name="name">sng.credito.solicitud.list</field>
+        <field name="model">sng.credito.solicitud</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="fecha"/>
+                <field name="tipo_cliente"/>
+                <field name="partner_id"/>
+                <field name="nombre_solicitante" optional="hide"/>
+                <field name="company_id"/>
+                <field name="monto_solicitado" sum="Total"/>
+                <field name="ia_recomendacion" widget="badge"
+                       decoration-success="ia_recomendacion == 'aprobar'"
+                       decoration-warning="ia_recomendacion == 'aprobar_condicionado'"
+                       decoration-danger="ia_recomendacion == 'rechazar'"/>
+                <field name="ia_limite_sugerido" optional="show"/>
+                <field name="estado" widget="badge"
+                       decoration-info="estado == 'analizado'"
+                       decoration-success="estado == 'aprobado'"
+                       decoration-danger="estado == 'rechazado'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_sng_credito_solicitud_form" model="ir.ui.view">
+        <field name="name">sng.credito.solicitud.form</field>
+        <field name="model">sng.credito.solicitud</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="accion_analizar" type="object"
+                            string="Analizar con IA" class="btn-primary"
+                            invisible="estado in ('aprobado', 'rechazado')"/>
+                    <button name="accion_aprobar" type="object"
+                            string="Aprobar" class="btn-success"
+                            invisible="estado != 'analizado'"/>
+                    <button name="accion_rechazar" type="object"
+                            string="Rechazar"
+                            invisible="estado != 'analizado'"/>
+                    <button name="accion_reabrir" type="object"
+                            string="Reabrir"
+                            invisible="estado not in ('aprobado', 'rechazado')"/>
+                    <field name="estado" widget="statusbar"
+                           statusbar_visible="borrador,analizado"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group string="Solicitante">
+                            <field name="tipo_cliente" widget="radio"
+                                   options="{'horizontal': true}"/>
+                            <field name="partner_id"
+                                   invisible="tipo_cliente == 'nuevo'"
+                                   required="tipo_cliente == 'existente'"/>
+                            <field name="nombre_solicitante"
+                                   invisible="tipo_cliente == 'existente'"/>
+                            <field name="identificacion"/>
+                        </group>
+                        <group string="Crédito solicitado">
+                            <field name="fecha"/>
+                            <field name="company_id"
+                                   options="{'no_create': true}"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="monto_solicitado"/>
+                            <field name="plazo_solicitado"/>
+                            <field name="estudio_pdf" widget="binary"
+                                   filename="estudio_filename"/>
+                            <field name="estudio_filename" invisible="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Resultado IA" name="resultado">
+                            <div invisible="ia_recomendacion">
+                                <p class="text-muted">Aún no se ha generado el
+                                análisis. Adjunte el estudio (PDF) y presione
+                                <b>Analizar con IA</b>.</p>
+                            </div>
+                            <group invisible="not ia_recomendacion">
+                                <group>
+                                    <field name="ia_recomendacion"
+                                           widget="badge"
+                                           decoration-success="ia_recomendacion == 'aprobar'"
+                                           decoration-warning="ia_recomendacion == 'aprobar_condicionado'"
+                                           decoration-danger="ia_recomendacion == 'rechazar'"/>
+                                    <field name="ia_nivel_riesgo"/>
+                                    <field name="ia_fecha"/>
+                                </group>
+                                <group>
+                                    <field name="ia_limite_sugerido"/>
+                                    <field name="ia_plazo_sugerido"/>
+                                </group>
+                            </group>
+                            <field name="ia_resumen" nolabel="1"
+                                   invisible="not ia_recomendacion"/>
+                            <field name="ia_detalle_html" nolabel="1"
+                                   invisible="not ia_recomendacion"/>
+                        </page>
+                        <page string="Comportamiento en el grupo"
+                              name="comportamiento">
+                            <div invisible="comportamiento">
+                                <p class="text-muted">Sin historial en las
+                                compañías del grupo (o aún no se analiza).</p>
+                            </div>
+                            <field name="comportamiento_html" nolabel="1"
+                                   invisible="not comportamiento"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_sng_credito_solicitud" model="ir.actions.act_window">
+        <field name="name">Solicitudes de crédito</field>
+        <field name="res_model">sng.credito.solicitud</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Registre la primera solicitud de apertura de crédito
+            </p>
+            <p>Indique si es cliente nuevo o existente, el monto y adjunte el
+            estudio de crédito (PDF). La IA evalúa el estudio y el
+            comportamiento del cliente en todas las compañías del grupo.</p>
+        </field>
+    </record>
+
+    <menuitem id="menu_sng_credito_root" name="Análisis de Crédito"
+              groups="sng_credito_ia.group_sng_credito_ia"
+              web_icon="sng_credito_ia,static/description/icon.png"
+              sequence="76"/>
+    <menuitem id="menu_sng_credito_solicitudes" name="Solicitudes"
+              parent="menu_sng_credito_root"
+              action="action_sng_credito_solicitud" sequence="10"/>
+</odoo>

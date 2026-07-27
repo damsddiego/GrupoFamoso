@@ -85,6 +85,29 @@ Cuando el puente no logra ligar algún número de factura del texto de la app (t
 - También hay un botón manual **Buscar facturas con IA** en el pago. Si el pago no tiene números capturados, la IA sugiere por coincidencia de montos (confianza máxima *media*).
 - Estados posibles: *Pendiente* → *Sugerencia lista* / *Sin coincidencia* / *Error* (con filtros propios en Ruteros → Recibos).
 
+## Reporte de recibos (pantalla / PDF / Excel)
+
+Menú **Ruteros → Reporte de recibos**: asistente con rango de fechas, filtro opcional de diarios y vendedores (el vendedor es un **contacto** marcado como vendedor — lógica de `sales_commission_omax` — no un usuario), y agrupación **Diario → Vendedor** o **Vendedor → Diario**. Tres salidas:
+
+- **Ver en pantalla**: lista nativa agrupada y expandible con subtotales (incluye vista pivote para cruzar diario × vendedor).
+- **PDF**: reporte imprimible con subtotales por grupo y total general.
+- **Excel**: archivo .xlsx con el mismo desglose, listo para filtrar/editar.
+
+Por defecto incluye solo pagos confirmados (*En proceso* / *Pagado*); se pueden incluir borradores desmarcando la casilla.
+
+## Detector de posibles duplicados
+
+Al llegar cada recibo de la app, una heurística (sin IA, instantánea) busca otros recibos del mismo cliente con **monto idéntico en ±7 días** o que **referencian la misma factura en ±14 días**. Si encuentra alguno, el recibo queda en **Duplicado: Sospecha** con los recibos parecidos ligados, y un cron (cada 10 minutos) pide a la IA el veredicto con contexto completo (fechas, referencias, saldos de la app y deuda real de las facturas):
+
+- **Probable duplicado** → revisar antes de conciliar (filtro propio en el menú Ruteros). Ante la duda la IA prefiere marcar para revisión.
+- **Descartado por IA** → parece un cobro legítimo distinto (ej. cuotas semanales del mismo monto).
+
+El razonamiento queda siempre en el chatter. Nada se bloquea ni se cancela automáticamente: es solo una alerta.
+
+## Resumen diario de liquidación
+
+Cada mañana (05:00 CR) se publica en el canal de Discuss **“Liquidación Ruteros”** el resumen del día anterior: tabla de totales por vendedor y por método de pago (calculada por Odoo, números exactos) más un comentario de la IA con las **anomalías a revisar**: referencias repetidas, posibles duplicados, saldos que no cuadran (`saldo_anterior − monto ≠ saldo_proyectado`) y montos atípicos. Si la IA no está disponible, el resumen sale igual solo con los totales. Únase al canal desde Conversaciones para recibirlo.
+
 ### Configuración
 
 1. Instalar la librería en el venv de Odoo: `pip install anthropic` (ya declarada como dependencia externa del módulo).

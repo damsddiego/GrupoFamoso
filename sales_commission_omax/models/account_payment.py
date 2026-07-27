@@ -25,7 +25,11 @@ class AccountPayment(models.Model):
         'partner_id',
         'partner_id.assigned_salesperson_id',
         'invoice_ids.salesperson_id',
-        'reconciled_invoice_ids.salesperson_id',
+        # 'reconciled_invoice_ids.salesperson_id' NO puede ser dependencia:
+        # es no-almacenado y sin search, así que Odoo no puede invertirla —
+        # solo logueaba un ERROR por cada write de pagos/asientos y omitía
+        # el recálculo. Los cambios de conciliación ya disparan vía
+        # matched_debit_ids/matched_credit_ids.
         'move_id.line_ids.matched_debit_ids',
         'move_id.line_ids.matched_credit_ids',
         'company_id',

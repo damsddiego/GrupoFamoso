@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="module_category_sng_dashboard" model="ir.module.category">
+        <field name="name">SNG Dashboard Gerencial</field>
+        <field name="description">Acceso al dashboard gerencial con análisis IA</field>
+        <field name="sequence">60</field>
+    </record>
+
+    <!-- Grupo especial: SOLO los usuarios agregados explícitamente a este
+         grupo ven el dashboard. No lo implica ningún otro grupo (ni ser
+         administrador de Contabilidad da acceso). -->
+    <record id="group_sng_dashboard_gerencial" model="res.groups">
+        <field name="name">Acceso completo (ventas + inventario)</field>
+        <field name="category_id" ref="module_category_sng_dashboard"/>
+        <field name="comment">Puede ver el Dashboard Gerencial completo:
+ventas, cobranza, cartera, inventario y todos los análisis IA.</field>
+        <field name="users" eval="[(4, ref('base.user_admin'))]"/>
+    </record>
+
+    <!-- Acceso restringido: únicamente la pestaña de inventario y su
+         análisis IA. El servidor no le entrega datos de ventas/cartera. -->
+    <record id="group_sng_dashboard_inventario" model="res.groups">
+        <field name="name">Solo Inventario</field>
+        <field name="category_id" ref="module_category_sng_dashboard"/>
+        <field name="comment">Solo ve la pestaña Inventario del Dashboard
+Gerencial (rotación, sobrestock, devoluciones, análisis IA de inventario).
+No ve ventas, cobros ni cartera.</field>
+    </record>
+
+    <!-- Acceso restringido: únicamente la pestaña Estrategia (compras,
+         rotación y ventas por producto) y su análisis IA. -->
+    <record id="group_sng_dashboard_estrategia" model="res.groups">
+        <field name="name">Estrategia (compras y ventas)</field>
+        <field name="category_id" ref="module_category_sng_dashboard"/>
+        <field name="comment">Solo ve la pestaña Estrategia del Dashboard
+Gerencial (sugerido de compras, quiebres de stock, ABC, márgenes,
+compras vs ventas, proveedores y análisis IA de estrategia).</field>
+    </record>
+
+    <!-- Reglas de registro para el historial de análisis IA -->
+    <record id="rule_sng_dashboard_analisis_completo" model="ir.rule">
+        <field name="name">Análisis IA: acceso completo ve todo</field>
+        <field name="model_id" ref="model_sng_dashboard_analisis"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('group_sng_dashboard_gerencial'))]"/>
+    </record>
+    <record id="rule_sng_dashboard_analisis_inventario" model="ir.rule">
+        <field name="name">Análisis IA: solo inventario ve tipo inventario</field>
+        <field name="model_id" ref="model_sng_dashboard_analisis"/>
+        <field name="domain_force">[('tipo', '=', 'inventario')]</field>
+        <field name="groups" eval="[(4, ref('group_sng_dashboard_inventario'))]"/>
+    </record>
+    <record id="rule_sng_dashboard_analisis_estrategia" model="ir.rule">
+        <field name="name">Análisis IA: grupo estrategia ve tipo estrategia</field>
+        <field name="model_id" ref="model_sng_dashboard_analisis"/>
+        <field name="domain_force">[('tipo', '=', 'estrategia')]</field>
+        <field name="groups" eval="[(4, ref('group_sng_dashboard_estrategia'))]"/>
+    </record>
+
+</odoo>

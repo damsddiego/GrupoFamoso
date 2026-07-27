@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_billing_report_wizard_form" model="ir.ui.view">
+        <field name="name">sng.billing.report.wizard.form</field>
+        <field name="model">sng.billing.report.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Reporte de Facturación por Cliente">
+                <header>
+                    <button name="action_view_on_screen"
+                            string="Ver en pantalla"
+                            type="object"
+                            class="btn-primary"
+                            icon="fa-list"/>
+                    <button name="action_print_pdf"
+                            string="PDF"
+                            type="object"
+                            class="btn-secondary"
+                            icon="fa-file-pdf-o"/>
+                    <button name="action_print_excel"
+                            string="Excel"
+                            type="object"
+                            class="btn-secondary"
+                            icon="fa-file-excel-o"/>
+                </header>
+                <field name="show_results" invisible="1"/>
+                <field name="excel_file" invisible="1"/>
+                <field name="excel_filename" invisible="1"/>
+                <div class="oe_title">
+                    <h1>Reporte de Facturación por Cliente</h1>
+                </div>
+                <group>
+                    <group string="Período">
+                        <field name="months_back"/>
+                        <field name="date_from" readonly="1"/>
+                        <field name="date_to" readonly="1"/>
+                    </group>
+                    <group string="Filtros">
+                        <field name="company_ids"
+                               widget="many2many_tags"
+                               options="{'no_create': True, 'no_open': True}"/>
+                        <field name="partner_id"
+                               options="{'no_create': True}"
+                               placeholder="Todos los clientes"/>
+                        <field name="minimum_amount"
+                               placeholder="Sin monto mínimo"/>
+                    </group>
+                </group>
+
+                <group string="Resultados" invisible="not show_results">
+                    <field name="line_ids" nolabel="1" readonly="1">
+                        <list create="false" edit="false" delete="false">
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="partner_id"/>
+                            <field name="partner_vat" optional="show"/>
+                            <field name="invoice_count"/>
+                            <field name="credit_note_count"/>
+                            <field name="amount_untaxed"/>
+                            <field name="amount_tax"/>
+                            <field name="amount_total"/>
+                            <field name="currency_id"/>
+                            <button name="action_open_invoices"
+                                    type="object"
+                                    string="Ver documentos"
+                                    icon="fa-external-link"/>
+                        </list>
+                    </field>
+                </group>
+
+            </form>
+        </field>
+    </record>
+
+    <record id="action_billing_report_wizard" model="ir.actions.act_window">
+        <field name="name">Facturación por Cliente</field>
+        <field name="res_model">sng.billing.report.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_billing_report_wizard_form"/>
+        <field name="target">current</field>
+    </record>
+
+    <menuitem id="menu_billing_report_wizard"
+              name="Facturación por Cliente"
+              parent="account.menu_finance_reports"
+              action="action_billing_report_wizard"
+              sequence="105"
+              groups="account.group_account_readonly,account.group_account_invoice"/>
+</odoo>

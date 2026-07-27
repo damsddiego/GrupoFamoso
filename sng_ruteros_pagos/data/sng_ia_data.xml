@@ -15,6 +15,14 @@
             <field name="value">claude-opus-4-8</field>
         </record>
 
+        <!-- Equivalencias de vendedores: ID que manda la app → ID real en esta
+             base. 11904 = Joaquín Guzmán Godínez (verificado 2026-07-22 por las
+             facturas de sus 7 pagos atascados). -->
+        <record id="config_vendedor_equivalencias" model="ir.config_parameter">
+            <field name="key">sng_ruteros_pagos.vendedor_equivalencias</field>
+            <field name="value">{"11904": 20}</field>
+        </record>
+
         <record id="cron_sng_ia_matching" model="ir.cron">
             <field name="name">SNG Ruteros: matching IA de facturas</field>
             <field name="model_id" ref="account.model_account_payment"/>
@@ -22,6 +30,67 @@
             <field name="code">model._sng_cron_ia_matching_facturas()</field>
             <field name="interval_number">10</field>
             <field name="interval_type">minutes</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <!-- Veredicto IA de sospechas de duplicado -->
+        <record id="cron_sng_ia_duplicados" model="ir.cron">
+            <field name="name">SNG Ruteros: veredicto IA de duplicados</field>
+            <field name="model_id" ref="account.model_account_payment"/>
+            <field name="state">code</field>
+            <field name="code">model._sng_cron_ia_duplicados()</field>
+            <field name="interval_number">10</field>
+            <field name="interval_type">minutes</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <!-- Umbral absoluto (moneda de la compañía) para marcar monto atípico -->
+        <record id="config_monto_atipico_umbral" model="ir.config_parameter">
+            <field name="key">sng_ruteros_pagos.monto_atipico_umbral</field>
+            <field name="value">5000000</field>
+        </record>
+
+        <!-- Deducción de vendedor faltante (determinístico, sin costo de IA) -->
+        <record id="cron_sng_vendedor_faltante" model="ir.cron">
+            <field name="name">SNG Ruteros: asignar vendedor faltante</field>
+            <field name="model_id" ref="account.model_account_payment"/>
+            <field name="state">code</field>
+            <field name="code">model._sng_cron_asignar_vendedor_faltante()</field>
+            <field name="interval_number">10</field>
+            <field name="interval_type">minutes</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <!-- Canal de Discuss donde se publica la liquidación diaria -->
+        <record id="channel_liquidacion_ruteros" model="discuss.channel">
+            <field name="name">Liquidación Ruteros</field>
+            <field name="channel_type">channel</field>
+            <field name="description">Resumen diario IA de los cobros de la app de ruteros</field>
+        </record>
+
+        <!-- Resumen diario: 11:00 UTC = 05:00 Costa Rica -->
+        <record id="cron_sng_ia_resumen_diario" model="ir.cron">
+            <field name="name">SNG Ruteros: resumen diario de liquidación</field>
+            <field name="model_id" ref="account.model_account_payment"/>
+            <field name="state">code</field>
+            <field name="code">model._sng_cron_ia_resumen_diario()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="nextcall"
+                   eval="(DateTime.now() + timedelta(days=1)).strftime('%Y-%m-%d 11:00:00')"/>
+            <field name="active" eval="True"/>
+        </record>
+
+        <!-- Morosidad semanal: lunes 11:00 UTC = 05:00 Costa Rica -->
+        <record id="cron_sng_ia_morosidad" model="ir.cron">
+            <field name="name">SNG Ruteros: perfil de morosidad semanal</field>
+            <field name="model_id" ref="account.model_account_payment"/>
+            <field name="state">code</field>
+            <field name="code">model._sng_cron_ia_morosidad()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">weeks</field>
+            <field name="nextcall"
+                   eval="(DateTime.now() + timedelta(days=((7 - DateTime.now().weekday()) % 7) or 7)).strftime('%Y-%m-%d 11:00:00')"/>
             <field name="active" eval="True"/>
         </record>
 

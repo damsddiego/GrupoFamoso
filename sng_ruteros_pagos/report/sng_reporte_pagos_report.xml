@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="action_reporte_pagos_pdf" model="ir.actions.report">
+        <field name="name">Recibos Ruteros por diario y vendedor</field>
+        <field name="model">sng.ruteros.reporte.pagos</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">sng_ruteros_pagos.reporte_pagos_pdf</field>
+        <field name="report_file">sng_ruteros_pagos.reporte_pagos_pdf</field>
+        <field name="print_report_name">'Recibos Ruteros'</field>
+    </record>
+
+    <template id="reporte_pagos_pdf">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.external_layout">
+                    <t t-set="datos" t-value="doc._datos_agrupados()"/>
+                    <div class="page">
+                        <h2>Recibos Ruteros</h2>
+                        <p>
+                            <strong>Período:</strong> <span t-esc="datos['periodo']"/>
+                            &#160;&#160;
+                            <strong>Agrupado por:</strong> <span t-esc="datos['agrupacion']"/>
+                        </p>
+                        <t t-foreach="datos['companias']" t-as="compania">
+                        <h3 style="background-color:#4472C4; color:white; padding:6px; margin-top:14px;">
+                            <span t-esc="compania['nombre']"/>
+                            <span class="float-end">
+                                <t t-esc="compania['cantidad']"/> recibos —
+                                <t t-esc="compania['total_fmt']"/>
+                            </span>
+                        </h3>
+                        <t t-foreach="compania['grupos']" t-as="grupo">
+                            <h4 style="background-color:#D9E1F2; padding:4px;">
+                                <span t-esc="grupo['nombre']"/>
+                                <span class="float-end">
+                                    <t t-esc="grupo['cantidad']"/> recibos —
+                                    <t t-esc="grupo['total_fmt']"/>
+                                </span>
+                            </h4>
+                            <t t-foreach="grupo['subgrupos']" t-as="sub">
+                                <h5 style="padding-left:12px;">
+                                    <span t-esc="sub['nombre']"/>
+                                    <span class="float-end">
+                                        <t t-esc="sub['cantidad']"/> recibos —
+                                        <t t-esc="sub['total_fmt']"/>
+                                    </span>
+                                </h5>
+                                <table class="table table-sm" style="font-size:11px;">
+                                    <thead>
+                                        <tr>
+                                            <th>Fecha</th>
+                                            <th>Recibo</th>
+                                            <th>Cliente</th>
+                                            <th>Método</th>
+                                            <th>Referencia</th>
+                                            <th>Estado</th>
+                                            <th class="text-end">Monto</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr t-foreach="sub['pagos']" t-as="p">
+                                            <td><span t-esc="p['fecha'].strftime('%d/%m/%Y')"/></td>
+                                            <td><span t-esc="p['recibo']"/></td>
+                                            <td><span t-esc="p['cliente']"/></td>
+                                            <td><span t-esc="p['metodo']"/></td>
+                                            <td><span t-esc="p['referencia']"/></td>
+                                            <td><span t-esc="p['estado']"/></td>
+                                            <td class="text-end"><span t-esc="p['monto_fmt']"/></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </t>
+                        </t>
+                        </t>
+                        <p class="text-end" style="border-top:2px solid #000; padding-top:6px;">
+                            <strong>Total de recibos: <t t-esc="datos['cantidad_total']"/></strong>
+                            (los montos totalizan por compañía, cada una en su moneda)
+                        </p>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

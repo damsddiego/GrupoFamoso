@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="billing_report_document">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <div class="page">
+                    <div class="text-center mb-3">
+                        <h2>Reporte de Facturación por Cliente</h2>
+                        <div>
+                            <strong>Período:</strong>
+                            <span t-esc="data.get('date_from_display')"/>
+                            al
+                            <span t-esc="data.get('date_to_display')"/>
+                        </div>
+                        <div>
+                            <strong>Compañías:</strong>
+                            <span t-esc="data.get('company_names')"/>
+                            <span class="mx-2">|</span>
+                            <strong>Cliente:</strong>
+                            <span t-esc="data.get('partner_name')"/>
+                            <span class="mx-2">|</span>
+                            <strong>Monto mínimo:</strong>
+                            <span t-esc="data.get('minimum_amount_display')"/>
+                        </div>
+                    </div>
+
+                    <t t-foreach="data.get('groups', [])" t-as="group">
+                        <div style="background:#4472C4;color:white;padding:7px;margin-top:12px;">
+                            <strong>
+                                <span t-esc="group.get('company_name')"/>
+                                (<span t-esc="group.get('currency_name')"/>)
+                            </strong>
+                        </div>
+                        <table class="table table-sm table-bordered" style="font-size:10px;">
+                            <thead>
+                                <tr style="background:#D9E2F3;">
+                                    <th>Cliente</th>
+                                    <th>Identificación</th>
+                                    <th class="text-end">Facturas</th>
+                                    <th class="text-end">Notas de crédito</th>
+                                    <th class="text-end">Subtotal neto</th>
+                                    <th class="text-end">Impuestos netos</th>
+                                    <th class="text-end">Total neto</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="group.get('lines', [])" t-as="line">
+                                    <td><span t-esc="line.get('partner_name')"/></td>
+                                    <td><span t-esc="line.get('partner_vat')"/></td>
+                                    <td class="text-end"><span t-esc="line.get('invoice_count')"/></td>
+                                    <td class="text-end"><span t-esc="line.get('credit_note_count')"/></td>
+                                    <td class="text-end"><span t-esc="line.get('amount_untaxed_display')"/></td>
+                                    <td class="text-end"><span t-esc="line.get('amount_tax_display')"/></td>
+                                    <td class="text-end"><strong t-esc="line.get('amount_total_display')"/></td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr style="background:#E2EFDA;font-weight:bold;">
+                                    <td colspan="2" class="text-end">Total compañía</td>
+                                    <td class="text-end"><span t-esc="group.get('invoice_count')"/></td>
+                                    <td class="text-end"><span t-esc="group.get('credit_note_count')"/></td>
+                                    <td class="text-end"><span t-esc="group.get('amount_untaxed_display')"/></td>
+                                    <td class="text-end"><span t-esc="group.get('amount_tax_display')"/></td>
+                                    <td class="text-end"><span t-esc="group.get('amount_total_display')"/></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </t>
+
+                    <div class="text-end" style="font-size:10px;color:#666;">
+                        Clientes/compañías incluidos: <span t-esc="data.get('customer_count', 0)"/>
+                    </div>
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>
+

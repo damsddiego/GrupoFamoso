@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Wizard de importación -->
+    <record id="view_sng_conciliacion_importar_form" model="ir.ui.view">
+        <field name="name">sng.conciliacion.importar.form</field>
+        <field name="model">sng.conciliacion.importar</field>
+        <field name="arch" type="xml">
+            <form>
+                <field name="estado" invisible="1"/>
+                <group invisible="estado == 'hecho'">
+                    <field name="archivo" widget="binary"
+                           filename="archivo_nombre"/>
+                    <field name="archivo_nombre" invisible="1"/>
+                </group>
+                <div invisible="estado != 'hecho'">
+                    <field name="resultado" nolabel="1"/>
+                    <field name="statement_id" invisible="1"/>
+                </div>
+                <footer>
+                    <button name="accion_importar" type="object"
+                            string="Importar" class="btn-primary"
+                            invisible="estado == 'hecho'"/>
+                    <button name="accion_ver_lineas" type="object"
+                            string="Ver líneas importadas" class="btn-primary"
+                            invisible="estado != 'hecho'"/>
+                    <button string="Cerrar" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_sng_conciliacion_importar"
+            model="ir.actions.act_window">
+        <field name="name">Importar estado de cuenta BAC</field>
+        <field name="res_model">sng.conciliacion.importar</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <!-- Lista de líneas del extracto con sugerencias -->
+    <record id="view_sng_statement_line_list" model="ir.ui.view">
+        <field name="name">sng.account.bank.statement.line.list</field>
+        <field name="model">account.bank.statement.line</field>
+        <field name="arch" type="xml">
+            <list create="false" default_order="date desc, sequence">
+                <header>
+                    <button name="accion_sng_sugerir" type="object"
+                            string="Sugerir conciliación (IA)"
+                            class="btn-primary"/>
+                    <button name="accion_sng_conciliar" type="object"
+                            string="Conciliar según sugerencia"
+                            confirm="Se conciliarán las líneas seleccionadas que tengan sugerencia de pago o factura. ¿Continuar?"/>
+                </header>
+                <field name="date"/>
+                <field name="journal_id" optional="hide"/>
+                <field name="payment_ref"/>
+                <field name="ref" optional="hide"/>
+                <field name="amount" sum="Total"/>
+                <field name="partner_id"/>
+                <field name="sng_sugerencia" widget="badge"
+                       decoration-success="sng_sugerencia == 'pago'"
+                       decoration-info="sng_sugerencia == 'factura'"
+                       decoration-warning="sng_sugerencia == 'revisar'"
+                       decoration-danger="sng_sugerencia == 'sin_match'"/>
+                <field name="sng_pago_id" optional="show"/>
+                <field name="sng_factura_ids" widget="many2many_tags"
+                       optional="show"/>
+                <field name="sng_confianza" optional="show"/>
+                <field name="sng_motivo" optional="show"/>
+                <field name="sng_ia" optional="hide"/>
+                <field name="sng_ia_pendiente" string="IA en cola"
+                       optional="show"/>
+                <field name="is_reconciled" string="Conciliada"
+                       optional="show"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_sng_statement_line_search" model="ir.ui.view">
+        <field name="name">sng.account.bank.statement.line.search</field>
+        <field name="model">account.bank.statement.line</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="payment_ref"/>
+                <field name="partner_id"/>
+                <field name="amount"/>
+                <filter name="sin_conciliar" string="Sin conciliar"
+                        domain="[('is_reconciled', '=', False)]"/>
+                <filter name="conciliadas" string="Conciliadas"
+                        domain="[('is_reconciled', '=', True)]"/>
+                <separator/>
+                <filter name="sug_pago" string="Sugerencia: pago"
+                        domain="[('sng_sugerencia', '=', 'pago')]"/>
+                <filter name="sug_factura" string="Sugerencia: factura"
+                        domain="[('sng_sugerencia', '=', 'factura')]"/>
+                <filter name="sug_revisar" string="Por revisar"
+                        domain="[('sng_sugerencia', 'in', ('revisar', 'sin_match'))]"/>
+                <filter name="sin_sugerencia" string="Sin sugerencia aún"
+                        domain="[('sng_sugerencia', '=', False)]"/>
+                <group expand="0" string="Agrupar por">
+                    <filter name="g_diario" string="Diario"
+                            context="{'group_by': 'journal_id'}"/>
+                    <filter name="g_sugerencia" string="Sugerencia"
+                            context="{'group_by': 'sng_sugerencia'}"/>
+                    <filter name="g_fecha" string="Fecha"
+                            context="{'group_by': 'date'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_sng_statement_lines" model="ir.actions.act_window">
+        <field name="name">Líneas del extracto</field>
+        <field name="res_model">account.bank.statement.line</field>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="view_sng_statement_line_list"/>
+        <field name="search_view_id" ref="view_sng_statement_line_search"/>
+        <field name="domain">[('journal_id.type', '=', 'bank')]</field>
+        <field name="context">{'search_default_sin_conciliar': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Aún no hay líneas de extracto importadas
+            </p>
+            <p>Use "Importar estado de cuenta BAC" y luego el botón
+            "Sugerir conciliación (IA)".</p>
+        </field>
+    </record>
+
+    <menuitem id="menu_sng_conciliacion_root" name="Conciliación IA"
+              groups="sng_conciliacion_bancaria.group_sng_conciliacion"
+              web_icon="sng_conciliacion_bancaria,static/description/icon.png"
+              sequence="77"/>
+    <menuitem id="menu_sng_conciliacion_importar"
+              name="Importar estado de cuenta BAC"
+              parent="menu_sng_conciliacion_root"
+              action="action_sng_conciliacion_importar" sequence="10"/>
+    <menuitem id="menu_sng_conciliacion_lineas" name="Líneas del extracto"
+              parent="menu_sng_conciliacion_root"
+              action="action_sng_statement_lines" sequence="20"/>
+</odoo>

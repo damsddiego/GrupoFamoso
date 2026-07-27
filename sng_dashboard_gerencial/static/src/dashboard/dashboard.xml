@@ -1,0 +1,552 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+<t t-name="sng_dashboard_gerencial.Dashboard">
+    <div class="o_sng_dashboard">
+        <div class="o_sng_dash_toolbar">
+            <div class="o_sng_dash_titulo">
+                <h4 class="mb-0">Dashboard Gerencial</h4>
+                <span t-if="state.datos" class="o_sng_dash_companias">
+                    <t t-esc="state.datos.companias.map((c) => c.nombre).join(' · ')"/>
+                </span>
+            </div>
+            <div class="o_sng_dash_acciones">
+                <select t-if="companias.length > 1"
+                        class="form-select form-select-sm o_sng_dash_select"
+                        aria-label="Compañía"
+                        t-on-change="onCambioCompania">
+                    <option value="">Todas las compañías</option>
+                    <option t-foreach="companias" t-as="c" t-key="c.id"
+                            t-att-value="c.id"
+                            t-att-selected="state.companiaId === c.id"
+                            t-esc="trunca(c.nombre, 38)"/>
+                </select>
+                <div class="btn-group btn-group-sm" role="group" aria-label="Período">
+                    <t t-foreach="[1, 3, 6, 12, 24]" t-as="m" t-key="m">
+                        <button type="button"
+                                class="btn btn-outline-secondary"
+                                t-att-class="{ active: state.meses === m }"
+                                t-on-click="() => this.cambiarPeriodo(m)">
+                            <t t-esc="m === 1 ? '1 mes' : m + ' meses'"/>
+                        </button>
+                    </t>
+                </div>
+                <button type="button" class="btn btn-sm btn-outline-secondary"
+                        t-on-click="cargar" title="Actualizar datos">
+                    <i class="fa fa-refresh" role="img" aria-label="Actualizar"/>
+                </button>
+                <button type="button" class="btn btn-sm btn-primary"
+                        t-att-disabled="state.generandoIA"
+                        t-on-click="generarIA">
+                    <i t-att-class="state.generandoIA
+                        ? 'fa fa-spinner fa-spin me-1'
+                        : 'fa fa-magic me-1'" role="img" aria-label="IA"/>
+                    <t t-esc="state.generandoIA
+                        ? 'Analizando…'
+                        : 'Actualizar análisis IA'"/>
+                </button>
+            </div>
+        </div>
+
+        <div t-if="state.cargando" class="o_sng_dash_cargando">
+            <i class="fa fa-spinner fa-spin fa-2x" role="img" aria-label="Cargando"/>
+        </div>
+
+        <div t-elif="state.datos" class="o_sng_dash_cuerpo">
+
+            <!-- KPIs -->
+            <div t-if="puedeVentas" class="o_sng_dash_kpis">
+                <div class="o_sng_kpi">
+                    <div class="o_sng_kpi_etiqueta">Ventas del mes</div>
+                    <div class="o_sng_kpi_valor" t-esc="moneda(state.datos.kpis.ventas_mes)"/>
+                    <div t-if="state.datos.kpis.ventas_variacion_pct !== null"
+                         class="o_sng_kpi_sub"
+                         t-att-class="state.datos.kpis.ventas_variacion_pct >= 0
+                            ? 'o_sng_delta_pos' : 'o_sng_delta_neg'">
+                        <t t-esc="(state.datos.kpis.ventas_variacion_pct >= 0 ? '▲ +' : '▼ ')
+                            + state.datos.kpis.ventas_variacion_pct + '%'"/>
+                        vs mismo corte del mes anterior
+                    </div>
+                </div>
+                <div class="o_sng_kpi">
+                    <div class="o_sng_kpi_etiqueta">Cobros del mes</div>
+                    <div class="o_sng_kpi_valor" t-esc="moneda(state.datos.kpis.cobros_mes)"/>
+                    <div class="o_sng_kpi_sub">pagos de clientes confirmados</div>
+                </div>
+                <div class="o_sng_kpi">
+                    <div class="o_sng_kpi_etiqueta">Cartera vencida</div>
+                    <div class="o_sng_kpi_valor o_sng_kpi_alerta"
+                         t-esc="moneda(state.datos.kpis.cartera_vencida)"/>
+                    <div class="o_sng_kpi_sub">
+                        <t t-esc="state.datos.kpis.pct_vencida"/>% de
+                        <t t-esc="moneda(state.datos.kpis.cartera_total)"/> por cobrar
+                    </div>
+                </div>
+                <div class="o_sng_kpi">
+                    <div class="o_sng_kpi_etiqueta">Inventario valorado</div>
+                    <div class="o_sng_kpi_valor" t-esc="moneda(state.datos.kpis.inventario)"/>
+                    <div class="o_sng_kpi_sub">costo restante en bodegas</div>
+                </div>
+                <div class="o_sng_kpi">
+                    <div class="o_sng_kpi_etiqueta">DSO (días de cobro)</div>
+                    <div class="o_sng_kpi_valor"
+                         t-esc="state.datos.kpis.dso_dias !== null
+                            ? state.datos.kpis.dso_dias + ' días' : '—'"/>
+                    <div class="o_sng_kpi_sub">cartera ÷ venta diaria (90 d)</div>
+                </div>
+                <div class="o_sng_kpi">
+                    <div class="o_sng_kpi_etiqueta">Facturas abiertas</div>
+                    <div class="o_sng_kpi_valor" t-esc="state.datos.kpis.facturas_abiertas"/>
+                    <div class="o_sng_kpi_sub">
+                        <t t-esc="state.datos.kpis.clientes_con_deuda"/> clientes con saldo
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pestañas (solo si el usuario puede ver más de una) -->
+            <ul t-if="pestanasVisibles > 1"
+                class="nav nav-tabs o_sng_dash_tabs">
+                <li t-if="puedeVentas" class="nav-item">
+                    <button type="button" class="nav-link"
+                            t-att-class="{ active: state.pestana === 'ventas' }"
+                            t-on-click="() => state.pestana = 'ventas'">
+                        Ventas y cobranza
+                    </button>
+                </li>
+                <li t-if="puedeInventario" class="nav-item">
+                    <button type="button" class="nav-link"
+                            t-att-class="{ active: state.pestana === 'inventario' }"
+                            t-on-click="() => state.pestana = 'inventario'">
+                        Inventario
+                    </button>
+                </li>
+                <li t-if="puedeEstrategia" class="nav-item">
+                    <button type="button" class="nav-link"
+                            t-att-class="{ active: state.pestana === 'estrategia' }"
+                            t-on-click="() => state.pestana = 'estrategia'">
+                        Estrategia
+                    </button>
+                </li>
+            </ul>
+
+            <!-- Pestaña Ventas y cobranza -->
+            <div t-if="puedeVentas and state.pestana === 'ventas'">
+            <div class="o_sng_dash_tarjeta o_sng_dash_ancha">
+                <div class="o_sng_dash_tarjeta_titulo">Ventas vs Cobros por mes</div>
+                <div class="o_sng_canvas o_sng_canvas_alta">
+                    <canvas t-ref="chartVentasCobros"/>
+                </div>
+            </div>
+
+            <div class="o_sng_dash_grid">
+                <div class="o_sng_dash_tarjeta">
+                    <div class="o_sng_dash_tarjeta_titulo">Cartera por antigüedad</div>
+                    <div class="o_sng_canvas"><canvas t-ref="chartCartera"/></div>
+                </div>
+                <div class="o_sng_dash_tarjeta">
+                    <div class="o_sng_dash_tarjeta_titulo">Top 10 deuda vencida por cliente</div>
+                    <div class="o_sng_canvas"><canvas t-ref="chartMorosos"/></div>
+                </div>
+                <div class="o_sng_dash_tarjeta">
+                    <div class="o_sng_dash_tarjeta_titulo">Ventas por vendedor (mes en curso)</div>
+                    <div class="o_sng_canvas"><canvas t-ref="chartVendedores"/></div>
+                </div>
+            </div>
+
+            <t t-set="listaIA" t-value="analisisVentas"/>
+            <t t-set="tituloIA" t-value="'Análisis y recomendaciones IA — Ventas y cobranza'"/>
+            <t t-call="sng_dashboard_gerencial.PanelIA"/>
+            </div>
+
+            <!-- Pestaña Inventario -->
+            <div t-if="state.pestana === 'inventario'">
+            <div class="o_sng_dash_tarjeta o_sng_dash_ancha">
+                <div class="o_sng_dash_tarjeta_titulo">Inventario por categoría (top 10)</div>
+                <div class="o_sng_canvas"><canvas t-ref="chartInventario"/></div>
+            </div>
+
+            <!-- Inventario a fondo -->
+            <div t-if="state.datos.inventario" class="o_sng_dash_seccion">
+                <div class="o_sng_dash_seccion_titulo">
+                    Inventario a fondo
+                    <span class="o_sng_dash_seccion_nota">
+                        ventas y salidas de los últimos
+                        <t t-esc="state.datos.inventario.ventana_dias"/> días
+                    </span>
+                </div>
+
+                <div class="o_sng_dash_kpis">
+                    <div class="o_sng_kpi">
+                        <div class="o_sng_kpi_etiqueta">Inventario valorado</div>
+                        <div class="o_sng_kpi_valor"
+                             t-esc="moneda(state.datos.inventario.kpis.inventario_total)"/>
+                        <div class="o_sng_kpi_sub">costo restante en bodegas</div>
+                    </div>
+                    <div class="o_sng_kpi">
+                        <div class="o_sng_kpi_etiqueta">Rotación de inventario</div>
+                        <div class="o_sng_kpi_valor"
+                             t-esc="state.datos.inventario.kpis.rotacion_anual + ' veces/año'"/>
+                        <div class="o_sng_kpi_sub"
+                             t-esc="state.datos.inventario.kpis.meses_cobertura !== null
+                                ? 'cobertura de ' + state.datos.inventario.kpis.meses_cobertura + ' meses'
+                                : ''"/>
+                    </div>
+                    <div class="o_sng_kpi">
+                        <div class="o_sng_kpi_etiqueta">Devoluciones</div>
+                        <div class="o_sng_kpi_valor"
+                             t-esc="state.datos.inventario.kpis.pct_devoluciones + '%'"/>
+                        <div class="o_sng_kpi_sub">de la venta del período</div>
+                    </div>
+                    <div class="o_sng_kpi">
+                        <div class="o_sng_kpi_etiqueta">Sin movimiento</div>
+                        <div class="o_sng_kpi_valor o_sng_kpi_alerta"
+                             t-esc="moneda(state.datos.inventario.kpis.valor_sin_movimiento)"/>
+                        <div class="o_sng_kpi_sub">
+                            <t t-esc="numero(state.datos.inventario.kpis.productos_sin_movimiento)"/>
+                            productos sin salidas en
+                            <t t-esc="state.datos.inventario.dias_sin_movimiento"/>+ días
+                        </div>
+                    </div>
+                    <div class="o_sng_kpi">
+                        <div class="o_sng_kpi_etiqueta">Sobrestock (exceso)</div>
+                        <div class="o_sng_kpi_valor o_sng_kpi_alerta"
+                             t-esc="moneda(state.datos.inventario.kpis.valor_sobrestock)"/>
+                        <div class="o_sng_kpi_sub">
+                            <t t-esc="numero(state.datos.inventario.kpis.productos_sobrestock)"/>
+                            productos con cobertura mayor a 12 meses
+                        </div>
+                    </div>
+                </div>
+
+                <div class="o_sng_dash_grid">
+                    <div class="o_sng_dash_tarjeta">
+                        <div class="o_sng_dash_tarjeta_titulo">Rotación por categoría (veces/año)</div>
+                        <div class="o_sng_canvas"><canvas t-ref="chartRotacion"/></div>
+                    </div>
+                    <div class="o_sng_dash_tarjeta">
+                        <div class="o_sng_dash_tarjeta_titulo">Top productos vendidos</div>
+                        <table class="table table-sm o_sng_tabla o_sng_tabla_mini">
+                            <thead><tr>
+                                <th>Producto</th>
+                                <th class="text-end">Venta</th>
+                                <th class="text-end">Unid.</th>
+                            </tr></thead>
+                            <tbody>
+                                <tr t-foreach="state.datos.inventario.top_vendidos" t-as="f" t-key="f_index">
+                                    <td t-att-title="f.producto" t-esc="trunca(f.producto)"/>
+                                    <td class="text-end" t-esc="moneda(f.venta)"/>
+                                    <td class="text-end" t-esc="numero(f.unidades)"/>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="o_sng_dash_tarjeta">
+                        <div class="o_sng_dash_tarjeta_titulo">Productos más devueltos</div>
+                        <table class="table table-sm o_sng_tabla o_sng_tabla_mini">
+                            <thead><tr>
+                                <th>Producto</th>
+                                <th class="text-end">Devuelto</th>
+                                <th class="text-end">% de su venta</th>
+                            </tr></thead>
+                            <tbody>
+                                <tr t-foreach="state.datos.inventario.top_devueltos" t-as="f" t-key="f_index">
+                                    <td t-att-title="f.producto" t-esc="trunca(f.producto)"/>
+                                    <td class="text-end" t-esc="moneda(f.devuelto)"/>
+                                    <td class="text-end"
+                                        t-esc="f.pct !== null ? f.pct + '%' : '—'"/>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div t-if="!state.datos.inventario.top_devueltos.length"
+                             class="o_sng_ia_vacio">Sin devoluciones en el período.</div>
+                    </div>
+                    <div class="o_sng_dash_tarjeta">
+                        <div class="o_sng_dash_tarjeta_titulo">Mayor valor sin movimiento</div>
+                        <table class="table table-sm o_sng_tabla o_sng_tabla_mini">
+                            <thead><tr>
+                                <th>Producto</th>
+                                <th class="text-end">Valor</th>
+                                <th class="text-end">Días sin salida</th>
+                            </tr></thead>
+                            <tbody>
+                                <tr t-foreach="state.datos.inventario.sin_movimiento" t-as="f" t-key="f_index">
+                                    <td t-att-title="f.producto" t-esc="trunca(f.producto)"/>
+                                    <td class="text-end" t-esc="moneda(f.valor)"/>
+                                    <td class="text-end"
+                                        t-esc="f.dias !== null ? numero(f.dias) : 'nunca'"/>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="o_sng_dash_tarjeta">
+                        <div class="o_sng_dash_tarjeta_titulo">Mayor sobrestock</div>
+                        <table class="table table-sm o_sng_tabla o_sng_tabla_mini">
+                            <thead><tr>
+                                <th>Producto</th>
+                                <th class="text-end">Valor</th>
+                                <th class="text-end">Cobertura</th>
+                            </tr></thead>
+                            <tbody>
+                                <tr t-foreach="state.datos.inventario.sobrestock" t-as="f" t-key="f_index">
+                                    <td t-att-title="f.producto" t-esc="trunca(f.producto)"/>
+                                    <td class="text-end" t-esc="moneda(f.valor)"/>
+                                    <td class="text-end" t-esc="numero(f.cobertura) + ' días'"/>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div t-if="!state.datos.inventario.sobrestock.length"
+                             class="o_sng_ia_vacio">Sin productos en sobrestock.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div t-if="!state.datos.inventario" class="o_sng_ia_vacio">
+                Las métricas profundas de inventario estarán disponibles
+                después del próximo reinicio del servidor.
+            </div>
+
+            <t t-set="listaIA" t-value="analisisInventario"/>
+            <t t-set="tituloIA" t-value="'Análisis y recomendaciones IA — Inventario'"/>
+            <t t-call="sng_dashboard_gerencial.PanelIA"/>
+            </div>
+
+            <!-- Pestaña Estrategia -->
+            <div t-if="puedeEstrategia and state.pestana === 'estrategia'">
+            <div t-if="!state.datos.estrategia" class="o_sng_ia_vacio">
+                Las métricas de estrategia estarán disponibles después del
+                próximo reinicio del servidor.
+            </div>
+            <t t-if="state.datos.estrategia">
+            <div class="o_sng_dash_kpis">
+                <div class="o_sng_kpi">
+                    <div class="o_sng_kpi_etiqueta">Compras del mes</div>
+                    <div class="o_sng_kpi_valor"
+                         t-esc="moneda(state.datos.estrategia.kpis.compras_mes)"/>
+                    <div class="o_sng_kpi_sub"
+                         t-esc="state.datos.estrategia.kpis.ratio_compras_ventas !== null
+                            ? 'últimos 90 días: compras = ' + state.datos.estrategia.kpis.ratio_compras_ventas + '% de la venta'
+                            : 'órdenes de compra confirmadas'"/>
+                </div>
+                <div class="o_sng_kpi">
+                    <div class="o_sng_kpi_etiqueta">Margen bruto (90 días)</div>
+                    <div class="o_sng_kpi_valor"
+                         t-esc="state.datos.estrategia.kpis.margen_bruto_pct !== null
+                            ? state.datos.estrategia.kpis.margen_bruto_pct + '%' : '—'"/>
+                    <div class="o_sng_kpi_sub">
+                        sobre ventas de
+                        <t t-esc="moneda(state.datos.estrategia.kpis.ventas_90)"/>
+                    </div>
+                </div>
+                <div class="o_sng_kpi">
+                    <div class="o_sng_kpi_etiqueta">Quiebres de stock</div>
+                    <div class="o_sng_kpi_valor o_sng_kpi_alerta"
+                         t-esc="numero(state.datos.estrategia.kpis.quiebres) + ' productos'"/>
+                    <div class="o_sng_kpi_sub">
+                        venta en riesgo:
+                        <t t-esc="moneda(state.datos.estrategia.kpis.venta_perdida_mensual)"/>/mes
+                    </div>
+                </div>
+                <div class="o_sng_kpi">
+                    <div class="o_sng_kpi_etiqueta">Sugerido de compra</div>
+                    <div class="o_sng_kpi_valor"
+                         t-esc="moneda(state.datos.estrategia.kpis.valor_sugerido_total)"/>
+                    <div class="o_sng_kpi_sub">
+                        <t t-esc="numero(state.datos.estrategia.kpis.productos_bajo_cobertura)"/>
+                        productos bajo cobertura de
+                        <t t-esc="state.datos.estrategia.cobertura_objetivo"/> meses
+                    </div>
+                </div>
+            </div>
+
+            <div class="o_sng_dash_tarjeta o_sng_dash_ancha">
+                <div class="o_sng_dash_tarjeta_titulo">Compras vs Ventas por mes</div>
+                <div class="o_sng_canvas o_sng_canvas_alta">
+                    <canvas t-ref="chartCompras"/>
+                </div>
+            </div>
+
+            <div class="o_sng_dash_grid">
+                <div class="o_sng_dash_tarjeta">
+                    <div class="o_sng_dash_tarjeta_titulo">Sugerido de compras
+                        <span class="o_sng_dash_seccion_nota">top 20 por valor,
+                            cobertura objetivo
+                            <t t-esc="state.datos.estrategia.cobertura_objetivo"/> meses</span>
+                    </div>
+                    <table class="table table-sm o_sng_tabla o_sng_tabla_mini">
+                        <thead><tr>
+                            <th>Producto</th>
+                            <th class="text-end">Stock</th>
+                            <th class="text-end">Venta/mes</th>
+                            <th class="text-end">Cobert.</th>
+                            <th class="text-end">Comprar</th>
+                            <th class="text-end">Valor</th>
+                        </tr></thead>
+                        <tbody>
+                            <tr t-foreach="state.datos.estrategia.sugerido_compras" t-as="f" t-key="f_index">
+                                <td t-att-title="f.producto" t-esc="trunca(f.producto, 30)"/>
+                                <td class="text-end" t-esc="numero(f.stock)"/>
+                                <td class="text-end" t-esc="numero(f.venta_mensual)"/>
+                                <td class="text-end" t-esc="f.cobertura + ' m'"/>
+                                <td class="text-end" t-esc="numero(f.sugerido_qty)"/>
+                                <td class="text-end" t-esc="moneda(f.sugerido_valor)"/>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="o_sng_dash_tarjeta">
+                    <div class="o_sng_dash_tarjeta_titulo">Quiebres de stock (se vende y no hay)</div>
+                    <table class="table table-sm o_sng_tabla o_sng_tabla_mini">
+                        <thead><tr>
+                            <th>Producto</th>
+                            <th class="text-end">Unid./mes</th>
+                            <th class="text-end">Venta en riesgo/mes</th>
+                        </tr></thead>
+                        <tbody>
+                            <tr t-foreach="state.datos.estrategia.quiebres" t-as="f" t-key="f_index">
+                                <td t-att-title="f.producto" t-esc="trunca(f.producto)"/>
+                                <td class="text-end" t-esc="numero(f.unidades_mensual)"/>
+                                <td class="text-end" t-esc="moneda(f.venta_mensual)"/>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div t-if="!state.datos.estrategia.quiebres.length"
+                         class="o_sng_ia_vacio">Sin quiebres de stock. 👌</div>
+                </div>
+                <div class="o_sng_dash_tarjeta">
+                    <div class="o_sng_dash_tarjeta_titulo">Clasificación ABC de la venta (90 días)</div>
+                    <table class="table table-sm o_sng_tabla o_sng_tabla_mini">
+                        <thead><tr>
+                            <th>Clase</th>
+                            <th class="text-end">Productos</th>
+                            <th class="text-end">% de la venta</th>
+                            <th class="text-end">Inventario invertido</th>
+                        </tr></thead>
+                        <tbody>
+                            <tr t-foreach="state.datos.estrategia.abc" t-as="f" t-key="f.clase">
+                                <td><b t-esc="f.clase"/></td>
+                                <td class="text-end" t-esc="numero(f.productos)"/>
+                                <td class="text-end" t-esc="f.pct_venta + '%'"/>
+                                <td class="text-end" t-esc="moneda(f.inventario)"/>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="o_sng_kpi_sub" style="margin-top:4px;">
+                        A = productos que hacen el 80% de la venta; B = el
+                        siguiente 15%; C = el resto. "Sin venta" = con stock
+                        pero sin ventas en 90 días.
+                    </div>
+                </div>
+                <div class="o_sng_dash_tarjeta">
+                    <div class="o_sng_dash_tarjeta_titulo">Margen bruto por categoría (90 días)</div>
+                    <div class="o_sng_canvas"><canvas t-ref="chartMargen"/></div>
+                </div>
+                <div class="o_sng_dash_tarjeta">
+                    <div class="o_sng_dash_tarjeta_titulo">Compras por proveedor (90 días)</div>
+                    <table class="table table-sm o_sng_tabla o_sng_tabla_mini">
+                        <thead><tr>
+                            <th>Proveedor</th>
+                            <th class="text-end">Monto</th>
+                            <th class="text-end">Órdenes</th>
+                        </tr></thead>
+                        <tbody>
+                            <tr t-foreach="state.datos.estrategia.top_proveedores" t-as="f" t-key="f_index">
+                                <td t-att-title="f.proveedor" t-esc="trunca(f.proveedor)"/>
+                                <td class="text-end" t-esc="moneda(f.monto)"/>
+                                <td class="text-end" t-esc="numero(f.ordenes)"/>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div t-if="!state.datos.estrategia.top_proveedores.length"
+                         class="o_sng_ia_vacio">Sin órdenes de compra en el período.</div>
+                </div>
+            </div>
+            </t>
+
+            <t t-set="listaIA" t-value="analisisEstrategia"/>
+            <t t-set="tituloIA" t-value="'Análisis y recomendaciones IA — Estrategia'"/>
+            <t t-call="sng_dashboard_gerencial.PanelIA"/>
+            </div>
+
+            <!-- Tabla por compañía -->
+            <div t-if="state.datos.por_compania.length > 1" class="o_sng_dash_tarjeta o_sng_dash_ancha">
+                <div class="o_sng_dash_tarjeta_titulo">Detalle por compañía</div>
+                <div class="table-responsive">
+                    <table class="table table-sm o_sng_tabla">
+                        <thead>
+                            <tr>
+                                <th>Compañía</th>
+                                <th class="text-end">Ventas del mes</th>
+                                <th class="text-end">Cobros del mes</th>
+                                <th class="text-end">Cartera total</th>
+                                <th class="text-end">Cartera vencida</th>
+                                <th class="text-end">Inventario</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="state.datos.por_compania" t-as="fila" t-key="fila.compania">
+                                <td t-esc="fila.compania"/>
+                                <td class="text-end" t-esc="moneda(fila.ventas_mes)"/>
+                                <td class="text-end" t-esc="moneda(fila.cobros_mes)"/>
+                                <td class="text-end" t-esc="moneda(fila.cartera_total)"/>
+                                <td class="text-end o_sng_kpi_alerta" t-esc="moneda(fila.cartera_vencida)"/>
+                                <td class="text-end" t-esc="moneda(fila.inventario)"/>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</t>
+
+<t t-name="sng_dashboard_gerencial.PanelIA">
+    <div class="o_sng_dash_tarjeta o_sng_dash_ancha o_sng_dash_ia">
+        <div class="o_sng_dash_tarjeta_titulo">
+            <i class="fa fa-magic me-1" role="img" aria-label="IA"/>
+            <t t-esc="tituloIA"/>
+        </div>
+        <div t-if="!listaIA.length" class="o_sng_ia_vacio">
+            Todavía no hay análisis generados de este tipo. Use el botón
+            <b>Actualizar análisis IA</b> o espere el análisis
+            automático de los lunes a las 06:00.
+        </div>
+        <div class="o_sng_ia_grid">
+            <div t-foreach="listaIA" t-as="a" t-key="a.company_id"
+                 class="o_sng_ia_carta">
+                <div class="o_sng_ia_encabezado">
+                    <span class="o_sng_ia_compania" t-esc="a.compania"/>
+                    <span class="o_sng_salud"
+                          t-att-class="'o_sng_salud_' + a.salud">
+                        <t t-esc="etiquetaSalud(a.salud)"/>
+                    </span>
+                </div>
+                <div class="o_sng_ia_fecha" t-esc="fechaCorta(a.fecha)"/>
+                <p class="o_sng_ia_resumen" t-esc="a.resumen"/>
+                <div t-if="a.alertas.length" class="o_sng_ia_bloque">
+                    <div class="o_sng_ia_subtitulo">⚠ Alertas</div>
+                    <ul>
+                        <li t-foreach="a.alertas" t-as="al" t-key="al_index">
+                            <b t-esc="al.titulo"/>: <t t-esc="al.detalle"/>
+                        </li>
+                    </ul>
+                </div>
+                <div t-if="a.recomendaciones.length" class="o_sng_ia_bloque">
+                    <div class="o_sng_ia_subtitulo">Recomendaciones</div>
+                    <ul>
+                        <li t-foreach="a.recomendaciones" t-as="r" t-key="r_index">
+                            <span class="o_sng_chip"
+                                  t-att-class="'o_sng_chip_' + r.prioridad"
+                                  t-esc="r.prioridad.toUpperCase()"/>
+                            <span class="o_sng_chip o_sng_chip_area"
+                                  t-esc="etiquetaArea(r.area)"/>
+                            <b t-esc="r.titulo"/>: <t t-esc="r.detalle"/>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</t>
+
+</templates>

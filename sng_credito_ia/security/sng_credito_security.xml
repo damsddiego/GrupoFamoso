@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="module_category_sng_credito" model="ir.module.category">
+        <field name="name">SNG Análisis de Crédito</field>
+        <field name="description">Permisos del análisis de crédito con IA</field>
+        <field name="sequence">61</field>
+    </record>
+
+    <!-- Nadie implica este grupo: solo membresía explícita, igual que el
+         dashboard gerencial. -->
+    <record id="group_sng_credito_ia" model="res.groups">
+        <field name="name">Análisis de crédito (IA)</field>
+        <field name="category_id" ref="module_category_sng_credito"/>
+        <field name="comment">Puede registrar solicitudes de apertura de
+crédito, ver el comportamiento del cliente en todas las compañías y generar
+el análisis IA.</field>
+        <field name="users" eval="[(4, ref('base.user_admin'))]"/>
+    </record>
+</odoo>

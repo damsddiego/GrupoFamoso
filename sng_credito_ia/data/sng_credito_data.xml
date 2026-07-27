@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="seq_sng_credito_solicitud" model="ir.sequence">
+        <field name="name">Solicitud de crédito SNG</field>
+        <field name="code">sng.credito.solicitud</field>
+        <field name="prefix">CRED/%(year)s/</field>
+        <field name="padding">4</field>
+    </record>
+
+    <!-- Respaldo: la key principal se reutiliza de
+         sng_ruteros_pagos.anthropic_api_key -->
+    <record id="param_anthropic_api_key" model="ir.config_parameter">
+        <field name="key">sng_credito_ia.anthropic_api_key</field>
+        <field name="value">CONFIGURAR_API_KEY</field>
+    </record>
+    <record id="param_anthropic_model" model="ir.config_parameter">
+        <field name="key">sng_credito_ia.anthropic_model</field>
+        <field name="value">claude-opus-4-8</field>
+    </record>
+</odoo>

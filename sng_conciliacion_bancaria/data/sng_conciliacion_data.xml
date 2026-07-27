@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!-- Respaldo: la key principal se reutiliza de
+         sng_ruteros_pagos.anthropic_api_key -->
+    <record id="param_anthropic_api_key" model="ir.config_parameter">
+        <field name="key">sng_conciliacion_bancaria.anthropic_api_key</field>
+        <field name="value">CONFIGURAR_API_KEY</field>
+    </record>
+    <record id="param_anthropic_model" model="ir.config_parameter">
+        <field name="key">sng_conciliacion_bancaria.anthropic_model</field>
+        <field name="value">claude-opus-4-8</field>
+    </record>
+    <!-- Antes de esta fecha los pagos debitaban directo la cuenta del banco
+         (sin transitoria): esas líneas no cruzan contra pagos. -->
+    <record id="param_fecha_inicio" model="ir.config_parameter">
+        <field name="key">sng_conciliacion_bancaria.fecha_inicio</field>
+        <field name="value">2026-07-01</field>
+    </record>
+
+    <!-- Cron de respaldo para la cola de IA: normalmente se dispara al
+         instante con _trigger() desde el botón "Sugerir conciliación". -->
+    <record id="cron_sng_conciliacion_ia" model="ir.cron">
+        <field name="name">SNG Conciliación: cola de sugerencias IA</field>
+        <field name="model_id" ref="account.model_account_bank_statement_line"/>
+        <field name="state">code</field>
+        <field name="code">model._sng_cron_ia()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="active" eval="True"/>
+        <field name="nextcall" eval="(DateTime.now() + timedelta(days=1)).strftime('%Y-%m-%d %H:%M:%S')"/>
+    </record>
+</odoo>

@@ -1,6 +1,6 @@
 {
     "name": "SNG Return",
-    "version": "18.0.1.2.2",
+    "version": "18.0.1.3.0",
     "category": "Sales",
     "summary": "Registro de devoluciones de clientes con historial de ventas facturadas",
     "author": "SNG",

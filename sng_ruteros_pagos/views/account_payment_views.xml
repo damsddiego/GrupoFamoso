@@ -12,7 +12,7 @@
                         type="object"
                         string="Aplicar a facturas"
                         class="btn-primary"
-                        invisible="not sng_from_app or state not in ('in_process', 'paid') or not invoice_ids"/>
+                        invisible="not sng_from_app or state not in ('in_process', 'paid') or not invoice_ids or is_reconciled"/>
                 <button name="action_sng_ia_matching"
                         type="object"
                         string="Buscar facturas con IA"
@@ -22,6 +22,8 @@
                 <group string="Recibo Ruteros (app)"
                        invisible="not sng_from_app" col="4">
                     <field name="sng_from_app" invisible="1"/>
+                    <field name="is_reconciled" invisible="1"/>
+                    <field name="sng_numero_recibo"/>
                     <field name="sng_metodo_pago"/>
                     <field name="sng_referencia"/>
                     <field name="sng_vendedor_id"/>
@@ -32,6 +34,15 @@
                            invisible="not sng_ia_estado"/>
                     <field name="sng_ia_numeros_pendientes" readonly="1"
                            invisible="not sng_ia_numeros_pendientes"/>
+                    <field name="sng_vendedor_app_id" readonly="1"
+                           invisible="not sng_vendedor_app_id"/>
+                    <field name="sng_monto_atipico" readonly="1"
+                           invisible="not sng_monto_atipico"/>
+                    <field name="sng_dup_estado" readonly="1"
+                           invisible="not sng_dup_estado"/>
+                    <field name="sng_dup_pago_ids" readonly="1" colspan="4"
+                           widget="many2many_tags"
+                           invisible="not sng_dup_pago_ids"/>
                     <field name="invoice_ids" colspan="4"
                            string="Facturas a pagar"
                            domain="[('move_type', '=', 'out_invoice'),
@@ -62,20 +73,36 @@
         <field name="name">account.payment.ruteros.list</field>
         <field name="model">account.payment</field>
         <field name="arch" type="xml">
-            <list string="Recibos Ruteros">
+            <list string="Recibos Ruteros"
+                  decoration-danger="sng_dup_estado == 'probable'"
+                  decoration-muted="state == 'draft' and sng_dup_estado != 'probable'"
+                  decoration-success="state == 'in_process' and sng_dup_estado != 'probable'">
+                <header>
+                    <button name="action_sng_restablecer_borrador"
+                            type="object"
+                            string="No Aplicar"
+                            confirm="Los pagos seleccionados volverán a borrador. Si alguno está aplicado a facturas, su conciliación se deshará y las facturas volverán a quedar pendientes. ¿Continuar?"/>
+                </header>
                 <field name="date"/>
                 <field name="name"/>
+                <field name="sng_numero_recibo" optional="show"/>
                 <field name="partner_id"/>
                 <field name="partner_unique_id" optional="show"/>
                 <field name="sng_vendedor_id"/>
                 <field name="sng_metodo_pago"/>
                 <field name="sng_referencia"/>
-                <field name="amount"/>
+                <field name="amount" sum="Total"/>
                 <field name="journal_id"/>
                 <field name="sng_ia_estado" optional="show" widget="badge"
                        decoration-warning="sng_ia_estado == 'pendiente'"
                        decoration-info="sng_ia_estado == 'sugerido'"
                        decoration-danger="sng_ia_estado in ('sin_match', 'error')"/>
+                <field name="sng_dup_estado" optional="show" widget="badge"
+                       decoration-warning="sng_dup_estado == 'sospecha'"
+                       decoration-danger="sng_dup_estado == 'probable'"
+                       decoration-success="sng_dup_estado == 'descartado'"/>
+                <field name="sng_monto_atipico" optional="show"
+                       widget="boolean_toggle" readonly="1"/>
                 <field name="state"
                        decoration-muted="state == 'draft'"
                        decoration-info="state == 'in_process'"
@@ -100,6 +127,7 @@
                        filter_domain="[('partner_unique_id', 'ilike', self)]"/>
                 <field name="sng_vendedor_id"/>
                 <field name="sng_referencia"/>
+                <field name="sng_numero_recibo" string="N° recibo app"/>
                 <filter name="borrador" string="Borrador"
                         domain="[('state', '=', 'draft')]"/>
                 <filter name="confirmado" string="Confirmado"
@@ -114,6 +142,13 @@
                         domain="[('sng_ia_estado', '=', 'sugerido')]"/>
                 <filter name="ia_revisar" string="IA sin coincidencia / error"
                         domain="[('sng_ia_estado', 'in', ('sin_match', 'error'))]"/>
+                <separator/>
+                <filter name="dup_probable" string="Probable duplicado"
+                        domain="[('sng_dup_estado', '=', 'probable')]"/>
+                <filter name="dup_revisar" string="Sospecha de duplicado"
+                        domain="[('sng_dup_estado', '=', 'sospecha')]"/>
+                <filter name="monto_atipico" string="Monto atípico"
+                        domain="[('sng_monto_atipico', '=', True)]"/>
                 <group expand="0" string="Agrupar por">
                     <filter name="group_state" string="Estado"
                             context="{'group_by': 'state'}"/>

@@ -452,6 +452,16 @@ class SngReturn(models.Model):
                 "la nota de crédito."
             ))
 
+        lines_without_invoice = self.line_ids.filtered(lambda l: not l.invoice_id)
+        if lines_without_invoice:
+            raise UserError(_(
+                "El Gerente de Devoluciones debe seleccionar la factura de origen de "
+                "los siguientes productos antes de generar la nota de crédito: %(products)s."
+            ) % {
+                "products": ", ".join(
+                    lines_without_invoice.mapped("product_id.display_name")
+                ),
+            })
         lines_with_invoice = self.line_ids.filtered(lambda l: l.invoice_id)
         if not lines_with_invoice:
             raise UserError(_("Ninguna línea tiene una factura asociada para generar la nota de crédito."))
@@ -568,6 +578,7 @@ class SngReturnLine(models.Model):
     _name = "sng.return.line"
     _description = "Linea de Devolucion"
     _order = "return_id, sequence, id"
+    _check_company_auto = True
 
     sequence = fields.Integer(default=10)
     return_id = fields.Many2one(
@@ -599,7 +610,8 @@ class SngReturnLine(models.Model):
         "product.product",
         string="Producto",
         required=True,
-        domain="[('sale_ok', '=', True)]",
+        check_company=True,
+        domain="[('sale_ok', '=', True), '|', ('company_id', '=', False), ('company_id', '=', company_id)]",
     )
     quantity = fields.Float(
         string="Cantidad a devolver",
@@ -617,34 +629,50 @@ class SngReturnLine(models.Model):
     invoice_id = fields.Many2one(
         "account.move",
         string="Factura de origen",
+        copy=False,
+        check_company=True,
         domain="[('move_type', '=', 'out_invoice'), ('state', '=', 'posted'), ('partner_id', 'child_of', partner_id), ('invoice_line_ids.product_id', '=', product_id)]",
-        help="Permite vincular este producto con una factura específica para generar la Nota de Crédito.",
+        help="Factura contra la que se devuelve el producto. La selecciona el Gerente "
+             "de Devoluciones (a mas tardar antes de generar la nota de credito) y, "
+             "cuando esta asignada, determina la cantidad disponible a devolver.",
+    )
+    invoice_editable = fields.Boolean(
+        string="Puede editar factura",
+        compute="_compute_invoice_editable",
     )
     invoiced_sale_qty = fields.Float(
-        string="Vendido facturado",
+        string="Facturado",
         compute="_compute_sale_metrics",
         compute_sudo=True,
         digits="Product Unit of Measure",
+        help="Cantidad del producto en la factura de origen seleccionada; sin factura, "
+             "cantidad facturada en las ordenes de venta del cliente.",
     )
     previous_return_qty = fields.Float(
         string="Devuelto antes",
         compute="_compute_sale_metrics",
         compute_sudo=True,
         digits="Product Unit of Measure",
+        help="Cantidad ya devuelta (devoluciones confirmadas) contra la misma factura; "
+             "sin factura, total devuelto por el cliente para este producto.",
     )
     available_return_qty = fields.Float(
         string="Disponible",
         compute="_compute_sale_metrics",
         compute_sudo=True,
         digits="Product Unit of Measure",
+        help="Cantidad disponible a devolver. Con factura de origen seleccionada se "
+             "calcula contra esa factura; sin factura, contra las ordenes facturadas "
+             "del cliente.",
     )
     credit_note_qty = fields.Float(
         string="Nc emitidas",
         compute="_compute_sale_metrics",
         compute_sudo=True,
         digits="Product Unit of Measure",
-        help="Cantidad reembolsada mediante notas de crédito manuales (sin devolución "
-             "asociada ni vínculo con ventas) para este producto y cliente.",
+        help="Cantidad reembolsada mediante notas de crédito externas: con factura "
+             "seleccionada, las que reversan esa factura; sin factura, las NC manuales "
+             "del cliente sin vinculo con ventas.",
     )
     invoiced_sale_order_count = fields.Integer(
         string="Ordenes facturadas",
@@ -652,20 +680,118 @@ class SngReturnLine(models.Model):
         compute_sudo=True,
     )
 
-    @api.depends("product_id", "partner_id", "company_id", "quantity", "state")
+    def _compute_invoice_editable(self):
+        can_edit = self.env.su or self.env.user.has_group(
+            "sng_return.group_sng_return_manager"
+        )
+        for line in self:
+            line.invoice_editable = can_edit
+
+    @api.depends("product_id", "partner_id", "company_id", "quantity", "state", "invoice_id")
     def _compute_sale_metrics(self):
-        lines_with_data = self.filtered(lambda l: l.product_id and l.partner_id)
-        for line in self - lines_with_data:
+        # Con factura de origen seleccionada el disponible se calcula contra esa
+        # factura; sin factura se usa el calculo global por cliente (ordenes
+        # facturadas), igual que antes de asignar la factura.
+        invoice_lines = self.filtered(
+            lambda l: l.product_id and l.invoice_id and l.invoice_id.state != "cancel"
+        )
+        partner_lines = (self - invoice_lines).filtered(
+            lambda l: l.product_id and l.partner_id
+        )
+        for line in self - invoice_lines - partner_lines:
             line.invoiced_sale_qty = 0.0
             line.previous_return_qty = 0.0
             line.available_return_qty = 0.0
             line.credit_note_qty = 0.0
             line.invoiced_sale_order_count = 0
+        if invoice_lines:
+            invoice_lines._compute_sale_metrics_by_invoice()
+        if partner_lines:
+            partner_lines._compute_sale_metrics_by_partner()
 
+    def _compute_sale_metrics_by_invoice(self):
+        lines_with_data = self
+        invoices = lines_with_data.mapped("invoice_id")
+        product_ids = list({line.product_id.id for line in lines_with_data})
+
+        # Cantidad facturada por (factura, producto).
+        invoiced_map = {}
+        order_map = {}
+        for invoice in invoices:
+            for inv_line in invoice.invoice_line_ids:
+                if inv_line.display_type != "product" or not inv_line.product_id:
+                    continue
+                key = (invoice.id, inv_line.product_id.id)
+                qty = inv_line.quantity
+                if inv_line.product_uom_id:
+                    qty = inv_line.product_uom_id._compute_quantity(
+                        qty, inv_line.product_id.uom_id
+                    )
+                invoiced_map[key] = invoiced_map.get(key, 0.0) + qty
+                order_map.setdefault(key, set()).update(
+                    inv_line.sale_line_ids.order_id.ids
+                )
+
+        # Devuelto antes: lineas confirmadas de este modulo sobre la misma factura.
+        return_map = {
+            (invoice.id, product.id): qty_sum or 0.0
+            for invoice, product, qty_sum in self.env["sng.return.line"]._read_group(
+                [
+                    ("invoice_id", "in", invoices.ids),
+                    ("product_id", "in", product_ids),
+                    ("state", "=", "confirmed"),
+                ],
+                ["invoice_id", "product_id"],
+                ["quantity:sum"],
+            )
+        }
+
+        # NC externas que reversan la factura (las generadas por este modulo ya
+        # cuentan en return_map via sus lineas de devolucion confirmadas).
+        credit_map = {}
+        refund_moves = self.env["account.move"].search([
+            ("move_type", "=", "out_refund"),
+            ("state", "=", "posted"),
+            ("sng_return_id", "=", False),
+            "|",
+            ("reversed_entry_id", "in", invoices.ids),
+            ("invoice_id", "in", invoices.ids),
+        ])
+        if refund_moves:
+            for move, product, qty_sum in self.env["account.move.line"]._read_group(
+                [
+                    ("move_id", "in", refund_moves.ids),
+                    ("product_id", "in", product_ids),
+                    ("display_type", "=", "product"),
+                ],
+                ["move_id", "product_id"],
+                ["quantity:sum"],
+            ):
+                origin = move.reversed_entry_id or move.invoice_id
+                key = (origin.id, product.id)
+                credit_map[key] = credit_map.get(key, 0.0) + (qty_sum or 0.0)
+
+        for line in lines_with_data:
+            key = (line.invoice_id.id, line.product_id.id)
+            invoiced_qty = invoiced_map.get(key, 0.0)
+            previous_qty = return_map.get(key, 0.0)
+            # Excluir la propia linea si ya esta confirmada (esta incluida
+            # en el agregado); asi no se descuenta a si misma.
+            if line.state == "confirmed" and isinstance(line.id, int):
+                previous_qty = max(0.0, previous_qty - line.quantity)
+            credit_qty = credit_map.get(key, 0.0)
+
+            line.invoiced_sale_qty = invoiced_qty
+            line.previous_return_qty = previous_qty
+            line.credit_note_qty = credit_qty
+            line.available_return_qty = max(0.0, invoiced_qty - previous_qty - credit_qty)
+            line.invoiced_sale_order_count = len(order_map.get(key, ()))
+
+    def _compute_sale_metrics_by_partner(self):
         # Agrupar por (cliente comercial, compania) para consultar en lote:
         # 3 read_group por grupo en lugar de 3 search por linea.
         groups = {}
-        for line in lines_with_data:
+        for line in self:
             key = (line.partner_id.commercial_partner_id.id, line.company_id.id)
             groups.setdefault(key, []).append(line)
 
@@ -745,7 +871,7 @@ class SngReturnLine(models.Model):
             if line.quantity <= 0:
                 raise ValidationError(_("La cantidad a devolver debe ser mayor a cero."))
 
-    @api.constrains("quantity", "state", "product_id", "partner_id", "company_id")
+    @api.constrains("quantity", "state", "product_id", "partner_id", "company_id", "invoice_id")
     def _check_available_quantity(self):
         for line in self:
             if line.state == "confirmed":
@@ -767,19 +893,37 @@ class SngReturnLine(models.Model):
         if not self.product_id:
             raise ValidationError(_("Debe seleccionar un producto."))
         if self.quantity > self.available_return_qty:
+            if self.invoice_id:
+                source = _("segun la factura %(invoice)s") % {
+                    "invoice": self.invoice_id.display_name,
+                }
+            else:
+                source = _("segun las ordenes facturadas del cliente")
             raise ValidationError(
                 _(
-                    "La cantidad a devolver de %(product)s (%(qty)s) excede lo disponible (%(available)s) "
-                    "segun las ordenes facturadas del cliente."
+                    "La cantidad a devolver de %(product)s (%(qty)s) excede lo disponible "
+                    "(%(available)s) %(source)s."
                 ) % {
                     "product": self.product_id.display_name,
                     "qty": self.quantity,
                     "available": self.available_return_qty,
+                    "source": source,
                 }
             )
 
+    def _check_invoice_manager_access(self):
+        if self.env.su:
+            return
+        if not self.env.user.has_group("sng_return.group_sng_return_manager"):
+            raise AccessError(_(
+                "Solo el Gerente de Devoluciones puede seleccionar o modificar "
+                "la factura de origen."
+            ))
+
     @api.model_create_multi
     def create(self, vals_list):
+        if any(vals.get("invoice_id") for vals in vals_list):
+            self._check_invoice_manager_access()
         records = super().create(vals_list)
         for line in records:
             if line.state and line.state != "draft":
@@ -787,6 +931,8 @@ class SngReturnLine(models.Model):
         return records
 
     def write(self, vals):
+        if "invoice_id" in vals:
+            self._check_invoice_manager_access()
         for line in self:
             if line.state == "confirmed":
                 if set(vals) - {"invoice_id"}:

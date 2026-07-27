@@ -1,0 +1,225 @@
+.o_sng_dashboard {
+    --sng-surface: #fcfcfb;
+    --sng-plane: #f9f9f7;
+    --sng-ink: #0b0b0b;
+    --sng-ink-sec: #52514e;
+    --sng-muted: #898781;
+    --sng-borde: rgba(11, 11, 11, 0.1);
+    --sng-critico: #d03b3b;
+    --sng-serio: #ec835a;
+    --sng-bueno: #0ca30c;
+    --sng-exito-texto: #006300;
+
+    position: absolute;
+    inset: 0;
+    overflow-y: auto;
+    background: var(--sng-plane);
+    padding: 12px 16px 24px;
+
+    .o_sng_dash_toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 12px;
+
+        .o_sng_dash_companias {
+            color: var(--sng-ink-sec);
+            font-size: 0.85rem;
+        }
+        .o_sng_dash_acciones {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .o_sng_dash_select {
+            width: auto;
+            max-width: 320px;
+        }
+    }
+
+    .o_sng_dash_cargando {
+        display: flex;
+        justify-content: center;
+        padding: 80px 0;
+        color: var(--sng-muted);
+    }
+
+    .o_sng_dash_kpis {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+        gap: 12px;
+        margin-bottom: 12px;
+    }
+
+    .o_sng_kpi {
+        background: var(--sng-surface);
+        border: 1px solid var(--sng-borde);
+        border-radius: 8px;
+        padding: 12px 14px;
+
+        .o_sng_kpi_etiqueta {
+            color: var(--sng-ink-sec);
+            font-size: 0.8rem;
+            margin-bottom: 2px;
+        }
+        .o_sng_kpi_valor {
+            color: var(--sng-ink);
+            font-size: 1.35rem;
+            font-weight: 600;
+            line-height: 1.2;
+        }
+        .o_sng_kpi_sub {
+            color: var(--sng-muted);
+            font-size: 0.75rem;
+            margin-top: 2px;
+        }
+        .o_sng_delta_pos { color: var(--sng-exito-texto); }
+        .o_sng_delta_neg { color: var(--sng-critico); }
+    }
+
+    .o_sng_kpi_alerta { color: var(--sng-critico); }
+
+    .o_sng_dash_tarjeta {
+        background: var(--sng-surface);
+        border: 1px solid var(--sng-borde);
+        border-radius: 8px;
+        padding: 12px 14px;
+
+        .o_sng_dash_tarjeta_titulo {
+            color: var(--sng-ink);
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+        }
+    }
+
+    .o_sng_dash_ancha { margin-bottom: 12px; }
+
+    .o_sng_dash_grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+        gap: 12px;
+        margin-bottom: 12px;
+    }
+
+    .o_sng_canvas {
+        position: relative;
+        height: 260px;
+    }
+    .o_sng_canvas_alta { height: 300px; }
+
+    .o_sng_tabla {
+        td, th { font-variant-numeric: tabular-nums; }
+        margin-bottom: 0;
+    }
+
+    .o_sng_tabla_mini {
+        font-size: 0.78rem;
+
+        td:first-child {
+            max-width: 260px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    }
+
+    .o_sng_dash_tabs {
+        margin-bottom: 12px;
+
+        .nav-link { color: var(--sng-ink-sec); }
+        .nav-link.active { font-weight: 600; }
+    }
+
+    .o_sng_dash_seccion { margin-bottom: 12px; }
+
+    .o_sng_dash_seccion_titulo {
+        font-weight: 600;
+        color: var(--sng-ink);
+        margin: 4px 0 8px;
+
+        .o_sng_dash_seccion_nota {
+            color: var(--sng-muted);
+            font-weight: 400;
+            font-size: 0.78rem;
+            margin-left: 8px;
+        }
+    }
+
+    // ---- IA ----
+    .o_sng_ia_vacio {
+        color: var(--sng-ink-sec);
+        padding: 8px 0;
+    }
+    .o_sng_ia_grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+        gap: 12px;
+    }
+    .o_sng_ia_carta {
+        border: 1px solid var(--sng-borde);
+        border-radius: 8px;
+        padding: 10px 12px;
+
+        .o_sng_ia_encabezado {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+        }
+        .o_sng_ia_compania {
+            font-weight: 600;
+            color: var(--sng-ink);
+        }
+        .o_sng_ia_fecha {
+            color: var(--sng-muted);
+            font-size: 0.75rem;
+            margin-bottom: 6px;
+        }
+        .o_sng_ia_resumen {
+            color: var(--sng-ink-sec);
+            font-size: 0.85rem;
+        }
+        .o_sng_ia_subtitulo {
+            font-weight: 600;
+            font-size: 0.82rem;
+            margin-bottom: 4px;
+        }
+        .o_sng_ia_bloque {
+            margin-top: 8px;
+            font-size: 0.82rem;
+
+            ul { padding-left: 18px; margin-bottom: 0; }
+            li { margin-bottom: 4px; }
+        }
+    }
+
+    .o_sng_salud {
+        border-radius: 10px;
+        padding: 1px 10px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #fff;
+    }
+    .o_sng_salud_buena { background: var(--sng-bueno); }
+    .o_sng_salud_regular { background: var(--sng-serio); }
+    .o_sng_salud_critica { background: var(--sng-critico); }
+
+    .o_sng_chip {
+        display: inline-block;
+        border-radius: 8px;
+        padding: 0 6px;
+        font-size: 0.68rem;
+        font-weight: 600;
+        margin-right: 4px;
+        border: 1px solid var(--sng-borde);
+        color: var(--sng-ink-sec);
+        vertical-align: 1px;
+    }
+    .o_sng_chip_alta { background: var(--sng-critico); border-color: var(--sng-critico); color: #fff; }
+    .o_sng_chip_media { background: var(--sng-serio); border-color: var(--sng-serio); color: #fff; }
+    .o_sng_chip_baja { background: transparent; }
+}

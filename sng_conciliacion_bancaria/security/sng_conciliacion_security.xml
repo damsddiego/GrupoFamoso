@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="module_category_sng_conciliacion" model="ir.module.category">
+        <field name="name">SNG Conciliación Bancaria</field>
+        <field name="description">Permisos de la conciliación bancaria con IA</field>
+        <field name="sequence">62</field>
+    </record>
+
+    <!-- Nadie implica este grupo: solo membresía explícita. -->
+    <record id="group_sng_conciliacion" model="res.groups">
+        <field name="name">Conciliación bancaria (IA)</field>
+        <field name="category_id" ref="module_category_sng_conciliacion"/>
+        <field name="comment">Puede importar estados de cuenta del banco,
+generar sugerencias de conciliación con IA y aplicarlas. Requiere además
+permisos normales de contabilidad para usar el widget de conciliación.</field>
+        <field name="users" eval="[(4, ref('base.user_admin'))]"/>
+    </record>
+</odoo>

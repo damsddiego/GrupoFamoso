@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="view_sng_reporte_pagos_form" model="ir.ui.view">
+        <field name="name">sng.ruteros.reporte.pagos.form</field>
+        <field name="model">sng.ruteros.reporte.pagos</field>
+        <field name="arch" type="xml">
+            <form string="Reporte de recibos">
+                <group>
+                    <group>
+                        <field name="fecha_desde"/>
+                        <field name="fecha_hasta"/>
+                        <field name="agrupar" widget="radio"/>
+                        <field name="solo_confirmados"/>
+                    </group>
+                    <group>
+                        <field name="company_ids" widget="many2many_tags"
+                               groups="base.group_multi_company"
+                               options="{'no_create': True}"/>
+                        <field name="journal_ids" widget="many2many_tags"
+                               placeholder="Todos los diarios"/>
+                        <field name="vendedor_ids" widget="many2many_tags"
+                               placeholder="Todos los vendedores"/>
+                    </group>
+                </group>
+                <footer>
+                    <button name="action_ver_pantalla" type="object"
+                            string="Ver en pantalla" class="btn-primary"/>
+                    <button name="action_imprimir_pdf" type="object"
+                            string="PDF"/>
+                    <button name="action_exportar_excel" type="object"
+                            string="Excel"/>
+                    <button string="Cancelar" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_sng_reporte_pagos" model="ir.actions.act_window">
+        <field name="name">Reporte de recibos</field>
+        <field name="res_model">sng.ruteros.reporte.pagos</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_ruteros_reporte"
+              name="Reporte de recibos"
+              parent="menu_ruteros_root"
+              action="action_sng_reporte_pagos"
+              sequence="20"/>
+
+</odoo>
