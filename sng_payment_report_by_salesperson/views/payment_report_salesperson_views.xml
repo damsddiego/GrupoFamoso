@@ -10,6 +10,8 @@
                 <field name="partner_name" string="Cliente"/>
                 <field name="salesperson_name" string="Vendedor" optional="show"/>
                 <field name="payment_date" string="Fecha de Pago"/>
+                <field name="applied_date" string="Fecha Aplicación" optional="show"/>
+                <field name="applied_user_id" string="Aplicado por" optional="show" widget="many2one_avatar_user"/>
                 <field name="payment_reference" string="Referencia"/>
                 <field name="payment_amount" string="Monto Pagado" sum="Total"/>
                 <field name="payment_state" string="Estado" widget="badge"
@@ -69,6 +71,7 @@
                 <field name="partner_name" string="Cliente"/>
                 <field name="invoice_name" string="Factura"/>
                 <field name="payment_reference" string="Referencia Pago"/>
+                <field name="applied_user_id" string="Aplicado por"/>
                 <field name="company_id" string="Compañía" groups="base.group_multi_company"/>
 
                 <!-- Filtros predefinidos -->
@@ -123,6 +126,7 @@
 
                 <!-- Filtros por fecha -->
                 <filter string="Fecha de Pago" name="payment_date_filter" date="payment_date"/>
+                <filter string="Fecha Aplicación" name="applied_date_filter" date="applied_date"/>
                 <filter string="Fecha de Factura" name="invoice_date_filter" date="invoice_date"/>
 
                 <separator/>
@@ -132,6 +136,7 @@
                     <filter string="Vendedor" name="group_by_salesperson" context="{'group_by': 'salesperson_name'}"/>
                     <filter string="Cliente" name="group_by_partner" context="{'group_by': 'partner_name'}"/>
                     <filter string="Estado" name="group_by_state" context="{'group_by': 'payment_state'}"/>
+                    <filter string="Aplicado por" name="group_by_applied_user" context="{'group_by': 'applied_user_id'}"/>
                     <filter string="Fecha de Pago" name="group_by_payment_date" context="{'group_by': 'payment_date'}"/>
                     <filter string="Mes de Pago" name="group_by_payment_month" context="{'group_by': 'payment_date:month'}"/>
                     <filter string="Estado Reconciliación" name="group_by_reconciled" context="{'group_by': 'is_reconciled'}"/>

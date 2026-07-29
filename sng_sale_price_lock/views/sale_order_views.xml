@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_order_form_sng_price_lock" model="ir.ui.view">
+        <field name="name">sale.order.form.inherit.sng.price.lock</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+
+            <!-- Vista lista de las lineas -->
+            <xpath expr="//field[@name='order_line']/list/field[@name='price_unit']" position="before">
+                <field name="sng_price_locked" column_invisible="1"/>
+                <field name="sng_discount_locked" column_invisible="1"/>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/list/field[@name='price_unit']" position="attributes">
+                <attribute name="readonly">qty_invoiced &gt; 0 or sng_price_locked</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/list/field[@name='discount']" position="attributes">
+                <attribute name="readonly">sng_discount_locked</attribute>
+            </xpath>
+
+            <!-- Vista formulario de la linea (pantallas pequenas / editar linea) -->
+            <xpath expr="//field[@name='order_line']/form//field[@name='price_unit']" position="before">
+                <field name="sng_price_locked" invisible="1"/>
+                <field name="sng_discount_locked" invisible="1"/>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/form//field[@name='price_unit']" position="attributes">
+                <attribute name="readonly">sng_price_locked</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/form//div[@name='discount']/field[@name='discount']" position="attributes">
+                <attribute name="readonly">sng_discount_locked</attribute>
+            </xpath>
+
+            <!-- Asistente nativo de descuentos -->
+            <xpath expr="//button[@name='action_open_discount_wizard']" position="before">
+                <field name="sng_discount_locked" invisible="1"/>
+            </xpath>
+            <xpath expr="//button[@name='action_open_discount_wizard']" position="attributes">
+                <attribute name="invisible">sng_discount_locked</attribute>
+            </xpath>
+
+        </field>
+    </record>
+</odoo>

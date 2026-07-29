@@ -45,11 +45,13 @@
             <list create="false" default_order="date desc, sequence">
                 <header>
                     <button name="accion_sng_sugerir" type="object"
-                            string="Sugerir conciliación (IA)"
-                            class="btn-primary"/>
+                            string="1 · Sugerir con IA (no concilia)"
+                            class="btn-primary"
+                            help="Analiza las líneas seleccionadas y llena las columnas Sugerencia, Pago sugerido, Facturas sugeridas y Motivo. No concilia nada todavía."/>
                     <button name="accion_sng_conciliar" type="object"
-                            string="Conciliar según sugerencia"
-                            confirm="Se conciliarán las líneas seleccionadas que tengan sugerencia de pago o factura. ¿Continuar?"/>
+                            string="2 · Conciliar lo sugerido"
+                            help="Aplica la sugerencia en las líneas seleccionadas que tengan 'Pago registrado' o 'Factura abierta'. Usa el motor nativo de Odoo y se puede deshacer desde el extracto."
+                            confirm="Se conciliarán las líneas seleccionadas que tengan sugerencia 'Pago registrado' o 'Factura abierta', usando el pago / las facturas que se ven en sus columnas. Las líneas en 'Revisar' o 'Sin coincidencia' no se tocan. ¿Continuar?"/>
                 </header>
                 <field name="date"/>
                 <field name="journal_id" optional="hide"/>
@@ -73,6 +75,101 @@
                 <field name="is_reconciled" string="Conciliada"
                        optional="show"/>
             </list>
+        </field>
+    </record>
+
+    <!-- Ficha de detalle: qué se va a conciliar y por qué -->
+    <record id="view_sng_statement_line_form" model="ir.ui.view">
+        <field name="name">sng.account.bank.statement.line.form</field>
+        <field name="model">account.bank.statement.line</field>
+        <field name="priority">200</field>
+        <field name="arch" type="xml">
+            <form create="false" delete="false" edit="false">
+                <header>
+                    <button name="accion_sng_sugerir" type="object"
+                            string="Sugerir con IA (esta línea)"
+                            invisible="is_reconciled"
+                            help="Vuelve a calcular la sugerencia solo para esta línea. No concilia nada."/>
+                    <button name="accion_sng_conciliar" type="object"
+                            class="btn-primary"
+                            string="Conciliar esta línea según la sugerencia"
+                            invisible="is_reconciled or sng_sugerencia not in ('pago', 'factura')"
+                            confirm="Se conciliará esta línea contra el pago / las facturas que se muestran abajo, con el motor nativo de Odoo (reversible desde el extracto). ¿Continuar?"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Conciliada"
+                            invisible="not is_reconciled"/>
+                    <field name="currency_id" invisible="1"/>
+                    <group>
+                        <group string="Línea del banco">
+                            <field name="date"/>
+                            <field name="journal_id"/>
+                            <field name="payment_ref"/>
+                            <field name="ref"/>
+                            <field name="amount"/>
+                            <field name="partner_id"/>
+                        </group>
+                        <group string="Sugerencia">
+                            <field name="sng_sugerencia" widget="badge"
+                                   decoration-success="sng_sugerencia == 'pago'"
+                                   decoration-info="sng_sugerencia == 'factura'"
+                                   decoration-warning="sng_sugerencia == 'revisar'"
+                                   decoration-danger="sng_sugerencia == 'sin_match'"/>
+                            <field name="sng_confianza"/>
+                            <field name="sng_motivo"/>
+                            <field name="sng_ia"/>
+                            <field name="sng_ia_pendiente"
+                                   invisible="not sng_ia_pendiente"/>
+                        </group>
+                    </group>
+                    <group string="Pago contra el que se conciliará"
+                           invisible="sng_sugerencia != 'pago'">
+                        <group>
+                            <field name="sng_pago_id"/>
+                            <field name="sng_pago_cliente_id"/>
+                            <field name="sng_pago_memo"/>
+                        </group>
+                        <group>
+                            <field name="sng_pago_fecha"/>
+                            <field name="sng_pago_monto"/>
+                            <field name="sng_diferencia"/>
+                        </group>
+                    </group>
+                    <group string="Facturas asociadas a ese pago (solo informativo)"
+                           invisible="sng_sugerencia != 'pago' or not sng_pago_factura_ids">
+                        <field name="sng_pago_factura_ids" nolabel="1"
+                               colspan="2">
+                            <list>
+                                <field name="name"/>
+                                <field name="invoice_date"/>
+                                <field name="partner_id"/>
+                                <field name="amount_total" sum="Total"/>
+                                <field name="amount_residual"
+                                       string="Saldo pendiente"
+                                       sum="Total saldo"/>
+                            </list>
+                        </field>
+                    </group>
+                    <group string="Facturas contra las que se conciliará"
+                           invisible="not sng_factura_ids">
+                        <field name="sng_factura_ids" nolabel="1" colspan="2">
+                            <list>
+                                <field name="name"/>
+                                <field name="invoice_date"/>
+                                <field name="partner_id"/>
+                                <field name="amount_total" sum="Total"/>
+                                <field name="amount_residual"
+                                       string="Saldo pendiente"
+                                       sum="Total saldo"/>
+                            </list>
+                        </field>
+                        <group>
+                            <field name="sng_total_sugerido"/>
+                            <field name="sng_diferencia"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
         </field>
     </record>
 
@@ -112,7 +209,7 @@
     <record id="action_sng_statement_lines" model="ir.actions.act_window">
         <field name="name">Líneas del extracto</field>
         <field name="res_model">account.bank.statement.line</field>
-        <field name="view_mode">list</field>
+        <field name="view_mode">list,form</field>
         <field name="view_id" ref="view_sng_statement_line_list"/>
         <field name="search_view_id" ref="view_sng_statement_line_search"/>
         <field name="domain">[('journal_id.type', '=', 'bank')]</field>
@@ -121,8 +218,113 @@
             <p class="o_view_nocontent_smiling_face">
                 Aún no hay líneas de extracto importadas
             </p>
-            <p>Use "Importar estado de cuenta BAC" y luego el botón
-            "Sugerir conciliación (IA)".</p>
+            <p>Use el menú "Importar estado de cuenta BAC". Luego, aquí:
+            seleccione las líneas y pulse "1 · Sugerir con IA" para que el
+            sistema proponga con qué pago o factura cruza cada una, revise
+            las columnas Sugerencia y Motivo, y por último pulse
+            "2 · Conciliar lo sugerido" en las que esté de acuerdo.</p>
+        </field>
+    </record>
+
+    <!-- Forzar nuestras vistas en la acción (el form nativo no aplica) -->
+    <record id="action_sng_statement_lines_v_list"
+            model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="view_sng_statement_line_list"/>
+        <field name="act_window_id" ref="action_sng_statement_lines"/>
+    </record>
+    <record id="action_sng_statement_lines_v_form"
+            model="ir.actions.act_window.view">
+        <field name="sequence" eval="2"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_sng_statement_line_form"/>
+        <field name="act_window_id" ref="action_sng_statement_lines"/>
+    </record>
+
+    <!-- Alias aprendidos (banco → cliente) -->
+    <record id="view_sng_alias_list" model="ir.ui.view">
+        <field name="name">sng.conciliacion.alias.list</field>
+        <field name="model">sng.conciliacion.alias</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <header>
+                    <button name="accion_sng_bootstrap" type="object"
+                            display="always"
+                            string="Aprender del histórico"
+                            help="Recorre las líneas del extracto ya conciliadas y aprende sus alias. Útil tras instalar el módulo o restaurar la base; el aprendizaje normal es automático al conciliar."
+                            confirm="Se aprenderán los alias de todas las líneas ya conciliadas con cliente. Repetirlo vuelve a sumar aciertos sobre las mismas líneas. ¿Continuar?"/>
+                </header>
+                <field name="alias"/>
+                <field name="tipo"/>
+                <field name="partner_id"/>
+                <field name="contador"/>
+                <field name="ultima_fecha"/>
+                <field name="origen"/>
+                <field name="company_id" optional="hide"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_sng_alias_form" model="ir.ui.view">
+        <field name="name">sng.conciliacion.alias.form</field>
+        <field name="model">sng.conciliacion.alias</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="alias"/>
+                            <field name="tipo"/>
+                            <field name="partner_id"/>
+                            <field name="active" widget="boolean_toggle"/>
+                        </group>
+                        <group>
+                            <field name="contador"/>
+                            <field name="ultima_fecha"/>
+                            <field name="origen"/>
+                            <field name="company_id"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_sng_alias_search" model="ir.ui.view">
+        <field name="name">sng.conciliacion.alias.search</field>
+        <field name="model">sng.conciliacion.alias</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="alias"/>
+                <field name="partner_id"/>
+                <filter name="inactivos" string="Desactivados"
+                        domain="[('active', '=', False)]"/>
+                <group expand="0" string="Agrupar por">
+                    <filter name="g_partner" string="Cliente"
+                            context="{'group_by': 'partner_id'}"/>
+                    <filter name="g_tipo" string="Tipo"
+                            context="{'group_by': 'tipo'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_sng_alias" model="ir.actions.act_window">
+        <field name="name">Aprendizajes</field>
+        <field name="res_model">sng.conciliacion.alias</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_sng_alias_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Aún no hay alias aprendidos
+            </p>
+            <p>Cada vez que se concilia una línea del extracto, el sistema
+            aprende solo la asociación entre el texto del banco (ej. el
+            alias del SINPE móvil) y el cliente. Aquí puede revisar lo
+            aprendido, corregirlo, desactivar un alias equivocado o
+            agregar asociaciones a mano.</p>
         </field>
     </record>
 
@@ -137,4 +339,7 @@
     <menuitem id="menu_sng_conciliacion_lineas" name="Líneas del extracto"
               parent="menu_sng_conciliacion_root"
               action="action_sng_statement_lines" sequence="20"/>
+    <menuitem id="menu_sng_conciliacion_alias" name="Aprendizajes"
+              parent="menu_sng_conciliacion_root"
+              action="action_sng_alias" sequence="30"/>
 </odoo>

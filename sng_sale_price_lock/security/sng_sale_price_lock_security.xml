@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <record id="group_sng_force_price" model="res.groups">
+            <field name="name">Modificar precio/descuento fuera de la lista de precios</field>
+            <field name="category_id" ref="base.module_category_sales_sales"/>
+            <field name="comment">Los usuarios con este permiso pueden capturar un
+                precio unitario o un descuento distinto al que define la lista de
+                precios del pedido.</field>
+        </record>
+    </data>
+</odoo>

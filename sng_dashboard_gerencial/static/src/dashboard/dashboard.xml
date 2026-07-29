@@ -36,6 +36,7 @@
                     <i class="fa fa-refresh" role="img" aria-label="Actualizar"/>
                 </button>
                 <button type="button" class="btn btn-sm btn-primary"
+                        t-if="puedeIA"
                         t-att-disabled="state.generandoIA"
                         t-on-click="generarIA">
                     <i t-att-class="state.generandoIA
@@ -507,8 +508,9 @@
             <t t-esc="tituloIA"/>
         </div>
         <div t-if="!listaIA.length" class="o_sng_ia_vacio">
-            Todavía no hay análisis generados de este tipo. Use el botón
-            <b>Actualizar análisis IA</b> o espere el análisis
+            Todavía no hay análisis generados de este tipo.
+            <t t-if="puedeIA">Use el botón <b>Actualizar análisis IA</b> o espere</t>
+            <t t-else="">Espere</t> el análisis
             automático de los lunes a las 06:00.
         </div>
         <div class="o_sng_ia_grid">

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Inherit Invoice Tree View to add Commercial Name column -->
+    <record id="view_invoice_tree_inherit_commercial_name" model="ir.ui.view">
+        <field name="name">account.move.tree.inherit.commercial.name</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_invoice_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='invoice_partner_display_name'][2]" position="after">
+                <field name="partner_commercial_name" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Inherit Invoice Search View to allow searching/filtering by Commercial Name -->
+    <record id="view_account_invoice_filter_inherit_commercial_name" model="ir.ui.view">
+        <field name="name">account.move.search.inherit.commercial.name</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_account_invoice_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="partner_commercial_name" string="Nombre Comercial"
+                       filter_domain="[('partner_commercial_name', 'ilike', self)]"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

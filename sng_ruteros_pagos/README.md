@@ -8,7 +8,7 @@ Recibe los **recibos de pago que los ruteros (vendedores de ruta) registran desd
 
 - Guarda los datos capturados en la app: método de pago, referencia, observaciones, saldos y vendedor.
 - Agrega el menú **Ruteros → Recibos** para revisar todos los recibos que llegan de la app.
-- **Aplica (concilia) el pago contra las facturas del cliente** automáticamente al confirmarlo, si la app indicó a qué facturas corresponde.
+- **Aplica (concilia) el pago contra las facturas del cliente** automáticamente al confirmarlo, si la app indicó a qué facturas corresponde y el recibo no presenta alertas.
 
 ---
 
@@ -25,7 +25,7 @@ App móvil (rutero cobra)          Odoo (oficina)
 
 ### 1. El rutero cobra en la app
 
-El rutero registra el cobro en la app móvil indicando cliente, monto, método de pago, referencia y (opcionalmente) las facturas que está cobrando. El recibo llega a Odoo como un **pago ya confirmado** (estado *En proceso*) con su asiento contable generado. Si la app indicó las facturas, el módulo las **concilia automáticamente en ese mismo momento** — no hay que hacer nada en la oficina.
+El rutero registra el cobro en la app móvil indicando cliente, monto, método de pago, referencia y (opcionalmente) las facturas que está cobrando. El recibo llega a Odoo como un **pago ya confirmado** (estado *En proceso*) con su asiento contable generado. Si la app indicó las facturas y el recibo no presenta alertas, el módulo las **concilia automáticamente en ese mismo momento** — no hay que hacer nada en la oficina.
 
 ### 2. Revisar los recibos en Odoo
 
@@ -50,7 +50,7 @@ Al abrir un recibo, el bloque **"Recibo Ruteros (app)"** muestra lo que capturó
 
 ### 3. ¿Y si un recibo llega en borrador?
 
-Normalmente no ocurre (la app los manda confirmados), pero si un pago quedara en *Borrador*, basta pulsar **Confirmar**: el módulo genera el asiento y, si el recibo trae **Facturas a pagar**, las concilia automáticamente en ese momento.
+Normalmente no ocurre (la app los manda confirmados), pero si un pago quedara en *Borrador*, basta pulsar **Confirmar**: el módulo genera el asiento y, si el recibo trae **Facturas a pagar** y no tiene alertas, las concilia automáticamente en ese momento.
 
 ### 4. Aplicar a facturas después (botón manual)
 
@@ -102,7 +102,21 @@ Al llegar cada recibo de la app, una heurística (sin IA, instantánea) busca ot
 - **Probable duplicado** → revisar antes de conciliar (filtro propio en el menú Ruteros). Ante la duda la IA prefiere marcar para revisión.
 - **Descartado por IA** → parece un cobro legítimo distinto (ej. cuotas semanales del mismo monto).
 
-El razonamiento queda siempre en el chatter. Nada se bloquea ni se cancela automáticamente: es solo una alerta.
+El razonamiento queda siempre en el chatter. El recibo nunca se cancela ni se
+rechaza automáticamente; únicamente se retiene su conciliación mientras se
+revisa la alerta.
+
+La creación desde la app nunca se rechaza por estas alertas: Flutter recibe el
+ID del pago y puede marcar el recibo como sincronizado. Los pagos limpios se
+aplican inmediatamente como antes. Si aparece una sospecha de duplicado o un
+monto atípico, el pago queda creado y confirmado pero **sin conciliar**:
+
+- Si la IA descarta la sospecha de duplicado, el pago se aplica automáticamente.
+- Si la IA confirma el posible duplicado, o el monto es atípico, un administrador
+  de contabilidad debe revisar el recibo, marcar **Verificado** y pulsar
+  **Aplicar a facturas**.
+- Flutter no necesita enviar campos adicionales ni cambiar su respuesta de
+  sincronización.
 
 ## Resumen diario de liquidación
 
@@ -118,7 +132,7 @@ Cada mañana (05:00 CR) se publica en el canal de Discuss **“Liquidación Rute
 
 ## Para el desarrollador de la app (referencia técnica)
 
-La app crea el pago vía API (XML-RPC / JSON-RPC) sobre `account.payment` y lo confirma. La conciliación automática se dispara tanto si el pago se crea ya confirmado como si se confirma después con `action_post` o escribiendo el estado. Requisitos del payload:
+La app crea el pago vía API (XML-RPC / JSON-RPC) sobre `account.payment` y lo confirma. La conciliación automática se dispara, siempre que no existan alertas, tanto si el pago se crea ya confirmado como si se confirma después con `action_post` o escribiendo el estado. Requisitos del payload:
 
 > ⚠️ **Importante:** la app debe enviar `sng_from_app: true`. Sin esa bandera el pago no aparece en el menú *Ruteros → Recibos* y **no se aplica a facturas automáticamente**.
 
@@ -143,7 +157,7 @@ Para que quede ligado a facturas, incluir `invoice_ids` en el payload de creaci�
 ```
 
 - `invoice_ids` usa el formato de comandos de Odoo: `[[6, 0, [ids...]]]` reemplaza la lista completa.
-- La conciliación se dispara automáticamente: al **crear** el pago si ya viene confirmado (`in_process`/`paid`), o al **confirmarlo después** (`action_post` o escritura del estado).
+- La conciliación se dispara automáticamente si el recibo está limpio: al **crear** el pago si ya viene confirmado (`in_process`/`paid`), o al **confirmarlo después** (`action_post` o escritura del estado). Las alertas retienen solamente la conciliación, no la creación ni la confirmación.
 - Si la app no envía `invoice_ids`, entra el **puente**: el módulo parsea el bloque `Facturas: NUM[A:../P:../S:..]` de `sng_observaciones` (o del memo), busca cada número por `name` de factura publicada dentro de la compañía del pago y del árbol de contactos del cliente, y llena `invoice_ids` automáticamente. Números que no matcheen de forma única se reportan en el chatter del pago (no bloquean el guardado) y el pago queda como anticipo. Cuando la app empiece a mandar `invoice_ids`, el puente deja de intervenir solo.
 
 ## Campos técnicos que agrega el módulo
@@ -157,5 +171,6 @@ Para que quede ligado a facturas, incluir `invoice_ids` en el payload de creaci�
 | `sng_saldo_anterior` | Monetary | Saldo del cliente antes del cobro |
 | `sng_saldo_proyectado` | Monetary | Saldo proyectado después del cobro |
 | `sng_vendedor_id` | Many2one → `res.partner` | Rutero que registró el cobro. Es el **contacto** marcado como vendedor (`is_salesperson`, lógica de `sales_commission_omax`), no un usuario |
+| `sng_verificado` | Boolean | Confirma que un administrador contable revisó un recibo con alertas antes de aplicarlo |
 
-*(Las facturas se ligan con el campo nativo `invoice_ids` de Odoo 18; el módulo agrega la conciliación automática al confirmar.)*
+*(Las facturas se ligan con el campo nativo `invoice_ids` de Odoo 18; el módulo agrega la conciliación automática de recibos sin alertas al confirmar.)*

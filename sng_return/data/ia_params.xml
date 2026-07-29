@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Parametros de la sugerencia de factura de origen. noupdate para no
+         pisar los valores que se ajusten en produccion. -->
+    <data noupdate="1">
+        <record id="param_suggestion_window_days" model="ir.config_parameter">
+            <field name="key">sng_return.suggestion_window_days</field>
+            <field name="value">60</field>
+        </record>
+        <record id="param_suggestion_min_score" model="ir.config_parameter">
+            <field name="key">sng_return.suggestion_min_score</field>
+            <field name="value">70</field>
+        </record>
+        <record id="param_suggestion_min_margin" model="ir.config_parameter">
+            <field name="key">sng_return.suggestion_min_margin</field>
+            <field name="value">20</field>
+        </record>
+        <record id="param_suggestion_candidate_limit" model="ir.config_parameter">
+            <field name="key">sng_return.suggestion_candidate_limit</field>
+            <field name="value">30</field>
+        </record>
+        <!-- La capa de IA queda apagada hasta que se configure la llave. -->
+        <record id="param_ia_enabled" model="ir.config_parameter">
+            <field name="key">sng_return.ia_enabled</field>
+            <field name="value">0</field>
+        </record>
+        <record id="param_anthropic_model" model="ir.config_parameter">
+            <field name="key">sng_return.anthropic_model</field>
+            <field name="value">claude-opus-5</field>
+        </record>
+        <record id="param_anthropic_effort" model="ir.config_parameter">
+            <field name="key">sng_return.anthropic_effort</field>
+            <field name="value">medium</field>
+        </record>
+    </data>
+</odoo>

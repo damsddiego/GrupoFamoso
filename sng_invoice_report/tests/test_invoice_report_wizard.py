@@ -156,6 +156,40 @@ class TestInvoiceReportWizard(AccountTestInvoicingCommon):
             self.independent_refund.name,
         ])
 
+    def test_non_salesperson_fallback_groups_under_unassigned(self):
+        """Invoices whose salesperson fallback is not a real salesperson must
+        appear under 'Sin asignar' instead of being dropped from the report."""
+        customer = self.partner_a.copy({'name': 'Customer Without Salesperson'})
+        invoice = self.init_invoice(
+            'out_invoice',
+            partner=customer,
+            invoice_date=fields.Date.from_string('2026-04-15'),
+            amounts=[80.0],
+            taxes=[],
+        )
+        invoice.action_post()
+
+        # sales_commission_omax falls back to the invoice/current user partner
+        self.assertTrue(invoice.salesperson_id)
+        self.assertFalse(invoice.salesperson_id.is_salesperson)
+        self.assertFalse(invoice.effective_salesperson_id)
+
+        wizard = self._create_wizard(invoice_type='out_invoice')
+        self.assertIn(invoice, wizard._get_invoices())
+
+        data = wizard._get_report_data()
+        groups = {
+            group['salesperson_name']: group
+            for group in data['data_by_salesperson']
+        }
+        self.assertIn('Sin asignar', groups)
+        unassigned = groups['Sin asignar']
+        self.assertEqual(
+            [line['number'] for line in unassigned['invoices']],
+            [invoice.name],
+        )
+        self.assertAlmostEqual(unassigned['total'], 80.0)
+
     def test_view_action_uses_same_invoice_universe(self):
         wizard = self._create_wizard(invoice_type='out_invoice')
 

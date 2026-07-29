@@ -2,6 +2,18 @@ from odoo import _, api, fields, models
 from odoo.exceptions import AccessError, UserError, ValidationError
 from odoo.tools.float_utils import float_compare
 
+# Campos de la sugerencia automatica de factura de origen (ver
+# sng_return_suggestion.py). Se listan aqui porque write() necesita conocerlos
+# para permitir escribirlos sobre lineas ya confirmadas.
+SUGGESTION_FIELDS = {
+    "suggested_invoice_id",
+    "suggestion_score",
+    "suggestion_confidence",
+    "suggestion_reason",
+    "suggestion_source",
+    "suggestion_date",
+}
+
 
 class SngReturn(models.Model):
     _name = "sng.return"
@@ -632,9 +644,11 @@ class SngReturnLine(models.Model):
         copy=False,
         check_company=True,
         domain="[('move_type', '=', 'out_invoice'), ('state', '=', 'posted'), ('partner_id', 'child_of', partner_id), ('invoice_line_ids.product_id', '=', product_id)]",
-        help="Factura contra la que se devuelve el producto. La selecciona el Gerente "
-             "de Devoluciones (a mas tardar antes de generar la nota de credito) y, "
-             "cuando esta asignada, determina la cantidad disponible a devolver.",
+        help="Factura contra la que se devuelve el producto. El Gerente de "
+             "Devoluciones puede asignarla o cambiarla en cualquier punto del "
+             "proceso mientras no exista una nota de credito activa; es "
+             "obligatoria antes de generar la nota de credito y, cuando esta "
+             "asignada, determina la cantidad disponible a devolver.",
     )
     invoice_editable = fields.Boolean(
         string="Puede editar factura",
@@ -680,12 +694,20 @@ class SngReturnLine(models.Model):
         compute_sudo=True,
     )
 
+    @api.depends("state", "return_id.credit_note_ids.state")
     def _compute_invoice_editable(self):
+        # El Gerente de Devoluciones puede asignar o cambiar la factura de
+        # origen en cualquier punto del proceso (borrador o confirmado),
+        # mientras la devolucion no tenga una nota de credito activa.
         can_edit = self.env.su or self.env.user.has_group(
             "sng_return.group_sng_return_manager"
         )
         for line in self:
-            line.invoice_editable = can_edit
+            line.invoice_editable = (
+                can_edit
+                and line.state in (False, "draft", "confirmed")
+                and not line.return_id._get_active_credit_notes()
+            )
 
     @api.depends("product_id", "partner_id", "company_id", "quantity", "state", "invoice_id")
     def _compute_sale_metrics(self):
@@ -709,10 +731,19 @@ class SngReturnLine(models.Model):
         if partner_lines:
             partner_lines._compute_sale_metrics_by_partner()
 
-    def _compute_sale_metrics_by_invoice(self):
-        lines_with_data = self
-        invoices = lines_with_data.mapped("invoice_id")
-        product_ids = list({line.product_id.id for line in lines_with_data})
+    @api.model
+    def _build_invoice_availability_maps(self, invoices, product_ids):
+        """Mapas de disponibilidad indexados por (factura, producto).
+
+        Devuelve un dict con cuatro mapas: ``invoiced`` (cantidad facturada),
+        ``returned`` (devuelto en devoluciones confirmadas), ``credited``
+        (cantidad de notas de credito externas al modulo) y ``orders``
+        (conjunto de ordenes de venta que originaron la linea).
+
+        Es la unica fuente de verdad del disponible: la usan tanto el calculo
+        de metricas de la linea como el scoring de sugerencia de factura.
+        """
+        product_ids = list(product_ids)
 
         # Cantidad facturada por (factura, producto).
         invoiced_map = {}
@@ -770,6 +801,24 @@ class SngReturnLine(models.Model):
                 origin = move.reversed_entry_id or move.invoice_id
                 key = (origin.id, product.id)
                 credit_map[key] = credit_map.get(key, 0.0) + (qty_sum or 0.0)
+
+        return {
+            "invoiced": invoiced_map,
+            "returned": return_map,
+            "credited": credit_map,
+            "orders": order_map,
+        }
+
+    def _compute_sale_metrics_by_invoice(self):
+        lines_with_data = self
+        maps = self._build_invoice_availability_maps(
+            lines_with_data.mapped("invoice_id"),
+            {line.product_id.id for line in lines_with_data},
+        )
+        invoiced_map = maps["invoiced"]
+        return_map = maps["returned"]
+        credit_map = maps["credited"]
+        order_map = maps["orders"]
 
         for line in lines_with_data:
             key = (line.invoice_id.id, line.product_id.id)
@@ -935,18 +984,30 @@ class SngReturnLine(models.Model):
             self._check_invoice_manager_access()
         for line in self:
             if line.state == "confirmed":
-                if set(vals) - {"invoice_id"}:
+                # Sobre una linea confirmada solo se admite fijar la factura de
+                # origen y refrescar la sugerencia automatica.
+                if set(vals) - {"invoice_id"} - SUGGESTION_FIELDS:
                     raise UserError(_(
                         "Después de confirmar la devolución solo puede modificar la factura "
                         "de origen."
                     ))
-                if line.return_id._get_active_credit_notes():
+                if "invoice_id" in vals and line.return_id._get_active_credit_notes():
                     raise UserError(_(
                         "No puede modificar la factura de origen porque la devolución ya "
                         "tiene una nota de crédito activa."
                     ))
             elif line.state and line.state != "draft":
                 raise UserError(_("Solo puede modificar productos cuando la devolucion esta en borrador."))
+        # Cambiar producto o cantidad invalida la sugerencia calculada antes.
+        if ("product_id" in vals or "quantity" in vals) and not (SUGGESTION_FIELDS & set(vals)):
+            vals = dict(vals, **{
+                "suggested_invoice_id": False,
+                "suggestion_score": 0.0,
+                "suggestion_confidence": False,
+                "suggestion_reason": False,
+                "suggestion_source": False,
+                "suggestion_date": False,
+            })
         return super().write(vals)
 
     def unlink(self):

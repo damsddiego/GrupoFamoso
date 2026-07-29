@@ -1,6 +1,6 @@
 {
     "name": "SNG Return",
-    "version": "18.0.1.3.0",
+    "version": "18.0.1.5.0",
     "category": "Sales",
     "summary": "Registro de devoluciones de clientes con historial de ventas facturadas",
     "author": "SNG",
@@ -17,6 +17,7 @@
         "security/security.xml",
         "security/ir.model.access.csv",
         "data/sequence.xml",
+        "data/ia_params.xml",
         "views/sng_return_reason_views.xml",
         "views/stock_picking_views.xml",
         "views/account_move_views.xml",
@@ -24,6 +25,7 @@
         "wizard/sng_return_confirm_wizard_views.xml",
         "wizard/sng_return_history_wizard_views.xml",
         "wizard/sng_return_invoice_history_wizard_views.xml",
+        "wizard/sng_return_invoice_suggestion_wizard_views.xml",
         "views/menu_views.xml",
     ],
     "installable": True,

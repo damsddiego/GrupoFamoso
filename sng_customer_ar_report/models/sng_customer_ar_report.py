@@ -31,6 +31,12 @@ class CustomerArReport(models.Model):
         'res.partner', string='Cliente', readonly=True)
     partner_code = fields.Char(
         string='Código - Cliente', readonly=True)
+    commercial_name = fields.Char(
+        string='Nombre Comercial', readonly=True,
+        related='partner_id.commercial_name')
+    credit_blocking = fields.Monetary(
+        string='Límite de crédito', readonly=True,
+        currency_field='currency_id', compute='_compute_credit_blocking')
     assigned_salesperson_id = fields.Many2one(
         'res.partner', string='Vendedor', readonly=True,
         compute='_compute_assigned_salesperson_id')
@@ -43,6 +49,17 @@ class CustomerArReport(models.Model):
                 rec.assigned_salesperson_id = partner.assigned_salesperson_id
             else:
                 rec.assigned_salesperson_id = False
+
+    @api.depends('partner_id', 'company_id')
+    @api.depends_context('company')
+    def _compute_credit_blocking(self):
+        for rec in self:
+            if rec.partner_id and rec.company_id:
+                partner = rec.partner_id.with_company(rec.company_id)
+                rec.credit_blocking = partner.credit_blocking
+            else:
+                rec.credit_blocking = 0.0
+
     company_id = fields.Many2one(
         'res.company', string='Compañía', readonly=True)
     currency_id = fields.Many2one(

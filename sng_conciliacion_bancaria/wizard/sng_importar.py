@@ -39,6 +39,8 @@ class SngConciliacionImportar(models.TransientModel):
     archivo_nombre = fields.Char(string='Nombre del archivo')
     resultado = fields.Html(string='Resultado', readonly=True)
     statement_id = fields.Many2one('account.bank.statement', readonly=True)
+    linea_ids = fields.Many2many('account.bank.statement.line',
+                                 readonly=True)
     estado = fields.Selection([('nuevo', 'Nuevo'), ('hecho', 'Hecho')],
                               default='nuevo')
 
@@ -188,8 +190,9 @@ class SngConciliacionImportar(models.TransientModel):
                 m['ref'] or 'SINREF', m['fecha'].strftime('%Y%m%d'),
                 round((m['credito'] - m['debito']) * 100))
         uids = [uid(m) for m in movimientos]
-        existentes = set(self.env['account.bank.statement.line'].search(
-            [('unique_import_id', 'in', uids)]).mapped('unique_import_id'))
+        lineas_previas = self.env['account.bank.statement.line'].search(
+            [('unique_import_id', 'in', uids)])
+        existentes = set(lineas_previas.mapped('unique_import_id'))
         nuevos, saltados = [], 0
         vistos = set(existentes)
         for m in movimientos:
@@ -204,9 +207,32 @@ class SngConciliacionImportar(models.TransientModel):
                 continue
             nuevos.append((m, u, monto))
         if not nuevos:
-            raise UserError(_(
-                'Las %s líneas del archivo ya estaban importadas.')
-                % len(movimientos))
+            sin_conciliar = len(lineas_previas.filtered(
+                lambda l: not l.is_reconciled))
+            self.write({
+                'estado': 'hecho',
+                'linea_ids': [(6, 0, lineas_previas.ids)],
+                'resultado': (
+                    '<p><b>%s</b></p><p>%s</p><p>%s</p>' % (
+                        _('Este archivo ya se había importado'),
+                        _('Las %(t)s líneas del archivo ya existen en Odoo, '
+                          'así que no se duplicó nada. De ellas, %(p)s '
+                          'siguen pendientes de conciliar.',
+                          t=len(lineas_previas), p=sin_conciliar),
+                        _('Pulse "Ver líneas importadas" para verlas. '
+                          'También las encuentra en el menú Conciliación IA '
+                          '→ Líneas del extracto (ojo: esa vista filtra '
+                          '"Sin conciliar" por defecto; si ya las concilió, '
+                          'quite el filtro para verlas).'),
+                    )),
+            })
+            return {
+                'type': 'ir.actions.act_window',
+                'res_model': self._name,
+                'res_id': self.id,
+                'view_mode': 'form',
+                'target': 'new',
+            }
 
         fechas = [m['fecha'] for m, _u, _mto in nuevos]
         statement = self.env['account.bank.statement'].create({
@@ -217,7 +243,7 @@ class SngConciliacionImportar(models.TransientModel):
             'balance_end_real': saldo_final,
         })
         # Las líneas se crean aparte del statement (no anidadas) en lote.
-        self.env['account.bank.statement.line'].create([{
+        lineas_nuevas = self.env['account.bank.statement.line'].create([{
             'statement_id': statement.id,
             'journal_id': diario.id,
             'date': m['fecha'],
@@ -242,8 +268,11 @@ class SngConciliacionImportar(models.TransientModel):
         self.write({
             'estado': 'hecho',
             'statement_id': statement.id,
+            'linea_ids': [(6, 0, lineas_nuevas.ids)],
             'resultado': (
-                '<p><b>%s</b></p><ul><li>%s</li><li>%s</li>%s</ul>' % (
+                '<p><b>%s</b></p><ul><li>%s</li><li>%s</li>%s</ul>'
+                '<p class="mt-3"><b>%s</b></p><ol>'
+                '<li>%s</li><li>%s</li><li>%s</li><li>%s</li></ol>' % (
                     _('Importación completada — diario %s') % diario.name,
                     _('%(n)s líneas nuevas (%(c)s créditos, %(d)s débitos); '
                       '%(s)s saltadas (duplicadas o en cero)',
@@ -253,6 +282,17 @@ class SngConciliacionImportar(models.TransientModel):
                       i=saldo_inicial, f=saldo_final or 0),
                     ''.join('<li class="text-warning">%s</li>' % a
                             for a in avisos),
+                    _('Siguiente paso — cómo conciliar:'),
+                    _('Pulse "Ver líneas importadas".'),
+                    _('Seleccione las líneas y pulse "1 · Sugerir con IA": '
+                      'solo llena la columna Sugerencia, todavía no concilia '
+                      'nada. Las líneas ambiguas quedan en cola de IA y se '
+                      'completan solas en unos minutos (columna "IA en '
+                      'cola"; refresque la vista).'),
+                    _('Revise las columnas Sugerencia, Confianza y Motivo.'),
+                    _('En las líneas que esté de acuerdo, pulse '
+                      '"2 · Conciliar lo sugerido". Es reversible desde el '
+                      'extracto bancario.'),
                 )),
         })
         return {
@@ -265,11 +305,25 @@ class SngConciliacionImportar(models.TransientModel):
 
     def accion_ver_lineas(self):
         self.ensure_one()
+        if self.linea_ids:
+            domain = [('id', 'in', self.linea_ids.ids)]
+        else:
+            domain = [('statement_id', '=', self.statement_id.id)]
+        # Sin filtro "Sin conciliar": aquí la usuaria quiere ver TODO lo
+        # que trae el archivo, conciliado o no.
         return {
             'type': 'ir.actions.act_window',
             'name': _('Líneas del extracto'),
             'res_model': 'account.bank.statement.line',
-            'view_mode': 'list',
-            'domain': [('statement_id', '=', self.statement_id.id)],
-            'context': {'search_default_sin_conciliar': 1},
+            'view_mode': 'list,form',
+            'views': [
+                (self.env.ref('sng_conciliacion_bancaria.'
+                              'view_sng_statement_line_list').id, 'list'),
+                (self.env.ref('sng_conciliacion_bancaria.'
+                              'view_sng_statement_line_form').id, 'form'),
+            ],
+            'search_view_id': self.env.ref(
+                'sng_conciliacion_bancaria.view_sng_statement_line_search'
+            ).id,
+            'domain': domain,
         }

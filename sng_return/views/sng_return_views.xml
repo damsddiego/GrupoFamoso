@@ -56,6 +56,11 @@
                             type="object"
                             groups="sng_return.group_sng_return_supervisor"
                             invisible="state != 'confirmed' or receipt_state != 'missing'"/>
+                    <button name="action_suggest_invoices"
+                            string="Sugerir facturas"
+                            type="object"
+                            icon="fa-magic"
+                            invisible="state == 'cancelled' or suggestion_pending_count == 0"/>
                     <button name="action_view_history"
                             string="Historial"
                             type="object"
@@ -111,6 +116,7 @@
                             <field name="total_qty" readonly="1"/>
                             <field name="receipt_complete" invisible="1"/>
                             <field name="active_credit_note_count" invisible="1"/>
+                            <field name="suggestion_pending_count" invisible="1"/>
                         </group>
                     </group>
                     <group string="Notas">
@@ -118,14 +124,29 @@
                     </group>
                     <notebook>
                         <page string="Productos">
+                            <div class="alert alert-info" role="alert"
+                                 groups="sng_return.group_sng_return_manager"
+                                 invisible="state != 'confirmed' or active_credit_note_count &gt; 0">
+                                Como Gerente de Devoluciones puede asignar o cambiar la factura de origen
+                                de cada producto en cualquier punto del proceso. Es obligatoria antes de
+                                generar la nota de crédito.
+                            </div>
+                            <!-- Tabla editable completa mientras la devolución está en borrador -->
                             <field name="line_ids"
                                    context="{'default_partner_id': partner_id, 'default_company_id': company_id}"
-                                   readonly="state != 'draft'">
+                                   invisible="state != 'draft'">
                                 <list string="Productos a devolver" editable="bottom">
                                     <field name="sequence" widget="handle"/>
                                     <field name="product_id" required="1"/>
                                     <field name="invoice_editable" column_invisible="1"/>
                                     <field name="invoice_id" optional="show" readonly="not invoice_editable"/>
+                                    <field name="suggested_invoice_id" optional="show" readonly="1"/>
+                                    <field name="suggestion_confidence" widget="badge" optional="show" readonly="1"
+                                           decoration-success="suggestion_confidence == 'high'"
+                                           decoration-warning="suggestion_confidence == 'medium'"
+                                           decoration-danger="suggestion_confidence == 'low'"/>
+                                    <field name="suggestion_score" optional="hide" readonly="1"/>
+                                    <field name="suggestion_matches_invoice" column_invisible="1"/>
                                     <field name="quantity"/>
                                     <field name="uom_id" readonly="1"/>
                                     <field name="invoiced_sale_qty" readonly="1"/>
@@ -135,6 +156,17 @@
                                            decoration-danger="available_return_qty &lt; quantity"
                                            decoration-success="available_return_qty &gt;= quantity"/>
                                     <field name="invoiced_sale_order_count" readonly="1" optional="hide"/>
+                                    <button name="action_suggest_invoice"
+                                            string="Sugerir factura"
+                                            type="object"
+                                            icon="fa-magic"
+                                            class="btn-link"/>
+                                    <button name="action_accept_suggestion"
+                                            string="Aceptar sugerencia"
+                                            type="object"
+                                            icon="fa-check"
+                                            class="btn-link"
+                                            invisible="not suggested_invoice_id or suggestion_matches_invoice or not invoice_editable"/>
                                     <button name="action_view_history"
                                             string="Historial"
                                             type="object"
@@ -161,37 +193,85 @@
                                             <field name="invoiced_sale_order_count" readonly="1"/>
                                         </group>
                                     </group>
+                                    <group string="Sugerencia de factura de origen"
+                                           invisible="not suggested_invoice_id and not suggestion_reason">
+                                        <field name="suggested_invoice_id" readonly="1"/>
+                                        <field name="suggestion_score" readonly="1"/>
+                                        <field name="suggestion_confidence" widget="badge" readonly="1"
+                                               decoration-success="suggestion_confidence == 'high'"
+                                               decoration-warning="suggestion_confidence == 'medium'"
+                                               decoration-danger="suggestion_confidence == 'low'"/>
+                                        <field name="suggestion_source" readonly="1"/>
+                                        <field name="suggestion_date" readonly="1"/>
+                                        <field name="suggestion_reason" readonly="1"/>
+                                        <field name="suggestion_matches_invoice" invisible="1"/>
+                                    </group>
                                     <group>
                                         <field name="notes" placeholder="Notas de la linea..."/>
                                     </group>
                                     <footer>
+                                        <button name="action_suggest_invoice"
+                                                string="Sugerir factura"
+                                                type="object"
+                                                class="btn-primary"/>
+                                        <button name="action_accept_suggestion"
+                                                string="Aceptar sugerencia"
+                                                type="object"
+                                                class="btn-secondary"
+                                                invisible="not suggested_invoice_id or suggestion_matches_invoice or not invoice_editable"/>
                                         <button name="action_view_history"
                                                 string="Ver historial"
                                                 type="object"
-                                                class="btn-primary"/>
+                                                class="btn-secondary"/>
                                     </footer>
                                 </form>
                             </field>
-                            <group string="Facturas para la nota de crédito"
-                                   groups="sng_return.group_sng_return_manager"
-                                   invisible="state != 'confirmed' or active_credit_note_count &gt; 0">
-                                <div class="alert alert-info" role="alert" colspan="2">
-                                    El Gerente de Devoluciones debe seleccionar aquí la factura de origen de los productos que no la tengan antes de generar la nota de crédito.
-                                </div>
-                                <field name="line_ids" nolabel="1" colspan="2">
-                                    <list string="Asignar facturas"
-                                          editable="bottom"
-                                          create="false"
-                                          delete="false">
-                                        <field name="product_id" readonly="1"/>
-                                        <field name="quantity" readonly="1"/>
-                                        <field name="uom_id" readonly="1"/>
-                                        <field name="invoice_id" required="1"/>
-                                        <field name="partner_id" column_invisible="1"/>
-                                        <field name="company_id" column_invisible="1"/>
-                                    </list>
-                                </field>
-                            </group>
+<!-- Tras confirmar, la tabla solo permite al gerente asignar la factura de origen -->
+                            <field name="line_ids" invisible="state == 'draft'">
+                                <list string="Productos a devolver"
+                                      editable="bottom"
+                                      create="false"
+                                      delete="false">
+                                    <field name="product_id" readonly="1"/>
+                                    <field name="invoice_editable" column_invisible="1"/>
+                                    <field name="invoice_id" optional="show" readonly="not invoice_editable"/>
+                                    <field name="suggested_invoice_id" optional="show" readonly="1"/>
+                                    <field name="suggestion_confidence" widget="badge" optional="show" readonly="1"
+                                           decoration-success="suggestion_confidence == 'high'"
+                                           decoration-warning="suggestion_confidence == 'medium'"
+                                           decoration-danger="suggestion_confidence == 'low'"/>
+                                    <field name="suggestion_score" optional="hide" readonly="1"/>
+                                    <field name="suggestion_matches_invoice" column_invisible="1"/>
+                                    <field name="quantity" readonly="1"/>
+                                    <field name="uom_id" readonly="1"/>
+                                    <field name="invoiced_sale_qty" readonly="1"/>
+                                    <field name="previous_return_qty" readonly="1"/>
+                                    <field name="credit_note_qty" readonly="1"/>
+                                    <field name="available_return_qty" readonly="1"
+                                           decoration-danger="available_return_qty &lt; quantity"
+                                           decoration-success="available_return_qty &gt;= quantity"/>
+                                    <field name="invoiced_sale_order_count" readonly="1" optional="hide"/>
+                                    <button name="action_suggest_invoice"
+                                            string="Sugerir factura"
+                                            type="object"
+                                            icon="fa-magic"
+                                            class="btn-link"/>
+                                    <button name="action_accept_suggestion"
+                                            string="Aceptar sugerencia"
+                                            type="object"
+                                            icon="fa-check"
+                                            class="btn-link"
+                                            invisible="not suggested_invoice_id or suggestion_matches_invoice or not invoice_editable"/>
+                                    <button name="action_view_history"
+                                            string="Historial"
+                                            type="object"
+                                            icon="fa-history"
+                                            class="btn-link"/>
+                                    <field name="partner_id" column_invisible="1"/>
+                                    <field name="company_id" column_invisible="1"/>
+                                    <field name="state" column_invisible="1"/>
+                                </list>
+                            </field>
                         </page>
                     </notebook>
                 </sheet>

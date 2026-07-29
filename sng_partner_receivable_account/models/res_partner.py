@@ -5,7 +5,7 @@ class ResPartner(models.Model):
     _inherit = "res.partner"
 
     def _sng_assign_default_receivable_accounts(self, companies=None):
-        companies = companies or self.env["res.company"].sudo().search([])
+        companies = companies or self.env.companies
         customer_partners = self
         if not customer_partners:
             customer_partners = self.with_context(active_test=False).search([
@@ -25,7 +25,7 @@ class ResPartner(models.Model):
             })
 
     def _sng_assign_default_payable_accounts(self, companies=None):
-        companies = companies or self.env["res.company"].sudo().search([])
+        companies = companies or self.env.companies
         supplier_partners = self
         if not supplier_partners:
             supplier_partners = self.with_context(active_test=False).search([

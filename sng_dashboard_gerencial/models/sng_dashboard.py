@@ -137,11 +137,14 @@ class SngDashboardGerencial(models.AbstractModel):
                 'sng_dashboard_gerencial.group_sng_dashboard_inventario'),
             'estrategia': completo or self.env.user.has_group(
                 'sng_dashboard_gerencial.group_sng_dashboard_estrategia'),
+            # Regenerar el análisis IA consume API y es global: solo
+            # Administración / Ajustes.
+            'ia': self.env.user.has_group('base.group_system'),
         }
 
     def _sng_verificar_acceso(self):
         permisos = self._sng_permisos()
-        if not any(permisos.values()):
+        if not any(permisos[s] for s in ('ventas', 'inventario', 'estrategia')):
             raise AccessError(_(
                 'No tiene permisos para consultar el Dashboard Gerencial. '
                 'Pida que lo agreguen a un grupo de acceso del dashboard.'))
@@ -961,6 +964,10 @@ class SngDashboardGerencial(models.AbstractModel):
         """Genera (o regenera) el análisis IA para las compañías activas.
         Se invoca desde el botón del dashboard."""
         permisos = self._sng_verificar_acceso()
+        if not permisos['ia']:
+            raise AccessError(_(
+                'Solo un administrador (Administración / Ajustes) puede '
+                'actualizar el análisis IA.'))
         companias = self._sng_companias(company_ids)
         tipos = []
         if permisos['ventas']:

@@ -1,6 +1,6 @@
 {
     'name': 'Associate Assigned Salesperson to Invoice and Sales Order',
-    'version': '18.0.1.0.0',
+    'version': '18.0.1.0.1',
     'category': 'Accounting/Accounting',
     'summary': 'Add assigned salesperson field to invoices and sales orders',
     'description': """
@@ -8,7 +8,9 @@
         and sale.order models, related to the partner's assigned salesperson.
     """,
     'author': 'SNG Cloud',
-    'depends': ['account', 'sale', 'sales_commission_omax'],
+    # customer_sequence is required because the invoice form view anchors
+    # on its partner_unique_id field.
+    'depends': ['account', 'sale', 'sales_commission_omax', 'customer_sequence'],
     'data': [
         'views/account_move_view.xml',
         'views/sale_order_view.xml',

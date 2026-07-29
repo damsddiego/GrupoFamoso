@@ -126,6 +126,10 @@ export class SngDashboardGerencial extends Component {
         }
     }
 
+    get puedeIA() {
+        return !!this.state.datos?.permisos?.ia;
+    }
+
     get puedeVentas() {
         return !!this.state.datos?.permisos?.ventas;
     }

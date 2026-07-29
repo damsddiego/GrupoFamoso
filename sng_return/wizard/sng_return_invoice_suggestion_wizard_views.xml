@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_sng_return_invoice_suggestion_wizard_form" model="ir.ui.view">
+        <field name="name">sng.return.invoice.suggestion.wizard.form</field>
+        <field name="model">sng.return.invoice.suggestion.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Sugerencia de factura de origen">
+                <group>
+                    <group>
+                        <field name="return_id" readonly="1"/>
+                        <field name="partner_id" readonly="1"/>
+                        <field name="product_id" readonly="1"/>
+                        <field name="quantity" readonly="1"/>
+                    </group>
+                    <group>
+                        <field name="current_invoice_id" readonly="1"/>
+                        <field name="suggested_invoice_id" readonly="1"/>
+                        <field name="suggestion_confidence" widget="badge" readonly="1"
+                               decoration-success="suggestion_confidence == 'high'"
+                               decoration-warning="suggestion_confidence == 'medium'"
+                               decoration-danger="suggestion_confidence == 'low'"/>
+                    </group>
+                </group>
+                <div class="alert alert-info" role="alert" invisible="not info_message">
+                    <field name="info_message" nolabel="1" readonly="1"/>
+                </div>
+                <group string="Por qué se sugiere esta factura" invisible="not suggestion_reason">
+                    <field name="suggestion_reason" nolabel="1" readonly="1"/>
+                </group>
+                <field name="candidate_ids" nolabel="1">
+                    <list string="Facturas candidatas"
+                          create="false"
+                          delete="false"
+                          decoration-success="eligible and rank == 1"
+                          decoration-muted="not eligible">
+                        <field name="rank"/>
+                        <field name="invoice_id" readonly="1"/>
+                        <field name="invoice_date" readonly="1"/>
+                        <field name="days_elapsed" readonly="1"/>
+                        <field name="invoiced_qty" readonly="1"/>
+                        <field name="available_qty" readonly="1"/>
+                        <field name="score" widget="progressbar" readonly="1"/>
+                        <field name="eligible" widget="boolean_toggle" readonly="1"/>
+                        <field name="payment_state" widget="badge" readonly="1" optional="show"/>
+                        <field name="amount_total" readonly="1" optional="hide"/>
+                        <field name="currency_id" column_invisible="1"/>
+                        <field name="reason" readonly="1" optional="show"/>
+                        <button name="action_open_invoice"
+                                string="Ver"
+                                type="object"
+                                icon="fa-external-link"
+                                class="btn-link"/>
+                        <button name="action_select_invoice"
+                                string="Usar esta factura"
+                                type="object"
+                                icon="fa-check"
+                                class="btn-link"
+                                invisible="not eligible"/>
+                    </list>
+                </field>
+                <footer>
+                    <button name="action_accept_suggestion"
+                            string="Aceptar sugerencia"
+                            type="object"
+                            class="btn-primary"
+                            invisible="not suggested_invoice_id"/>
+                    <button name="action_recompute"
+                            string="Recalcular"
+                            type="object"
+                            class="btn-secondary"/>
+                    <button name="action_consult_ia"
+                            string="Consultar IA"
+                            type="object"
+                            class="btn-secondary"
+                            invisible="not ia_available"/>
+                    <field name="ia_available" invisible="1"/>
+                    <button string="Cerrar" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

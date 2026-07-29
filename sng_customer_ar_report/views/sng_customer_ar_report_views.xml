@@ -11,6 +11,8 @@
             <list string="Reporte CxC por Cliente" create="false" edit="false" delete="false">
                 <field name="partner_code"/>
                 <field name="partner_id"/>
+                <field name="commercial_name" optional="show"/>
+                <field name="credit_blocking" optional="show"/>
                 <field name="assigned_salesperson_id" optional="show"/>
                 <field name="payment_term_id" optional="show"/>
                 <field name="company_id" optional="show" groups="base.group_multi_company"/>

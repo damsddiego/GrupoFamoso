@@ -23,6 +23,18 @@ class PaymentReportSalesperson(models.Model):
     payment_amount = fields.Monetary(string='Monto del Pago', readonly=True, currency_field='currency_id')
     payment_reference = fields.Char(string='Referencia de Pago', readonly=True)
 
+    # Aplicación del pago (confirmación)
+    applied_date = fields.Datetime(
+        string='Fecha Aplicación', readonly=True,
+        help='Fecha y hora en que el pago fue confirmado (pasó de borrador a '
+             'en proceso/pagado), según el registro del chatter. Para pagos '
+             'creados ya confirmados (sin transición registrada) se usa la '
+             'fecha de creación del pago.')
+    applied_user_id = fields.Many2one(
+        'res.users', string='Aplicado por', readonly=True,
+        help='Usuario que confirmó el pago. Para pagos creados ya confirmados '
+             'se usa el usuario que creó el pago.')
+
     # Factura
     invoice_id = fields.Many2one('account.move', string='Factura', readonly=True)
     invoice_name = fields.Char(string='Número de Factura', readonly=True)
@@ -74,6 +86,26 @@ class PaymentReportSalesperson(models.Model):
 
         query = """
             CREATE OR REPLACE VIEW payment_report_salesperson AS (
+                -- Última confirmación registrada de cada pago (borrador -> en proceso/pagado),
+                -- tomada del tracking del chatter. Las etiquetas están traducidas según el
+                -- idioma del usuario que confirmó, por eso se listan en español e inglés.
+                WITH pago_confirmacion AS (
+                    SELECT DISTINCT ON (mm.res_id)
+                        mm.res_id as payment_id,
+                        mm.date as applied_date,
+                        mm.create_uid as applied_user_id
+                    FROM mail_message mm
+                    INNER JOIN mail_tracking_value mtv
+                        ON mtv.mail_message_id = mm.id
+                    INNER JOIN ir_model_fields imf
+                        ON imf.id = mtv.field_id
+                        AND imf.model = 'account.payment'
+                        AND imf.name = 'state'
+                    WHERE mm.model = 'account.payment'
+                        AND mtv.old_value_char IN ('Borrador', 'Draft')
+                        AND mtv.new_value_char IN ('En proceso', 'In Process', 'Pagado', 'Paid')
+                    ORDER BY mm.res_id, mm.date DESC, mm.id DESC
+                )
                 -- Pagos reconciliados con facturas
                 SELECT
                     ROW_NUMBER() OVER (ORDER BY ap.date DESC, ap.id, am.id) as id,
@@ -91,6 +123,15 @@ class PaymentReportSalesperson(models.Model):
                     ap.date as payment_date,
                     COALESCE(apr.amount, ap.amount) as payment_amount,
                     ap.name as payment_reference,
+
+                    -- Aplicación del pago (confirmación). Si no hay transición
+                    -- registrada (pago creado ya confirmado), se usa la creación.
+                    CASE WHEN ap.state IN ('in_process', 'paid')
+                         THEN COALESCE(pc.applied_date, ap.create_date)
+                    END as applied_date,
+                    CASE WHEN ap.state IN ('in_process', 'paid')
+                         THEN COALESCE(pc.applied_user_id, ap.create_uid)
+                    END as applied_user_id,
 
                     -- Factura
                     am.id as invoice_id,
@@ -146,6 +187,10 @@ class PaymentReportSalesperson(models.Model):
                 LEFT JOIN res_partner rp_salesperson
                     ON rp_salesperson.id = (rp.assigned_salesperson_id->>(ap.company_id::text))::integer
 
+                -- Confirmación del pago (tracking del chatter)
+                LEFT JOIN pago_confirmacion pc
+                    ON pc.payment_id = ap.id
+
                 -- Relación payment -> move (a través de account.partial.reconcile)
                 INNER JOIN account_move_line aml_payment
                     ON aml_payment.payment_id = ap.id
@@ -185,6 +230,14 @@ class PaymentReportSalesperson(models.Model):
                     ap.amount as payment_amount,
                     ap.name as payment_reference,
 
+                    -- Aplicación del pago (confirmación)
+                    CASE WHEN ap.state IN ('in_process', 'paid')
+                         THEN COALESCE(pc.applied_date, ap.create_date)
+                    END as applied_date,
+                    CASE WHEN ap.state IN ('in_process', 'paid')
+                         THEN COALESCE(pc.applied_user_id, ap.create_uid)
+                    END as applied_user_id,
+
                     -- Sin factura
                     NULL::integer as invoice_id,
                     NULL::varchar as invoice_name,
@@ -215,6 +268,10 @@ class PaymentReportSalesperson(models.Model):
                 -- Vendedor del cliente (LEFT JOIN para incluir pagos sin vendedor)
                 LEFT JOIN res_partner rp_salesperson
                     ON rp_salesperson.id = (rp.assigned_salesperson_id->>(ap.company_id::text))::integer
+
+                -- Confirmación del pago (tracking del chatter)
+                LEFT JOIN pago_confirmacion pc
+                    ON pc.payment_id = ap.id
 
                 WHERE
                     ap.payment_type = 'inbound'

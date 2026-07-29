@@ -1,6 +1,6 @@
 {
     'name': 'Invoice Report by Salesperson',
-    'version': '18.0.2.0.0',
+    'version': '18.0.2.1.0',
     'category': 'Accounting/Accounting',
     'summary': 'Multi-company invoice reports by salesperson with on-screen view, Excel and PDF export',
     'description': """

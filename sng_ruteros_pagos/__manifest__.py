@@ -3,7 +3,7 @@
     'name': 'SNG Ruteros - Recibos de pago',
     'summary': 'Guarda los recibos creados desde la app app_ruteros sobre account.payment '
                'y agrega un menú para ver los pagos (borradores) de ruteros.',
-    'version': '1.6.2',
+    'version': '1.6.3',
     'category': 'Accounting',
     'author': 'SNG',
     'website': 'https://sngcloud.com',

@@ -12,7 +12,7 @@
                         type="object"
                         string="Aplicar a facturas"
                         class="btn-primary"
-                        invisible="not sng_from_app or state not in ('in_process', 'paid') or not invoice_ids or is_reconciled"/>
+                        invisible="not sng_from_app or state not in ('in_process', 'paid') or not invoice_ids or is_reconciled or ((sng_monto_atipico or sng_dup_estado in ('sospecha', 'probable')) and not sng_verificado)"/>
                 <button name="action_sng_ia_matching"
                         type="object"
                         string="Buscar facturas con IA"
@@ -23,6 +23,9 @@
                        invisible="not sng_from_app" col="4">
                     <field name="sng_from_app" invisible="1"/>
                     <field name="is_reconciled" invisible="1"/>
+                    <field name="sng_puede_verificar" invisible="1"/>
+                    <field name="sng_verificado" widget="boolean_toggle"
+                           readonly="not sng_puede_verificar"/>
                     <field name="sng_numero_recibo"/>
                     <field name="sng_metodo_pago"/>
                     <field name="sng_referencia"/>
@@ -78,6 +81,14 @@
                   decoration-muted="state == 'draft' and sng_dup_estado != 'probable'"
                   decoration-success="state == 'in_process' and sng_dup_estado != 'probable'">
                 <header>
+                    <button name="action_sng_marcar_verificado"
+                            type="object"
+                            string="Marcar verificado"
+                            groups="account.group_account_manager"/>
+                    <button name="action_sng_desmarcar_verificado"
+                            type="object"
+                            string="Quitar verificado"
+                            groups="account.group_account_manager"/>
                     <button name="action_sng_restablecer_borrador"
                             type="object"
                             string="No Aplicar"
@@ -103,6 +114,10 @@
                        decoration-success="sng_dup_estado == 'descartado'"/>
                 <field name="sng_monto_atipico" optional="show"
                        widget="boolean_toggle" readonly="1"/>
+                <field name="sng_puede_verificar" column_invisible="1"/>
+                <field name="sng_verificado" optional="show"
+                       widget="boolean_toggle"
+                       readonly="not sng_puede_verificar"/>
                 <field name="state"
                        decoration-muted="state == 'draft'"
                        decoration-info="state == 'in_process'"
@@ -149,7 +164,14 @@
                         domain="[('sng_dup_estado', '=', 'sospecha')]"/>
                 <filter name="monto_atipico" string="Monto atípico"
                         domain="[('sng_monto_atipico', '=', True)]"/>
+                <separator/>
+                <filter name="verificado" string="Verificado"
+                        domain="[('sng_verificado', '=', True)]"/>
+                <filter name="no_verificado" string="Sin verificar"
+                        domain="[('sng_verificado', '=', False)]"/>
                 <group expand="0" string="Agrupar por">
+                    <filter name="group_verificado" string="Verificado"
+                            context="{'group_by': 'sng_verificado'}"/>
                     <filter name="group_state" string="Estado"
                             context="{'group_by': 'state'}"/>
                     <filter name="group_vendedor" string="Vendedor"
@@ -177,6 +199,7 @@
     <!-- Menú propio -->
     <menuitem id="menu_ruteros_root"
               name="Ruteros"
+              web_icon="sng_ruteros_pagos,static/description/icon_odoo18.png"
               sequence="90"
               groups="account.group_account_invoice"/>
     <menuitem id="menu_ruteros_recibos"

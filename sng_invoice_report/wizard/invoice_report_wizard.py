@@ -1,6 +1,5 @@
 import base64
 import io
-from collections import OrderedDict
 from datetime import date
 
 from odoo import api, fields, models, _
@@ -102,7 +101,9 @@ class InvoiceReportWizard(models.TransientModel):
         if self.salesperson_ids:
             domain.append(('salesperson_id', 'in', self.salesperson_ids.ids))
         # Note: When no salesperson selected, we don't add any filter here.
-        # Invalid salespersons are removed in the shared report helper.
+        # Invoices whose resolved salesperson is not a real salesperson
+        # (e.g. the invoicing user set as fallback) are grouped under
+        # 'Sin asignar' by _get_grouping_salesperson.
 
         # Filter by payment status
         if self.payment_status != 'all':
@@ -125,32 +126,26 @@ class InvoiceReportWizard(models.TransientModel):
         return ['out_invoice', 'out_refund']
 
     def _get_grouping_salesperson(self, invoice):
-        """Return the salesperson used for grouping and export headers."""
-        self.ensure_one()
-        return invoice.salesperson_id or invoice.assigned_salesperson_id
+        """Return the salesperson used for grouping and export headers.
 
-    def _is_report_invoice(self, invoice):
-        """Apply export-level filtering that cannot be expressed in the domain."""
+        Only partners flagged as salespersons are considered. Fallback
+        partners injected by sales_commission_omax (invoice user, current
+        user) are ignored so those invoices are grouped under
+        'Sin asignar' instead of being silently dropped from the report.
+        """
         self.ensure_one()
-        salesperson = self._get_grouping_salesperson(invoice)
-        if salesperson and not self.salesperson_ids and not salesperson.is_salesperson:
-            return False
-        return True
+        for candidate in (invoice.salesperson_id, invoice.assigned_salesperson_id):
+            if candidate and candidate.is_salesperson:
+                return candidate
+        return self.env['res.partner']
 
     def _get_invoices(self):
         """Get the final document universe shared by screen and export."""
         domain = self._get_invoices_domain()
-        invoices = self.env['account.move'].search(
+        return self.env['account.move'].search(
             domain,
             order='salesperson_id, invoice_date, id',
         )
-
-        unique_invoice_ids = OrderedDict()
-        for invoice in invoices:
-            if self._is_report_invoice(invoice):
-                unique_invoice_ids.setdefault(invoice.id, None)
-
-        return self.env['account.move'].browse(list(unique_invoice_ids))
 
     def _get_salesperson_entries(self, invoices, salesperson_id):
         """Order one salesperson block, keeping linked refunds after the source invoice."""

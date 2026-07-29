@@ -281,10 +281,11 @@ class StockAdjustmentRequestLine(models.Model):
     # ------------------------------------------------------------------
     # Onchanges / Constraints
     # ------------------------------------------------------------------
-    @api.onchange('product_id')
+    @api.onchange('product_id', 'location_id', 'package_id', 'owner_id')
     def _onchange_product_id(self):
         if self.product_id:
-            self.lot_id = False
+            if self._origin.product_id != self.product_id:
+                self.lot_id = False
             if not self.location_id:
                 warehouse = self.env['stock.warehouse'].search(
                     [('company_id', '=', self.company_id.id or self.env.company.id)],
@@ -292,6 +293,32 @@ class StockAdjustmentRequestLine(models.Model):
                 )
                 if warehouse:
                     self.location_id = warehouse.lot_stock_id
+            if not self.lot_id:
+                self._assign_unique_existing_lot()
+
+    def _assign_unique_existing_lot(self):
+        """Select the lot automatically when the stock dimension is unambiguous."""
+        self.ensure_one()
+        if (
+            not self.product_id
+            or not self.location_id
+            or self.product_id.tracking not in ('lot', 'serial')
+            or self.lot_id
+        ):
+            return self.lot_id
+
+        company = self.company_id or self.env.company
+        quants = self.env['stock.quant'].with_company(company).search([
+            ('product_id', '=', self.product_id.id),
+            ('location_id', '=', self.location_id.id),
+            ('lot_id', '!=', False),
+            ('package_id', '=', self.package_id.id or False),
+            ('owner_id', '=', self.owner_id.id or False),
+        ])
+        lots = quants.lot_id
+        if len(lots) == 1:
+            self.lot_id = lots
+        return self.lot_id
 
     @api.constrains('counted_quantity')
     def _check_counted_quantity_positive(self):
@@ -332,6 +359,8 @@ class StockAdjustmentRequestLine(models.Model):
         self.ensure_one()
         if not self.product_id or not self.location_id:
             raise UserError(_('Todas las líneas deben tener producto y ubicación.'))
+        if not self.lot_id:
+            self._assign_unique_existing_lot()
         if self.product_id.tracking in ('lot', 'serial') and not self.lot_id:
             raise UserError(
                 _('El producto %s requiere lote/número de serie. Por favor asígnelo.') % self.product_id.display_name

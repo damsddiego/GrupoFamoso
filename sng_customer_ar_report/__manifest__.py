@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Reporte CxC por Cliente (Facturado, Pendiente, Días promedio de pago)',
-    'version': '18.0.1.0.0',
+    'version': '18.0.1.1.0',
     'category': 'Accounting',
     'summary': 'Reporte de Cuentas por Cobrar por cliente con total facturado, pendiente y días promedio de pago',
     'description': """
@@ -20,7 +20,12 @@ Características:
 - Exportable a Excel con botón estándar
     """,
     'author': 'SNG',
-    'depends': ['account', 'customer_sequence'],
+    'depends': [
+        'account',
+        'customer_sequence',
+        'sng_custom_name_partner',
+        'sale_account_manager_customer_credit_limit_approval',
+    ],
     'data': [
         'security/ir.model.access.csv',
         'security/security.xml',

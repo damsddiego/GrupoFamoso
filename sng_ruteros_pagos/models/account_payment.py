@@ -285,9 +285,38 @@ class AccountPayment(models.Model):
         copy=False,
         help='Otros recibos del mismo cliente con monto o factura coincidente.',
     )
+    # Marca puramente informativa de revisión de oficina: no dispara ninguna
+    # lógica contable. tracking=True deja en el chatter quién la cambió.
+    sng_verificado = fields.Boolean(
+        string='Verificado',
+        default=False,
+        index=True,
+        copy=False,
+        tracking=True,
+        help='Control interno: marca que la oficina ya revisó este recibo. '
+             'No afecta al sistema. Solo lo puede cambiar un asesor/'
+             'administrador de contabilidad.',
+    )
+    sng_puede_verificar = fields.Boolean(
+        string='Puede verificar',
+        compute='_compute_sng_puede_verificar',
+        help='Técnico: controla si el usuario actual puede marcar Verificado.',
+    )
+
+    @api.depends_context('uid')
+    def _compute_sng_puede_verificar(self):
+        puede = self.env.user.has_group('account.group_account_manager')
+        for payment in self:
+            payment.sng_puede_verificar = puede
 
     @api.model_create_multi
     def create(self, vals_list):
+        if any(vals.get('sng_verificado') for vals in vals_list) \
+                and not self.env.su \
+                and not self.env.user.has_group('account.group_account_manager'):
+            raise UserError(_(
+                'Solo un administrador de contabilidad puede crear un recibo '
+                'marcado como "Verificado".'))
         # IDEMPOTENCIA: si la app reenvía el MISMO recibo (típico: timeout —
         # Odoo creó el pago pero la respuesta no llegó a la tableta y la app
         # reintenta), se devuelve el pago existente en lugar de crear un
@@ -313,22 +342,26 @@ class AccountPayment(models.Model):
         payments = super().create(vals_a_crear)
         for indice, aviso in avisos:
             payments[indice].message_post(body=aviso)
-        # La app crea los pagos ya confirmados: ligar facturas (puente) y
-        # aplicar de inmediato. Solo sobre los recién creados: los existentes
-        # ya pasaron por este flujo cuando se crearon.
+        # La app crea los pagos ya confirmados: ligar facturas (puente), evaluar
+        # riesgos y aplicar solo los recibos limpios. El pago siempre queda
+        # creado aunque falle una evaluación o requiera revisión, para que la
+        # app reciba su ID y no entre en un ciclo de reintentos.
         app_payments = payments.filtered('sng_from_app')
         app_payments._sng_ligar_facturas_desde_observaciones()
-        app_payments.filtered(
-            lambda p: p.invoice_ids and p.state in ('in_process', 'paid')
-        )._sng_aplicar_a_facturas()
+        evaluados = app_payments
         try:
-            app_payments._sng_marcar_posibles_duplicados()
+            with self.env.cr.savepoint():
+                app_payments._sng_marcar_posibles_duplicados()
         except Exception:  # noqa: BLE001 - nunca bloquear la entrada de pagos
             _logger.exception('Detector de duplicados Ruteros: error al marcar')
+            evaluados -= app_payments
         try:
-            app_payments._sng_marcar_montos_atipicos()
+            with self.env.cr.savepoint():
+                app_payments._sng_marcar_montos_atipicos()
         except Exception:  # noqa: BLE001 - nunca bloquear la entrada de pagos
             _logger.exception('Detector de montos atípicos: error al marcar')
+            evaluados -= app_payments
+        evaluados._sng_auto_aplicables()._sng_aplicar_a_facturas()
 
         if not existentes:
             return payments
@@ -376,14 +409,31 @@ class AccountPayment(models.Model):
         return existente
 
     def write(self, vals):
+        # La marca "Verificado" es de control de oficina: solo un administrador
+        # de contabilidad puede ponerla o quitarla (la vista además la deja
+        # readonly, pero el guardia real va aquí: cubre importaciones y RPC).
+        if 'sng_verificado' in vals and not self.env.su \
+                and not self.env.user.has_group('account.group_account_manager'):
+            raise UserError(_(
+                'Solo un administrador de contabilidad puede cambiar la marca '
+                '"Verificado".'))
         res = super().write(vals)
         # Cubre tanto action_post (asigna state vía write) como una escritura
         # directa del estado desde la API.
         if vals.get('state') in ('in_process', 'paid'):
             app_payments = self.filtered('sng_from_app')
             app_payments._sng_ligar_facturas_desde_observaciones()
-            app_payments.filtered('invoice_ids')._sng_aplicar_a_facturas()
+            app_payments._sng_auto_aplicables()._sng_aplicar_a_facturas()
         return res
+
+    def _sng_auto_aplicables(self):
+        """Pagos que pueden conciliarse sin revisión previa de la oficina."""
+        return self.filtered(
+            lambda p: p.invoice_ids
+            and p.state in ('in_process', 'paid')
+            and not p.sng_monto_atipico
+            and p.sng_dup_estado not in ('sospecha', 'probable')
+        )
 
     def _sng_ligar_facturas_desde_observaciones(self):
         """Puente: si la app no mandó invoice_ids, deducirlas del texto.
@@ -446,6 +496,17 @@ class AccountPayment(models.Model):
                 raise UserError(_(
                     'Seleccione al menos una factura en el pago %s.',
                     payment.display_name,
+                ))
+            requiere_revision = (
+                payment.sng_monto_atipico
+                or payment.sng_dup_estado in ('sospecha', 'probable')
+            )
+            if requiere_revision and not payment.sng_verificado:
+                raise UserError(_(
+                    'El pago %(pago)s tiene una alerta de duplicado o monto '
+                    'atípico. Un administrador de contabilidad debe revisarlo '
+                    'y marcarlo como "Verificado" antes de aplicarlo.',
+                    pago=payment.display_name,
                 ))
         self._sng_aplicar_a_facturas()
 
@@ -681,6 +742,35 @@ class AccountPayment(models.Model):
                 valores['sng_vendedor_app_id'] = 0
             payment.write(valores)
             payment.message_post(body=' '.join(partes))
+
+    def action_sng_marcar_verificado(self):
+        """Acción masiva: marca los recibos seleccionados como verificados."""
+        return self._sng_cambiar_verificado(True)
+
+    def action_sng_desmarcar_verificado(self):
+        """Acción masiva: quita la marca de verificado."""
+        return self._sng_cambiar_verificado(False)
+
+    def _sng_cambiar_verificado(self, valor):
+        # El permiso lo valida write(); aquí solo se filtra lo que ya está en
+        # el estado pedido para no ensuciar el chatter con cambios vacíos.
+        a_cambiar = self.filtered(lambda p: p.sng_verificado != valor)
+        a_cambiar.write({'sng_verificado': valor})
+        mensaje = (
+            _('%s recibo(s) marcados como verificados.', len(a_cambiar))
+            if valor else
+            _('%s recibo(s) sin la marca de verificado.', len(a_cambiar))
+        )
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Verificado'),
+                'message': mensaje,
+                'type': 'success',
+                'next': {'type': 'ir.actions.act_window_close'},
+            },
+        }
 
     def action_sng_restablecer_borrador(self):
         """Acción masiva: restablece a borrador los pagos seleccionados.
@@ -1207,6 +1297,21 @@ class AccountPayment(models.Model):
         ))
         if es_dup:
             self._sng_alertar_duplicado_en_canal(data, etiquetas)
+        else:
+            # El pago quedó retenido mientras la sospecha estaba pendiente. Si
+            # la IA la descarta y no existe otra alerta, completar el mismo
+            # flujo automático que habría seguido un recibo limpio al crearse.
+            try:
+                with self.env.cr.savepoint():
+                    self._sng_auto_aplicables()._sng_aplicar_a_facturas()
+            except Exception:  # noqa: BLE001 - conservar el veredicto y reintentar manual
+                _logger.exception(
+                    'Veredicto IA duplicados: no se pudo aplicar el pago %s '
+                    'después de descartar la sospecha', self.id)
+                self.message_post(body=_(
+                    'La IA descartó la sospecha de duplicado, pero no fue '
+                    'posible aplicar automáticamente el pago a las facturas. '
+                    'Revise la selección y use "Aplicar a facturas".'))
 
     def _sng_alertar_duplicado_en_canal(self, data, etiquetas):
         """Alerta inmediata al canal de liquidación (no espera al resumen)."""
