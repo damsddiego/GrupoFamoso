@@ -44,6 +44,10 @@
         <field name="arch" type="xml">
             <list create="false" default_order="date desc, sequence">
                 <header>
+                    <button name="%(action_sng_conciliacion_importar)d"
+                            type="action" display="always"
+                            string="Importar estado de cuenta"
+                            help="Abre el asistente para cargar otro archivo xlsx del BAC. Reimportar el mismo archivo no duplica líneas."/>
                     <button name="accion_sng_sugerir" type="object"
                             string="1 · Sugerir con IA (no concilia)"
                             class="btn-primary"
@@ -218,7 +222,8 @@
             <p class="o_view_nocontent_smiling_face">
                 Aún no hay líneas de extracto importadas
             </p>
-            <p>Use el menú "Importar estado de cuenta BAC". Luego, aquí:
+            <p>Pulse el botón "Importar estado de cuenta" (arriba) para
+            cargar el xlsx del BAC. Luego, aquí:
             seleccione las líneas y pulse "1 · Sugerir con IA" para que el
             sistema proponga con qué pago o factura cruza cada una, revise
             las columnas Sugerencia y Motivo, y por último pulse
@@ -332,13 +337,13 @@
               groups="sng_conciliacion_bancaria.group_sng_conciliacion"
               web_icon="sng_conciliacion_bancaria,static/description/icon.png"
               sequence="77"/>
+    <menuitem id="menu_sng_conciliacion_lineas" name="Líneas del extracto"
+              parent="menu_sng_conciliacion_root"
+              action="action_sng_statement_lines" sequence="10"/>
     <menuitem id="menu_sng_conciliacion_importar"
               name="Importar estado de cuenta BAC"
               parent="menu_sng_conciliacion_root"
-              action="action_sng_conciliacion_importar" sequence="10"/>
-    <menuitem id="menu_sng_conciliacion_lineas" name="Líneas del extracto"
-              parent="menu_sng_conciliacion_root"
-              action="action_sng_statement_lines" sequence="20"/>
+              action="action_sng_conciliacion_importar" sequence="20"/>
     <menuitem id="menu_sng_conciliacion_alias" name="Aprendizajes"
               parent="menu_sng_conciliacion_root"
               action="action_sng_alias" sequence="30"/>

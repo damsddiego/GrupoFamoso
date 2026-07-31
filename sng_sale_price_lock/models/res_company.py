@@ -6,15 +6,15 @@ class ResCompany(models.Model):
 
     sng_lock_price_unit = fields.Boolean(
         string='Bloquear precio unitario',
-        help="Impide guardar una linea de venta con un precio unitario distinto "
-             "al que calcula la lista de precios del pedido.",
+        help="Impide guardar una linea de venta o factura de cliente con un "
+             "precio unitario distinto al que calcula la lista de precios.",
         default=False,
     )
     sng_lock_discount = fields.Boolean(
         string='Bloquear descuento',
-        help="Impide guardar una linea de venta con un descuento distinto al que "
-             "define la regla de la lista de precios. Si la regla no define "
-             "descuento, el descuento debe quedar en 0.",
+        help="Impide guardar una linea de venta o factura de cliente con un "
+             "descuento distinto al que define la regla de la lista de precios. "
+             "Si la regla no define descuento, debe quedar en 0.",
         default=False,
     )
     sng_price_lock_mode = fields.Selection(

@@ -22,6 +22,7 @@ export class SngDashboardGerencial extends Component {
         this.state = useState({
             cargando: true,
             generandoIA: false,
+            progresoIA: "",
             meses: 12,
             pestana: "ventas",
             companiaId: false,
@@ -36,6 +37,7 @@ export class SngDashboardGerencial extends Component {
         this.refRotacion = useRef("chartRotacion");
         this.refCompras = useRef("chartCompras");
         this.refMargen = useRef("chartMargen");
+        this.refCxc = useRef("cxcContenedor");
         this.charts = [];
         this.fmtColones = new Intl.NumberFormat("es-CR", {
             style: "currency",
@@ -76,8 +78,9 @@ export class SngDashboardGerencial extends Component {
                 this.companias = this.state.datos.companias;
             }
             if (!this.puedeVentas && this.state.pestana === "ventas") {
-                this.state.pestana = this.puedeInventario
-                    ? "inventario" : "estrategia";
+                this.state.pestana = this.puedeCxc
+                    ? "cxc"
+                    : this.puedeInventario ? "inventario" : "estrategia";
             }
         } finally {
             this.state.cargando = false;
@@ -95,34 +98,63 @@ export class SngDashboardGerencial extends Component {
     }
 
     async generarIA() {
+        // Un request por análisis (compañía × tipo): generarlos todos en
+        // una sola llamada excede limit_time_real del worker (120 s) y el
+        // servidor la mata sin guardar nada.
         this.state.generandoIA = true;
+        const companyIds = this.state.companiaId
+            ? [this.state.companiaId] : false;
+        const errores = [];
         try {
-            const res = await this.orm.call(
+            const tareas = await this.orm.call(
                 "sng.dashboard.gerencial",
-                "sng_generar_analisis_ia",
+                "sng_tareas_analisis_ia",
                 [],
-                {
-                    company_ids: this.state.companiaId
-                        ? [this.state.companiaId] : false,
-                }
+                { company_ids: companyIds }
             );
-            if (res.errores.length) {
-                this.notification.add(res.errores.join(" · "), {
+            let hechas = 0;
+            for (const tarea of tareas) {
+                this.state.progresoIA =
+                    `${hechas + 1}/${tareas.length} · ` +
+                    `${this.trunca(tarea.compania, 22)} — ` +
+                    this.etiquetaTipo(tarea.tipo);
+                try {
+                    await this.orm.call(
+                        "sng.dashboard.gerencial",
+                        "sng_generar_analisis_ia_uno",
+                        [tarea.company_id, tarea.tipo]
+                    );
+                } catch (e) {
+                    const detalle = e?.data?.message || e?.message || e;
+                    errores.push(
+                        `${tarea.compania} (${this.etiquetaTipo(tarea.tipo)}): ${detalle}`);
+                }
+                hechas++;
+            }
+            const analisis = await this.orm.call(
+                "sng.dashboard.gerencial",
+                "sng_ultimos_analisis_ia",
+                [],
+                { company_ids: companyIds }
+            );
+            if (this.state.datos) {
+                this.state.datos = { ...this.state.datos, analisis };
+            }
+            if (errores.length) {
+                this.notification.add(errores.join(" · "), {
                     title: "Análisis IA con errores",
                     type: "warning",
                     sticky: true,
                 });
             } else {
                 this.notification.add(
-                    `Análisis IA actualizado para ${res.ok} compañía(s).`,
+                    `Análisis IA actualizado (${tareas.length} análisis).`,
                     { type: "success" }
                 );
             }
-            if (this.state.datos) {
-                this.state.datos = { ...this.state.datos, analisis: res.analisis };
-            }
         } finally {
             this.state.generandoIA = false;
+            this.state.progresoIA = "";
         }
     }
 
@@ -134,6 +166,10 @@ export class SngDashboardGerencial extends Component {
         return !!this.state.datos?.permisos?.ventas;
     }
 
+    get puedeCxc() {
+        return !!this.state.datos?.permisos?.cxc;
+    }
+
     get puedeInventario() {
         return !!this.state.datos?.permisos?.inventario;
     }
@@ -143,8 +179,13 @@ export class SngDashboardGerencial extends Component {
     }
 
     get pestanasVisibles() {
-        return [this.puedeVentas, this.puedeInventario, this.puedeEstrategia]
-            .filter(Boolean).length;
+        return [this.puedeVentas, this.puedeCxc, this.puedeInventario,
+            this.puedeEstrategia].filter(Boolean).length;
+    }
+
+    get analisisCxc() {
+        return (this.state.datos?.analisis || []).filter(
+            (a) => a.tipo === "cxc");
     }
 
     get analisisEstrategia() {
@@ -182,6 +223,10 @@ export class SngDashboardGerencial extends Component {
             .format(v || 0);
     }
 
+    porcentaje(parte, total) {
+        return total ? Math.round((parte || 0) * 100 / total) : 0;
+    }
+
     trunca(texto, n = 34) {
         return (texto || "").length > n ? texto.slice(0, n - 1) + "…" : texto;
     }
@@ -197,6 +242,15 @@ export class SngDashboardGerencial extends Component {
         return (dt || "").slice(0, 16);
     }
 
+    etiquetaTipo(tipo) {
+        return {
+            general: "Ventas y cobranza",
+            cxc: "CXC y pagos",
+            inventario: "Inventario",
+            estrategia: "Estrategia",
+        }[tipo] || tipo;
+    }
+
     etiquetaSalud(salud) {
         return { buena: "Buena", regular: "Regular", critica: "Crítica" }[salud] || "—";
     }
@@ -204,6 +258,7 @@ export class SngDashboardGerencial extends Component {
     etiquetaArea(area) {
         return {
             ventas: "Ventas", cobranza: "Cobranza", inventario: "Inventario",
+            compras: "Compras", precios: "Precios",
             finanzas: "Finanzas", otro: "Otro",
         }[area] || area;
     }
@@ -371,6 +426,47 @@ export class SngDashboardGerencial extends Component {
             },
             options: this._opcionesBase(true),
         });
+
+        // CXC - Pagos: un gráfico Ventas vs Cobros por compañía
+        if (datos.cxc && this.refCxc.el) {
+            for (const canvas of this.refCxc.el.querySelectorAll(
+                "canvas[data-compania]")) {
+                const compania = datos.cxc.companias.find(
+                    (c) => c.id === parseInt(canvas.dataset.compania, 10));
+                if (!compania) continue;
+                const opsCxc = this._opcionesBase(false);
+                opsCxc.plugins.legend = {
+                    display: true,
+                    position: "top",
+                    align: "end",
+                    labels: { usePointStyle: true, boxHeight: 8, color: "#52514e" },
+                };
+                // eslint-disable-next-line no-undef
+                this.charts.push(new Chart(canvas, {
+                    type: "bar",
+                    data: {
+                        labels: compania.mensual.map((f) => this.etiquetaMes(f.mes)),
+                        datasets: [
+                            {
+                                label: "Ventas",
+                                data: compania.mensual.map((f) => f.ventas),
+                                backgroundColor: PALETA.azul,
+                                borderRadius: 4,
+                                maxBarThickness: 18,
+                            },
+                            {
+                                label: "Cobros",
+                                data: compania.mensual.map((f) => f.cobros),
+                                backgroundColor: PALETA.naranja,
+                                borderRadius: 4,
+                                maxBarThickness: 18,
+                            },
+                        ],
+                    },
+                    options: opsCxc,
+                }));
+            }
+        }
 
         // Compras vs Ventas por mes (2 series, leyenda visible)
         if (datos.estrategia) {

@@ -525,6 +525,12 @@ class AccountPayment(models.Model):
             if not payment.move_id:
                 # Sin cuenta transitoria configurada en el diario no hay asiento
                 # que conciliar; el pago queda ligado solo informativamente.
+                payment._sng_avisar_sin_conciliar(
+                    payment.invoice_ids,
+                    motivo_general=_(
+                        'el pago no tiene asiento contable (diario sin cuenta '
+                        'transitoria configurada), así que no hay nada que '
+                        'conciliar'))
                 continue
             payment_lines = payment.move_id.line_ids.filtered_domain(line_domain)
             invoice_lines = payment.invoice_ids.line_ids.filtered_domain(line_domain)
@@ -535,6 +541,113 @@ class AccountPayment(models.Model):
                     ('parent_state', '=', 'posted'),
                 ]).reconcile()
             payment.invoice_ids.matched_payment_ids += payment
+            payment._sng_avisar_sin_conciliar(
+                payment._sng_facturas_sin_conciliar())
+
+    def _sng_facturas_sin_conciliar(self):
+        """Facturas ligadas al pago que no tienen ningún apunte conciliado
+        contra él (el reconcile de arriba no las tocó)."""
+        self.ensure_one()
+        if not self.move_id:
+            return self.invoice_ids
+        lineas_pago = self.move_id.line_ids
+        partials = lineas_pago.matched_debit_ids | lineas_pago.matched_credit_ids
+        conciliados = (partials.debit_move_id | partials.credit_move_id).move_id
+        return self.invoice_ids - conciliados
+
+    def _sng_motivo_factura_sin_conciliar(self, factura):
+        """Diagnóstico legible de por qué la factura no se concilió con el pago."""
+        self.ensure_one()
+        if factura.state != 'posted':
+            return _('la factura no está publicada')
+        tipos = self._get_valid_payment_account_types()
+        lineas_factura = factura.line_ids.filtered(
+            lambda l: l.account_type in tipos)
+        if not lineas_factura:
+            return _('la factura no tiene apuntes en cuentas por cobrar')
+        pendientes = lineas_factura.filtered(lambda l: not l.reconciled)
+        if not pendientes:
+            return _('los apuntes por cobrar de la factura ya estaban '
+                     'conciliados (posiblemente se pagó por otro medio)')
+        lineas_pago = self.move_id.line_ids.filtered(
+            lambda l: l.account_type in tipos and not l.reconciled)
+        if not lineas_pago:
+            return _('el pago ya no tiene saldo pendiente de conciliar')
+        if not (pendientes.account_id & lineas_pago.account_id):
+            return _(
+                'la cuenta por cobrar de la factura (%(cta_factura)s) es '
+                'distinta a la del pago (%(cta_pago)s)',
+                cta_factura=', '.join(
+                    pendientes.account_id.mapped('display_name')),
+                cta_pago=', '.join(
+                    lineas_pago.account_id.mapped('display_name')))
+        return _('motivo no determinado: revise los apuntes contables de '
+                 'ambos documentos')
+
+    def _sng_avisar_sin_conciliar(self, facturas, motivo_general=None):
+        """Chatter + canal: el pago quedó ligado a facturas SIN conciliarse.
+
+        Sin este aviso el fallo es silencioso: la factura muestra el pago
+        ligado pero su saldo pendiente no baja. Nunca lanza excepción para no
+        bloquear la entrada de pagos de la app.
+        """
+        self.ensure_one()
+        if not facturas:
+            return
+        try:
+            with self.env.cr.savepoint():
+                detalles = [
+                    (factura,
+                     motivo_general
+                     or self._sng_motivo_factura_sin_conciliar(factura))
+                    for factura in facturas
+                ]
+                lineas = Markup('').join(
+                    Markup('<li><b>%s</b>: %s</li>') % (
+                        escape(factura.display_name), escape(motivo))
+                    for factura, motivo in detalles)
+                self.message_post(body=Markup(
+                    '<p>⚠️ <b>%s</b></p><ul>%s</ul><p>%s</p>') % (
+                    _('Atención: el pago quedó ligado a estas facturas pero '
+                      'NO se pudo conciliar contra ellas — el saldo pendiente '
+                      'de la factura NO se redujo:'),
+                    lineas,
+                    _('Corrija la causa (o ligue las facturas correctas) y '
+                      'use "Aplicar a facturas".'),
+                ))
+                self._sng_alertar_sin_conciliar_en_canal(detalles)
+        except Exception:  # noqa: BLE001 - nunca bloquear la entrada de pagos
+            _logger.exception(
+                'Ruteros: no se pudo publicar el aviso de pago sin conciliar '
+                '(pago id %s)', self.id)
+
+    def _sng_alertar_sin_conciliar_en_canal(self, detalles):
+        """Alerta 🔴 inmediata al canal de liquidación."""
+        self.ensure_one()
+        channel = self.env.ref(
+            'sng_ruteros_pagos.channel_liquidacion_ruteros',
+            raise_if_not_found=False)
+        if channel is None:
+            return
+        lineas = Markup('').join(
+            Markup('<li><b>%s</b>: %s</li>') % (
+                escape(factura.display_name), escape(motivo))
+            for factura, motivo in detalles)
+        channel.message_post(
+            body=Markup(
+                '<p>🔴 <b>%(titulo)s</b> (%(compania)s): %(enlace)s — '
+                '%(cliente)s, %(vendedor)s. %(aviso)s</p><ul>%(lineas)s</ul>') % {
+                'titulo': _('Pago sin conciliar'),
+                'compania': escape(self.company_id.name),
+                'enlace': self._sng_enlace(),
+                'cliente': escape(self.partner_id.display_name or ''),
+                'vendedor': escape(self.sng_vendedor_id.name
+                                   or _('(sin vendedor)')),
+                'aviso': _('El pago quedó ligado a estas facturas pero no se '
+                           'concilió: el saldo de la factura no bajó.'),
+                'lineas': lineas,
+            },
+            message_type='comment', subtype_xmlid='mail.mt_comment')
 
     @api.model
     def _sng_numeros_factura_desde_texto(self, texto):

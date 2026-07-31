@@ -1,8 +1,8 @@
 # SNG Bloqueo de Precio y Descuento en Ventas
 
 Bloqueo **duro** (validado en servidor) del precio unitario y del descuento en
-las lineas de pedido de venta: si el valor no proviene de la lista de precios
-del pedido, no se guarda.
+las lineas de pedido de venta y facturas de cliente: si el valor no proviene de
+la lista de precios, no se guarda.
 
 ## Como funciona
 
@@ -24,6 +24,18 @@ La validacion vive en `create()` y `write()` de `sale.order.line`, **no** en un
 
 Los recalculos internos de Odoo pasan por `_write()` (flush de campos
 calculados) y no por `write()`, por lo que no disparan falsos positivos.
+
+## Facturas de cliente
+
+- Las lineas creadas desde un pedido conservan el precio y descuento de su
+  linea de venta de origen.
+- Las facturas manuales reciben la lista de precios del cliente. El precio y el
+  descuento se calculan con esa lista, considerando cantidad, unidad de medida,
+  fecha, moneda, impuestos y posicion fiscal.
+- Se validan al crear y modificar las lineas y nuevamente antes de contabilizar
+  la factura. Esto evita que una automatizacion deje una factura inconsistente.
+- El bloqueo aplica a facturas, notas de credito y recibos de cliente; no aplica
+  a facturas de proveedor ni asientos contables.
 
 ## Configuracion
 
@@ -55,8 +67,19 @@ linea de descuento global del asistente nativo.
 lines.with_context(sng_skip_price_lock=True).write({'price_unit': 123.0})
 ```
 
+## Pruebas
+
+El addon incluye pruebas transaccionales para ventas, facturas manuales, notas
+de credito, tolerancia, modos permisivos, contabilizacion, grupo de excepcion,
+contexto de automatizacion y documentos fuera de alcance.
+
+```bash
+odoo-bin -d BASE_TEMPORAL -i sng_sale_price_lock --test-enable \
+  --test-tags=sng_sale_price_lock --stop-after-init --workers=0
+```
+
 ## Alcance
 
-Solo `sale.order.line`. Las facturas (`account.move.line`) no se validan: una
-factura creada desde el pedido hereda el precio ya validado, pero una factura
-capturada a mano admite cualquier precio.
+Aplica a `sale.order.line` y a lineas comerciales de `account.move.line` en
+documentos de cliente. Secciones, notas, anticipos y lineas de descuento global
+permanecen fuera del bloqueo.

@@ -6,7 +6,7 @@
             <field name="category_id" ref="base.module_category_sales_sales"/>
             <field name="comment">Los usuarios con este permiso pueden capturar un
                 precio unitario o un descuento distinto al que define la lista de
-                precios del pedido.</field>
+                precios en pedidos de venta y facturas de cliente.</field>
         </record>
     </data>
 </odoo>

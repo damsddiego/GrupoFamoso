@@ -28,6 +28,17 @@ Gerencial (rotación, sobrestock, devoluciones, análisis IA de inventario).
 No ve ventas, cobros ni cartera.</field>
     </record>
 
+    <!-- Acceso restringido: únicamente la pestaña CXC - Pagos (ventas vs
+         cobros por compañía y resumen por vendedor) y su análisis IA. -->
+    <record id="group_sng_dashboard_cxc" model="res.groups">
+        <field name="name">CXC - Pagos</field>
+        <field name="category_id" ref="module_category_sng_dashboard"/>
+        <field name="comment">Solo ve la pestaña CXC - Pagos del Dashboard
+Gerencial (ventas vs cobros por compañía, resumen por vendedor con montos
+sin/con IVA y cobrado, análisis IA de CXC). No ve el resto de ventas,
+cartera, inventario ni estrategia.</field>
+    </record>
+
     <!-- Acceso restringido: únicamente la pestaña Estrategia (compras,
          rotación y ventas por producto) y su análisis IA. -->
     <record id="group_sng_dashboard_estrategia" model="res.groups">
@@ -50,6 +61,12 @@ compras vs ventas, proveedores y análisis IA de estrategia).</field>
         <field name="model_id" ref="model_sng_dashboard_analisis"/>
         <field name="domain_force">[('tipo', '=', 'inventario')]</field>
         <field name="groups" eval="[(4, ref('group_sng_dashboard_inventario'))]"/>
+    </record>
+    <record id="rule_sng_dashboard_analisis_cxc" model="ir.rule">
+        <field name="name">Análisis IA: grupo CXC ve tipo cxc</field>
+        <field name="model_id" ref="model_sng_dashboard_analisis"/>
+        <field name="domain_force">[('tipo', '=', 'cxc')]</field>
+        <field name="groups" eval="[(4, ref('group_sng_dashboard_cxc'))]"/>
     </record>
     <record id="rule_sng_dashboard_analisis_estrategia" model="ir.rule">
         <field name="name">Análisis IA: grupo estrategia ve tipo estrategia</field>

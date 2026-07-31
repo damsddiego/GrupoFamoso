@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_move_form_sng_price_lock" model="ir.ui.view">
+        <field name="name">account.move.form.inherit.sng.price.lock</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='currency_div']" position="after">
+                <field name="sng_pricelist_id"
+                       groups="product.group_product_pricelist"
+                       invisible="move_type not in ('out_invoice', 'out_refund', 'out_receipt')"
+                       readonly="state != 'draft'"
+                       options="{'no_create': True}"/>
+            </xpath>
+
+            <xpath expr="//field[@name='invoice_line_ids']/list/field[@name='price_unit']" position="before">
+                <field name="sng_price_locked" column_invisible="True"/>
+                <field name="sng_discount_locked" column_invisible="True"/>
+            </xpath>
+            <xpath expr="//field[@name='invoice_line_ids']/list/field[@name='price_unit']" position="attributes">
+                <attribute name="readonly">sng_price_locked</attribute>
+            </xpath>
+            <xpath expr="//field[@name='invoice_line_ids']/list/field[@name='discount']" position="attributes">
+                <attribute name="readonly">sng_discount_locked</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='invoice_line_ids']/form//field[@name='price_unit']" position="before">
+                <field name="sng_price_locked" invisible="1"/>
+                <field name="sng_discount_locked" invisible="1"/>
+            </xpath>
+            <xpath expr="//field[@name='invoice_line_ids']/form//field[@name='price_unit']" position="attributes">
+                <attribute name="readonly">sng_price_locked</attribute>
+            </xpath>
+            <xpath expr="//field[@name='invoice_line_ids']/form//field[@name='discount']" position="attributes">
+                <attribute name="readonly">sng_discount_locked</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -57,7 +57,7 @@
     <menuitem id="menu_sng_dashboard_root"
               name="Dashboard Gerencial"
               sequence="8"
-              groups="sng_dashboard_gerencial.group_sng_dashboard_gerencial,sng_dashboard_gerencial.group_sng_dashboard_inventario,sng_dashboard_gerencial.group_sng_dashboard_estrategia"
+              groups="sng_dashboard_gerencial.group_sng_dashboard_gerencial,sng_dashboard_gerencial.group_sng_dashboard_inventario,sng_dashboard_gerencial.group_sng_dashboard_estrategia,sng_dashboard_gerencial.group_sng_dashboard_cxc"
               web_icon="sng_dashboard_gerencial,static/description/icon.png"/>
     <menuitem id="menu_sng_dashboard_principal"
               name="Dashboard"

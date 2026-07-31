@@ -3,7 +3,7 @@
     'name': 'SNG Dashboard Gerencial',
     'summary': 'Dashboard para toma de decisiones: ventas, cobros, cartera, '
                'inventario y análisis IA con recomendaciones',
-    'version': '1.0.0',
+    'version': '1.1.0',
     'category': 'Accounting',
     'author': 'SNG',
     'license': 'LGPL-3',
@@ -11,6 +11,7 @@
         'account',
         'stock_account',
         'sales_commission_omax',
+        'sng_payment_report_by_salesperson',
         'web',
     ],
     'external_dependencies': {'python': ['anthropic']},

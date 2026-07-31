@@ -43,7 +43,7 @@
                         ? 'fa fa-spinner fa-spin me-1'
                         : 'fa fa-magic me-1'" role="img" aria-label="IA"/>
                     <t t-esc="state.generandoIA
-                        ? 'Analizando…'
+                        ? (state.progresoIA ? 'Analizando ' + state.progresoIA : 'Analizando…')
                         : 'Actualizar análisis IA'"/>
                 </button>
             </div>
@@ -114,6 +114,13 @@
                         Ventas y cobranza
                     </button>
                 </li>
+                <li t-if="puedeCxc" class="nav-item">
+                    <button type="button" class="nav-link"
+                            t-att-class="{ active: state.pestana === 'cxc' }"
+                            t-on-click="() => state.pestana = 'cxc'">
+                        CXC - Pagos
+                    </button>
+                </li>
                 <li t-if="puedeInventario" class="nav-item">
                     <button type="button" class="nav-link"
                             t-att-class="{ active: state.pestana === 'inventario' }"
@@ -157,6 +164,101 @@
             <t t-set="listaIA" t-value="analisisVentas"/>
             <t t-set="tituloIA" t-value="'Análisis y recomendaciones IA — Ventas y cobranza'"/>
             <t t-call="sng_dashboard_gerencial.PanelIA"/>
+            </div>
+
+            <!-- Pestaña CXC - Pagos -->
+            <div t-if="puedeCxc and state.pestana === 'cxc'" t-ref="cxcContenedor">
+            <div t-if="!state.datos.cxc" class="o_sng_ia_vacio">
+                Los datos de CXC - Pagos estarán disponibles después del
+                próximo reinicio del servidor.
+            </div>
+            <t t-if="state.datos.cxc">
+            <div t-foreach="state.datos.cxc.companias" t-as="comp" t-key="comp.id"
+                 class="o_sng_dash_seccion">
+                <div class="o_sng_dash_seccion_titulo">
+                    <t t-esc="comp.nombre"/>
+                    <span class="o_sng_dash_seccion_nota">
+                        ventas y pagos confirmados desde
+                        <t t-esc="state.datos.cxc.desde"/>
+                    </span>
+                </div>
+
+                <div class="o_sng_dash_kpis">
+                    <div class="o_sng_kpi">
+                        <div class="o_sng_kpi_etiqueta">Ventas sin IVA</div>
+                        <div class="o_sng_kpi_valor"
+                             t-esc="moneda(comp.totales.venta_sin_iva)"/>
+                        <div class="o_sng_kpi_sub">facturado en el período</div>
+                    </div>
+                    <div class="o_sng_kpi">
+                        <div class="o_sng_kpi_etiqueta">Ventas con IVA</div>
+                        <div class="o_sng_kpi_valor"
+                             t-esc="moneda(comp.totales.venta_con_iva)"/>
+                        <div class="o_sng_kpi_sub">total facturado con impuestos</div>
+                    </div>
+                    <div class="o_sng_kpi">
+                        <div class="o_sng_kpi_etiqueta">Cobrado</div>
+                        <div class="o_sng_kpi_valor"
+                             t-esc="moneda(comp.totales.cobrado)"/>
+                        <div class="o_sng_kpi_sub">
+                            <t t-if="comp.totales.venta_con_iva">
+                                <t t-esc="porcentaje(comp.totales.cobrado,
+                                    comp.totales.venta_con_iva)"/>% de la
+                                venta con IVA del período
+                            </t>
+                            <t t-else="">pagos de clientes confirmados</t>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="o_sng_dash_tarjeta o_sng_dash_ancha">
+                    <div class="o_sng_dash_tarjeta_titulo">
+                        Ventas vs Cobros por mes — <t t-esc="comp.nombre"/>
+                    </div>
+                    <div class="o_sng_canvas o_sng_canvas_alta">
+                        <canvas t-att-data-compania="comp.id"/>
+                    </div>
+                </div>
+
+                <div class="o_sng_dash_tarjeta o_sng_dash_ancha">
+                    <div class="o_sng_dash_tarjeta_titulo">
+                        Resumen por vendedor — <t t-esc="comp.nombre"/>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-sm o_sng_tabla">
+                            <thead>
+                                <tr>
+                                    <th>Vendedor</th>
+                                    <th class="text-end">Monto sin IVA</th>
+                                    <th class="text-end">Total con IVA</th>
+                                    <th class="text-end">Monto del pago</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="comp.vendedores" t-as="f" t-key="f.vendedor">
+                                    <td t-esc="f.vendedor"/>
+                                    <td class="text-end" t-esc="moneda(f.venta_sin_iva)"/>
+                                    <td class="text-end" t-esc="moneda(f.venta_con_iva)"/>
+                                    <td class="text-end" t-esc="moneda(f.cobrado)"/>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th>Total</th>
+                                    <th class="text-end" t-esc="moneda(comp.totales.venta_sin_iva)"/>
+                                    <th class="text-end" t-esc="moneda(comp.totales.venta_con_iva)"/>
+                                    <th class="text-end" t-esc="moneda(comp.totales.cobrado)"/>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <t t-set="listaIA" t-value="analisisCxc"/>
+            <t t-set="tituloIA" t-value="'Análisis y recomendaciones IA — CXC y pagos'"/>
+            <t t-call="sng_dashboard_gerencial.PanelIA"/>
+            </t>
             </div>
 
             <!-- Pestaña Inventario -->

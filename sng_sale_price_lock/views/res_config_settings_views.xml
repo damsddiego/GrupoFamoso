@@ -8,7 +8,7 @@
             <xpath expr="//block[@id='pricing_setting_container']" position="inside">
                 <setting id="sng_price_lock"
                          string="Bloquear precio fuera de la lista"
-                         help="Impide guardar lineas de venta con un precio unitario distinto al de la lista de precios">
+                         help="Impide guardar lineas de venta y factura de cliente con un precio unitario distinto al de la lista de precios">
                     <field name="sng_lock_price_unit"/>
                     <div class="content-group mt16" invisible="not sng_lock_price_unit">
                         <field name="sng_price_lock_mode" widget="radio" class="o_light_label"/>
@@ -16,7 +16,7 @@
                 </setting>
                 <setting id="sng_discount_lock"
                          string="Bloquear descuento fuera de la lista"
-                         help="Impide guardar lineas de venta con un descuento que la lista de precios no define">
+                         help="Impide guardar lineas de venta y factura de cliente con un descuento que la lista de precios no define">
                     <field name="sng_lock_discount"/>
                     <div class="content-group mt16" invisible="not sng_lock_discount">
                         <field name="sng_discount_lock_mode" widget="radio" class="o_light_label"/>

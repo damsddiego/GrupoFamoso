@@ -118,6 +118,25 @@ monto atípico, el pago queda creado y confirmado pero **sin conciliar**:
 - Flutter no necesita enviar campos adicionales ni cambiar su respuesta de
   sincronización.
 
+## Aviso de pago ligado pero sin conciliar
+
+Al aplicar un pago puede pasar que alguna factura ligada **no se logre
+conciliar**: su cuenta por cobrar es distinta a la del pago, la factura ya
+estaba pagada por otro medio, no está publicada, el pago se quedó sin saldo, o
+el diario no tiene cuenta transitoria (el pago no genera asiento). Antes esto
+era silencioso: la factura mostraba el pago ligado pero su saldo pendiente no
+bajaba. Ahora el módulo lo detecta en el momento y avisa por dos vías:
+
+- **Chatter del pago**: ⚠️ lista de facturas no conciliadas con el motivo de
+  cada una, y la instrucción de corregir y volver a pulsar **Aplicar a
+  facturas**.
+- **Canal “Liquidación Ruteros”**: alerta 🔴 inmediata con el enlace al pago,
+  cliente, vendedor y el detalle por factura.
+
+El aviso nunca bloquea la entrada del pago; solo informa para que la oficina
+corrija (ligar la factura correcta, publicarla, o conciliar manualmente en la
+cuenta correcta).
+
 ## Resumen diario de liquidación
 
 Cada mañana (05:00 CR) se publica en el canal de Discuss **“Liquidación Ruteros”** el resumen del día anterior: tabla de totales por vendedor y por método de pago (calculada por Odoo, números exactos) más un comentario de la IA con las **anomalías a revisar**: referencias repetidas, posibles duplicados, saldos que no cuadran (`saldo_anterior − monto ≠ saldo_proyectado`) y montos atípicos. Si la IA no está disponible, el resumen sale igual solo con los totales. Únase al canal desde Conversaciones para recibirlo.
