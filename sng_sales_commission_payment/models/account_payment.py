@@ -93,27 +93,38 @@ class AccountPayment(models.Model):
             if commission_base <= 0:
                 continue
 
-            monthly = Monthly._get_or_create(salesperson, self.company_id, period)
-            # No modificamos meses ya facturados o pagados.
-            if monthly.state != 'draft':
+            existing = Line.search([
+                ('payment_id', '=', self.id),
+                ('invoice_id', '=', invoice.id),
+            ], limit=1)
+            # Una línea que ya quedó en un mes cerrado/facturado no se toca.
+            if existing and existing.monthly_id.state != 'draft':
                 continue
 
             vals = {
-                'monthly_id': monthly.id,
                 'salesperson_id': salesperson.id,
                 'payment_amount': amount,
                 'invoice_amount_untaxed': invoice_amount_untaxed,
                 'invoice_amount_total': invoice_amount_total,
                 'commission_base': commission_base,
             }
-            existing = Line.search([
-                ('payment_id', '=', self.id),
-                ('invoice_id', '=', invoice.id),
-            ], limit=1)
             if existing:
                 existing.write(vals)
-            else:
-                Line.create(dict(vals, payment_id=self.id, invoice_id=invoice.id))
+                affected |= existing.monthly_id
+                continue
+
+            # Si el mes natural del pago ya está cerrado, la comisión se
+            # acumula en el siguiente mes abierto del vendedor.
+            open_period = Monthly._get_open_period(salesperson, self.company_id, period)
+            if not open_period:
+                continue
+            if open_period != period:
+                _logger.info(
+                    "Pago %s (factura %s): mes %s cerrado; la comisión se acumula en %s.",
+                    self.name, invoice.name, period, open_period,
+                )
+            monthly = Monthly._get_or_create(salesperson, self.company_id, open_period)
+            Line.create(dict(vals, monthly_id=monthly.id, payment_id=self.id, invoice_id=invoice.id))
             affected |= monthly
 
         affected._recompute_commission()

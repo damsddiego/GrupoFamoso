@@ -55,10 +55,25 @@ class SngCommissionPaymentLine(models.Model):
     )
     period = fields.Date(
         string='Periodo',
-        compute='_compute_period',
+        related='monthly_id.period',
         store=True,
         index=True,
-        help='Primer día del mes al que pertenece el pago.',
+        help='Mes en el que esta línea acumula comisión. Puede ser posterior '
+             'al mes del pago si aquel ya estaba cerrado.',
+    )
+    original_period = fields.Date(
+        string='Periodo Original',
+        compute='_compute_original_period',
+        store=True,
+        index=True,
+        help='Primer día del mes de la fecha del pago.',
+    )
+    is_rolled_over = fields.Boolean(
+        string='Rodado de Otro Mes',
+        compute='_compute_is_rolled_over',
+        store=True,
+        help='Verdadero cuando el pago se acumuló en un mes posterior porque '
+             'su mes original ya estaba cerrado.',
     )
     company_id = fields.Many2one(
         'res.company',
@@ -126,9 +141,16 @@ class SngCommissionPaymentLine(models.Model):
     ]
 
     @api.depends('payment_date')
-    def _compute_period(self):
+    def _compute_original_period(self):
         for line in self:
-            line.period = line.payment_date.replace(day=1) if line.payment_date else False
+            line.original_period = line.payment_date.replace(day=1) if line.payment_date else False
+
+    @api.depends('period', 'original_period')
+    def _compute_is_rolled_over(self):
+        for line in self:
+            line.is_rolled_over = bool(
+                line.period and line.original_period and line.period != line.original_period
+            )
 
     @api.depends('invoice_amount_untaxed', 'invoice_amount_total')
     def _compute_tax_profile(self):

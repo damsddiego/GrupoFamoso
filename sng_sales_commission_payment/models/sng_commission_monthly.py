@@ -1,6 +1,13 @@
 # -*- coding: utf-8 -*-
 
+import logging
+
+from dateutil.relativedelta import relativedelta
+
 from odoo import api, fields, models, _
+from odoo.exceptions import UserError
+
+_logger = logging.getLogger(__name__)
 
 MONTH_NAMES = {
     1: 'Enero', 2: 'Febrero', 3: 'Marzo', 4: 'Abril', 5: 'Mayo', 6: 'Junio',
@@ -77,6 +84,7 @@ class SngCommissionMonthly(models.Model):
     state = fields.Selection(
         [
             ('draft', 'Pendiente'),
+            ('closed', 'Cerrado'),
             ('billed', 'Facturado'),
             ('paid', 'Pagado'),
         ],
@@ -84,6 +92,23 @@ class SngCommissionMonthly(models.Model):
         compute='_compute_state',
         store=True,
         index=True,
+    )
+    closed = fields.Boolean(
+        string='Mes Cerrado',
+        copy=False,
+        help='Un mes cerrado ya no se recalcula: los pagos que lleguen después '
+             'con fecha de este mes se acumulan en el siguiente mes abierto.',
+    )
+    closed_date = fields.Datetime(
+        string='Fecha de Cierre',
+        copy=False,
+        readonly=True,
+    )
+    closed_by_id = fields.Many2one(
+        'res.users',
+        string='Cerrado por',
+        copy=False,
+        readonly=True,
     )
     bill_id = fields.Many2one(
         'account.move',
@@ -118,7 +143,7 @@ class SngCommissionMonthly(models.Model):
             else:
                 rec.period_label = ''
 
-    @api.depends('bill_id', 'bill_id.state', 'bill_id.payment_state')
+    @api.depends('bill_id', 'bill_id.state', 'bill_id.payment_state', 'closed')
     def _compute_state(self):
         for rec in self:
             bill = rec.bill_id
@@ -126,8 +151,72 @@ class SngCommissionMonthly(models.Model):
                 rec.state = 'paid'
             elif bill and bill.state != 'cancel':
                 rec.state = 'billed'
+            elif rec.closed:
+                rec.state = 'closed'
             else:
                 rec.state = 'draft'
+
+    def action_close(self):
+        """Recalcula y cierra el mes: deja de aceptar cambios; los pagos
+        tardíos de este periodo se acumularán en el siguiente mes abierto."""
+        for rec in self:
+            if rec.state != 'draft':
+                raise UserError(_(
+                    "Solo se pueden cerrar comisiones en estado Pendiente (%(name)s está en %(state)s).",
+                    name=rec.name, state=dict(rec._fields['state']._description_selection(rec.env)).get(rec.state),
+                ))
+        self._recompute_commission()
+        self.write({
+            'closed': True,
+            'closed_date': fields.Datetime.now(),
+            'closed_by_id': self.env.user.id,
+        })
+        return True
+
+    def action_reopen(self):
+        """Reabre un mes cerrado sin factura y lo recalcula.
+
+        Las líneas que ya rodaron a otro mes por estar este cerrado NO
+        regresan: permanecen en el mes donde se acumularon.
+        """
+        for rec in self:
+            if rec.state != 'closed':
+                raise UserError(_(
+                    "Solo se pueden reabrir comisiones cerradas (%(name)s).",
+                    name=rec.name,
+                ))
+            if rec.bill_id and rec.bill_id.state != 'cancel':
+                raise UserError(_(
+                    "No se puede reabrir %(name)s: ya tiene la factura %(bill)s.",
+                    name=rec.name, bill=rec.bill_id.name,
+                ))
+        self.write({
+            'closed': False,
+            'closed_date': False,
+            'closed_by_id': False,
+        })
+        self._recompute_commission()
+        return True
+
+    @api.model
+    def _get_open_period(self, salesperson, company, period):
+        """Devuelve el primer periodo >= period cuyo mensual del vendedor no
+        esté cerrado/facturado (o no exista). Máximo 24 meses hacia adelante."""
+        current = period
+        for _i in range(24):
+            monthly = self.search([
+                ('salesperson_id', '=', salesperson.id),
+                ('company_id', '=', company.id),
+                ('period', '=', current),
+            ], limit=1)
+            if not monthly or monthly.state == 'draft':
+                return current
+            current = current + relativedelta(months=1)
+        _logger.warning(
+            "No se encontró un periodo abierto para %s en %s partiendo de %s; se omite la comisión.",
+            salesperson.name, company.name, period,
+        )
+        return False
 
     @api.model
     def _get_or_create(self, salesperson, company, period):

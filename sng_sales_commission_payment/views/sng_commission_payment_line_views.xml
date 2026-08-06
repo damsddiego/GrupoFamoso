@@ -5,9 +5,12 @@
             <field name="name">sng.commission.payment.line.tree</field>
             <field name="model">sng.commission.payment.line</field>
             <field name="arch" type="xml">
-                <list string="Detalle de Comisión por Pago" create="0">
+                <list string="Detalle de Comisión por Pago" create="0" decoration-warning="is_rolled_over">
                     <field name="currency_id" column_invisible="1"/>
                     <field name="payment_date"/>
+                    <field name="period" optional="hide"/>
+                    <field name="original_period" optional="hide"/>
+                    <field name="is_rolled_over" optional="hide"/>
                     <field name="salesperson_id"/>
                     <field name="partner_id"/>
                     <field name="invoice_id"/>
@@ -37,6 +40,9 @@
                                 <field name="salesperson_id"/>
                                 <field name="payment_date"/>
                                 <field name="monthly_id"/>
+                                <field name="period"/>
+                                <field name="original_period"/>
+                                <field name="is_rolled_over"/>
                             </group>
                             <group>
                                 <field name="currency_id" invisible="1"/>
@@ -66,6 +72,7 @@
                     <filter string="IVA 13%" name="taxed_13" domain="[('tax_profile', '=', 'taxed_13')]"/>
                     <filter string="Sin impuesto (0%)" name="no_tax" domain="[('tax_profile', '=', 'no_tax')]"/>
                     <filter string="Tarifa mixta/reducida" name="mixed" domain="[('tax_profile', '=', 'mixed')]"/>
+                    <filter string="Rodados de otro mes" name="rolled_over" domain="[('is_rolled_over', '=', True)]"/>
                     <group expand="0" string="Agrupar por">
                         <filter string="Vendedor" name="group_by_salesperson" context="{'group_by': 'salesperson_id'}"/>
                         <filter string="Periodo" name="group_by_period" context="{'group_by': 'period'}"/>

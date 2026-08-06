@@ -32,16 +32,22 @@ class SngCreateCommissionBillWiz(models.TransientModel):
             raise UserError(_('Debe seleccionar al menos una comisión mensual.'))
 
         monthlies = self.env['sng.commission.monthly'].browse(active_ids)
-        to_bill = monthlies.filtered(lambda m: m.state == 'draft' and m.commission_amount > 0)
+        to_bill = monthlies.filtered(lambda m: m.state == 'closed' and m.commission_amount > 0)
         if not to_bill:
-            raise UserError(_('No hay comisiones pendientes (con monto) para facturar.'))
+            raise UserError(_(
+                'No hay comisiones cerradas (con monto) para facturar. '
+                'Cierre primero los meses que desea facturar.'
+            ))
 
         commission_product = self.env.ref('sng_sales_commission_payment.sng_sales_commission_product')
         bill_ids = self.env['account.move']
 
-        # Una factura de compra por vendedor, con una línea por mes.
-        for salesperson, months in to_bill.grouped('salesperson_id').items():
-            bill = self._create_bill(salesperson, months, commission_product)
+        # Una factura de compra por vendedor y compañía, con una línea por mes.
+        # La compañía de la factura es la del mes de comisión, no la del wizard.
+        for (salesperson, company), months in to_bill.grouped(
+            lambda m: (m.salesperson_id, m.company_id)
+        ).items():
+            bill = self._create_bill(salesperson, company, months, commission_product)
             if bill:
                 bill_ids += bill
                 months.write({'bill_id': bill.id})
@@ -58,10 +64,15 @@ class SngCreateCommissionBillWiz(models.TransientModel):
             action['res_id'] = bill_ids.id
         return action
 
-    def _create_bill(self, salesperson, months, commission_product):
+    def _create_bill(self, salesperson, company, months, commission_product):
         self.ensure_one()
         if not salesperson:
             raise UserError(_('No se puede generar una factura de compra sin vendedor.'))
+
+        # La cuenta indicada solo se usa si está disponible en la compañía del mes.
+        account = self.account_id
+        if account and company not in account.company_ids:
+            account = self.env['account.account']
 
         invoice_lines = []
         for month in months:
@@ -72,8 +83,8 @@ class SngCreateCommissionBillWiz(models.TransientModel):
                 'product_uom_id': commission_product.uom_id.id,
                 'price_unit': month.commission_amount,
             }
-            if self.account_id:
-                line_vals['account_id'] = self.account_id.id
+            if account:
+                line_vals['account_id'] = account.id
             invoice_lines.append((0, 0, line_vals))
 
         bill_vals = {
@@ -81,7 +92,7 @@ class SngCreateCommissionBillWiz(models.TransientModel):
             'partner_id': salesperson.id,
             'invoice_date': self.date,
             'date': self.date,
-            'company_id': self.company_id.id,
+            'company_id': company.id,
             'invoice_line_ids': invoice_lines,
         }
-        return self.env['account.move'].create(bill_vals)
+        return self.env['account.move'].with_company(company).create(bill_vals)
