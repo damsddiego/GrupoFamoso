@@ -752,51 +752,24 @@ class AccountPayment(models.Model):
     def _sng_sanear_vendedor(self, vals_list):
         """Sustituye vendedores inexistentes por su equivalencia configurada.
 
-        Equivalencias en el parámetro de sistema
-        `sng_ruteros_pagos.vendedor_equivalencias` (JSON: {"id_app": id_real}).
-        Sin equivalencia, el pago entra sin vendedor y se avisa en el chatter.
+        La resolución vive en `res.partner._sng_resolver_vendedor_app` para
+        compartirla con las visitas de ruteros. Sin equivalencia, el pago
+        entra sin vendedor y se avisa en el chatter.
         Devuelve [(índice en vals_list, aviso para el chatter)].
         """
         avisos = []
         Partner = self.env['res.partner']
-        mapa = {}
-        try:
-            mapa = json.loads(self.env['ir.config_parameter'].sudo().get_param(
-                'sng_ruteros_pagos.vendedor_equivalencias') or '{}')
-        except ValueError:
-            _logger.warning(
-                'Ruteros: el parámetro vendedor_equivalencias no es JSON válido')
         for indice, vals in enumerate(vals_list):
             if not vals.get('sng_from_app') or not vals.get('sng_vendedor_id'):
                 continue
             original = vals['sng_vendedor_id']
-            if Partner.browse(original).exists():
+            resuelto, aviso = Partner._sng_resolver_vendedor_app(original)
+            if not aviso:
                 continue
-            equivalente = mapa.get(str(original))
-            partner_eq = (Partner.browse(int(equivalente)).exists()
-                          if equivalente else Partner)
-            if partner_eq:
-                vals['sng_vendedor_id'] = partner_eq.id
-                _logger.info(
-                    'Ruteros: vendedor inexistente %s sustituido por %s (%s)',
-                    original, partner_eq.id, partner_eq.name)
-                avisos.append((indice, _(
-                    'La app mandó el vendedor %(orig)s, que no existe en esta '
-                    'base; se asignó su equivalencia configurada: %(nuevo)s.',
-                    orig=original, nuevo=partner_eq.display_name)))
-            else:
-                vals['sng_vendedor_id'] = False
+            vals['sng_vendedor_id'] = resuelto
+            if not resuelto:
                 vals['sng_vendedor_app_id'] = original
-                _logger.warning(
-                    'Ruteros: vendedor inexistente %s sin equivalencia; el '
-                    'pago entra sin vendedor', original)
-                avisos.append((indice, _(
-                    'La app mandó el vendedor %(orig)s, que no existe en esta '
-                    'base y no tiene equivalencia configurada. El pago entró '
-                    'SIN vendedor: asígnelo manualmente y agregue la '
-                    'equivalencia en el parámetro de sistema '
-                    '"sng_ruteros_pagos.vendedor_equivalencias".',
-                    orig=original)))
+            avisos.append((indice, aviso))
         return avisos
 
     @api.model

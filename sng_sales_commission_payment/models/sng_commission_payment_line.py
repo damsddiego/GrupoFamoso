@@ -95,6 +95,27 @@ class SngCommissionPaymentLine(models.Model):
         help='Monto sin impuestos pagado proporcionalmente por este pago. '
              'Se acumula en la comisión mensual del vendedor.',
     )
+    effective_tax_rate = fields.Float(
+        string='% Impuesto Efectivo',
+        compute='_compute_tax_profile',
+        store=True,
+        digits=(16, 1),
+        help='Impuesto efectivo de la factura: (total / subtotal - 1) × 100. '
+             'Una factura con líneas gravadas y exentas da un porcentaje intermedio.',
+    )
+    tax_profile = fields.Selection(
+        [
+            ('taxed_13', 'IVA 13%'),
+            ('no_tax', 'Sin impuesto (0%)'),
+            ('mixed', 'Tarifa mixta/reducida'),
+        ],
+        string='Tipo de Factura',
+        compute='_compute_tax_profile',
+        store=True,
+        index=True,
+        help='Clasificación según el impuesto efectivo de la factura: 13% completo, '
+             'sin impuesto, o intermedio (facturas mixtas o con tarifa reducida).',
+    )
 
     _sql_constraints = [
         (
@@ -108,6 +129,24 @@ class SngCommissionPaymentLine(models.Model):
     def _compute_period(self):
         for line in self:
             line.period = line.payment_date.replace(day=1) if line.payment_date else False
+
+    @api.depends('invoice_amount_untaxed', 'invoice_amount_total')
+    def _compute_tax_profile(self):
+        for line in self:
+            untaxed = line.invoice_amount_untaxed
+            total = line.invoice_amount_total
+            if not untaxed or not total:
+                line.effective_tax_rate = 0.0
+                line.tax_profile = 'no_tax'
+                continue
+            rate = (total / untaxed - 1.0) * 100.0
+            line.effective_tax_rate = rate
+            if abs(rate) <= 0.05:
+                line.tax_profile = 'no_tax'
+            elif abs(rate - 13.0) <= 0.05:
+                line.tax_profile = 'taxed_13'
+            else:
+                line.tax_profile = 'mixed'
 
     @api.depends('salesperson_id', 'invoice_id', 'commission_base')
     def _compute_name(self):

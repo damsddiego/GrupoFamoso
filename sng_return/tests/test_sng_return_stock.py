@@ -1,4 +1,4 @@
-from odoo.exceptions import AccessError, UserError
+from odoo.exceptions import AccessError, UserError, ValidationError
 from odoo.tests.common import TransactionCase
 
 
@@ -60,6 +60,16 @@ class TestSngReturnStock(TransactionCase):
         cls.reason = cls.env["sng.return.reason"].create({
             "name": "Producto no requerido",
         })
+        cls.other_company = cls.env["res.company"].create({
+            "name": "Otra compañía para devoluciones",
+        })
+        cls.other_company_product = cls.env["product.product"].sudo().with_company(
+            cls.other_company
+        ).create({
+            "name": "Producto de otra compañía",
+            "company_id": cls.other_company.id,
+            "is_storable": True,
+        })
         # Otros modulos custom pueden bloquear la confirmacion de la venta si
         # no hay stock disponible, por lo que se carga inventario inicial.
         cls.env["stock.quant"].with_context(inventory_mode=True).create({
@@ -119,6 +129,35 @@ class TestSngReturnStock(TransactionCase):
         self.assertEqual(customer_return.picking_id.move_ids.product_uom_qty, 1.0)
         self.assertEqual(customer_return.receipt_state, "pending")
         self.assertFalse(customer_return.receipt_complete)
+
+    def test_cross_company_product_is_rejected_on_nested_create(self):
+        with self.assertRaisesRegex(ValidationError, "pertenece a"), self.env.cr.savepoint():
+            self.env["sng.return"].create({
+                "name": "TEST/CROSS-COMPANY",
+                "partner_id": self.partner.id,
+                "company_id": self.company.id,
+                "reason_id": self.reason.id,
+                "line_ids": [(0, 0, {
+                    "product_id": self.other_company_product.id,
+                    "quantity": 1.0,
+                })],
+            })
+
+    def test_cross_company_product_is_rejected_on_line_write(self):
+        customer_return = self._create_return()
+
+        with self.assertRaisesRegex(ValidationError, "pertenece a"), self.env.cr.savepoint():
+            customer_return.line_ids.write({
+                "product_id": self.other_company_product.id,
+            })
+
+    def test_company_change_is_rejected_when_lines_are_incompatible(self):
+        customer_return = self._create_return()
+
+        with self.assertRaisesRegex(ValidationError, "pertenece a"):
+            customer_return.write({"company_id": self.other_company.id})
+
+        self.assertEqual(customer_return.company_id, self.company)
 
     def test_credit_note_requires_completed_receipt(self):
         customer_return = self._create_return()
@@ -196,6 +235,77 @@ class TestSngReturnStock(TransactionCase):
 
         customer_return.line_ids.with_user(manager).invoice_id = self.invoice
         self.assertEqual(customer_return.line_ids.invoice_id, self.invoice)
+
+    def test_not_loaded_invoice_constraints(self):
+        clave = (
+            "506" + "150125" + "310123456789"
+            + "001" + "00001" + "01" + "0000000123" + "1" + "12345678"
+        )
+        customer_return = self._create_return()
+        with self.assertRaisesRegex(ValidationError, "50 dígitos"), self.env.cr.savepoint():
+            customer_return.line_ids.write({
+                "invoice_id": False,
+                "not_loaded_invoice": "12345",
+            })
+        with self.assertRaisesRegex(ValidationError, "a la vez"), self.env.cr.savepoint():
+            customer_return.line_ids.not_loaded_invoice = clave
+
+    def test_credit_note_with_not_loaded_invoice(self):
+        # Clave de 50 digitos: pais(3) fecha ddmmaa(6) cedula(12) sucursal(3)
+        # terminal(5) tipo doc(2) consecutivo(10) situacion(1) seguridad(8).
+        clave = (
+            "506" + "150125" + "310123456789"
+            + "001" + "00001" + "01" + "0000000123" + "1" + "12345678"
+        )
+        product_legacy = self.env["product.product"].create({
+            "name": "Producto sistema anterior",
+            "is_storable": True,
+            "list_price": 50.0,
+            "property_account_income_id": self.income_account.id,
+        })
+        customer_return = self.env["sng.return"].create({
+            "partner_id": self.partner.id,
+            "company_id": self.company.id,
+            "reason_id": self.reason.id,
+            "line_ids": [
+                (0, 0, {
+                    "product_id": self.product.id,
+                    "quantity": 1.0,
+                    "invoice_id": self.invoice.id,
+                }),
+                # Sin historial de venta en Odoo: la clave no cargada permite
+                # confirmar sin validar disponible.
+                (0, 0, {
+                    "product_id": product_legacy.id,
+                    "quantity": 3.0,
+                    "not_loaded_invoice": clave,
+                    "not_loaded_invoice_date": "2025-01-15",
+                }),
+            ],
+        })
+        customer_return._confirm_with_warehouse(self.warehouse)
+
+        picking = customer_return.picking_id
+        for move in picking.move_ids:
+            move.quantity = move.product_uom_qty
+        picking.button_validate()
+        customer_return.invalidate_recordset(["receipt_complete", "receipt_state"])
+
+        action = customer_return.action_generate_credit_note()
+        moves = self.env["account.move"].search(action["domain"])
+
+        self.assertEqual(len(moves), 2)
+        legacy_move = moves.filtered(lambda move: move.not_loaded_invoice)
+        self.assertEqual(legacy_move.not_loaded_invoice, clave)
+        self.assertEqual(str(legacy_move.not_loaded_invoice_date), "2025-01-15")
+        self.assertFalse(legacy_move.reversed_entry_id)
+        self.assertFalse(legacy_move.invoice_id)
+        self.assertEqual(legacy_move.reference_code_id.code, "06")
+        self.assertEqual(legacy_move.reference_document_id.code, "01")
+        self.assertEqual(legacy_move.invoice_line_ids.quantity, 3.0)
+        self.assertEqual(legacy_move.invoice_line_ids.price_unit, 50.0)
+        other_move = moves - legacy_move
+        self.assertEqual(other_move.reversed_entry_id, self.invoice)
 
     def test_available_quantity_with_and_without_invoice(self):
         customer_return = self._create_return()

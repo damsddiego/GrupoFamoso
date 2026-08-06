@@ -166,7 +166,11 @@ class AccountPayment(models.Model):
             self._load_outstanding_moves()
 
     #account/models/account_payment.py
-    def action_validate(self):
+    def _reconcile_selected_outstanding_moves(self):
+        if self.is_reconciled:
+            # Ya se aplicó a las facturas (p. ej. al confirmar); no hay nada
+            # que re-conciliar.
+            return
         if self.pay_moves:
             outstanding_move_ids = self.outstanding_move_lines.filtered(lambda pl: pl.select_to_pay)
             total_invoice_amount = 0
@@ -338,18 +342,28 @@ class AccountPayment(models.Model):
                         move.js_assign_outstanding_line(opp_reconcile_id)
                         paid_amount -= abs(amount_residual)
 
-        self.state = 'paid'
+    def action_validate(self):
+        # Botón "Marcar como pagado": concilia las facturas seleccionadas y
+        # deja que el core marque el pago como pagado (decisión explícita
+        # del usuario).
+        self._reconcile_selected_outstanding_moves()
+        return super().action_validate()
 
     def action_draft(self):
         res = super().action_draft()
         if self.move_id and self.pay_moves:
             self.move_id.unlink()
-        return res 
+        return res
 
     def action_post(self):
         res = super().action_post()
         if self.pay_moves:
-            self.action_validate()
+            # Solo conciliar contra las facturas seleccionadas. El estado lo
+            # decide el core: 'in_process' si el método usa cuenta transitoria
+            # (queda pendiente de conciliar con el extracto) o 'paid' si la
+            # cuenta es de efectivo.
+            self._reconcile_selected_outstanding_moves()
+        return res
 
     def unlink(self):
         for rec in self:

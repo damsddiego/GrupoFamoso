@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- Lista de visitas -->
+    <record id="view_sng_ruteros_visita_list" model="ir.ui.view">
+        <field name="name">sng.ruteros.visita.list</field>
+        <field name="model">sng.ruteros.visita</field>
+        <field name="arch" type="xml">
+            <list string="Visitas Ruteros"
+                  decoration-success="resultado in ('venta', 'venta_cobro')"
+                  decoration-info="resultado == 'cobro'"
+                  decoration-muted="resultado == 'visita'">
+                <field name="fecha_inicio"/>
+                <field name="partner_id"/>
+                <field name="vendedor_id"/>
+                <field name="resultado" widget="badge"
+                       decoration-success="resultado in ('venta', 'venta_cobro')"
+                       decoration-info="resultado == 'cobro'"/>
+                <field name="en_sitio" widget="boolean_toggle" readonly="1"
+                       optional="show"/>
+                <field name="distancia_m" optional="show"/>
+                <field name="duracion_min" optional="hide"/>
+                <field name="sale_order_id" optional="show"/>
+                <field name="payment_id" optional="show"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Formulario -->
+    <record id="view_sng_ruteros_visita_form" model="ir.ui.view">
+        <field name="name">sng.ruteros.visita.form</field>
+        <field name="model">sng.ruteros.visita</field>
+        <field name="arch" type="xml">
+            <form string="Visita">
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group col="4">
+                        <field name="partner_id"/>
+                        <field name="vendedor_id"/>
+                        <field name="fecha_inicio"/>
+                        <field name="fecha_fin"/>
+                        <field name="duracion_min"/>
+                        <field name="resultado"/>
+                        <field name="sale_order_id"/>
+                        <field name="payment_id"/>
+                        <field name="company_id" groups="base.group_multi_company"/>
+                    </group>
+                    <group string="Ubicación" col="4">
+                        <field name="lat"/>
+                        <field name="lng"/>
+                        <field name="distancia_m"/>
+                        <field name="en_sitio"/>
+                    </group>
+                    <group>
+                        <field name="observaciones" colspan="2"/>
+                        <field name="vendedor_app_id" readonly="1"
+                               invisible="not vendedor_app_id"/>
+                        <field name="sng_uuid" readonly="1" groups="base.group_no_one"/>
+                        <field name="sng_from_app" readonly="1" groups="base.group_no_one"/>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Búsqueda -->
+    <record id="view_sng_ruteros_visita_search" model="ir.ui.view">
+        <field name="name">sng.ruteros.visita.search</field>
+        <field name="model">sng.ruteros.visita</field>
+        <field name="arch" type="xml">
+            <search string="Visitas Ruteros">
+                <field name="partner_id"/>
+                <field name="vendedor_id"/>
+                <filter name="hoy" string="Hoy"
+                        domain="[('fecha_inicio', '&gt;=', context_today().strftime('%Y-%m-%d 00:00:00'))]"/>
+                <separator/>
+                <filter name="solo_visita" string="Solo visita (sin venta ni cobro)"
+                        domain="[('resultado', '=', 'visita')]"/>
+                <filter name="con_venta" string="Con venta"
+                        domain="[('resultado', 'in', ('venta', 'venta_cobro'))]"/>
+                <filter name="con_cobro" string="Con cobro"
+                        domain="[('resultado', 'in', ('cobro', 'venta_cobro'))]"/>
+                <separator/>
+                <filter name="fuera_sitio" string="Fuera de sitio"
+                        domain="[('en_sitio', '=', False)]"/>
+                <group expand="0" string="Agrupar por">
+                    <filter name="group_vendedor" string="Vendedor"
+                            context="{'group_by': 'vendedor_id'}"/>
+                    <filter name="group_partner" string="Cliente"
+                            context="{'group_by': 'partner_id'}"/>
+                    <filter name="group_resultado" string="Resultado"
+                            context="{'group_by': 'resultado'}"/>
+                    <filter name="group_fecha" string="Fecha"
+                            context="{'group_by': 'fecha_inicio:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Acción y menú bajo Ruteros -->
+    <record id="action_sng_ruteros_visitas" model="ir.actions.act_window">
+        <field name="name">Visitas</field>
+        <field name="res_model">sng.ruteros.visita</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_sng_ruteros_visita_search"/>
+    </record>
+
+    <menuitem id="menu_ruteros_visitas"
+              name="Visitas"
+              parent="sng_ruteros_pagos.menu_ruteros_root"
+              action="action_sng_ruteros_visitas"
+              sequence="20"/>
+
+</odoo>

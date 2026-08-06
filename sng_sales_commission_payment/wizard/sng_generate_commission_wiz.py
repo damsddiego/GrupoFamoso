@@ -30,7 +30,7 @@ class SngGenerateCommissionWiz(models.TransientModel):
 
         domain = [
             ('payment_type', '=', 'inbound'),
-            ('state', '=', 'posted'),
+            ('state', 'in', ('in_process', 'paid')),
             ('date', '>=', self.date_from),
             ('date', '<=', self.date_to),
             ('company_id', '=', self.company_id.id),

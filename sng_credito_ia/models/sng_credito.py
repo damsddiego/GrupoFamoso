@@ -183,6 +183,12 @@ class SngCreditoSolicitud(models.Model):
     comportamiento_html = fields.Html(string='Comportamiento en el grupo',
                                       compute='_compute_comportamiento_html')
 
+    # Recibos cobrados por los ruteros (módulo sng_ruteros_pagos). Solo se
+    # muestra si ese módulo está instalado; se cruza por los mismos partners
+    # relacionados (cédula en todas las compañías) que el comportamiento.
+    recibos_app_html = fields.Html(string='Recibos de ruta (app)',
+                                   compute='_compute_recibos_app_html')
+
     # ------------------------------------------------------------------
     # Básicos
     # ------------------------------------------------------------------
@@ -571,6 +577,59 @@ class SngCreditoSolicitud(models.Model):
                 '<table class="table table-sm table-striped">'
                 '<thead><tr>%s</tr></thead><tbody>%s</tbody></table>%s'
                 % (cab, cuerpo, pie))
+
+    @api.depends('partner_id', 'identificacion', 'tipo_cliente')
+    def _compute_recibos_app_html(self):
+        Payment = self.env['account.payment'].sudo()
+        con_ruteros = 'sng_from_app' in Payment._fields
+        limite = 80
+        for rec in self:
+            if not con_ruteros:
+                rec.recibos_app_html = False
+                continue
+            pids = rec._sng_partner_ids_relacionados()
+            if not pids:
+                rec.recibos_app_html = False
+                continue
+            pagos = Payment.search(
+                [('sng_from_app', '=', True), ('partner_id', 'in', pids)],
+                order='date desc, id desc', limit=limite)
+            if not pagos:
+                rec.recibos_app_html = False
+                continue
+            esc = self._sng_html_escape
+            filas = []
+            for p in pagos:
+                verificado = (
+                    '<span class="text-success">&#10004; Sí</span>'
+                    if p.sng_verificado
+                    else '<span class="text-muted">&#10008; No</span>')
+                filas.append(
+                    '<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td>'
+                    '<td class="text-end">%s %s</td>'
+                    '<td class="text-center">%s</td></tr>' % (
+                        esc(p.date or ''),
+                        esc(p.company_id.name),
+                        esc(p.sng_numero_recibo or '—'),
+                        esc(p.sng_vendedor_id.name or '—'),
+                        esc(p.currency_id.symbol or ''),
+                        '{:,.0f}'.format(p.amount),
+                        verificado,
+                    ))
+            verificados = len(pagos.filtered('sng_verificado'))
+            resumen = _('%(total)s recibos de ruta, %(ok)s verificados.',
+                        total=len(pagos), ok=verificados)
+            if len(pagos) == limite:
+                resumen += ' ' + _('(mostrando los %s más recientes)') % limite
+            cab = ''.join('<th%s>%s</th>' % (attr, t) for attr, t in [
+                ('', _('Fecha')), ('', _('Compañía')), ('', _('N° recibo')),
+                ('', _('Vendedor')), (' class="text-end"', _('Monto')),
+                (' class="text-center"', _('Verificado'))])
+            rec.recibos_app_html = (
+                '<p class="mb-2">%s</p>'
+                '<table class="table table-sm table-striped">'
+                '<thead><tr>%s</tr></thead><tbody>%s</tbody></table>'
+                % (esc(resumen), cab, ''.join(filas)))
 
     @staticmethod
     def _sng_html_escape(texto):

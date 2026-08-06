@@ -1,3 +1,5 @@
+import re
+
 from odoo import _, api, fields, models
 from odoo.exceptions import AccessError, UserError, ValidationError
 from odoo.tools.float_utils import float_compare
@@ -12,6 +14,15 @@ SUGGESTION_FIELDS = {
     "suggestion_reason",
     "suggestion_source",
     "suggestion_date",
+}
+
+# Campos que definen el documento de origen de la linea (factura del sistema o
+# clave de una factura de un sistema anterior). Solo el Gerente de Devoluciones
+# puede fijarlos y son los unicos editables tras confirmar la devolucion.
+ORIGIN_INVOICE_FIELDS = {
+    "invoice_id",
+    "not_loaded_invoice",
+    "not_loaded_invoice_date",
 }
 
 
@@ -227,6 +238,10 @@ class SngReturn(models.Model):
             for record in self:
                 if record.state != "draft":
                     raise AccessError(_("Solo puede modificar devoluciones en estado borrador."))
+        if "company_id" in vals:
+            target_company = self.env["res.company"].browse(vals["company_id"])
+            for record in self:
+                record.line_ids._validate_related_companies(target_company)
         return super().write(vals)
 
     def _get_active_credit_notes(self):
@@ -447,6 +462,24 @@ class SngReturn(models.Model):
         "NC": "03",   # Nota de Crédito
     }
 
+    def _prepare_credit_note_common_vals(self):
+        self.ensure_one()
+        move_vals = {
+            "move_type": "out_refund",
+            "partner_id": self.partner_id.id,
+            "invoice_origin": self.name,
+            "sng_return_id": self.id,
+            "company_id": self.company_id.id,
+            "tipo_documento": "NC",
+            "invoice_line_ids": [],
+        }
+        account_move_fields = self.env["account.move"]._fields
+        if "return_location_id" in account_move_fields:
+            move_vals["return_location_id"] = self.location_dest_id.id
+        if "stock_return_picking_id" in account_move_fields and self.picking_id:
+            move_vals["stock_return_picking_id"] = self.picking_id.id
+        return move_vals
+
     def action_generate_credit_note(self):
         self.ensure_one()
         if self.state != "confirmed":
@@ -464,18 +497,36 @@ class SngReturn(models.Model):
                 "la nota de crédito."
             ))
 
-        lines_without_invoice = self.line_ids.filtered(lambda l: not l.invoice_id)
+        lines_without_invoice = self.line_ids.filtered(
+            lambda l: not l.invoice_id and not l.not_loaded_invoice
+        )
         if lines_without_invoice:
             raise UserError(_(
-                "El Gerente de Devoluciones debe seleccionar la factura de origen de "
-                "los siguientes productos antes de generar la nota de crédito: %(products)s."
+                "El Gerente de Devoluciones debe seleccionar la factura de origen "
+                "(o indicar la factura original no cargada) de los siguientes "
+                "productos antes de generar la nota de crédito: %(products)s."
             ) % {
                 "products": ", ".join(
                     lines_without_invoice.mapped("product_id.display_name")
                 ),
             })
+        legacy_lines = self.line_ids.filtered(
+            lambda l: not l.invoice_id and l.not_loaded_invoice
+        )
+        legacy_without_date = legacy_lines.filtered(
+            lambda l: not l.not_loaded_invoice_date
+        )
+        if legacy_without_date:
+            raise UserError(_(
+                "Debe indicar la fecha de la factura original no cargada de los "
+                "siguientes productos antes de generar la nota de crédito: %(products)s."
+            ) % {
+                "products": ", ".join(
+                    legacy_without_date.mapped("product_id.display_name")
+                ),
+            })
         lines_with_invoice = self.line_ids.filtered(lambda l: l.invoice_id)
-        if not lines_with_invoice:
+        if not lines_with_invoice and not legacy_lines:
             raise UserError(_("Ninguna línea tiene una factura asociada para generar la nota de crédito."))
 
         invoices = lines_with_invoice.mapped("invoice_id")
@@ -494,27 +545,16 @@ class SngReturn(models.Model):
                 [("code", "=", ref_doc_code)], limit=1
             )
 
-            move_vals = {
-                "move_type": "out_refund",
-                "partner_id": self.partner_id.id,
-                "invoice_origin": self.name,
-                "sng_return_id": self.id,
-                "company_id": self.company_id.id,
+            move_vals = self._prepare_credit_note_common_vals()
+            move_vals.update({
                 "reversed_entry_id": invoice.id,
-                "tipo_documento": "NC",
                 # Campos requeridos por cr_electronic_invoice para generar el XML a Hacienda
                 "invoice_id": invoice.id,
                 "reference_code_id": ref_code.id if ref_code else False,
                 "reference_document_id": ref_document.id if ref_document else False,
                 "economic_activity_id": invoice.economic_activity_id.id if invoice.economic_activity_id else False,
                 "payment_methods_id": invoice.payment_methods_id.id if invoice.payment_methods_id else False,
-                "invoice_line_ids": [],
-            }
-            account_move_fields = self.env["account.move"]._fields
-            if "return_location_id" in account_move_fields:
-                move_vals["return_location_id"] = self.location_dest_id.id
-            if "stock_return_picking_id" in account_move_fields and self.picking_id:
-                move_vals["stock_return_picking_id"] = self.picking_id.id
+            })
 
             for line in return_lines:
                 inv_lines = invoice.invoice_line_ids.filtered(
@@ -545,6 +585,50 @@ class SngReturn(models.Model):
                     "account_id": inv_line.account_id.id if inv_line else False,
                 }
                 move_vals["invoice_line_ids"].append((0, 0, line_vals))
+
+            new_move = self.env["account.move"].create(move_vals)
+            created_moves |= new_move
+
+        # NC por factura original no cargada (venta de un sistema anterior):
+        # una NC por clave. cr_electronic_invoice referencia el documento ante
+        # Hacienda con not_loaded_invoice/not_loaded_invoice_date en lugar de
+        # invoice_id. Sin factura en Odoo no hay precio ni impuestos de origen:
+        # se usan la lista de precios y los impuestos de venta del producto, y
+        # el gerente puede ajustarlos en la NC en borrador antes de validarla.
+        legacy_groups = {}
+        for line in legacy_lines:
+            key = (line.not_loaded_invoice, line.not_loaded_invoice_date)
+            legacy_groups.setdefault(key, self.env["sng.return.line"])
+            legacy_groups[key] |= line
+        for (clave, invoice_date), return_lines in legacy_groups.items():
+            # Posiciones 30-31 de la clave: tipo de comprobante original
+            # (01 FE, 02 ND, 03 NC, 04 TE); coincide con reference.document.
+            ref_doc_code = clave[29:31]
+            if ref_doc_code not in ("01", "02", "03", "04"):
+                ref_doc_code = "01"
+            ref_document = self.env["reference.document"].search(
+                [("code", "=", ref_doc_code)], limit=1
+            )
+
+            move_vals = self._prepare_credit_note_common_vals()
+            move_vals.update({
+                "not_loaded_invoice": clave,
+                "not_loaded_invoice_date": invoice_date,
+                "reference_code_id": ref_code.id if ref_code else False,
+                "reference_document_id": ref_document.id if ref_document else False,
+            })
+            for line in return_lines:
+                product = line.product_id.with_company(self.company_id)
+                taxes = product.taxes_id.filtered(
+                    lambda tax: tax.company_id == self.company_id
+                )
+                move_vals["invoice_line_ids"].append((0, 0, {
+                    "product_id": product.id,
+                    "quantity": line.quantity,
+                    "product_uom_id": line.uom_id.id,
+                    "price_unit": product.list_price,
+                    "tax_ids": [(6, 0, taxes.ids)],
+                }))
 
             new_move = self.env["account.move"].create(move_vals)
             created_moves |= new_move
@@ -649,6 +733,21 @@ class SngReturnLine(models.Model):
              "proceso mientras no exista una nota de credito activa; es "
              "obligatoria antes de generar la nota de credito y, cuando esta "
              "asignada, determina la cantidad disponible a devolver.",
+    )
+    not_loaded_invoice = fields.Char(
+        string="Factura original no cargada",
+        size=50,
+        copy=False,
+        help="Clave numérica de 50 dígitos de la factura electrónica original "
+             "cuando la venta se hizo en un sistema anterior y la factura no "
+             "existe en Odoo. La nota de crédito la referenciará ante Hacienda "
+             "como documento no cargado. Excluyente con la factura de origen.",
+    )
+    not_loaded_invoice_date = fields.Date(
+        string="Fecha factura no cargada",
+        copy=False,
+        help="Fecha de emisión de la factura original no cargada. Se completa "
+             "automáticamente desde la clave si es posible.",
     )
     invoice_editable = fields.Boolean(
         string="Puede editar factura",
@@ -937,10 +1036,91 @@ class SngReturnLine(models.Model):
                     _("No puede repetir el mismo producto en una misma devolucion. Ajuste la cantidad en una sola linea.")
                 )
 
+    @api.onchange("not_loaded_invoice")
+    def _onchange_not_loaded_invoice(self):
+        clave = (self.not_loaded_invoice or "").strip()
+        self.not_loaded_invoice = clave or False
+        # La clave codifica la fecha de emision: posiciones 4-9 (ddmmaa),
+        # tras el codigo de pais (506).
+        if len(clave) == 50 and clave.isdigit() and not self.not_loaded_invoice_date:
+            try:
+                self.not_loaded_invoice_date = fields.Date.to_date(
+                    "20%s-%s-%s" % (clave[7:9], clave[5:7], clave[3:5])
+                )
+            except ValueError:
+                pass
+
+    @api.onchange("invoice_id")
+    def _onchange_invoice_id(self):
+        # Factura del sistema y clave no cargada son excluyentes.
+        if self.invoice_id:
+            self.not_loaded_invoice = False
+            self.not_loaded_invoice_date = False
+
+    @api.constrains("not_loaded_invoice", "not_loaded_invoice_date", "invoice_id")
+    def _check_not_loaded_invoice(self):
+        for line in self:
+            if not line.not_loaded_invoice:
+                continue
+            if line.invoice_id:
+                raise ValidationError(_(
+                    "La línea de %(product)s no puede tener a la vez una factura "
+                    "de origen del sistema y una factura original no cargada."
+                ) % {"product": line.product_id.display_name})
+            if not re.fullmatch(r"\d{50}", line.not_loaded_invoice):
+                raise ValidationError(_(
+                    "La factura original no cargada de %(product)s debe ser la "
+                    "clave numérica de exactamente 50 dígitos de la factura "
+                    "electrónica original."
+                ) % {"product": line.product_id.display_name})
+
+    def _validate_related_companies(self, return_company=None):
+        """Validate company-dependent values against the return header.
+
+        ``company_id`` is a stored related field on the line. During nested
+        One2many creation it may not be ready when Odoo runs its generic
+        ``check_company`` validation, so compare against ``return_id``
+        directly instead.
+        """
+        for line in self:
+            company = return_company or line.return_id.company_id
+            if not company:
+                continue
+
+            product = line.product_id.sudo()
+            if product.company_id and product.company_id != company:
+                raise ValidationError(_(
+                    "El producto %(product)s pertenece a %(product_company)s y "
+                    "no puede usarse en una devolución de %(return_company)s."
+                ) % {
+                    "product": product.display_name,
+                    "product_company": product.company_id.display_name,
+                    "return_company": company.display_name,
+                })
+
+            invoice = line.invoice_id.sudo()
+            if invoice.company_id and invoice.company_id != company:
+                raise ValidationError(_(
+                    "La factura %(invoice)s pertenece a %(invoice_company)s y "
+                    "no puede usarse en una devolución de %(return_company)s."
+                ) % {
+                    "invoice": invoice.display_name,
+                    "invoice_company": invoice.company_id.display_name,
+                    "return_company": company.display_name,
+                })
+
+    @api.constrains("return_id", "product_id", "invoice_id")
+    def _check_related_companies(self):
+        self._validate_related_companies()
+
     def _validate_return_quantity(self):
         self.ensure_one()
         if not self.product_id:
             raise ValidationError(_("Debe seleccionar un producto."))
+        # Venta hecha en un sistema anterior: no existe trazabilidad en Odoo
+        # contra la cual validar el disponible.
+        if not self.invoice_id and self.not_loaded_invoice:
+            return
         if self.quantity > self.available_return_qty:
             if self.invoice_id:
                 source = _("segun la factura %(invoice)s") % {
@@ -971,7 +1151,10 @@ class SngReturnLine(models.Model):
 
     @api.model_create_multi
     def create(self, vals_list):
-        if any(vals.get("invoice_id") for vals in vals_list):
+        if any(
+            any(vals.get(field) for field in ORIGIN_INVOICE_FIELDS)
+            for vals in vals_list
+        ):
             self._check_invoice_manager_access()
         records = super().create(vals_list)
         for line in records:
@@ -980,18 +1163,19 @@ class SngReturnLine(models.Model):
         return records
 
     def write(self, vals):
-        if "invoice_id" in vals:
+        if ORIGIN_INVOICE_FIELDS & set(vals):
             self._check_invoice_manager_access()
         for line in self:
             if line.state == "confirmed":
                 # Sobre una linea confirmada solo se admite fijar la factura de
-                # origen y refrescar la sugerencia automatica.
-                if set(vals) - {"invoice_id"} - SUGGESTION_FIELDS:
+                # origen (del sistema o no cargada) y refrescar la sugerencia
+                # automatica.
+                if set(vals) - ORIGIN_INVOICE_FIELDS - SUGGESTION_FIELDS:
                     raise UserError(_(
                         "Después de confirmar la devolución solo puede modificar la factura "
                         "de origen."
                     ))
-                if "invoice_id" in vals and line.return_id._get_active_credit_notes():
+                if ORIGIN_INVOICE_FIELDS & set(vals) and line.return_id._get_active_credit_notes():
                     raise UserError(_(
                         "No puede modificar la factura de origen porque la devolución ya "
                         "tiene una nota de crédito activa."

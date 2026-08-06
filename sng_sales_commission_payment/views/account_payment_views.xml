@@ -13,7 +13,7 @@
                         type="object"
                         class="oe_highlight"
                         groups="sales_commission_omax.group_sales_commission_user"
-                        invisible="state != 'posted' or payment_type != 'inbound'"
+                        invisible="state not in ['in_process', 'paid'] or payment_type != 'inbound'"
                         confirm="Esto regenerará las líneas de comisión en borrador para este pago. ¿Desea continuar?"/>
                 </button>
                 <xpath expr="//div[@name='button_box']" position="inside">

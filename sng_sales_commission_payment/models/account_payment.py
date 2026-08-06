@@ -30,19 +30,22 @@ class AccountPayment(models.Model):
         for payment in self:
             payment.sng_commission_count = len(payment.sng_commission_line_ids)
 
+    # Estados de account.payment (Odoo 18) en los que el pago está confirmado.
+    SNG_COMMISSION_VALID_STATES = ('in_process', 'paid')
+
     def action_post(self):
         res = super(AccountPayment, self).action_post()
         for payment in self:
-            if payment.payment_type == 'inbound' and payment.state == 'posted':
+            if payment.payment_type == 'inbound' and payment.state in self.SNG_COMMISSION_VALID_STATES:
                 payment._generate_commission_lines()
         return res
 
     def action_generate_commission_lines(self):
         """Botón manual para (re)generar el detalle de comisión del pago."""
         for payment in self:
-            if payment.state != 'posted':
+            if payment.state not in self.SNG_COMMISSION_VALID_STATES:
                 raise UserError(_(
-                    "El pago %(payment)s debe estar publicado para generar comisiones.",
+                    "El pago %(payment)s debe estar confirmado para generar comisiones.",
                     payment=payment.name,
                 ))
             payment._generate_commission_lines()
@@ -51,7 +54,12 @@ class AccountPayment(models.Model):
     def _generate_commission_lines(self):
         """Genera/actualiza el detalle de base y recalcula la comisión mensual."""
         self.ensure_one()
-        if self.payment_type != 'inbound' or self.state != 'posted' or not self.move_id or not self.date:
+        if (
+            self.payment_type != 'inbound'
+            or self.state not in self.SNG_COMMISSION_VALID_STATES
+            or not self.move_id
+            or not self.date
+        ):
             return
 
         partials_data = self._get_reconciled_invoice_partials()

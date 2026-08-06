@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'SNG Conciliación Bancaria con IA',
-    'version': '18.0.1.1.0',
+    'version': '18.0.1.2.0',
     'category': 'Accounting',
     'summary': 'Importa el estado de cuenta del banco (BAC) y deja cada línea '
                'montada con su pago/factura sugerido para conciliar en el '

@@ -1,20 +1,28 @@
 # -*- coding: utf-8 -*-
-"""Importador del estado de cuenta BAC (xlsx) al extracto bancario nativo.
+"""Importador de estados de cuenta bancarios al extracto nativo.
 
-Formato esperado (BAC San José, "Detalle de movimientos"): hoja con
-encabezado ("Producto" = IBAN de la cuenta, "Saldo Inicial") y tabla
-Fecha / Referencia / Código / Descripción / Débitos / Créditos / Balance.
-El diario se detecta comparando los dígitos del IBAN con el nombre de los
-diarios de banco. Reimportar el mismo archivo no duplica líneas
-(unique_import_id).
+Formatos soportados (se detectan por el contenido del archivo):
+
+- BAC San José, "Detalle de movimientos" (xlsx): hoja con encabezado
+  ("Producto" = IBAN de la cuenta, "Saldo Inicial") y tabla Fecha /
+  Referencia / Código / Descripción / Débitos / Créditos / Balance.
+  El diario se detecta comparando los dígitos del IBAN con el nombre de
+  los diarios de banco.
+- Banco Nacional (csv separado por ";"): columnas oficina /
+  fechaMovimiento / numeroDocumento / debito / credito / descripcion.
+  El CSV NO trae número de cuenta ni saldos, así que el diario lo elige
+  la usuaria en el asistente y el extracto queda sin saldos de control.
+
+Reimportar el mismo archivo no duplica líneas (unique_import_id).
 """
 import base64
+import csv
 import io
 import logging
 import re
 from datetime import datetime
 
-from odoo import _, fields, models
+from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
@@ -33,16 +41,99 @@ def _num(valor):
 
 class SngConciliacionImportar(models.TransientModel):
     _name = 'sng.conciliacion.importar'
-    _description = 'Importar estado de cuenta BAC'
+    _description = 'Importar estado de cuenta bancario'
 
-    archivo = fields.Binary(string='Estado de cuenta (xlsx)', required=True)
+    archivo = fields.Binary(string='Estado de cuenta (BAC xlsx / BN csv)',
+                            required=True)
     archivo_nombre = fields.Char(string='Nombre del archivo')
+    formato = fields.Selection(
+        [('bac', 'BAC (xlsx)'), ('bn', 'Banco Nacional (csv)')],
+        string='Formato', readonly=True,
+        help='Se deduce del archivo. Solo para el CSV del Banco Nacional '
+             'hay que indicar el diario: ese archivo no trae el número de '
+             'cuenta.')
+    diario_id = fields.Many2one(
+        'account.journal', string='Diario del banco',
+        domain="[('type', '=', 'bank')]",
+        help='Solo para el CSV del Banco Nacional. El xlsx del BAC trae el '
+             'IBAN y el diario se detecta solo.')
     resultado = fields.Html(string='Resultado', readonly=True)
     statement_id = fields.Many2one('account.bank.statement', readonly=True)
     linea_ids = fields.Many2many('account.bank.statement.line',
                                  readonly=True)
     estado = fields.Selection([('nuevo', 'Nuevo'), ('hecho', 'Hecho')],
                               default='nuevo')
+
+    @api.onchange('archivo_nombre')
+    def _onchange_archivo_nombre(self):
+        nombre = (self.archivo_nombre or '').lower()
+        if nombre.endswith('.csv'):
+            self.formato = 'bn'
+        elif nombre.endswith(('.xlsx', '.xls')):
+            self.formato = 'bac'
+        else:
+            self.formato = False
+
+    # ------------------------------------------------------------------
+    @api.model
+    def _sng_detectar_formato(self, data):
+        """'bac' (xlsx) o 'bn' (csv). Se decide por el CONTENIDO, no por el
+        nombre: el nombre solo alimenta el onchange para pedir el diario."""
+        if data[:2] == b'PK':  # zip → xlsx
+            return 'bac'
+        inicio = data[:200].decode('latin-1', 'ignore')
+        if 'fechamovimiento' in inicio.replace(' ', '').lower():
+            return 'bn'
+        raise UserError(_(
+            'Formato de archivo no reconocido. Se espera el xlsx del BAC '
+            '("Detalle de movimientos") o el CSV del Banco Nacional '
+            '(encabezado "oficina;fechaMovimiento;numeroDocumento;...").'))
+
+    def _sng_parse_bn(self, data):
+        """CSV del Banco Nacional. Devuelve (movimientos, avisos).
+
+        No trae número de cuenta ni saldos; los montos usan coma de miles
+        y punto decimal (igual que el BAC), fechas dd/mm/aaaa.
+        """
+        texto = None
+        for enc in ('utf-8-sig', 'latin-1'):
+            try:
+                texto = data.decode(enc)
+                break
+            except UnicodeDecodeError:
+                continue
+        if texto is None:
+            raise UserError(_('No se pudo leer el CSV (codificación).'))
+        movimientos = []
+        for fila in csv.reader(io.StringIO(texto), delimiter=';'):
+            if len(fila) < 6:
+                continue
+            try:
+                fecha = datetime.strptime(fila[1].strip(),
+                                          '%d/%m/%Y').date()
+            except ValueError:
+                continue  # encabezado ("fechaMovimiento") u otras filas
+            try:
+                debito = _num(fila[3].strip())
+                credito = _num(fila[4].strip())
+            except ValueError:
+                continue
+            movimientos.append({
+                'fecha': fecha,
+                'ref': fila[2].strip(),
+                'codigo': '',
+                'descripcion': fila[5].strip(),
+                'debito': debito,
+                'credito': credito,
+                'balance': None,
+            })
+        if not movimientos:
+            raise UserError(_('El archivo no trae movimientos.'))
+        avisos = [_(
+            'El CSV del Banco Nacional no trae número de cuenta ni saldos '
+            'inicial/final: verifique que el diario elegido sea el correcto '
+            'y cuadre los saldos contra el banco por aparte.')]
+        return movimientos, avisos
 
     # ------------------------------------------------------------------
     def _sng_parse_bac(self, data):
@@ -164,13 +255,17 @@ class SngConciliacionImportar(models.TransientModel):
                 '(coincidencias: %(n)s). El nombre del diario debe contener '
                 'el número de cuenta.', iban=iban, n=len(coincidencias)))
         diario = coincidencias
+        self._sng_validar_suspense(diario)
+        return diario
+
+    @api.model
+    def _sng_validar_suspense(self, diario):
         suspense = diario.suspense_account_id
         if not suspense or suspense.account_type == 'off_balance':
             raise UserError(_(
                 'El diario "%s" no tiene una cuenta suspense válida '
                 '(no puede ser de tipo fuera de balance). Corrija la '
                 'configuración del diario antes de importar.') % diario.name)
-        return diario
 
     # ------------------------------------------------------------------
     def accion_importar(self):
@@ -180,14 +275,27 @@ class SngConciliacionImportar(models.TransientModel):
             raise UserError(_(
                 'Necesita el permiso "Conciliación bancaria (IA)".'))
         data = base64.b64decode(self.archivo)
-        iban, saldo_inicial, saldo_final, movimientos, avisos = \
-            self._sng_parse_bac(data)
-        diario = self._sng_detectar_diario(iban)
+        formato = self._sng_detectar_formato(data)
+        if formato == 'bac':
+            banco = 'BAC'
+            iban, saldo_inicial, saldo_final, movimientos, avisos = \
+                self._sng_parse_bac(data)
+            diario = self._sng_detectar_diario(iban)
+        else:
+            banco = 'BN'
+            saldo_inicial = saldo_final = None
+            movimientos, avisos = self._sng_parse_bn(data)
+            diario = self.diario_id
+            if not diario:
+                raise UserError(_(
+                    'El CSV del Banco Nacional no trae el número de cuenta: '
+                    'seleccione el diario del banco en el asistente.'))
+            self._sng_validar_suspense(diario)
 
         # dedup contra líneas ya importadas
         def uid(m):
-            return 'BAC-%s-%s-%d' % (
-                m['ref'] or 'SINREF', m['fecha'].strftime('%Y%m%d'),
+            return '%s-%s-%s-%d' % (
+                banco, m['ref'] or 'SINREF', m['fecha'].strftime('%Y%m%d'),
                 round((m['credito'] - m['debito']) * 100))
         uids = [uid(m) for m in movimientos]
         lineas_previas = self.env['account.bank.statement.line'].search(
@@ -235,13 +343,18 @@ class SngConciliacionImportar(models.TransientModel):
             }
 
         fechas = [m['fecha'] for m, _u, _mto in nuevos]
-        statement = self.env['account.bank.statement'].create({
-            'name': _('BAC %(desde)s a %(hasta)s',
+        statement_vals = {
+            'name': _('%(banco)s %(desde)s a %(hasta)s', banco=banco,
                       desde=min(fechas), hasta=max(fechas)),
             'date': max(fechas),
-            'balance_start': saldo_inicial,
-            'balance_end_real': saldo_final,
-        })
+        }
+        # El CSV del BN no trae saldos: el extracto queda sin control de
+        # saldo inicial/final (avisado en `avisos`).
+        if saldo_inicial is not None:
+            statement_vals['balance_start'] = saldo_inicial
+        if saldo_final is not None:
+            statement_vals['balance_end_real'] = saldo_final
+        statement = self.env['account.bank.statement'].create(statement_vals)
         # Las líneas se crean aparte del statement (no anidadas) en lote.
         lineas_nuevas = self.env['account.bank.statement.line'].create([{
             'statement_id': statement.id,
@@ -279,7 +392,9 @@ class SngConciliacionImportar(models.TransientModel):
                       n=len(nuevos), c=creditos, d=len(nuevos) - creditos,
                       s=saltados),
                     _('Saldos del archivo: inicial %(i).2f → final %(f).2f',
-                      i=saldo_inicial, f=saldo_final or 0),
+                      i=saldo_inicial, f=saldo_final or 0)
+                    if saldo_inicial is not None
+                    else _('El archivo no trae saldos de control (CSV BN).'),
                     ''.join('<li class="text-warning">%s</li>' % a
                             for a in avisos),
                     _('Siguiente paso — cómo conciliar:'),

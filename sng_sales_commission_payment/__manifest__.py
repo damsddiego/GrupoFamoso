@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Comisiones por Pagos de Facturas',
-    'version': '18.0.2.0.0',
+    'version': '18.0.2.2.0',
     'category': 'Accounting/Accounting',
     'summary': 'Comisión mensual por vendedor con escala por tramos sobre pagos recibidos',
     'description': """
@@ -25,6 +25,7 @@
     'website': '',
     'depends': [
         'account',
+        'report_xlsx',
         'sales_commission_omax',
         'sng_invoice_assigned_salesperson',
         'sng_payment_report_by_salesperson',
@@ -38,6 +39,7 @@
         'views/sng_commission_monthly_views.xml',
         'views/sng_commission_payment_line_views.xml',
         'views/account_payment_views.xml',
+        'report/sng_commission_monthly_report.xml',
         'wizard/sng_create_commission_bill_wiz.xml',
         'wizard/sng_generate_commission_wiz.xml',
     ],

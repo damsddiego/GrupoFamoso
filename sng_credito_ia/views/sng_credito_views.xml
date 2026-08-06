@@ -109,6 +109,15 @@
                             <field name="comportamiento_html" nolabel="1"
                                    invisible="not comportamiento"/>
                         </page>
+                        <page string="Recibos de ruta" name="recibos_app">
+                            <div invisible="recibos_app_html">
+                                <p class="text-muted">Sin recibos de la app de
+                                ruteros para este cliente (o el módulo de
+                                Ruteros Pagos no está instalado).</p>
+                            </div>
+                            <field name="recibos_app_html" nolabel="1"
+                                   invisible="not recibos_app_html"/>
+                        </page>
                     </notebook>
                 </sheet>
                 <chatter/>

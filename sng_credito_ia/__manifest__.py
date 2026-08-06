@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'SNG Análisis de Crédito con IA',
-    'version': '18.0.1.0.0',
+    'version': '18.0.1.1.0',
     'category': 'Accounting',
     'summary': 'Evaluación de apertura de crédito con IA: estudio de buró (PDF) '
                '+ comportamiento del cliente en todas las compañías del grupo',

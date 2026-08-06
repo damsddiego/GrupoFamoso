@@ -62,7 +62,11 @@
                                         <field name="invoice_id"/>
                                         <field name="payment_id"/>
                                         <field name="partner_id"/>
-                                        <field name="payment_amount"/>
+                                        <field name="payment_amount" sum="Pagado"/>
+                                        <field name="tax_profile" widget="badge"
+                                               decoration-success="tax_profile == 'taxed_13'"
+                                               decoration-warning="tax_profile == 'mixed'"/>
+                                        <field name="effective_tax_rate" optional="show"/>
                                         <field name="commission_base" sum="Base"/>
                                     </list>
                                 </field>

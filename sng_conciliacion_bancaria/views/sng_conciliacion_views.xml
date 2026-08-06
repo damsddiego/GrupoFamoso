@@ -11,7 +11,17 @@
                     <field name="archivo" widget="binary"
                            filename="archivo_nombre"/>
                     <field name="archivo_nombre" invisible="1"/>
+                    <field name="formato" invisible="1"/>
+                    <field name="diario_id"
+                           invisible="formato != 'bn'"
+                           required="formato == 'bn'"
+                           options="{'no_create': true}"/>
                 </group>
+                <div class="alert alert-info" role="status"
+                     invisible="estado == 'hecho' or formato != 'bn'">
+                    El CSV del Banco Nacional no trae el número de cuenta ni
+                    saldos: elija el diario del banco con cuidado.
+                </div>
                 <div invisible="estado != 'hecho'">
                     <field name="resultado" nolabel="1"/>
                     <field name="statement_id" invisible="1"/>
@@ -31,7 +41,7 @@
 
     <record id="action_sng_conciliacion_importar"
             model="ir.actions.act_window">
-        <field name="name">Importar estado de cuenta BAC</field>
+        <field name="name">Importar estado de cuenta (BAC xlsx / BN csv)</field>
         <field name="res_model">sng.conciliacion.importar</field>
         <field name="view_mode">form</field>
         <field name="target">new</field>
@@ -47,7 +57,7 @@
                     <button name="%(action_sng_conciliacion_importar)d"
                             type="action" display="always"
                             string="Importar estado de cuenta"
-                            help="Abre el asistente para cargar otro archivo xlsx del BAC. Reimportar el mismo archivo no duplica líneas."/>
+                            help="Abre el asistente para cargar otro estado de cuenta (xlsx del BAC o CSV del Banco Nacional). Reimportar el mismo archivo no duplica líneas."/>
                     <button name="accion_sng_sugerir" type="object"
                             string="1 · Sugerir con IA (no concilia)"
                             class="btn-primary"

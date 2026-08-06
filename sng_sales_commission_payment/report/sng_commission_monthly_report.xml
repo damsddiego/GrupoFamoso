@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <template id="report_commission_monthly">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="doc">
+                    <t t-call="web.external_layout">
+                        <div class="page">
+                            <h2>Comisión Mensual por Pagos</h2>
+                            <div class="row mt-3">
+                                <div class="col-6">
+                                    <strong>Vendedor:</strong> <span t-field="doc.salesperson_id.name"/><br/>
+                                    <strong>Mes:</strong> <span t-field="doc.period_label"/><br/>
+                                    <strong>Compañía:</strong> <span t-field="doc.company_id.name"/><br/>
+                                    <strong>Estado:</strong> <span t-field="doc.state"/>
+                                </div>
+                                <div class="col-6">
+                                    <table class="table table-sm table-borderless">
+                                        <tr>
+                                            <td><strong>Base Acumulada (sin impuestos)</strong></td>
+                                            <td class="text-end">
+                                                <span t-field="doc.base_amount"
+                                                      t-options="{'widget': 'monetary', 'display_currency': doc.currency_id}"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Tramo Aplicado</strong></td>
+                                            <td class="text-end"><span t-field="doc.tier_id.name"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>% Comisión</strong></td>
+                                            <td class="text-end"><span t-esc="'{:.2f}%'.format(doc.percentage)"/></td>
+                                        </tr>
+                                        <tr class="border-top">
+                                            <td><strong>Monto de Comisión</strong></td>
+                                            <td class="text-end">
+                                                <strong><span t-field="doc.commission_amount"
+                                                      t-options="{'widget': 'monetary', 'display_currency': doc.currency_id}"/></strong>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <h5 class="mt-3">Resumen por Tipo de Factura</h5>
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr class="table-light">
+                                        <th>Tipo de Factura</th>
+                                        <th class="text-end">Líneas</th>
+                                        <th class="text-end">Pagado (con IVA)</th>
+                                        <th class="text-end">Base (sin IVA)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="doc._get_tax_profile_summary()" t-as="item">
+                                        <td><span t-esc="item['label']"/></td>
+                                        <td class="text-end"><span t-esc="item['count']"/></td>
+                                        <td class="text-end">
+                                            <span t-esc="item['payment_amount']"
+                                                  t-options="{'widget': 'monetary', 'display_currency': doc.currency_id}"/>
+                                        </td>
+                                        <td class="text-end">
+                                            <span t-esc="item['commission_base']"
+                                                  t-options="{'widget': 'monetary', 'display_currency': doc.currency_id}"/>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <h5 class="mt-3">Detalle de Pagos</h5>
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr class="table-light">
+                                        <th>Fecha</th>
+                                        <th>Factura</th>
+                                        <th>Pago</th>
+                                        <th>Cliente</th>
+                                        <th class="text-end">Monto Pago</th>
+                                        <th>Tipo</th>
+                                        <th class="text-end">% Imp.</th>
+                                        <th class="text-end">Base</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="doc.line_ids" t-as="line">
+                                        <td><span t-field="line.payment_date"/></td>
+                                        <td><span t-field="line.invoice_id.name"/></td>
+                                        <td><span t-field="line.payment_id.name"/></td>
+                                        <td><span t-field="line.partner_id.name"/></td>
+                                        <td class="text-end">
+                                            <span t-field="line.payment_amount"
+                                                  t-options="{'widget': 'monetary', 'display_currency': line.currency_id}"/>
+                                        </td>
+                                        <td><span t-field="line.tax_profile"/></td>
+                                        <td class="text-end"><span t-esc="'{:.1f}'.format(line.effective_tax_rate)"/></td>
+                                        <td class="text-end">
+                                            <span t-field="line.commission_base"
+                                                  t-options="{'widget': 'monetary', 'display_currency': line.currency_id}"/>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="4"><strong>TOTAL</strong></td>
+                                        <td class="text-end">
+                                            <strong><span t-esc="sum(doc.line_ids.mapped('payment_amount'))"
+                                                  t-options="{'widget': 'monetary', 'display_currency': doc.currency_id}"/></strong>
+                                        </td>
+                                        <td colspan="2"/>
+                                        <td class="text-end">
+                                            <strong><span t-esc="doc.base_amount"
+                                                  t-options="{'widget': 'monetary', 'display_currency': doc.currency_id}"/></strong>
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </t>
+                </t>
+            </t>
+        </template>
+
+        <record id="action_report_commission_monthly_pdf" model="ir.actions.report">
+            <field name="name">Comisión Mensual (PDF)</field>
+            <field name="model">sng.commission.monthly</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">sng_sales_commission_payment.report_commission_monthly</field>
+            <field name="report_file">sng_sales_commission_payment.report_commission_monthly</field>
+            <field name="print_report_name">'Comision - %s' % (object.name)</field>
+            <field name="binding_model_id" ref="model_sng_commission_monthly"/>
+            <field name="binding_type">report</field>
+        </record>
+
+        <record id="action_report_commission_monthly_xlsx" model="ir.actions.report">
+            <field name="name">Comisión Mensual (Excel)</field>
+            <field name="model">sng.commission.monthly</field>
+            <field name="report_type">xlsx</field>
+            <field name="report_name">sng_sales_commission_payment.commission_monthly_xlsx</field>
+            <field name="report_file">Comisiones Mensuales</field>
+            <field name="print_report_name">'Comisiones Mensuales'</field>
+            <field name="binding_model_id" ref="model_sng_commission_monthly"/>
+            <field name="binding_type">report</field>
+        </record>
+    </data>
+</odoo>

@@ -12,8 +12,12 @@
                     <field name="partner_id"/>
                     <field name="invoice_id"/>
                     <field name="payment_id"/>
-                    <field name="payment_amount"/>
-                    <field name="commission_base"/>
+                    <field name="payment_amount" sum="Pagado"/>
+                    <field name="commission_base" sum="Base"/>
+                    <field name="tax_profile" widget="badge"
+                           decoration-success="tax_profile == 'taxed_13'"
+                           decoration-warning="tax_profile == 'mixed'"/>
+                    <field name="effective_tax_rate" optional="show"/>
                     <field name="company_id" groups="base.group_multi_company"/>
                 </list>
             </field>
@@ -39,6 +43,8 @@
                                 <field name="payment_amount"/>
                                 <field name="invoice_amount_untaxed"/>
                                 <field name="invoice_amount_total"/>
+                                <field name="tax_profile"/>
+                                <field name="effective_tax_rate"/>
                                 <field name="commission_base"/>
                                 <field name="company_id" groups="base.group_multi_company"/>
                             </group>
@@ -57,19 +63,37 @@
                     <field name="partner_id"/>
                     <field name="invoice_id"/>
                     <field name="payment_id"/>
+                    <filter string="IVA 13%" name="taxed_13" domain="[('tax_profile', '=', 'taxed_13')]"/>
+                    <filter string="Sin impuesto (0%)" name="no_tax" domain="[('tax_profile', '=', 'no_tax')]"/>
+                    <filter string="Tarifa mixta/reducida" name="mixed" domain="[('tax_profile', '=', 'mixed')]"/>
                     <group expand="0" string="Agrupar por">
                         <filter string="Vendedor" name="group_by_salesperson" context="{'group_by': 'salesperson_id'}"/>
                         <filter string="Periodo" name="group_by_period" context="{'group_by': 'period'}"/>
                         <filter string="Fecha de pago" name="group_by_payment_date" context="{'group_by': 'payment_date'}"/>
+                        <filter string="Tipo de factura" name="group_by_tax_profile" context="{'group_by': 'tax_profile'}"/>
+                        <filter string="Cliente" name="group_by_partner" context="{'group_by': 'partner_id'}"/>
                     </group>
                 </search>
+            </field>
+        </record>
+
+        <record id="view_sng_commission_payment_line_pivot" model="ir.ui.view">
+            <field name="name">sng.commission.payment.line.pivot</field>
+            <field name="model">sng.commission.payment.line</field>
+            <field name="arch" type="xml">
+                <pivot string="Análisis de Base de Comisión">
+                    <field name="salesperson_id" type="row"/>
+                    <field name="tax_profile" type="col"/>
+                    <field name="payment_amount" type="measure"/>
+                    <field name="commission_base" type="measure"/>
+                </pivot>
             </field>
         </record>
 
         <record id="action_sng_commission_payment_line" model="ir.actions.act_window">
             <field name="name">Detalle de Comisión por Pago</field>
             <field name="res_model">sng.commission.payment.line</field>
-            <field name="view_mode">list,form</field>
+            <field name="view_mode">list,pivot,form</field>
         </record>
     </data>
 </odoo>

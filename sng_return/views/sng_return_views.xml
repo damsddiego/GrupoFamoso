@@ -137,9 +137,14 @@
                                    invisible="state != 'draft'">
                                 <list string="Productos a devolver" editable="bottom">
                                     <field name="sequence" widget="handle"/>
-                                    <field name="product_id" required="1"/>
+                                    <field name="product_id" required="1"
+                                           domain="[('sale_ok', '=', True), '|', ('company_id', '=', False), ('company_id', '=', parent.company_id)]"/>
                                     <field name="invoice_editable" column_invisible="1"/>
                                     <field name="invoice_id" optional="show" readonly="not invoice_editable"/>
+                                    <field name="not_loaded_invoice" optional="show"
+                                           readonly="not invoice_editable or invoice_id != False"/>
+                                    <field name="not_loaded_invoice_date" optional="hide"
+                                           readonly="not invoice_editable or invoice_id != False"/>
                                     <field name="suggested_invoice_id" optional="show" readonly="1"/>
                                     <field name="suggestion_confidence" widget="badge" optional="show" readonly="1"
                                            decoration-success="suggestion_confidence == 'high'"
@@ -179,9 +184,14 @@
                                 <form string="Linea de devolucion">
                                     <group>
                                         <group>
-                                            <field name="product_id" required="1"/>
+                                            <field name="product_id" required="1"
+                                                   domain="[('sale_ok', '=', True), '|', ('company_id', '=', False), ('company_id', '=', parent.company_id)]"/>
                                             <field name="invoice_editable" invisible="1"/>
                                             <field name="invoice_id" readonly="not invoice_editable"/>
+                                            <field name="not_loaded_invoice" readonly="not invoice_editable"
+                                                   invisible="invoice_id != False"/>
+                                            <field name="not_loaded_invoice_date" readonly="not invoice_editable"
+                                                   invisible="invoice_id != False"/>
                                             <field name="quantity"/>
                                             <field name="uom_id" readonly="1"/>
                                         </group>
@@ -235,6 +245,10 @@
                                     <field name="product_id" readonly="1"/>
                                     <field name="invoice_editable" column_invisible="1"/>
                                     <field name="invoice_id" optional="show" readonly="not invoice_editable"/>
+                                    <field name="not_loaded_invoice" optional="show"
+                                           readonly="not invoice_editable or invoice_id != False"/>
+                                    <field name="not_loaded_invoice_date" optional="hide"
+                                           readonly="not invoice_editable or invoice_id != False"/>
                                     <field name="suggested_invoice_id" optional="show" readonly="1"/>
                                     <field name="suggestion_confidence" widget="badge" optional="show" readonly="1"
                                            decoration-success="suggestion_confidence == 'high'"

@@ -161,6 +161,24 @@ class SngCommissionMonthly(models.Model):
                 'commission_amount': base * percentage / 100.0,
             })
 
+    def _get_tax_profile_summary(self):
+        """Resumen por tipo de factura para los reportes PDF/XLSX."""
+        self.ensure_one()
+        Line = self.env['sng.commission.payment.line']
+        labels = dict(Line._fields['tax_profile']._description_selection(self.env))
+        summary = []
+        for profile in ('taxed_13', 'no_tax', 'mixed'):
+            lines = self.line_ids.filtered(lambda l: l.tax_profile == profile)
+            if not lines:
+                continue
+            summary.append({
+                'label': labels.get(profile, profile),
+                'count': len(lines),
+                'payment_amount': sum(lines.mapped('payment_amount')),
+                'commission_base': sum(lines.mapped('commission_base')),
+            })
+        return summary
+
     def action_view_bill(self):
         self.ensure_one()
         return {
