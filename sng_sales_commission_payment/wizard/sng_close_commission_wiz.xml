@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_sng_close_commission_wiz_form" model="ir.ui.view">
+            <field name="name">sng.close.commission.wiz.form</field>
+            <field name="model">sng.close.commission.wiz</field>
+            <field name="arch" type="xml">
+                <form string="Cerrar Mes por Compañía">
+                    <group>
+                        <field name="period"/>
+                        <field name="company_id" groups="base.group_multi_company"/>
+                        <field name="pending_count"/>
+                    </group>
+                    <div class="alert alert-warning" role="alert">
+                        Se cerrarán todas las comisiones pendientes del mes seleccionado.
+                        Los meses cerrados ya no se recalculan y los pagos que lleguen con
+                        fecha de ese mes se acumularán en el siguiente mes abierto.
+                    </div>
+                    <footer>
+                        <button
+                            name="action_close_month"
+                            string="Cerrar Mes"
+                            type="object"
+                            class="oe_highlight"
+                            confirm="¿Confirma el cierre de todas las comisiones pendientes del mes?"/>
+                        <button string="Cancelar" class="oe_link" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_sng_close_commission_wiz" model="ir.actions.act_window">
+            <field name="name">Cerrar mes por compañía</field>
+            <field name="res_model">sng.close.commission.wiz</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+            <field name="groups_id" eval="[(4, ref('sales_commission_omax.group_sales_commission_manager'))]"/>
+        </record>
+
+        <menuitem
+            id="menu_sng_close_commission_wiz"
+            name="Cerrar mes por compañía"
+            parent="sales_commission_omax.menu_sale_commission_root"
+            action="action_sng_close_commission_wiz"
+            groups="sales_commission_omax.group_sales_commission_manager"
+            sequence="15"/>
+    </data>
+</odoo>
