@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'SNG Plan Comercial Clientes',
-    'version': '18.0.1.0.0',
+    'version': '18.0.1.0.1',
     'category': 'Sales',
     'summary': 'Planificacion comercial anual por cliente con segmentacion y exportacion XLSX',
     'license': 'AGPL-3',

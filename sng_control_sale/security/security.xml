@@ -1,9 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data noupdate="0">
+        <record id="module_category_sale_stock_control" model="ir.module.category">
+            <field name="name">Control de stock en ventas</field>
+            <field name="parent_id" ref="base.module_category_sales"/>
+            <field name="sequence">20</field>
+        </record>
+
         <record id="group_allow_negative_stock" model="res.groups">
             <field name="name">Permitir confirmar sin stock</field>
-            <field name="category_id" ref="base.module_category_sales_sales"/>
+            <field name="category_id" ref="module_category_sale_stock_control"/>
         </record>
     </data>
 </odoo>

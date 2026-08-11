@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_move_form_sng_tax_edit_lock" model="ir.ui.view">
+        <field name="name">account.move.form.inherit.sng.tax.edit.lock</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <!-- Lineas de factura: lista y formulario movil. -->
+            <xpath expr="//field[@name='invoice_line_ids']/list/field[@name='tax_ids']" position="before">
+                <field name="sng_tax_edit_allowed" column_invisible="True"/>
+            </xpath>
+            <xpath expr="//field[@name='invoice_line_ids']/list/field[@name='tax_ids']" position="attributes">
+                <attribute name="readonly">not sng_tax_edit_allowed</attribute>
+            </xpath>
+            <xpath expr="//field[@name='invoice_line_ids']/form//field[@name='tax_ids']" position="before">
+                <field name="sng_tax_edit_allowed" invisible="1"/>
+            </xpath>
+            <xpath expr="//field[@name='invoice_line_ids']/form//field[@name='tax_ids']" position="attributes">
+                <attribute name="readonly">not sng_tax_edit_allowed</attribute>
+            </xpath>
+
+            <!-- Apuntes contables de la misma factura. -->
+            <xpath expr="//field[@name='line_ids']/list/field[@name='tax_ids']" position="before">
+                <field name="sng_tax_edit_allowed" column_invisible="True"/>
+            </xpath>
+            <xpath expr="//field[@name='line_ids']/list/field[@name='tax_ids']" position="attributes">
+                <attribute name="readonly">not sng_tax_edit_allowed or display_type in ('line_section', 'line_note') or tax_line_id or (parent.move_type in ('out_invoice', 'out_refund', 'in_invoice', 'in_refund', 'out_receipt', 'in_receipt') and account_type in ('asset_receivable', 'liability_payable'))</attribute>
+            </xpath>
+            <xpath expr="//field[@name='line_ids']/form//field[@name='tax_ids']" position="before">
+                <field name="sng_tax_edit_allowed" invisible="1"/>
+            </xpath>
+            <xpath expr="//field[@name='line_ids']/form//field[@name='tax_ids']" position="attributes">
+                <attribute name="readonly">not sng_tax_edit_allowed</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>

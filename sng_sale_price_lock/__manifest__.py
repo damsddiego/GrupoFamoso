@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'SNG Bloqueo de Precio y Descuento en Ventas',
-    'version': '18.0.1.1.0',
+    'version': '18.0.1.1.1',
     'category': 'Sales',
     'summary': 'Impide modificar precios o descuentos fuera de lista en ventas '
                'y facturas de cliente',

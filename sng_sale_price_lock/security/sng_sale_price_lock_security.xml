@@ -1,9 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data noupdate="0">
+        <record id="module_category_sale_price_override" model="ir.module.category">
+            <field name="name">Excepciones de precio de venta</field>
+            <field name="parent_id" ref="base.module_category_sales"/>
+            <field name="sequence">22</field>
+        </record>
+
         <record id="group_sng_force_price" model="res.groups">
             <field name="name">Modificar precio/descuento fuera de la lista de precios</field>
-            <field name="category_id" ref="base.module_category_sales_sales"/>
+            <field name="category_id" ref="module_category_sale_price_override"/>
             <field name="comment">Los usuarios con este permiso pueden capturar un
                 precio unitario o un descuento distinto al que define la lista de
                 precios en pedidos de venta y facturas de cliente.</field>

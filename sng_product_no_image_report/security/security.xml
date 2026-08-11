@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="sng_product_no_image_comp_rule" model="ir.rule">
+        <field name="name">Artículos sin Imagen: multi-compañía</field>
+        <field name="model_id" ref="model_sng_product_no_image"/>
+        <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        <field name="global" eval="True"/>
+    </record>
+
+</odoo>

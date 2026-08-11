@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_sng_product_no_image_stock_user,sng.product.no.image.stock.user,model_sng_product_no_image,stock.group_stock_user,1,0,0,0
+access_sng_product_no_image_sale_user,sng.product.no.image.sale.user,model_sng_product_no_image,sales_team.group_sale_salesman,1,0,0,0
+access_sng_product_no_image_wizard_stock_user,sng.product.no.image.wizard.stock.user,model_sng_product_no_image_wizard,stock.group_stock_user,1,1,1,1
+access_sng_product_no_image_wizard_sale_user,sng.product.no.image.wizard.sale.user,model_sng_product_no_image_wizard,sales_team.group_sale_salesman,1,1,1,1

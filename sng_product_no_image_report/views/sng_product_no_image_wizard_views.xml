@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_sng_product_no_image_wizard_form" model="ir.ui.view">
+        <field name="name">sng.product.no.image.wizard.form</field>
+        <field name="model">sng.product.no.image.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Artículos sin Imagen">
+                <group>
+                    <group string="Alcance">
+                        <field name="company_ids" widget="many2many_tags"
+                               options="{'no_create': True}"
+                               groups="base.group_multi_company"/>
+                        <field name="include_shared"/>
+                        <field name="categ_id" options="{'no_create': True}"/>
+                        <field name="type"/>
+                    </group>
+                    <group string="Filtros">
+                        <field name="only_sale_ok"/>
+                        <field name="only_purchase_ok"/>
+                        <field name="only_with_code"/>
+                    </group>
+                </group>
+                <footer>
+                    <button name="action_view_report" string="Ver reporte"
+                            type="object" class="btn-primary"/>
+                    <button string="Cancelar" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_sng_product_no_image_wizard" model="ir.actions.act_window">
+        <field name="name">Artículos sin Imagen (filtros)</field>
+        <field name="res_model">sng.product.no.image.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_sng_product_no_image_wizard_form"/>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_sng_product_no_image_wizard"
+              name="Artículos sin Imagen (filtros)"
+              parent="stock.menu_warehouse_report"
+              action="action_sng_product_no_image_wizard"
+              groups="stock.group_stock_user,sales_team.group_sale_salesman"
+              sequence="96"/>
+
+</odoo>

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_sng_product_no_image_list" model="ir.ui.view">
+        <field name="name">sng.product.no.image.list</field>
+        <field name="model">sng.product.no.image</field>
+        <field name="arch" type="xml">
+            <list string="Artículos sin Imagen" create="false" edit="false"
+                  delete="false" default_order="company_id, default_code">
+                <field name="default_code" string="Código"/>
+                <field name="product_name" string="Descripción"/>
+                <field name="barcode" optional="hide"/>
+                <field name="categ_id" optional="show"/>
+                <field name="type" optional="hide"/>
+                <field name="is_storable" optional="hide"/>
+                <field name="list_price" optional="show" sum="Total"/>
+                <field name="sale_ok" optional="hide"/>
+                <field name="purchase_ok" optional="hide"/>
+                <field name="extra_image_count" optional="hide"/>
+                <field name="create_date" optional="hide"/>
+                <field name="company_id" optional="show" groups="base.group_multi_company"/>
+                <button name="action_open_product" type="object" icon="fa-external-link"
+                        title="Abrir producto para cargar la imagen"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_sng_product_no_image_pivot" model="ir.ui.view">
+        <field name="name">sng.product.no.image.pivot</field>
+        <field name="model">sng.product.no.image</field>
+        <field name="arch" type="xml">
+            <pivot string="Artículos sin Imagen" sample="0">
+                <field name="company_id" type="row"/>
+                <field name="categ_id" type="row"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_sng_product_no_image_search" model="ir.ui.view">
+        <field name="name">sng.product.no.image.search</field>
+        <field name="model">sng.product.no.image</field>
+        <field name="arch" type="xml">
+            <search string="Artículos sin Imagen">
+                <field name="product_name" string="Producto"
+                       filter_domain="['|', ('default_code', 'ilike', self), ('product_name', 'ilike', self)]"/>
+                <field name="default_code"/>
+                <field name="categ_id"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <filter name="filter_sale_ok" string="Se venden"
+                        domain="[('sale_ok', '=', True)]"/>
+                <filter name="filter_purchase_ok" string="Se compran"
+                        domain="[('purchase_ok', '=', True)]"/>
+                <separator/>
+                <filter name="filter_storable" string="Almacenables"
+                        domain="[('is_storable', '=', True)]"/>
+                <filter name="filter_consu" string="Bienes"
+                        domain="[('type', '=', 'consu')]"/>
+                <filter name="filter_service" string="Servicios"
+                        domain="[('type', '=', 'service')]"/>
+                <separator/>
+                <filter name="filter_no_code" string="Sin código interno"
+                        domain="['|', ('default_code', '=', False), ('default_code', '=', '')]"/>
+                <filter name="filter_with_extra_images" string="Con imágenes extra"
+                        domain="[('extra_image_count', '&gt;', 0)]"/>
+                <group expand="1" string="Agrupar por">
+                    <filter name="group_company" string="Compañía"
+                            context="{'group_by': 'company_id'}"/>
+                    <filter name="group_categ" string="Categoría"
+                            context="{'group_by': 'categ_id'}"/>
+                    <filter name="group_type" string="Tipo"
+                            context="{'group_by': 'type'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_sng_product_no_image" model="ir.actions.act_window">
+        <field name="name">Artículos sin Imagen</field>
+        <field name="res_model">sng.product.no.image</field>
+        <field name="view_mode">list,pivot</field>
+        <field name="search_view_id" ref="view_sng_product_no_image_search"/>
+        <field name="context">{'search_default_group_company': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No hay artículos sin imagen
+            </p>
+            <p>
+                Todos los productos activos de las compañías seleccionadas
+                tienen su imagen principal cargada.
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="menu_sng_product_no_image"
+              name="Artículos sin Imagen"
+              parent="stock.menu_warehouse_report"
+              action="action_sng_product_no_image"
+              groups="stock.group_stock_user,sales_team.group_sale_salesman"
+              sequence="95"/>
+
+</odoo>

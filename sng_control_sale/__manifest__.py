@@ -1,6 +1,6 @@
 {
     'name': 'SNG Control Sale',
-    'version': '18.0.1.0.0',
+    'version': '18.0.1.0.1',
     'category': 'Sales',
     'summary': 'Block sale confirmations without sufficient stock per warehouse',
     'description': """

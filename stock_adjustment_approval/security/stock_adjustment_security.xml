@@ -1,16 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data noupdate="0">
+        <record id="module_category_stock_adjustment_request" model="ir.module.category">
+            <field name="name">Solicitudes de ajuste de inventario</field>
+            <field name="parent_id" ref="base.module_category_inventory"/>
+            <field name="sequence">20</field>
+        </record>
+
+        <record id="module_category_stock_adjustment_approval" model="ir.module.category">
+            <field name="name">Aprobación de ajustes de inventario</field>
+            <field name="parent_id" ref="base.module_category_inventory"/>
+            <field name="sequence">21</field>
+        </record>
+
         <!-- Grupos -->
         <record id="group_stock_adjustment_requester" model="res.groups">
             <field name="name">Solicitante de Ajuste de Inventario</field>
-            <field name="category_id" ref="base.module_category_inventory_inventory"/>
+            <field name="category_id" ref="module_category_stock_adjustment_request"/>
             <field name="implied_ids" eval="[(4, ref('stock.group_stock_user'))]"/>
         </record>
 
         <record id="group_stock_adjustment_approver" model="res.groups">
             <field name="name">Aprobador de Ajuste de Inventario</field>
-            <field name="category_id" ref="base.module_category_inventory_inventory"/>
+            <field name="category_id" ref="module_category_stock_adjustment_approval"/>
             <field name="implied_ids" eval="[(4, ref('stock.group_stock_user'))]"/>
         </record>
     </data>
