@@ -31,7 +31,10 @@ class AccountMove(models.Model):
         Se usa sudo() para que un usuario de contabilidad sin permisos sobre los
         modelos de comisión pueda pasar una factura a borrador o cancelarla.
         """
-        lines = self.sudo().sng_commission_line_ids.filtered(lambda l: l.monthly_id.state == 'draft')
+        # Solo líneas de comisión: un reverso en mes borrador sigue vigente
+        # aunque la factura se cancele (la comisión pagada igual se recupera).
+        lines = self.sudo().sng_commission_line_ids.filtered(
+            lambda l: l.monthly_id.state == 'draft' and l.line_type == 'commission')
         monthlies = lines.mapped('monthly_id')
         lines.unlink()
         monthlies._recompute_commission()

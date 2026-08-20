@@ -16,6 +16,10 @@
                         invisible="state not in ['in_process', 'paid'] or payment_type != 'inbound'"
                         confirm="Esto regenerará las líneas de comisión en borrador para este pago. ¿Desea continuar?"/>
                 </button>
+                <xpath expr="//field[@name='date']" position="after">
+                    <field name="sng_confirmation_date" readonly="1"
+                           groups="sales_commission_omax.group_sales_commission_user"/>
+                </xpath>
                 <xpath expr="//div[@name='button_box']" position="inside">
                     <button
                         name="%(action_sng_commission_payment_line)d"

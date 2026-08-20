@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 
+import logging
+
 from odoo import _, api, fields, models
+
+_logger = logging.getLogger(__name__)
 
 
 class SngCommissionPaymentLine(models.Model):
@@ -53,6 +57,12 @@ class SngCommissionPaymentLine(models.Model):
         store=True,
         index=True,
     )
+    confirmation_date = fields.Date(
+        string='Fecha de Confirmación',
+        related='payment_id.sng_confirmation_date',
+        store=True,
+        index=True,
+    )
     period = fields.Date(
         string='Periodo',
         related='monthly_id.period',
@@ -66,7 +76,8 @@ class SngCommissionPaymentLine(models.Model):
         compute='_compute_original_period',
         store=True,
         index=True,
-        help='Primer día del mes de la fecha del pago.',
+        help='Primer día del mes de la confirmación del pago (o de su fecha '
+             'contable si no hay fecha de confirmación).',
     )
     is_rolled_over = fields.Boolean(
         string='Rodado de Otro Mes',
@@ -110,6 +121,52 @@ class SngCommissionPaymentLine(models.Model):
         help='Monto sin impuestos pagado proporcionalmente por este pago. '
              'Se acumula en la comisión mensual del vendedor.',
     )
+    line_type = fields.Selection(
+        [
+            ('commission', 'Comisión'),
+            ('reversal', 'Reverso'),
+        ],
+        string='Tipo de Línea',
+        required=True,
+        default='commission',
+        index=True,
+        help='Un reverso descuenta la comisión ya pagada de un pago que fue '
+             'cancelado o desconciliado después de cerrar su mes.',
+    )
+    commission_adjustment = fields.Monetary(
+        string='Ajuste de Comisión',
+        currency_field='currency_id',
+        default=0.0,
+        help='Monto (negativo) que se descuenta de la comisión del mes: lo que '
+             'realmente se pagó por el pago revertido (base × % del mes original). '
+             'No afecta la base ni el tramo del mes donde se descuenta.',
+    )
+    reversal_of_line_id = fields.Many2one(
+        'sng.commission.payment.line',
+        string='Reverso de',
+        index=True,
+        ondelete='set null',
+        help='Línea de comisión original (de un mes cerrado) que este reverso descuenta.',
+    )
+    reversal_line_ids = fields.One2many(
+        'sng.commission.payment.line',
+        'reversal_of_line_id',
+        string='Reversos Generados',
+    )
+    reversal_reason = fields.Selection(
+        [
+            ('canceled', 'Pago cancelado/anulado'),
+            ('unreconciled', 'Pago desconciliado de la factura'),
+        ],
+        string='Motivo del Reverso',
+    )
+    original_monthly_id = fields.Many2one(
+        'sng.commission.monthly',
+        string='Mes Original del Reverso',
+        related='reversal_of_line_id.monthly_id',
+        store=True,
+        help='Mes cerrado donde se pagó la comisión que este reverso descuenta.',
+    )
     effective_tax_rate = fields.Float(
         string='% Impuesto Efectivo',
         compute='_compute_tax_profile',
@@ -135,15 +192,16 @@ class SngCommissionPaymentLine(models.Model):
     _sql_constraints = [
         (
             'unique_payment_invoice',
-            'UNIQUE(payment_id, invoice_id)',
-            'Ya existe una línea de comisión para este pago y factura.',
+            'UNIQUE(payment_id, invoice_id, line_type)',
+            'Ya existe una línea de comisión (o reverso) para este pago y factura.',
         ),
     ]
 
-    @api.depends('payment_date')
+    @api.depends('confirmation_date', 'payment_date')
     def _compute_original_period(self):
         for line in self:
-            line.original_period = line.payment_date.replace(day=1) if line.payment_date else False
+            base_date = line.confirmation_date or line.payment_date
+            line.original_period = base_date.replace(day=1) if base_date else False
 
     @api.depends('period', 'original_period')
     def _compute_is_rolled_over(self):
@@ -170,11 +228,64 @@ class SngCommissionPaymentLine(models.Model):
             else:
                 line.tax_profile = 'mixed'
 
-    @api.depends('salesperson_id', 'invoice_id', 'commission_base')
+    @api.depends('salesperson_id', 'invoice_id', 'commission_base', 'line_type')
     def _compute_name(self):
         for line in self:
-            line.name = _(
-                "Base %(salesperson)s - Factura %(invoice)s",
-                salesperson=line.salesperson_id.name or '',
-                invoice=line.invoice_id.name or '',
-            )
+            if line.line_type == 'reversal':
+                line.name = _(
+                    "Reverso %(salesperson)s - Factura %(invoice)s",
+                    salesperson=line.salesperson_id.name or '',
+                    invoice=line.invoice_id.name or '',
+                )
+            else:
+                line.name = _(
+                    "Base %(salesperson)s - Factura %(invoice)s",
+                    salesperson=line.salesperson_id.name or '',
+                    invoice=line.invoice_id.name or '',
+                )
+
+    def _create_reversals(self, reason):
+        """Crea un reverso en el mes abierto actual por cada línea de comisión
+        cuyo mes ya está cerrado/facturado/pagado.
+
+        El reverso descuenta exactamente lo que se pagó (base × % del mes
+        original) como ajuste monetario: no toca la base ni el tramo del mes
+        donde se descuenta. Idempotente: si la línea ya tiene un reverso no se
+        crea otro.
+        """
+        Monthly = self.env['sng.commission.monthly'].sudo()
+        Line = self.env['sng.commission.payment.line'].sudo()
+        start_period = self.env['account.payment']._sng_confirmation_today().replace(day=1)
+        for line in self:
+            if line.line_type != 'commission' or line.monthly_id.state == 'draft':
+                continue
+            if line.reversal_line_ids:
+                continue
+            paid_amount = line.commission_base * (line.monthly_id.percentage or 0.0) / 100.0
+            if line.currency_id.is_zero(paid_amount):
+                # El mes original no alcanzó tramo: no se pagó nada por esta línea.
+                continue
+            open_period = Monthly._get_open_period(line.salesperson_id, line.company_id, start_period)
+            if not open_period:
+                _logger.warning(
+                    "Sin mes abierto para revertir la comisión del pago %s (vendedor %s); "
+                    "el reverso queda pendiente de crear manualmente.",
+                    line.payment_id.name, line.salesperson_id.name,
+                )
+                continue
+            monthly = Monthly._get_or_create(line.salesperson_id, line.company_id, open_period)
+            Line.create({
+                'line_type': 'reversal',
+                'reversal_of_line_id': line.id,
+                'reversal_reason': reason,
+                'monthly_id': monthly.id,
+                'payment_id': line.payment_id.id,
+                'invoice_id': line.invoice_id.id,
+                'salesperson_id': line.salesperson_id.id,
+                'payment_amount': -line.payment_amount,
+                'invoice_amount_untaxed': line.invoice_amount_untaxed,
+                'invoice_amount_total': line.invoice_amount_total,
+                'commission_base': 0.0,
+                'commission_adjustment': -paid_amount,
+            })
+            monthly._recompute_commission()

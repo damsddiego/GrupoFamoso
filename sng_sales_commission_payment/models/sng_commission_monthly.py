@@ -61,11 +61,33 @@ class SngCommissionMonthly(models.Model):
         string='Detalle de Pagos',
         readonly=True,
     )
+    commission_line_ids = fields.One2many(
+        'sng.commission.payment.line',
+        'monthly_id',
+        string='Detalle de Pagos (comisión)',
+        domain=[('line_type', '=', 'commission')],
+        readonly=True,
+    )
+    reversal_line_ids = fields.One2many(
+        'sng.commission.payment.line',
+        'monthly_id',
+        string='Reversos',
+        domain=[('line_type', '=', 'reversal')],
+        readonly=True,
+    )
     base_amount = fields.Monetary(
         string='Base Acumulada (sin impuestos)',
         currency_field='currency_id',
         readonly=True,
         help='Suma sin impuestos de los pagos recibidos en el mes.',
+    )
+    adjustment_amount = fields.Monetary(
+        string='Reversos del Mes',
+        currency_field='currency_id',
+        readonly=True,
+        help='Total (negativo) descontado por comisiones ya pagadas de pagos '
+             'cancelados o desconciliados de meses cerrados. No afecta la base '
+             'ni el tramo: se resta directo del monto de comisión.',
     )
     tier_id = fields.Many2one(
         'sng.commission.tier',
@@ -235,19 +257,26 @@ class SngCommissionMonthly(models.Model):
         return rec
 
     def _recompute_commission(self):
-        """Recalcula base, tramo y monto. Solo afecta registros en borrador."""
+        """Recalcula base, tramo y monto. Solo afecta registros en borrador.
+
+        Los reversos no suman base (no cambian el tramo): su ajuste monetario
+        se descuenta directo del monto de comisión del mes.
+        """
         Tier = self.env['sng.commission.tier']
         for rec in self:
             if rec.state != 'draft':
                 continue
-            base = sum(rec.line_ids.mapped('commission_base'))
+            base = sum(rec.line_ids.filtered(
+                lambda l: l.line_type == 'commission').mapped('commission_base'))
+            adjustment = sum(rec.line_ids.mapped('commission_adjustment'))
             tier = Tier.get_tier_for_amount(base, rec.company_id)
             percentage = tier.percentage if tier else 0.0
             rec.write({
                 'base_amount': base,
                 'tier_id': tier.id if tier else False,
                 'percentage': percentage,
-                'commission_amount': base * percentage / 100.0,
+                'adjustment_amount': adjustment,
+                'commission_amount': base * percentage / 100.0 + adjustment,
             })
 
     def _get_tax_profile_summary(self):
@@ -257,7 +286,8 @@ class SngCommissionMonthly(models.Model):
         labels = dict(Line._fields['tax_profile']._description_selection(self.env))
         summary = []
         for profile in ('taxed_13', 'no_tax', 'mixed'):
-            lines = self.line_ids.filtered(lambda l: l.tax_profile == profile)
+            lines = self.line_ids.filtered(
+                lambda l: l.tax_profile == profile and l.line_type == 'commission')
             if not lines:
                 continue
             summary.append({

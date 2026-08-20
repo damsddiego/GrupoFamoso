@@ -148,6 +148,8 @@ class CustomerStatementWizard(models.TransientModel):
     # ── Descarga XLSX ───────────────────────────────────────────────────────
     excel_file = fields.Binary('Archivo Excel', readonly=True)
     excel_filename = fields.Char('Nombre Excel', readonly=True)
+    pdf_file = fields.Binary('Archivo PDF', readonly=True)
+    pdf_filename = fields.Char('Nombre PDF', readonly=True)
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -1340,6 +1342,52 @@ class CustomerStatementWizard(models.TransientModel):
                 'allowed_company_ids': report_ctx['allowed_company_ids'],
             },
         )
+
+    def get_pdf_b64(self):
+        """Devuelve el PDF del estado de cuenta en base64, sin sesión web.
+
+        Why: `action_print_pdf` devuelve un descriptor de acción, no el archivo;
+        materializarlo exige la cookie de sesión de `/web/report`, y esa ruta
+        rechaza las API keys (Odoo solo las acepta para RPC). Este método hace
+        el render del lado del servidor y devuelve los bytes, de modo que un
+        cliente XML-RPC —app de escritorio, script, integración— pueda obtener
+        el mismo PDF autenticándose con una API key.
+
+        No altera `action_print_pdf` ni `action_print_excel`: quien use la
+        interfaz web sigue por el camino de siempre.
+
+        Returns:
+            dict con 'filename' (str) y 'pdf_b64' (str, base64 del PDF).
+        """
+        self.ensure_one()
+        report_mode_ctx = self.env.context.get('report_mode_ctx')
+        if report_mode_ctx in ('summary', 'detail') and self.report_mode != report_mode_ctx:
+            self.write({'report_mode': report_mode_ctx})
+
+        company = self._get_report_company()
+        report_ctx = self._get_report_context(company)
+        wizard = self.with_context(**report_ctx).with_company(company)
+
+        # Mismo payload que action_print_pdf: el parser recalcula desde el
+        # wizard, así que basta con identificarlo y fijar la compañía.
+        pdf_bytes, _dummy = self.env['ir.actions.report'].with_context(
+            **report_ctx
+        )._render_qweb_pdf(
+            'sng_customer_statement.action_report_customer_statement',
+            res_ids=wizard.ids,
+            data={
+                'wizard_id': self.id,
+                'company_id': company.id,
+                'allowed_company_ids': report_ctx['allowed_company_ids'],
+            },
+        )
+
+        filename = f"estado_cuenta_{self.report_mode}_{self.date_from}_{self.date_to}.pdf"
+        contenido = base64.b64encode(pdf_bytes)
+        # Se guarda además en el registro para poder descargarlo por
+        # /web/content, igual que hace el XLSX.
+        self.write({'pdf_file': contenido, 'pdf_filename': filename})
+        return {'filename': filename, 'pdf_b64': contenido.decode()}
 
     # ======================================================================
     # ACCIÓN 3: XLSX

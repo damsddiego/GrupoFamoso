@@ -7,6 +7,8 @@ from odoo import _, fields, models
 from odoo.exceptions import UserError
 from odoo.tools.misc import formatLang
 
+from ..models.account_payment import SNG_SOLO_RUTEROS
+
 
 class SngRuterosReportePagos(models.TransientModel):
     _name = 'sng.ruteros.reporte.pagos'
@@ -51,6 +53,7 @@ class SngRuterosReportePagos(models.TransientModel):
         self.ensure_one()
         domain = [
             ('sng_from_app', '=', True),
+            SNG_SOLO_RUTEROS,  # este reporte es la liquidación de ruta
             ('company_id', 'in', self.company_ids.ids),
             ('date', '>=', self.fecha_desde),
             ('date', '<=', self.fecha_hasta),

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Comisiones por Pagos de Facturas',
-    'version': '18.0.3.1.0',
+    'version': '18.0.5.0.0',
     'category': 'Accounting/Accounting',
     'summary': 'Comisión mensual por vendedor con escala por tramos sobre pagos recibidos',
     'description': """

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 ERP Heritage (https://www.erpheritage.com.au)
+    License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl-3.0).
+-->
+<odoo>
+    <data>
+
+        <menuitem id="menu_eh_access_root"
+                  name="User Access Studio"
+                  groups="eh_access_studio.group_eh_access_user"
+                  sequence="90"
+                  web_icon="eh_access_studio,static/description/icon.png"/>
+
+        <menuitem id="menu_eh_access_profiles"
+                  name="Profiles"
+                  parent="menu_eh_access_root"
+                  action="action_eh_access_profile"
+                  sequence="10"/>
+
+        <menuitem id="menu_eh_access_configuration"
+                  name="Configuration"
+                  parent="menu_eh_access_root"
+                  groups="eh_access_studio.group_eh_access_manager"
+                  sequence="90"/>
+
+        <menuitem id="menu_eh_access_template"
+                  name="New from Template"
+                  parent="menu_eh_access_root"
+                  action="action_eh_access_template_wizard"
+                  groups="eh_access_studio.group_eh_access_manager"
+                  sequence="20"/>
+
+        <menuitem id="menu_eh_access_yaml"
+                  name="Import / Export"
+                  parent="menu_eh_access_configuration"
+                  action="action_eh_access_yaml_wizard"
+                  groups="eh_access_studio.group_eh_access_manager"
+                  sequence="10"/>
+
+    </data>
+</odoo>

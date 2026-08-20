@@ -28,12 +28,20 @@ class SngGenerateCommissionWiz(models.TransientModel):
         if self.date_from > self.date_to:
             raise UserError(_('La fecha "Desde" no puede ser mayor a la fecha "Hasta".'))
 
+        # El rango filtra por fecha de confirmación; los pagos antiguos sin
+        # sellar (sng_confirmation_date vacío) caen por su fecha contable.
         domain = [
             ('payment_type', '=', 'inbound'),
             ('state', 'in', ('in_process', 'paid')),
-            ('date', '>=', self.date_from),
-            ('date', '<=', self.date_to),
             ('company_id', '=', self.company_id.id),
+            '|',
+                '&',
+                    ('sng_confirmation_date', '>=', self.date_from),
+                    ('sng_confirmation_date', '<=', self.date_to),
+                '&', '&',
+                    ('sng_confirmation_date', '=', False),
+                    ('date', '>=', self.date_from),
+                    ('date', '<=', self.date_to),
         ]
         payments = self.env['account.payment'].search(domain)
         if not payments:

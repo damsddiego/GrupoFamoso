@@ -13,6 +13,7 @@
                     <field name="salesperson_id"/>
                     <field name="base_amount" sum="Base"/>
                     <field name="percentage"/>
+                    <field name="adjustment_amount" sum="Reversos" optional="hide"/>
                     <field name="commission_amount" sum="Comisión"/>
                     <field name="state" widget="badge"
                            decoration-success="state == 'paid'" decoration-info="state == 'billed'"
@@ -66,6 +67,8 @@
                                 <field name="base_amount"/>
                                 <field name="tier_id"/>
                                 <field name="percentage"/>
+                                <field name="adjustment_amount" invisible="not adjustment_amount"
+                                       decoration-danger="adjustment_amount &lt; 0"/>
                                 <field name="commission_amount"/>
                                 <field name="bill_id"/>
                                 <field name="currency_id" invisible="1"/>
@@ -73,10 +76,11 @@
                         </group>
                         <notebook>
                             <page string="Detalle de Pagos" name="detail">
-                                <field name="line_ids">
+                                <field name="commission_line_ids">
                                     <list create="0" delete="0" decoration-warning="is_rolled_over">
                                         <field name="currency_id" column_invisible="1"/>
                                         <field name="payment_date"/>
+                                        <field name="confirmation_date" optional="show"/>
                                         <field name="original_period" optional="hide"/>
                                         <field name="is_rolled_over" optional="hide"/>
                                         <field name="invoice_id"/>
@@ -88,6 +92,20 @@
                                                decoration-warning="tax_profile == 'mixed'"/>
                                         <field name="effective_tax_rate" optional="show"/>
                                         <field name="commission_base" sum="Base"/>
+                                    </list>
+                                </field>
+                            </page>
+                            <page string="Reversos" name="reversals" invisible="not reversal_line_ids">
+                                <field name="reversal_line_ids">
+                                    <list create="0" delete="0" decoration-danger="commission_adjustment &lt; 0">
+                                        <field name="currency_id" column_invisible="1"/>
+                                        <field name="payment_id"/>
+                                        <field name="invoice_id"/>
+                                        <field name="partner_id"/>
+                                        <field name="reversal_reason"/>
+                                        <field name="original_monthly_id"/>
+                                        <field name="payment_amount" string="Pago Revertido"/>
+                                        <field name="commission_adjustment" sum="Descuento"/>
                                     </list>
                                 </field>
                             </page>

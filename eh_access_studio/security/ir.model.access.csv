@@ -1,0 +1,15 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_eh_access_profile_user,eh.access.profile.user,model_eh_access_profile,eh_access_studio.group_eh_access_user,1,0,0,0
+access_eh_access_profile_manager,eh.access.profile.manager,model_eh_access_profile,eh_access_studio.group_eh_access_manager,1,1,1,1
+access_eh_access_field_user,eh.access.field.user,model_eh_access_field,eh_access_studio.group_eh_access_user,1,0,0,0
+access_eh_access_field_manager,eh.access.field.manager,model_eh_access_field,eh_access_studio.group_eh_access_manager,1,1,1,1
+access_eh_access_model_user,eh.access.model.user,model_eh_access_model,eh_access_studio.group_eh_access_user,1,0,0,0
+access_eh_access_model_manager,eh.access.model.manager,model_eh_access_model,eh_access_studio.group_eh_access_manager,1,1,1,1
+access_eh_access_node_user,eh.access.node.user,model_eh_access_node,eh_access_studio.group_eh_access_user,1,0,0,0
+access_eh_access_node_manager,eh.access.node.manager,model_eh_access_node,eh_access_studio.group_eh_access_manager,1,1,1,1
+access_eh_access_chatter_user,eh.access.chatter.user,model_eh_access_chatter,eh_access_studio.group_eh_access_user,1,0,0,0
+access_eh_access_chatter_manager,eh.access.chatter.manager,model_eh_access_chatter,eh_access_studio.group_eh_access_manager,1,1,1,1
+access_eh_access_domain_user,eh.access.domain.user,model_eh_access_domain,eh_access_studio.group_eh_access_user,1,0,0,0
+access_eh_access_domain_manager,eh.access.domain.manager,model_eh_access_domain,eh_access_studio.group_eh_access_manager,1,1,1,1
+access_eh_access_yaml_wizard_manager,eh.access.yaml.wizard.manager,model_eh_access_yaml_wizard,eh_access_studio.group_eh_access_manager,1,1,1,1
+access_eh_access_template_wizard_manager,eh.access.template.wizard.manager,model_eh_access_template_wizard,eh_access_studio.group_eh_access_manager,1,1,1,1

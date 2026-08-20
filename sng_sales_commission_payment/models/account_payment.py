@@ -2,15 +2,27 @@
 
 import logging
 
+import pytz
+
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
 
+CR_TZ = pytz.timezone('America/Costa_Rica')
+
 
 class AccountPayment(models.Model):
     _inherit = 'account.payment'
 
+    sng_confirmation_date = fields.Date(
+        string='Fecha de Confirmación',
+        copy=False,
+        readonly=True,
+        index=True,
+        help='Día (hora de Costa Rica) en que el pago pasó por primera vez a '
+             'En proceso/Pagado. Determina el mes de la comisión.',
+    )
     sng_commission_line_ids = fields.One2many(
         'sng.commission.payment.line',
         'payment_id',
@@ -33,12 +45,77 @@ class AccountPayment(models.Model):
     # Estados de account.payment (Odoo 18) en los que el pago está confirmado.
     SNG_COMMISSION_VALID_STATES = ('in_process', 'paid')
 
+    @api.model
+    def _sng_confirmation_today(self):
+        """Fecha actual en hora de Costa Rica, independiente del tz del usuario."""
+        return fields.Datetime.now().replace(tzinfo=pytz.utc).astimezone(CR_TZ).date()
+
+    def _sng_set_confirmation_date(self):
+        """Sella la fecha de la PRIMERA confirmación; reconfirmar no la mueve."""
+        to_stamp = self.filtered(
+            lambda p: p.state in self.SNG_COMMISSION_VALID_STATES and not p.sng_confirmation_date
+        )
+        if to_stamp:
+            to_stamp.write({'sng_confirmation_date': self._sng_confirmation_today()})
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        payments = super().create(vals_list)
+        # Pagos que nacen ya confirmados (p. ej. conciliación bancaria).
+        payments._sng_set_confirmation_date()
+        return payments
+
+    def write(self, vals):
+        res = super().write(vals)
+        # action_post y la app asignan el estado vía write; el write interno de
+        # _sng_set_confirmation_date no incluye 'state', así que no hay recursión.
+        if vals.get('state') in self.SNG_COMMISSION_VALID_STATES:
+            self._sng_set_confirmation_date()
+        return res
+
     def action_post(self):
         res = super(AccountPayment, self).action_post()
         for payment in self:
             if payment.payment_type == 'inbound' and payment.state in self.SNG_COMMISSION_VALID_STATES:
                 payment._generate_commission_lines()
         return res
+
+    def action_draft(self):
+        self._sng_handle_payment_invalidation('canceled')
+        return super().action_draft()
+
+    def action_cancel(self):
+        self._sng_handle_payment_invalidation('canceled')
+        return super().action_cancel()
+
+    def action_reject(self):
+        self._sng_handle_payment_invalidation('canceled')
+        return super().action_reject()
+
+    def _sng_handle_payment_invalidation(self, reason, invoices=None):
+        """Al invalidarse un pago (anulado/cancelado/rechazado/desconciliado):
+
+        - sus líneas de comisión en meses en borrador se eliminan y el mes se
+          recalcula;
+        - las de meses cerrados/facturados/pagados generan un reverso en el mes
+          abierto actual por lo que realmente se pagó (idempotente).
+
+        Con ``invoices`` solo se afectan las líneas de esas facturas (caso
+        desconciliación parcial).
+        """
+        Line = self.env['sng.commission.payment.line'].sudo()
+        domain = [('payment_id', 'in', self.ids), ('line_type', '=', 'commission')]
+        if invoices is not None:
+            domain.append(('invoice_id', 'in', invoices.ids))
+        lines = Line.search(domain)
+        if not lines:
+            return
+        draft_lines = lines.filtered(lambda l: l.monthly_id.state == 'draft')
+        frozen_lines = lines - draft_lines
+        monthlies = draft_lines.mapped('monthly_id')
+        draft_lines.unlink()
+        monthlies._recompute_commission()
+        frozen_lines._create_reversals(reason)
 
     def action_generate_commission_lines(self):
         """Botón manual para (re)generar el detalle de comisión del pago."""
@@ -70,7 +147,9 @@ class AccountPayment(models.Model):
         # tener permisos sobre los modelos de comisión.
         Monthly = self.env['sng.commission.monthly'].sudo()
         Line = self.env['sng.commission.payment.line'].sudo()
-        period = self.date.replace(day=1)
+        # El mes de la comisión lo define la fecha de confirmación del pago;
+        # la fecha contable solo es respaldo para pagos antiguos sin sellar.
+        period = (self.sng_confirmation_date or self.date).replace(day=1)
         affected = Monthly
 
         for invoice, partial, amount in partials_data:
@@ -96,9 +175,18 @@ class AccountPayment(models.Model):
             existing = Line.search([
                 ('payment_id', '=', self.id),
                 ('invoice_id', '=', invoice.id),
+                ('line_type', '=', 'commission'),
             ], limit=1)
             # Una línea que ya quedó en un mes cerrado/facturado no se toca.
             if existing and existing.monthly_id.state != 'draft':
+                # Pago revivido tras un reverso: si el reverso sigue en un mes
+                # abierto se elimina y la comisión original vuelve a valer.
+                reversals = existing.reversal_line_ids.filtered(
+                    lambda r: r.monthly_id.state == 'draft')
+                if reversals:
+                    reversal_months = reversals.mapped('monthly_id')
+                    reversals.unlink()
+                    affected |= reversal_months
                 continue
 
             vals = {
