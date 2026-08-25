@@ -11,7 +11,9 @@
     'depends': ['base', 'sales_commission_omax'],
     'data': [],
     'external_dependencies': {
-        'python': ['paho.mqtt.publish'],
+        # Nombre del paquete pip (Odoo 18 lo valida contra los paquetes
+        # instalados), no la ruta del módulo Python
+        'python': ['paho-mqtt'],
     },
     'installable': True,
     'application': False,
