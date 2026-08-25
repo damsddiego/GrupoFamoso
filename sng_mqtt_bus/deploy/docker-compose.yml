@@ -1,0 +1,21 @@
+# Broker MQTT para sng_mqtt_bus (eventos Odoo → app ruteros)
+# Uso:
+#   1. Copiar esta carpeta `deploy/` al VPS (p. ej. /opt/mosquitto)
+#   2. bash setup.sh          (crea los usuarios y arranca)
+#   3. Abrir el puerto 1883 SOLO a las IPs necesarias, o configurar TLS (8883)
+services:
+  mosquitto:
+    image: eclipse-mosquitto:2
+    container_name: mosquitto
+    restart: unless-stopped
+    ports:
+      - "1883:1883"
+    volumes:
+      - ./mosquitto/config:/mosquitto/config
+      - ./mosquitto/data:/mosquitto/data
+      - ./mosquitto/log:/mosquitto/log
+    healthcheck:
+      test: ["CMD", "mosquitto_sub", "-t", "$$SYS/#", "-C", "1", "-i", "healthcheck", "-W", "3", "-u", "healthcheck", "-P", "healthcheck"]
+      interval: 30s
+      timeout: 10s
+      retries: 3

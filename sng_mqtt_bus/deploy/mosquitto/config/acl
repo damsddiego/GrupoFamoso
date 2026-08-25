@@ -1,0 +1,9 @@
+# Odoo publica, las tabletas solo leen
+user odoo_pub
+topic write ruteros/#
+
+user app_sub
+topic read ruteros/#
+
+user healthcheck
+topic read $SYS/#
