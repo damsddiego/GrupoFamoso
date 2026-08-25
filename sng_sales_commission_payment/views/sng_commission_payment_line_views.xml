@@ -5,9 +5,13 @@
             <field name="name">sng.commission.payment.line.tree</field>
             <field name="model">sng.commission.payment.line</field>
             <field name="arch" type="xml">
-                <list string="Detalle de Comisión por Pago" create="0" decoration-warning="is_rolled_over">
+                <list string="Detalle de Comisión por Pago" create="0"
+                      decoration-warning="is_rolled_over" decoration-danger="line_type == 'reversal'">
                     <field name="currency_id" column_invisible="1"/>
+                    <field name="line_type" widget="badge" optional="show"
+                           decoration-danger="line_type == 'reversal'"/>
                     <field name="payment_date"/>
+                    <field name="confirmation_date" optional="show"/>
                     <field name="period" optional="hide"/>
                     <field name="original_period" optional="hide"/>
                     <field name="is_rolled_over" optional="hide"/>
@@ -17,6 +21,7 @@
                     <field name="payment_id"/>
                     <field name="payment_amount" sum="Pagado"/>
                     <field name="commission_base" sum="Base"/>
+                    <field name="commission_adjustment" sum="Reversos" optional="hide"/>
                     <field name="tax_profile" widget="badge"
                            decoration-success="tax_profile == 'taxed_13'"
                            decoration-warning="tax_profile == 'mixed'"/>
@@ -34,11 +39,16 @@
                     <sheet>
                         <group>
                             <group>
+                                <field name="line_type"/>
+                                <field name="reversal_reason" invisible="line_type != 'reversal'"/>
+                                <field name="reversal_of_line_id" invisible="line_type != 'reversal'"/>
+                                <field name="original_monthly_id" invisible="line_type != 'reversal'"/>
                                 <field name="payment_id"/>
                                 <field name="invoice_id"/>
                                 <field name="partner_id"/>
                                 <field name="salesperson_id"/>
                                 <field name="payment_date"/>
+                                <field name="confirmation_date"/>
                                 <field name="monthly_id"/>
                                 <field name="period"/>
                                 <field name="original_period"/>
@@ -52,6 +62,7 @@
                                 <field name="tax_profile"/>
                                 <field name="effective_tax_rate"/>
                                 <field name="commission_base"/>
+                                <field name="commission_adjustment" invisible="line_type != 'reversal'"/>
                                 <field name="company_id" groups="base.group_multi_company"/>
                             </group>
                         </group>
@@ -73,10 +84,12 @@
                     <filter string="Sin impuesto (0%)" name="no_tax" domain="[('tax_profile', '=', 'no_tax')]"/>
                     <filter string="Tarifa mixta/reducida" name="mixed" domain="[('tax_profile', '=', 'mixed')]"/>
                     <filter string="Rodados de otro mes" name="rolled_over" domain="[('is_rolled_over', '=', True)]"/>
+                    <filter string="Reversos" name="reversals" domain="[('line_type', '=', 'reversal')]"/>
                     <group expand="0" string="Agrupar por">
                         <filter string="Vendedor" name="group_by_salesperson" context="{'group_by': 'salesperson_id'}"/>
                         <filter string="Periodo" name="group_by_period" context="{'group_by': 'period'}"/>
                         <filter string="Fecha de pago" name="group_by_payment_date" context="{'group_by': 'payment_date'}"/>
+                        <filter string="Fecha de confirmación" name="group_by_confirmation_date" context="{'group_by': 'confirmation_date'}"/>
                         <filter string="Tipo de factura" name="group_by_tax_profile" context="{'group_by': 'tax_profile'}"/>
                         <filter string="Cliente" name="group_by_partner" context="{'group_by': 'partner_id'}"/>
                     </group>

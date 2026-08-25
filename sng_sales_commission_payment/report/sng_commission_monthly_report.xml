@@ -31,6 +31,13 @@
                                             <td><strong>% Comisión</strong></td>
                                             <td class="text-end"><span t-esc="'{:.2f}%'.format(doc.percentage)"/></td>
                                         </tr>
+                                        <tr t-if="doc.adjustment_amount">
+                                            <td><strong>Reversos del Mes</strong></td>
+                                            <td class="text-end text-danger">
+                                                <span t-field="doc.adjustment_amount"
+                                                      t-options="{'widget': 'monetary', 'display_currency': doc.currency_id}"/>
+                                            </td>
+                                        </tr>
                                         <tr class="border-top">
                                             <td><strong>Monto de Comisión</strong></td>
                                             <td class="text-end">
@@ -83,7 +90,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr t-foreach="doc.line_ids" t-as="line">
+                                    <tr t-foreach="doc.commission_line_ids" t-as="line">
                                         <td><span t-field="line.payment_date"/></td>
                                         <td><span t-field="line.invoice_id.name"/></td>
                                         <td><span t-field="line.payment_id.name"/></td>
@@ -104,7 +111,7 @@
                                     <tr>
                                         <td colspan="4"><strong>TOTAL</strong></td>
                                         <td class="text-end">
-                                            <strong><span t-esc="sum(doc.line_ids.mapped('payment_amount'))"
+                                            <strong><span t-esc="sum(doc.commission_line_ids.mapped('payment_amount'))"
                                                   t-options="{'widget': 'monetary', 'display_currency': doc.currency_id}"/></strong>
                                         </td>
                                         <td colspan="2"/>
@@ -115,6 +122,44 @@
                                     </tr>
                                 </tfoot>
                             </table>
+
+                            <t t-if="doc.reversal_line_ids">
+                                <h5 class="mt-3">Reversos (comisiones pagadas de pagos cancelados)</h5>
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr class="table-light">
+                                            <th>Pago</th>
+                                            <th>Factura</th>
+                                            <th>Cliente</th>
+                                            <th>Motivo</th>
+                                            <th>Mes Original</th>
+                                            <th class="text-end">Descuento</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr t-foreach="doc.reversal_line_ids" t-as="line">
+                                            <td><span t-field="line.payment_id.name"/></td>
+                                            <td><span t-field="line.invoice_id.name"/></td>
+                                            <td><span t-field="line.partner_id.name"/></td>
+                                            <td><span t-field="line.reversal_reason"/></td>
+                                            <td><span t-field="line.original_monthly_id.period_label"/></td>
+                                            <td class="text-end text-danger">
+                                                <span t-field="line.commission_adjustment"
+                                                      t-options="{'widget': 'monetary', 'display_currency': line.currency_id}"/>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <td colspan="5"><strong>TOTAL REVERSOS</strong></td>
+                                            <td class="text-end text-danger">
+                                                <strong><span t-esc="doc.adjustment_amount"
+                                                      t-options="{'widget': 'monetary', 'display_currency': doc.currency_id}"/></strong>
+                                            </td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </t>
                         </div>
                     </t>
                 </t>

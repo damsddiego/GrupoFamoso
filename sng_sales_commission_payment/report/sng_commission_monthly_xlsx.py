@@ -31,7 +31,7 @@ class CommissionMonthlyXlsx(models.AbstractModel):
         sheet.set_column(3, 8, 16)
         sheet.write(0, 0, 'Comisiones Mensuales', title)
         headers = ['Vendedor', 'Mes', 'Compañía', 'Base (sin IVA)',
-                   '% Comisión', 'Comisión', 'Estado', 'Factura de Comisión']
+                   '% Comisión', 'Reversos', 'Comisión', 'Estado', 'Factura de Comisión']
         for col, text in enumerate(headers):
             sheet.write(2, col, text, header)
         row = 3
@@ -41,13 +41,15 @@ class CommissionMonthlyXlsx(models.AbstractModel):
             sheet.write(row, 2, m.company_id.name or '')
             sheet.write_number(row, 3, m.base_amount, money)
             sheet.write_number(row, 4, m.percentage, pct)
-            sheet.write_number(row, 5, m.commission_amount, money)
-            sheet.write(row, 6, state_labels.get(m.state, m.state))
-            sheet.write(row, 7, m.bill_id.name or '')
+            sheet.write_number(row, 5, m.adjustment_amount or 0.0, money)
+            sheet.write_number(row, 6, m.commission_amount, money)
+            sheet.write(row, 7, state_labels.get(m.state, m.state))
+            sheet.write(row, 8, m.bill_id.name or '')
             row += 1
         sheet.write(row, 2, 'TOTAL', bold)
         sheet.write_number(row, 3, sum(monthlies.mapped('base_amount')), money_bold)
-        sheet.write_number(row, 5, sum(monthlies.mapped('commission_amount')), money_bold)
+        sheet.write_number(row, 5, sum(monthlies.mapped('adjustment_amount')), money_bold)
+        sheet.write_number(row, 6, sum(monthlies.mapped('commission_amount')), money_bold)
 
         # ---- Hoja Análisis: resumen por tipo de factura ----
         sheet = workbook.add_worksheet('Análisis IVA')
@@ -81,7 +83,7 @@ class CommissionMonthlyXlsx(models.AbstractModel):
             sheet.write(0, col, text, header)
         row = 1
         for m in monthlies:
-            for line in m.line_ids:
+            for line in m.commission_line_ids:
                 sheet.write(row, 0, m.salesperson_id.name or '')
                 if line.payment_date:
                     sheet.write_datetime(row, 1, line.payment_date, date_fmt)
@@ -94,6 +96,34 @@ class CommissionMonthlyXlsx(models.AbstractModel):
                 sheet.write_number(row, 8, line.commission_base, money)
                 row += 1
         sheet.write(row, 4, 'TOTAL', bold)
-        all_lines = monthlies.mapped('line_ids')
+        all_lines = monthlies.mapped('commission_line_ids')
         sheet.write_number(row, 5, sum(all_lines.mapped('payment_amount')), money_bold)
         sheet.write_number(row, 8, sum(all_lines.mapped('commission_base')), money_bold)
+
+        # ---- Hoja Reversos: comisiones pagadas de pagos cancelados ----
+        reversals = monthlies.mapped('reversal_line_ids')
+        if reversals:
+            reason_labels = dict(
+                reversals._fields['reversal_reason']._description_selection(reversals.env))
+            sheet = workbook.add_worksheet('Reversos')
+            sheet.set_column(0, 0, 30)
+            sheet.set_column(1, 4, 22)
+            sheet.set_column(3, 3, 35)
+            sheet.set_column(5, 7, 18)
+            headers = ['Vendedor', 'Mes del Descuento', 'Pago', 'Cliente', 'Factura',
+                       'Motivo', 'Mes Original', 'Descuento']
+            for col, text in enumerate(headers):
+                sheet.write(0, col, text, header)
+            row = 1
+            for line in reversals:
+                sheet.write(row, 0, line.salesperson_id.name or '')
+                sheet.write(row, 1, line.monthly_id.period_label or '')
+                sheet.write(row, 2, line.payment_id.name or '')
+                sheet.write(row, 3, line.partner_id.name or '')
+                sheet.write(row, 4, line.invoice_id.name or '')
+                sheet.write(row, 5, reason_labels.get(line.reversal_reason, ''))
+                sheet.write(row, 6, line.original_monthly_id.period_label or '')
+                sheet.write_number(row, 7, line.commission_adjustment, money)
+                row += 1
+            sheet.write(row, 6, 'TOTAL', bold)
+            sheet.write_number(row, 7, sum(reversals.mapped('commission_adjustment')), money_bold)

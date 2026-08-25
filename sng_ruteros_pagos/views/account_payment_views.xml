@@ -19,17 +19,19 @@
                         invisible="not sng_from_app or (not sng_ia_estado and invoice_ids)"/>
             </xpath>
             <xpath expr="//sheet" position="inside">
-                <group string="Recibo Ruteros (app)"
+                <group string="Recibo de app SNG"
                        invisible="not sng_from_app" col="4">
                     <field name="sng_from_app" invisible="1"/>
                     <field name="is_reconciled" invisible="1"/>
                     <field name="sng_puede_verificar" invisible="1"/>
+                    <field name="sng_origen" readonly="1"/>
                     <field name="sng_verificado" widget="boolean_toggle"
                            readonly="not sng_puede_verificar"/>
                     <field name="sng_numero_recibo"/>
                     <field name="sng_metodo_pago"/>
                     <field name="sng_referencia"/>
-                    <field name="sng_vendedor_id"/>
+                    <field name="sng_vendedor_id"
+                           invisible="sng_origen == 'escritorio'"/>
                     <field name="sng_saldo_anterior"/>
                     <field name="sng_saldo_proyectado"/>
                     <field name="sng_observaciones" colspan="4"/>
@@ -97,6 +99,8 @@
                 <field name="date"/>
                 <field name="name"/>
                 <field name="sng_numero_recibo" optional="show"/>
+                <field name="sng_origen" optional="hide" widget="badge"
+                       decoration-info="sng_origen == 'escritorio'"/>
                 <field name="partner_id"/>
                 <field name="partner_unique_id" optional="show"/>
                 <field name="sng_vendedor_id"/>
@@ -143,6 +147,11 @@
                 <field name="sng_vendedor_id"/>
                 <field name="sng_referencia"/>
                 <field name="sng_numero_recibo" string="N° recibo app"/>
+                <filter name="solo_ruteros" string="Solo ruteros"
+                        domain="[('sng_origen', '!=', 'escritorio')]"/>
+                <filter name="solo_escritorio" string="Solo escritorio"
+                        domain="[('sng_origen', '=', 'escritorio')]"/>
+                <separator/>
                 <filter name="borrador" string="Borrador"
                         domain="[('state', '=', 'draft')]"/>
                 <filter name="confirmado" string="Confirmado"
@@ -170,6 +179,8 @@
                 <filter name="no_verificado" string="Sin verificar"
                         domain="[('sng_verificado', '=', False)]"/>
                 <group expand="0" string="Agrupar por">
+                    <filter name="group_origen" string="Origen"
+                            context="{'group_by': 'sng_origen'}"/>
                     <filter name="group_verificado" string="Verificado"
                             context="{'group_by': 'sng_verificado'}"/>
                     <filter name="group_state" string="Estado"
@@ -191,7 +202,9 @@
         <field name="res_model">account.payment</field>
         <field name="view_mode">list,form</field>
         <field name="domain">[('sng_from_app', '=', True)]</field>
-        <field name="context">{}</field>
+        <!-- Por defecto solo ruteros (comportamiento histórico del menú); el
+             filtro se puede quitar para ver también los pagos de oficina. -->
+        <field name="context">{'search_default_solo_ruteros': 1}</field>
         <field name="search_view_id" ref="view_ruteros_recibo_search"/>
         <field name="view_id" ref="view_ruteros_recibo_list"/>
     </record>

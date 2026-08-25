@@ -29,6 +29,12 @@ SNG_FACTURA_SIMPLE_RE = re.compile(
 # Valor centinela del parámetro de sistema mientras no se configure la API key.
 SNG_IA_KEY_SIN_CONFIGURAR = 'PENDIENTE_CONFIGURAR'
 
+# Filtro de "solo cobros de ruta", para reportes y crons que son exclusivos de
+# ruteros. Se usa '!=' escritorio (y no '=' ruteros) a propósito: los recibos
+# anteriores a la introducción de sng_origen tienen la columna en NULL y deben
+# seguir contando como ruteros, que es lo que eran.
+SNG_SOLO_RUTEROS = ('sng_origen', '!=', 'escritorio')
+
 # La IA solo puede elegir facturas de la lista de candidatas que le enviamos;
 # el schema fuerza JSON válido y en Python se re-validan los IDs devueltos.
 SNG_IA_MATCH_SCHEMA = {
@@ -188,12 +194,31 @@ SNG_IA_SYSTEM = (
 class AccountPayment(models.Model):
     _inherit = 'account.payment'
 
-    # Bandera: identifica los pagos creados desde la app móvil app_ruteros.
+    # Bandera: identifica los pagos creados desde una app de SNG (móvil o
+    # escritorio). Activa el pipeline: ligado de facturas, detectores de
+    # riesgo y conciliación automática de los recibos limpios.
     sng_from_app = fields.Boolean(
-        string='Recibo Ruteros',
+        string='Recibo de app SNG',
         default=False,
         index=True,
-        help='Marca los pagos/recibos creados desde la app móvil app_ruteros.',
+        help='Marca los pagos/recibos creados desde una app de SNG. '
+             'Vea "Origen" para saber de cuál.',
+    )
+    # Origen del recibo. Separa los cobros de ruta (liquidación de ruteros)
+    # de los que registra la oficina desde el escritorio: comparten el mismo
+    # pipeline de seguridad, pero NO los mismos reportes ni crons.
+    sng_origen = fields.Selection(
+        [
+            ('ruteros', 'Ruteros (app móvil)'),
+            ('escritorio', 'Escritorio (oficina)'),
+        ],
+        string='Origen',
+        default='ruteros',
+        index=True,
+        copy=False,
+        help='Ruteros: cobro de ruta hecho con la tableta; entra en la '
+             'liquidación diaria y en el reporte de ruteros. Escritorio: '
+             'pago registrado por la oficina desde la app de escritorio.',
     )
     # Datos del recibo que hoy solo viajan dentro del memo.
     sng_metodo_pago = fields.Char(string='Método (app)')
@@ -784,6 +809,7 @@ class AccountPayment(models.Model):
         """
         payments = self.search([
             ('sng_from_app', '=', True),
+            SNG_SOLO_RUTEROS,  # los pagos de oficina no llevan vendedor
             ('sng_vendedor_id', '=', False),
             ('date', '>=', fields.Date.context_today(self) - timedelta(days=60)),
         ], limit=limit, order='id')
@@ -915,6 +941,7 @@ class AccountPayment(models.Model):
         """
         payments = self.search([
             ('sng_from_app', '=', True),
+            SNG_SOLO_RUTEROS,
             ('sng_ia_estado', '=', 'pendiente'),
         ], limit=limit, order='id')
         restante = limit - len(payments)
@@ -926,6 +953,7 @@ class AccountPayment(models.Model):
             excluidos = sospechosos.ids + sospechosos.sng_dup_pago_ids.ids
             payments |= self.search([
                 ('sng_from_app', '=', True),
+                SNG_SOLO_RUTEROS,
                 ('sng_ia_estado', '=', False),
                 ('invoice_ids', '=', False),
                 ('state', 'in', ('in_process', 'paid')),
@@ -1444,6 +1472,7 @@ class AccountPayment(models.Model):
             return
         payments = self.sudo().search([
             ('sng_from_app', '=', True),
+            SNG_SOLO_RUTEROS,  # la liquidación diaria es de ruta, no de oficina
             ('date', '=', fecha),
             ('state', 'not in', ('canceled', 'rejected')),
         ], order='company_id, sng_vendedor_id, id')
