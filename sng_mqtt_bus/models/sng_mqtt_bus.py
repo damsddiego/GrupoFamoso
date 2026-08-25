@@ -55,15 +55,35 @@ class SngMqttBus(models.AbstractModel):
     def get_app_config(self):
         """Configuración de conexión para la APP (la llama por RPC al hacer
         login). Entrega las credenciales de solo-suscripción, nunca las del
-        publicador. Retorna {} si el bus no está configurado."""
+        publicador. Retorna {} si el bus no está configurado.
+
+        Las tabletas pueden entrar por un camino distinto al de Odoo (p. ej.
+        WebSocket detrás de un túnel cloudflared mientras Odoo publica por
+        TCP interno). Parámetros propios de la app, con fallback al del
+        publicador:
+        - sng_mqtt_bus.app_host     (default: sng_mqtt_bus.host)
+        - sng_mqtt_bus.app_port     (default: sng_mqtt_bus.port; 443 con túnel)
+        - sng_mqtt_bus.app_ws       ('1' = MQTT sobre WebSocket)
+        - sng_mqtt_bus.app_ws_path  (default '/mqtt')
+        - sng_mqtt_bus.app_tls      (default: '1' si ws — wss://; si no, tls
+                                     del publicador)
+        """
         cfg = self._config()
         if not cfg:
             return {}
         get = self.env['ir.config_parameter'].sudo().get_param
+        ws = (get('sng_mqtt_bus.app_ws') or '0') == '1'
+        app_tls_param = get('sng_mqtt_bus.app_tls')
+        if app_tls_param is not None and app_tls_param is not False:
+            app_tls = app_tls_param == '1'
+        else:
+            app_tls = True if ws else cfg['tls']
         return {
-            'host': cfg['host'],
-            'port': cfg['port'],
-            'tls': cfg['tls'],
+            'host': (get('sng_mqtt_bus.app_host') or cfg['host']).strip(),
+            'port': int(get('sng_mqtt_bus.app_port') or cfg['port']),
+            'tls': app_tls,
+            'ws': ws,
+            'ws_path': get('sng_mqtt_bus.app_ws_path') or '/mqtt',
             'prefix': cfg['prefix'],
             'username': get('sng_mqtt_bus.app_username') or '',
             'password': get('sng_mqtt_bus.app_password') or '',

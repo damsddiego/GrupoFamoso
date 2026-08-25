@@ -1,5 +1,26 @@
 # sng_mqtt_bus — Despliegue
 
+> **Variante EMQX + cloudflared (la usada en producción)**: si ya corre EMQX
+> en Docker, NO hace falta Mosquitto ni `setup.sh`. Pasos:
+> 1. En EMQX (dashboard): crear en *Authentication* los usuarios `odoo_pub`
+>    y `app_sub`, y en *Authorization*: `odoo_pub` solo **publish** en
+>    `ruteros/#`, `app_sub` solo **subscribe** en `ruteros/#`.
+> 2. En cloudflared, publicar el listener **ws (8083)**:
+>    `hostname: mqtt.tudominio.com → service: http://localhost:8083`
+> 3. Parámetros de sistema en Odoo — publicador por TCP interno y app por
+>    WebSocket vía túnel:
+>    - `sng_mqtt_bus.host` = host interno de EMQX (p. ej. `localhost`)
+>    - `sng_mqtt_bus.port` = 1883 · `sng_mqtt_bus.tls` = 0
+>    - `sng_mqtt_bus.username/password` = odoo_pub / su clave
+>    - `sng_mqtt_bus.app_host` = `mqtt.tudominio.com`
+>    - `sng_mqtt_bus.app_port` = 443 · `sng_mqtt_bus.app_ws` = 1
+>    - `sng_mqtt_bus.app_username/app_password` = app_sub / su clave
+>    - `sng_mqtt_bus.prefix` = ruteros
+> 4. Probar: editar un cliente en Odoo y verlo llegar en EMQX
+>    (dashboard → WebSocket Client, suscrito a `ruteros/#`).
+
+Lo que sigue es la variante Mosquitto self-hosted (alternativa).
+
 Eventos en tiempo real Odoo → app_ruteros vía MQTT (Mosquitto self-hosted).
 El bus solo AVISA ("cambió el cliente 15485"); los datos siguen viajando por
 RPC como siempre.
