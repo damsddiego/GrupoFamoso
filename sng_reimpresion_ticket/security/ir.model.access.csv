@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_sng_reimpresion_wizard,sng.reimpresion.wizard autorizador,model_sng_reimpresion_wizard,sng_reimpresion_ticket.group_reimpresion_ticket,1,1,1,1
+access_sng_reimpresion_log_autorizador,sng.reimpresion.log autorizador (solo lectura),model_sng_reimpresion_log,sng_reimpresion_ticket.group_reimpresion_ticket,1,0,0,0
+access_sng_reimpresion_log_sistema,sng.reimpresion.log ajustes (solo lectura),model_sng_reimpresion_log,base.group_system,1,0,0,0

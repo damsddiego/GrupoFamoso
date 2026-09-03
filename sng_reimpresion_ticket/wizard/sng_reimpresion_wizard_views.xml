@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_sng_reimpresion_wizard_form" model="ir.ui.view">
+        <field name="name">sng.reimpresion.wizard.form</field>
+        <field name="model">sng.reimpresion.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Autorizar reimpresión de ticket">
+
+                <div class="alert alert-danger" role="alert"
+                     invisible="not entrega_despachada">
+                    <strong>Esta orden ya tiene mercadería despachada.</strong>
+                    <br/>
+                    Un ticket de alistado para mercadería que ya salió de bodega
+                    puede provocar que se surta dos veces. Autorice solo si sabe
+                    por qué hace falta el papel, y explíquelo en el motivo.
+                </div>
+
+                <div class="alert alert-info" role="alert"
+                     invisible="not consulta_ok or copias_previas &lt; 1">
+                    Esta orden ya se imprimió
+                    <field name="copias_previas" class="oe_inline" nolabel="1"/>
+                    vez/veces. El ticket nuevo saldrá marcado como copia y con el
+                    aviso <strong>NO SURTIR DE NUEVO</strong>.
+                </div>
+
+                <div class="alert alert-warning" role="alert"
+                     invisible="consulta_ok">
+                    No se pudo consultar cuántas copias existen:
+                    <field name="consulta_error" class="oe_inline" nolabel="1" readonly="1"/>
+                    <br/>
+                    Puede autorizar igual. El agente de impresión lleva su propia
+                    cuenta y numerará la copia correctamente.
+                </div>
+
+                <group>
+                    <group>
+                        <field name="order_id" options="{'no_open': True}"/>
+                        <field name="partner_id" options="{'no_open': True}"/>
+                    </group>
+                    <group>
+                        <field name="entrega_detalle"/>
+                        <field name="entrega_despachada" invisible="1"/>
+                        <field name="consulta_ok" invisible="1"/>
+                    </group>
+                </group>
+
+                <group>
+                    <field name="motivo" nolabel="1" colspan="2"
+                           placeholder="Por qué hace falta otro ticket. Ej: el papel estaba al revés y salió en blanco."/>
+                </group>
+
+                <footer>
+                    <button name="action_confirmar" type="object"
+                            string="Autorizar reimpresión" class="btn-primary"/>
+                    <button string="Cancelar" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>

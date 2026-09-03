@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_sng_reimpresion_log_list" model="ir.ui.view">
+        <field name="name">sng.reimpresion.log.list</field>
+        <field name="model">sng.reimpresion.log</field>
+        <field name="arch" type="xml">
+            <list string="Reimpresiones de ticket" create="false" edit="false"
+                  decoration-danger="resultado == 'error'"
+                  decoration-warning="entrega_despachada and resultado == 'ok'">
+                <field name="create_date" string="Fecha"/>
+                <field name="order_ref"/>
+                <field name="user_id"/>
+                <field name="motivo"/>
+                <field name="copias_previas" string="Copias antes"/>
+                <field name="entrega_despachada" string="Ya despachada"/>
+                <field name="resultado"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_sng_reimpresion_log_form" model="ir.ui.view">
+        <field name="name">sng.reimpresion.log.form</field>
+        <field name="model">sng.reimpresion.log</field>
+        <field name="arch" type="xml">
+            <form string="Reimpresión de ticket" create="false" edit="false">
+                <sheet>
+                    <div class="alert alert-warning" role="alert"
+                         invisible="not entrega_despachada">
+                        Se autorizó con la mercadería ya despachada.
+                    </div>
+                    <group>
+                        <group>
+                            <field name="order_ref"/>
+                            <field name="order_id" options="{'no_open': False}"/>
+                            <field name="odoo_order_id"/>
+                            <field name="create_date" string="Fecha"/>
+                        </group>
+                        <group>
+                            <field name="user_id"/>
+                            <field name="resultado"/>
+                            <field name="copias_previas"/>
+                            <field name="entrega_despachada"/>
+                        </group>
+                    </group>
+                    <group string="Motivo">
+                        <field name="motivo" nolabel="1"/>
+                    </group>
+                    <group string="Detalle del servicio">
+                        <field name="detalle" nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_sng_reimpresion_log_search" model="ir.ui.view">
+        <field name="name">sng.reimpresion.log.search</field>
+        <field name="model">sng.reimpresion.log</field>
+        <field name="arch" type="xml">
+            <search string="Reimpresiones de ticket">
+                <field name="order_ref"/>
+                <field name="user_id"/>
+                <field name="motivo"/>
+                <filter name="filtro_ok" string="Autorizadas"
+                        domain="[('resultado', '=', 'ok')]"/>
+                <filter name="filtro_error" string="Fallidas"
+                        domain="[('resultado', '=', 'error')]"/>
+                <filter name="filtro_despachada" string="Ya despachadas"
+                        domain="[('entrega_despachada', '=', True)]"/>
+                <separator/>
+                <filter name="filtro_mes" string="Este mes"
+                        domain="[('create_date', '&gt;=', (context_today().replace(day=1)).strftime('%Y-%m-%d'))]"/>
+                <group expand="0" string="Agrupar por">
+                    <filter name="group_user" string="Autorizado por"
+                            context="{'group_by': 'user_id'}"/>
+                    <filter name="group_resultado" string="Resultado"
+                            context="{'group_by': 'resultado'}"/>
+                    <filter name="group_fecha" string="Fecha"
+                            context="{'group_by': 'create_date:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_sng_reimpresion_log" model="ir.actions.act_window">
+        <field name="name">Reimpresiones de ticket</field>
+        <field name="res_model">sng.reimpresion.log</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_sng_reimpresion_log_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Todavía no hay reimpresiones registradas
+            </p>
+            <p>
+                Cada vez que alguien autoriza un segundo ticket desde una orden
+                de venta queda una fila acá, incluidos los intentos que fallaron.
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="menu_sng_reimpresion_log"
+              name="Reimpresiones de ticket"
+              parent="sale.sale_menu_root"
+              action="action_sng_reimpresion_log"
+              groups="sng_reimpresion_ticket.group_reimpresion_ticket"
+              sequence="90"/>
+
+</odoo>

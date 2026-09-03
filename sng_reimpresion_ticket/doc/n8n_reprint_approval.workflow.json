@@ -1,0 +1,189 @@
+{
+  "name": "Reimpresion Ticket (Odoo -> RTDB)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "reprint-approval",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "a1b2c3d4-0001-4000-8000-000000000001",
+      "name": "Webhook Reimpresion",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [0, 300],
+      "webhookId": "a1b2c3d4-0001-4000-8000-000000000001"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ---------------------------------------------------------------\n// Reemplazar estos tres valores antes de activar el workflow.\n// __RTDB_URL__    sin barra final, ej. https://xxxx-default-rtdb.firebaseio.com\n// __RTDB_SECRET__ el secreto de la base en tiempo real\n// __TOKEN_ODOO__  el mismo token configurado en Odoo (largo y aleatorio)\n// ---------------------------------------------------------------\nconst RTDB = '__RTDB_URL__';\nconst SECRETO = '__RTDB_SECRET__';\nconst TOKEN = '__TOKEN_ODOO__';\n\nconst crudo = $input.first().json;\nconst entrada = crudo.body || crudo;\n\nconst token = String(entrada.token || '');\nconst accion = String(entrada.accion || 'autorizar');\nconst orderId = parseInt(entrada.orderId, 10);\n\nlet error = '';\nif (token !== TOKEN) {\n  error = 'Token invalido.';\n} else if (!Number.isInteger(orderId) || orderId <= 0) {\n  error = 'orderId invalido.';\n} else if (accion !== 'consultar' && accion !== 'autorizar') {\n  error = 'Accion desconocida.';\n}\n\n// approvedBy y reason salen impresos en el ticket, que mide 48 columnas.\n// Se recortan para que el encabezado de COPIA no se vuelva ilegible.\nreturn [{\n  json: {\n    valido: error === '',\n    error,\n    accion,\n    orderId: Number.isInteger(orderId) ? orderId : 0,\n    approvedBy: String(entrada.approvedBy || '').slice(0, 90),\n    reason: String(entrada.reason || '').slice(0, 120),\n    urlLedger: RTDB + '/print_ledger/' + orderId + '.json?auth=' + SECRETO,\n    urlAprobacion: RTDB + '/print_reprint_approvals/' + orderId + '.json?auth=' + SECRETO\n  }\n}];"
+      },
+      "id": "a1b2c3d4-0002-4000-8000-000000000002",
+      "name": "Preparar",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [220, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "cond-token",
+              "leftValue": "={{ $json.valido }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "id": "a1b2c3d4-0003-4000-8000-000000000003",
+      "name": "Token valido",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [440, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "cond-accion",
+              "leftValue": "={{ $json.accion }}",
+              "rightValue": "consultar",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "id": "a1b2c3d4-0004-4000-8000-000000000004",
+      "name": "Es consulta",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [660, 200]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.urlLedger }}",
+        "options": {}
+      },
+      "id": "a1b2c3d4-0005-4000-8000-000000000005",
+      "name": "Leer ledger",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [880, 100],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "={{ $json.urlAprobacion }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ approvedBy: $json.approvedBy, reason: $json.reason, createdAt: new Date().toISOString(), source: 'odoo' }) }}",
+        "options": {}
+      },
+      "id": "a1b2c3d4-0006-4000-8000-000000000006",
+      "name": "Escribir aprobacion",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [880, 300],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "jsCode": "const prep = $('Preparar').first().json;\nconst datos = $input.first().json;\n\nif (prep.accion === 'consultar') {\n  // Firebase devuelve null cuando la orden nunca se imprimio.\n  const ledger = (datos && typeof datos === 'object') ? datos : {};\n  return [{\n    json: {\n      ok: true,\n      accion: 'consultar',\n      orderId: prep.orderId,\n      copies: Number(ledger.copies || 0),\n      status: ledger.status || '',\n      orderName: ledger.orderName || ''\n    }\n  }];\n}\n\n// La escritura de la aprobacion no imprime nada por si sola: el agente escucha\n// /print_reprint_approvals y consume el token dentro de su propia transaccion.\nreturn [{\n  json: {\n    ok: true,\n    accion: 'autorizar',\n    orderId: prep.orderId,\n    approvedBy: prep.approvedBy\n  }\n}];"
+      },
+      "id": "a1b2c3d4-0007-4000-8000-000000000007",
+      "name": "Respuesta",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1100, 200]
+    },
+    {
+      "parameters": {
+        "jsCode": "const prep = $('Preparar').first().json;\nreturn [{ json: { ok: false, error: prep.error || 'Solicitud rechazada.' } }];"
+      },
+      "id": "a1b2c3d4-0008-4000-8000-000000000008",
+      "name": "Rechazo",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [660, 460]
+    },
+    {
+      "parameters": {
+        "respondWith": "firstIncomingItem",
+        "options": {}
+      },
+      "id": "a1b2c3d4-0009-4000-8000-000000000009",
+      "name": "Responder",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1320, 300]
+    }
+  ],
+  "connections": {
+    "Webhook Reimpresion": {
+      "main": [[{ "node": "Preparar", "type": "main", "index": 0 }]]
+    },
+    "Preparar": {
+      "main": [[{ "node": "Token valido", "type": "main", "index": 0 }]]
+    },
+    "Token valido": {
+      "main": [
+        [{ "node": "Es consulta", "type": "main", "index": 0 }],
+        [{ "node": "Rechazo", "type": "main", "index": 0 }]
+      ]
+    },
+    "Es consulta": {
+      "main": [
+        [{ "node": "Leer ledger", "type": "main", "index": 0 }],
+        [{ "node": "Escribir aprobacion", "type": "main", "index": 0 }]
+      ]
+    },
+    "Leer ledger": {
+      "main": [[{ "node": "Respuesta", "type": "main", "index": 0 }]]
+    },
+    "Escribir aprobacion": {
+      "main": [[{ "node": "Respuesta", "type": "main", "index": 0 }]]
+    },
+    "Respuesta": {
+      "main": [[{ "node": "Responder", "type": "main", "index": 0 }]]
+    },
+    "Rechazo": {
+      "main": [[{ "node": "Responder", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

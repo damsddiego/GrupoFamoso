@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="res_config_settings_view_form_sng_reimpresion" model="ir.ui.view">
+        <field name="name">res.config.settings.form.sng.reimpresion</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="sale.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//app[@name='sale_management']" position="inside">
+                <block title="Reimpresión de tickets de bodega"
+                       name="sng_reimpresion_block">
+                    <setting string="URL del webhook"
+                             help="Endpoint de n8n que escribe la autorización en Firebase.">
+                        <field name="sng_reimpresion_webhook_url"
+                               placeholder="https://n8n.facturaexpert.com/webhook/reprint-approval"/>
+                    </setting>
+                    <setting string="Token compartido"
+                             help="Clave que n8n valida antes de escribir. Es una credencial al portador: quien la tenga puede autorizar reimpresiones sin pasar por Odoo.">
+                        <field name="sng_reimpresion_token" password="True"/>
+                    </setting>
+                    <setting string="Tiempo de espera"
+                             help="Segundos que Odoo espera la respuesta del webhook.">
+                        <field name="sng_reimpresion_timeout"/>
+                    </setting>
+                </block>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
