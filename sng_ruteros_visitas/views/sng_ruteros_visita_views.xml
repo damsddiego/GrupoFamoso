@@ -9,9 +9,11 @@
             <list string="Visitas Ruteros"
                   decoration-success="resultado in ('venta', 'venta_cobro')"
                   decoration-info="resultado == 'cobro'"
-                  decoration-muted="resultado == 'visita'">
+                  decoration-muted="resultado == 'visita'"
+                  decoration-danger="not partner_id">
                 <field name="fecha_inicio"/>
                 <field name="partner_id"/>
+                <field name="partner_app_id" optional="hide"/>
                 <field name="vendedor_id"/>
                 <field name="resultado" widget="badge"
                        decoration-success="resultado in ('venta', 'venta_cobro')"
@@ -33,12 +35,27 @@
         <field name="model">sng.ruteros.visita</field>
         <field name="arch" type="xml">
             <form string="Visita">
+                <header>
+                    <button name="action_sng_resolver_cliente" type="object"
+                            string="Reintentar resolver cliente"
+                            class="btn-primary"
+                            invisible="not partner_app_id"/>
+                </header>
                 <sheet>
+                    <div class="alert alert-warning" role="alert"
+                         invisible="not partner_app_id">
+                        La app mandó un cliente que no existe en esta base y no
+                        se pudo deducir cuál es. Asígnelo a mano (o configure la
+                        equivalencia en el parámetro de sistema
+                        <b>sng_ruteros_pagos.cliente_equivalencias</b> y use
+                        "Reintentar resolver cliente").
+                    </div>
                     <div class="oe_title">
                         <h1><field name="name" readonly="1"/></h1>
                     </div>
                     <group col="4">
-                        <field name="partner_id"/>
+                        <field name="partner_id"
+                               required="not partner_app_id"/>
                         <field name="vendedor_id"/>
                         <field name="fecha_inicio"/>
                         <field name="fecha_fin"/>
@@ -58,6 +75,8 @@
                         <field name="observaciones" colspan="2"/>
                         <field name="vendedor_app_id" readonly="1"
                                invisible="not vendedor_app_id"/>
+                        <field name="partner_app_id" readonly="1"
+                               invisible="not partner_app_id"/>
                         <field name="sng_uuid" readonly="1" groups="base.group_no_one"/>
                         <field name="sng_from_app" readonly="1" groups="base.group_no_one"/>
                     </group>
@@ -87,6 +106,8 @@
                 <separator/>
                 <filter name="fuera_sitio" string="Fuera de sitio"
                         domain="[('en_sitio', '=', False)]"/>
+                <filter name="sin_cliente" string="Sin cliente resuelto"
+                        domain="[('partner_id', '=', False)]"/>
                 <group expand="0" string="Agrupar por">
                     <filter name="group_vendedor" string="Vendedor"
                             context="{'group_by': 'vendedor_id'}"/>

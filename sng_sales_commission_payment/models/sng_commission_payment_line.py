@@ -57,6 +57,14 @@ class SngCommissionPaymentLine(models.Model):
         store=True,
         index=True,
     )
+    sng_numero_recibo = fields.Char(
+        string='N° Recibo (app)',
+        related='payment_id.sng_numero_recibo',
+        store=True,
+        help='Número de recibo impreso por la app de ruteros. Puede repetirse '
+             'entre tabletas; combínelo con el vendedor para identificarlo. '
+             'Vacío en pagos que no vienen de la app.',
+    )
     confirmation_date = fields.Date(
         string='Fecha de Confirmación',
         related='payment_id.sng_confirmation_date',

@@ -378,14 +378,27 @@ class SngConciliacionImportar(models.TransientModel):
                 '(sin transitoria), así que esas líneas NO van a cruzar '
                 'contra pagos registrados.') % fecha_inicio)
         creditos = sum(1 for m, _u, mto in nuevos if mto > 0)
+        # Sugerencias al tiro: así las líneas llegan al widget nativo de
+        # conciliación ya montadas. Un fallo aquí nunca tumba la importación.
+        sugeridas = en_cola = 0
+        try:
+            procesadas, pendientes = lineas_nuevas._sng_sugerir_lote()
+            sugeridas = len(procesadas) - len(pendientes)
+            en_cola = len(pendientes)
+        except Exception:  # noqa: BLE001
+            _logger.exception('SNG: fallo calculando sugerencias al importar '
+                              'el extracto %s', statement.id)
+            avisos.append(_(
+                'No se pudieron calcular las sugerencias automáticamente: '
+                'seleccione las líneas y pulse "1 · Sugerir con IA".'))
         self.write({
             'estado': 'hecho',
             'statement_id': statement.id,
             'linea_ids': [(6, 0, lineas_nuevas.ids)],
             'resultado': (
-                '<p><b>%s</b></p><ul><li>%s</li><li>%s</li>%s</ul>'
-                '<p class="mt-3"><b>%s</b></p><ol>'
-                '<li>%s</li><li>%s</li><li>%s</li><li>%s</li></ol>' % (
+                '<p><b>%s</b></p><ul><li>%s</li><li>%s</li><li>%s</li>%s'
+                '</ul><p class="mt-3"><b>%s</b></p><ol>'
+                '<li>%s</li><li>%s</li></ol>' % (
                     _('Importación completada — diario %s') % diario.name,
                     _('%(n)s líneas nuevas (%(c)s créditos, %(d)s débitos); '
                       '%(s)s saltadas (duplicadas o en cero)',
@@ -395,19 +408,19 @@ class SngConciliacionImportar(models.TransientModel):
                       i=saldo_inicial, f=saldo_final or 0)
                     if saldo_inicial is not None
                     else _('El archivo no trae saldos de control (CSV BN).'),
+                    _('Sugerencias: %(o)s resueltas al instante; %(q)s en '
+                      'cola de IA (se completan solas en unos minutos)',
+                      o=sugeridas, q=en_cola),
                     ''.join('<li class="text-warning">%s</li>' % a
                             for a in avisos),
                     _('Siguiente paso — cómo conciliar:'),
-                    _('Pulse "Ver líneas importadas".'),
-                    _('Seleccione las líneas y pulse "1 · Sugerir con IA": '
-                      'solo llena la columna Sugerencia, todavía no concilia '
-                      'nada. Las líneas ambiguas quedan en cola de IA y se '
-                      'completan solas en unos minutos (columna "IA en '
-                      'cola"; refresque la vista).'),
-                    _('Revise las columnas Sugerencia, Confianza y Motivo.'),
-                    _('En las líneas que esté de acuerdo, pulse '
-                      '"2 · Conciliar lo sugerido". Es reversible desde el '
-                      'extracto bancario.'),
+                    _('Desde Contabilidad → Conciliación: cada línea abre '
+                      'con el cliente y la contrapartida sugerida ya '
+                      'montados; revise y pulse Validar.'),
+                    _('O en lote desde "Ver líneas importadas": revise '
+                      'Sugerencia / Confianza / Motivo y pulse '
+                      '"2 · Conciliar lo sugerido" en las que esté de '
+                      'acuerdo (reversible desde el extracto).'),
                 )),
         })
         return {

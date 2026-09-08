@@ -19,6 +19,7 @@
                     <field name="partner_id"/>
                     <field name="invoice_id"/>
                     <field name="payment_id"/>
+                    <field name="sng_numero_recibo" optional="show"/>
                     <field name="payment_amount" sum="Pagado"/>
                     <field name="commission_base" sum="Base"/>
                     <field name="commission_adjustment" sum="Reversos" optional="hide"/>
@@ -44,6 +45,7 @@
                                 <field name="reversal_of_line_id" invisible="line_type != 'reversal'"/>
                                 <field name="original_monthly_id" invisible="line_type != 'reversal'"/>
                                 <field name="payment_id"/>
+                                <field name="sng_numero_recibo"/>
                                 <field name="invoice_id"/>
                                 <field name="partner_id"/>
                                 <field name="salesperson_id"/>
@@ -80,6 +82,7 @@
                     <field name="partner_id"/>
                     <field name="invoice_id"/>
                     <field name="payment_id"/>
+                    <field name="sng_numero_recibo"/>
                     <filter string="IVA 13%" name="taxed_13" domain="[('tax_profile', '=', 'taxed_13')]"/>
                     <filter string="Sin impuesto (0%)" name="no_tax" domain="[('tax_profile', '=', 'no_tax')]"/>
                     <filter string="Tarifa mixta/reducida" name="mixed" domain="[('tax_profile', '=', 'mixed')]"/>

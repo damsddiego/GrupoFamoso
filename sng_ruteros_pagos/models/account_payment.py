@@ -280,6 +280,14 @@ class AccountPayment(models.Model):
              'Cuando el sistema deduce el vendedor real, registra la '
              'equivalencia y limpia este campo.',
     )
+    # ID de cliente que mandó la app cuando no existe en esta base y no se
+    # pudo deducir por fusión, auditoría ni por las facturas del recibo.
+    sng_cliente_app_id = fields.Integer(
+        string='ID cliente app (sin resolver)',
+        copy=False,
+        help='ID de cliente que mandó la app y no existe en esta base. El '
+             'recibo entró sin cliente para no perderlo: asígnelo a mano.',
+    )
     # Marca de monto atípico (posible error de digitación, ej. ₡15,450,942
     # en vez de ₡154,509.42). Detección por reglas, sin costo de IA.
     sng_monto_atipico = fields.Boolean(
@@ -692,60 +700,40 @@ class AccountPayment(models.Model):
     def _sng_partner_fusionado(self, partner_id, max_saltos=5):
         """Destino de un cliente eliminado por el asistente de FUSIÓN.
 
-        El asistente de fusionar contactos deja en el chatter del destino un
-        mensaje "Se fusionó con los siguientes contactos: ... (ID x)"; se
-        sigue ese rastro (encadenado, por si el destino se volvió a
-        fusionar). Devuelve el id vigente o None.
+        La implementación vive en `res.partner._sng_partner_fusionado` para
+        compartirla con las visitas de ruteros.
         """
-        Partner = self.env['res.partner'].sudo()
-        actual = partner_id
-        for _salto in range(max_saltos):
-            self.env.cr.execute("""
-                SELECT res_id FROM mail_message
-                WHERE model = 'res.partner' AND body LIKE %s
-                ORDER BY id DESC LIMIT 1
-            """, ('%%(ID {})%%'.format(int(actual)),))
-            fila = self.env.cr.fetchone()
-            if not fila:
-                return None
-            actual = fila[0]
-            if Partner.browse(actual).exists():
-                return actual
-        return None
+        return self.env['res.partner']._sng_partner_fusionado(
+            partner_id, max_saltos=max_saltos)
 
     def _sng_sanear_cliente(self, vals_list):
-        """Sustituye clientes inexistentes por el cliente de la factura citada."""
+        """Resuelve contra esta base el cliente que mandó la app.
+
+        Primero la resolución compartida (`res.partner._sng_resolver_cliente_app`:
+        fusiones, contactos borrados según la auditoría y equivalencias
+        configuradas a mano) y, si no alcanza, el cliente de las facturas
+        citadas en el texto del recibo. Sin resolver, el recibo entra SIN
+        cliente en vez de reventar por FK: así la app recibe su ID, deja de
+        reintentar y el cobro no se pierde.
+        Devuelve [(índice en vals_list, aviso para el chatter)].
+        """
         avisos = []
-        Partner = self.env['res.partner'].sudo()
+        Partner = self.env['res.partner']
         Move = self.env['account.move'].sudo()
         for indice, vals in enumerate(vals_list):
             if not vals.get('sng_from_app') or not vals.get('partner_id'):
                 continue
             original = vals['partner_id']
-            if Partner.browse(original).exists():
+            resuelto, aviso = Partner._sng_resolver_cliente_app(original)
+            if not aviso:
+                continue  # el cliente existe: nada que sanear
+            if resuelto:
+                vals['partner_id'] = resuelto
+                avisos.append((indice, aviso))
                 continue
-            # 1) ¿fue fusionado con otro contacto? (limpieza multicompañía)
-            fusionado = self._sng_partner_fusionado(original)
-            if fusionado:
-                vals['partner_id'] = fusionado
-                destino = Partner.browse(fusionado)
-                _logger.info(
-                    'Ruteros: cliente %s fue fusionado; sustituido por %s '
-                    '(%s)', original, fusionado, destino.display_name)
-                avisos.append((indice, _(
-                    'La app mandó el cliente %(orig)s, que fue fusionado con '
-                    'otro contacto; se asignó %(nuevo)s. Conviene actualizar '
-                    'los datos en la app.',
-                    orig=original, nuevo=destino.display_name)))
-                continue
-            # 2) rescate por las facturas citadas en el texto del recibo
+            # rescate propio del recibo: las facturas citadas en el texto
             numeros = self._sng_numeros_factura_desde_texto(
                 vals.get('sng_observaciones') or vals.get('memo') or '')
-            if not numeros:
-                _logger.warning(
-                    'Ruteros: cliente inexistente %s sin facturas en el texto; '
-                    'no se pudo sanear', original)
-                continue
             domain = [
                 ('name', 'in', list(numeros)),
                 ('move_type', '=', 'out_invoice'),
@@ -754,23 +742,28 @@ class AccountPayment(models.Model):
             company_id = vals.get('company_id') or self.env.company.id
             if company_id:
                 domain.append(('company_id', '=', company_id))
-            facturas = Move.search(domain)
+            facturas = Move.search(domain) if numeros else Move
             clientes = facturas.mapped('partner_id.commercial_partner_id')
-            if len(clientes) != 1:
-                _logger.warning(
-                    'Ruteros: cliente inexistente %s no se pudo sanear; '
-                    'facturas=%s clientes=%s',
-                    original, sorted(numeros), clientes.ids)
+            if len(clientes) == 1:
+                vals['partner_id'] = clientes.id
+                _logger.info(
+                    'Ruteros: cliente inexistente %s sustituido por %s (%s) '
+                    'según facturas %s',
+                    original, clientes.id, clientes.display_name,
+                    sorted(numeros))
+                avisos.append((indice, _(
+                    'La app mandó el cliente %(orig)s, que no existe en esta '
+                    'base; se asignó el cliente %(nuevo)s según las facturas '
+                    'del recibo.',
+                    orig=original, nuevo=clientes.display_name)))
                 continue
-            vals['partner_id'] = clientes.id
-            _logger.info(
-                'Ruteros: cliente inexistente %s sustituido por %s (%s) '
-                'según facturas %s',
-                original, clientes.id, clientes.display_name, sorted(numeros))
-            avisos.append((indice, _(
-                'La app mandó el cliente %(orig)s, que no existe en esta base; '
-                'se asignó el cliente %(nuevo)s según las facturas del recibo.',
-                orig=original, nuevo=clientes.display_name)))
+            _logger.warning(
+                'Ruteros: cliente inexistente %s no se pudo sanear; el recibo '
+                'entra sin cliente (facturas=%s clientes=%s)',
+                original, sorted(numeros), clientes.ids)
+            vals['partner_id'] = False
+            vals['sng_cliente_app_id'] = original
+            avisos.append((indice, aviso))
         return avisos
 
     @api.model

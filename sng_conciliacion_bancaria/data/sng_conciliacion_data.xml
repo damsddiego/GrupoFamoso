@@ -29,4 +29,18 @@
         <field name="active" eval="True"/>
         <field name="nextcall" eval="(DateTime.now() + timedelta(days=1)).strftime('%Y-%m-%d %H:%M:%S')"/>
     </record>
+
+    <!-- Barrido horario: sugiere solo las líneas que nadie pidió sugerir
+         (creadas a mano o por otros importadores; las del importador SNG ya
+         llegan sugeridas). Así el widget nativo de conciliación siempre
+         encuentra la sugerencia lista. -->
+    <record id="cron_sng_conciliacion_barrido" model="ir.cron">
+        <field name="name">SNG Conciliación: sugerencias automáticas (barrido)</field>
+        <field name="model_id" ref="account.model_account_bank_statement_line"/>
+        <field name="state">code</field>
+        <field name="code">model._sng_cron_barrido()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">hours</field>
+        <field name="active" eval="True"/>
+    </record>
 </odoo>

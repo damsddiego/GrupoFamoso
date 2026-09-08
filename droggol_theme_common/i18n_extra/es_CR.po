@@ -1,0 +1,2699 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* droggol_theme_common
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0 (droggol_theme_common)\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-27 01:18+0000\n"
+"PO-Revision-Date: 2026-08-27 01:18+0000\n"
+"Last-Translator: \n"
+"Language-Team: Spanish (Costa Rica)\n"
+"Language: es_CR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.dr_pwa_screenshots_view_form
+msgid "540x420"
+msgstr ""
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.dr_website_content_view_form
+msgid ""
+"<span class=\"o_stat_value\">\n"
+"                                    Design\n"
+"                                </span>\n"
+"                                <span class=\"o_stat_text\">\n"
+"                                    Content\n"
+"                                </span>"
+msgstr ""
+"<span class=\"o_stat_value\">\n"
+"                                    Diseño\n"
+"                                </span>\n"
+"                                <span class=\"o_stat_text\">\n"
+"                                    Contenido\n"
+"                                </span>"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_category_mega_menu_snippet
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_category_tabs_snippet
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_tp_mega_menu_category_snippet
+msgid ""
+"<span class=\"tp-config-link fw-bold tp-cursor-pointer\">Click Here!</span> "
+"to configure snippet."
+msgstr ""
+"<span class=\"tp-config-link fw-bold tp-cursor-pointer\">¡Haz clic "
+"aquí!</span> para configurar el bloque."
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_6
+msgid "<span style=\"font-weight: bolder;\">Starting at $30</span>"
+msgstr "<span style=\"font-weight: bolder;\">Desde $30</span>"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_6
+msgid "<span style=\"font-weight: bolder;\">Starting at $40</span>"
+msgstr "<span style=\"font-weight: bolder;\">Desde $40</span>"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_1
+msgid "About"
+msgstr "Acerca de"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_2
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_3
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_4
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_6
+msgid "Accessories"
+msgstr "Accesorios"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_search_report__clicked_type
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.dr_search_report_view_search
+msgid "Action"
+msgstr "Acción"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_product_brand__active
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_product_label__active
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_product_tags__active
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_website_content__active
+msgid "Active"
+msgstr "Activo"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.dr_product_brand_values_view_tree
+msgid "Add New Brand"
+msgstr "Agregar nueva marca"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_2
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_3
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_4
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_5
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_6
+msgid "Aenean"
+msgstr ""
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_3
+msgid ""
+"Aenean <span class=\"s_badge badge text-bg-primary\"><i class=\"fa fa-"
+"star\"/>Sale</span>"
+msgstr ""
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_3
+msgid ""
+"Aenean <span class=\"s_badge badge text-bg-warning\"><i class=\"fa fa-"
+"star\"/>Sale</span>"
+msgstr ""
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid ""
+"After enabling this option user will only see assigned pricelist to their "
+"contact record."
+msgstr ""
+"Al activar esta opción, el usuario solo verá la lista de precios asignada a "
+"su contacto."
+
+#. module: droggol_theme_common
+#: model:ir.model.fields.selection,name:droggol_theme_common.selection__website_menu__dr_menu_visible_on__all
+msgid "All Devices"
+msgstr "Todos los dispositivos"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid ""
+"Allows users to follow up product's Add to Cart button until bottom scroll "
+"reached."
+msgstr ""
+"Mantiene visible el botón Agregar al carrito del producto hasta llegar al "
+"final de la página."
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.res_config_settings_view_form
+msgid ""
+"Allows users to install your website as an application on mobile and "
+"desktop."
+msgstr ""
+"Permite que los usuarios instalen tu sitio web como una aplicación en móvil "
+"y escritorio."
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.res_config_settings_view_form
+msgid "App Shortcuts"
+msgstr "Accesos directos de la app"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.res_config_settings_view_form
+msgid ""
+"App shortcuts help users quickly start common or recommended tasks within "
+"your web app."
+msgstr ""
+"Los accesos directos ayudan a los usuarios a iniciar rápidamente tareas "
+"comunes o recomendadas dentro de tu app web."
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Apply filters with lazy method"
+msgstr "Aplicar filtros con método diferido"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.res_config_settings_view_form
+msgid ""
+"Apply manual discounts on sales order lines or display discounts computed "
+"from pricelists (option to activate in the pricelist configuration)."
+msgstr ""
+"Aplique descuentos de forma manual en las líneas de las órdenes de venta o "
+"muestre los descuentos calculados desde la lista de precios (se activa la "
+"opción en la configuración de la lista de precios)."
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.dr_product_label_view_form
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.dr_product_label_view_search
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.dr_website_content_view_form
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.dr_website_content_view_search
+msgid "Archived"
+msgstr "Archivado"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_1
+msgid "Article"
+msgstr "Artículo"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields.selection,name:droggol_theme_common.selection__dr_website_content__content_type__attribute_popup
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.dr_website_content_view_search
+msgid "Attribute Guide"
+msgstr "Guía de atributos"
+
+#. module: droggol_theme_common
+#: model:ir.model,name:droggol_theme_common.model_product_attribute_value
+msgid "Attribute Value"
+msgstr "Valor del atributo"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.dr_product_brand_values_view_search
+msgid "Attributes"
+msgstr "Atributos"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+#: model:ir.actions.server,name:droggol_theme_common.delete_search_report_cron_ir_actions_server
+msgid "Auto Delete Search Report"
+msgstr "Eliminar automáticamente el reporte de búsquedas"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Auto products fill"
+msgstr "Relleno automático de productos"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields.selection,name:droggol_theme_common.selection__product_attribute__dr_search_suggestion__auto
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.dr_search_report_view_search
+msgid "Autocomplete"
+msgstr "Autocompletar"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields.selection,name:droggol_theme_common.selection__product_attribute__dr_search_suggestion__auto_suggestion
+msgid "Autocomplete & Suggestion"
+msgstr "Autocompletado y sugerencias"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields.selection,name:droggol_theme_common.selection__dr_search_report__clicked_type__autocomplete
+msgid "Autocomplete Clicked"
+msgstr "Clic en autocompletado"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_search_report__autocomplete_count
+msgid "Autocomplete Count"
+msgstr "Cantidad de autocompletado"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Autocomplete Limit"
+msgstr "Límite de autocompletado"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "B2B Mode"
+msgstr "Modo B2B"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "B2b Configuration"
+msgstr "Configuración B2B"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_product_label__background_color
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_product_public_category_label__background_color
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_website_menu_label__background_color
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.res_config_settings_view_form
+msgid "Background Color"
+msgstr "Color de fondo"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_product_label__background_color_rgb
+msgid "Background Color RGB"
+msgstr "Color de fondo RGB"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields.selection,name:droggol_theme_common.selection__dr_product_label__style__2
+msgid "Badge"
+msgstr "Distintivo"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_2
+msgid "Bags"
+msgstr "Bolsas"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_6
+msgid "Bags &amp; Purses"
+msgstr "Bolsos y carteras"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_1
+msgid "Basic"
+msgstr "Básico"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_1
+msgid "Basic Grid"
+msgstr "Cuadrícula básica"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Behavior of load more products"
+msgstr "Comportamiento de cargar más productos"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_1
+msgid "Blog"
+msgstr ""
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_6
+msgid "Boots"
+msgstr "Botas"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Bottom bar allow movement between primary destinations on the website."
+msgstr ""
+"La barra inferior permite moverse entre los destinos principales del sitio "
+"web."
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Bottombar"
+msgstr "Barra inferior"
+
+#. module: droggol_theme_common
+#. odoo-python
+#: code:addons/droggol_theme_common/models/product_attribute.py:0
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_snippet_records_collection__brand_ids
+#: model:ir.model.fields,field_description:droggol_theme_common.field_product_product__dr_brand_value_id
+#: model:ir.model.fields,field_description:droggol_theme_common.field_product_template__dr_brand_value_id
+#: model:ir.model.fields.selection,name:droggol_theme_common.selection__dr_search_report__clicked_type__brand
+#: model:ir.model.fields.selection,name:droggol_theme_common.selection__dr_snippet_records_collection__dr_res_model__product_attribute_value
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.dr_product_brand_values_view_form
+msgid "Brand"
+msgstr "Marca"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Brand Page"
+msgstr "Página de marca"
+
+#. module: droggol_theme_common
+#. odoo-python
+#: code:addons/droggol_theme_common/models/product_attribute.py:0
+msgid "Brand attribute must have display type \"Radio Image\"."
+msgstr ""
+"El atributo de marca debe tener el tipo de visualización \"Imagen de "
+"opción\"."
+
+#. module: droggol_theme_common
+#. odoo-python
+#: code:addons/droggol_theme_common/models/website.py:0
+#: model:ir.actions.act_window,name:droggol_theme_common.dr_product_brand_values_action
+#: model:ir.ui.menu,name:droggol_theme_common.menu_dr_product_brand_values
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.dr_product_brand_values_view_search
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.dr_product_brand_values_view_tree
+msgid "Brands"
+msgstr "Marcas"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Brands Pills"
+msgstr "Píldoras de marcas"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Buttombar Buttons"
+msgstr "Botones de la barra inferior"
+
+#. module: droggol_theme_common
+#: model:ir.model,name:droggol_theme_common.model_dr_cache_mixin
+msgid "Cache Mixin"
+msgstr ""
+
+#. module: droggol_theme_common
+#: model:ir.model.fields.selection,name:droggol_theme_common.selection__dr_website_content__product_info_visibility__card
+msgid "Card"
+msgstr "Tarjeta"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_1
+msgid "Career"
+msgstr "Empleo"
+
+#. module: droggol_theme_common
+#. odoo-python
+#: code:addons/droggol_theme_common/models/website.py:0
+msgid "Cart"
+msgstr "Carrito"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Cart Flow"
+msgstr "Flujo del carrito"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_1
+msgid "Case Study"
+msgstr "Caso de éxito"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Categories Pills"
+msgstr "Píldoras de categorías"
+
+#. module: droggol_theme_common
+#. odoo-python
+#: code:addons/droggol_theme_common/models/website.py:0
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_category_synonyms__category_id
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_snippet_records_collection__category_ids
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.dr_search_report_view_search
+msgid "Category"
+msgstr "Categoría"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields.selection,name:droggol_theme_common.selection__dr_search_report__clicked_type__category
+msgid "Category Clicked"
+msgstr "Clic en categoría"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_search_report__category_count
+msgid "Category Count"
+msgstr "Cantidad de categorías"
+
+#. module: droggol_theme_common
+#: model:ir.model,name:droggol_theme_common.model_dr_product_public_category_label
+msgid "Category Label"
+msgstr "Etiqueta de categoría"
+
+#. module: droggol_theme_common
+#: model:ir.actions.act_window,name:droggol_theme_common.dr_category_label_action
+#: model:ir.ui.menu,name:droggol_theme_common.menu_dr_category_label
+msgid "Category Labels"
+msgstr "Etiquetas de categoría"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Category Pills"
+msgstr "Píldoras de categorías"
+
+#. module: droggol_theme_common
+#: model:ir.model,name:droggol_theme_common.model_dr_category_synonyms
+msgid "Category Search Synonyms"
+msgstr "Sinónimos de búsqueda de categorías"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Category sidebar style"
+msgstr "Estilo de la barra lateral de categorías"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields.selection,name:droggol_theme_common.selection__dr_product_label__style__3
+msgid "Circle"
+msgstr "Círculo"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_search_report__clicked_href
+msgid "Clicked Href"
+msgstr ""
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_search_report__clicked_string
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.dr_search_report_view_search
+msgid "Clicked String"
+msgstr ""
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_3
+msgid "Client Image #{number}"
+msgstr "Imagen del cliente #{number}"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_2
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_3
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_4
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_6
+msgid "Clothing"
+msgstr "Ropa"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_6
+msgid "Coats &amp; Jackets"
+msgstr "Abrigos y chaquetas"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Collapsible attributes"
+msgstr "Atributos plegables"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Collapsible category"
+msgstr "Categoría plegable"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_1
+msgid "Company"
+msgstr "Compañía"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.res_config_settings_view_form
+msgid "Configure Screenshots"
+msgstr "Configurar capturas de pantalla"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.res_config_settings_view_form
+msgid "Configure Shortcuts"
+msgstr "Configurar accesos directos"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Configure action buttons of product card in shop page."
+msgstr ""
+"Configura los botones de acción de la tarjeta de producto en la página de "
+"tienda."
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Configure actions and style of product card."
+msgstr "Configura las acciones y el estilo de la tarjeta de producto."
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Consider sale description for the product search."
+msgstr "Considerar la descripción de venta en la búsqueda de productos."
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_1
+msgid "Contact"
+msgstr "Contacto"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_product_tabs__content
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_website_content__content
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.dr_website_content_view_form
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.dr_website_content_view_search
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.dr_website_content_view_tree
+msgid "Content"
+msgstr "Contenido"
+
+#. module: droggol_theme_common
+#: model:ir.actions.act_window,name:droggol_theme_common.dr_website_content_action
+#: model:ir.ui.menu,name:droggol_theme_common.menu_dr_website_content
+msgid "Contents"
+msgstr "Contenido"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_search_report__country_id
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.dr_search_report_view_search
+msgid "Country"
+msgstr "País"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_1
+msgid "Cover"
+msgstr "Portada"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_product_public_category__dr_category_cover_image
+msgid "Cover Image"
+msgstr "Imagen de portada"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_category_synonyms__create_uid
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_product_brand__create_uid
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_product_label__create_uid
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_product_offer__create_uid
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_product_public_category_label__create_uid
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_product_tabs__create_uid
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_product_tags__create_uid
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_pwa_screenshots__create_uid
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_pwa_shortcuts__create_uid
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_search_report__create_uid
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_snippet_records_collection__create_uid
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_theme_config__create_uid
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_website_content__create_uid
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_website_menu_label__create_uid
+msgid "Created by"
+msgstr "Creado por"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_category_synonyms__create_date
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_product_brand__create_date
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_product_label__create_date
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_product_offer__create_date
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_product_public_category_label__create_date
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_product_tabs__create_date
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_product_tags__create_date
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_pwa_screenshots__create_date
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_pwa_shortcuts__create_date
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_search_report__create_date
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_snippet_records_collection__create_date
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_theme_config__create_date
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_website_content__create_date
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_website_menu_label__create_date
+msgid "Created on"
+msgstr "Creado el"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_2
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_3
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_4
+msgid "Dapibus"
+msgstr ""
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.dr_search_report_view_search
+msgid "Date"
+msgstr "Fecha"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields.selection,name:droggol_theme_common.selection__product_attribute__dr_radio_image_style__default
+msgid "Default"
+msgstr "Predeterminado"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Default view mode"
+msgstr "Modo de vista predeterminado"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Define factor of how much you want to magnify."
+msgstr "Define cuánto quieres ampliar."
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_product_product__dr_document_ids
+#: model:ir.model.fields,field_description:droggol_theme_common.field_product_template__dr_document_ids
+msgid "Deprecated Documents"
+msgstr "Documentos obsoletos"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_product_product__dr_tag_ids
+#: model:ir.model.fields,field_description:droggol_theme_common.field_product_template__dr_tag_ids
+msgid "Deprecated Tags"
+msgstr "Etiquetas obsoletas"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_product_brand__description
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_product_offer__description
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_pwa_shortcuts__description
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_website_content__description
+#: model:ir.model.fields,field_description:droggol_theme_common.field_product_attribute_value__dr_brand_description
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.dr_product_brand_values_view_form
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.dr_pwa_shortcuts_view_form
+msgid "Description"
+msgstr "Descripción"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.dr_website_content_view_tree
+msgid "Design"
+msgstr "Diseño"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields.selection,name:droggol_theme_common.selection__dr_search_report__device_type__desktop
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.dr_search_report_view_search
+msgid "Desktop"
+msgstr "Escritorio"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_search_report__device_type
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.dr_search_report_view_search
+msgid "Device Type"
+msgstr "Tipo de dispositivo"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields.selection,name:droggol_theme_common.selection__dr_website_content__popup_style__dialog
+msgid "Dialog"
+msgstr "Diálogo"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_product_offer__dialog_content
+msgid "Dialog Content"
+msgstr "Contenido del diálogo"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Disable grouping of brands"
+msgstr "Desactivar la agrupación de marcas"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_website_sale_extra_field__dr_label
+msgid "Display Label"
+msgstr "Etiqueta a mostrar"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_category_synonyms__display_name
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_product_brand__display_name
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_product_label__display_name
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_product_offer__display_name
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_product_public_category_label__display_name
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_product_tabs__display_name
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_product_tags__display_name
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_pwa_screenshots__display_name
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_pwa_shortcuts__display_name
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_search_report__display_name
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_snippet_records_collection__display_name
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_theme_config__display_name
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_website_content__display_name
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_website_menu_label__display_name
+msgid "Display Name"
+msgstr "Nombre en pantalla"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_product_attribute__display_type
+msgid "Display Type"
+msgstr "Tipo de visualización"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,help:droggol_theme_common.field_dr_product_tags__dr_offer_ids
+#: model:ir.model.fields,help:droggol_theme_common.field_dr_product_tags__dr_tab_ids
+#: model:ir.model.fields,help:droggol_theme_common.field_product_product__dr_offer_ids
+#: model:ir.model.fields,help:droggol_theme_common.field_product_product__dr_tab_ids
+#: model:ir.model.fields,help:droggol_theme_common.field_product_template__dr_offer_ids
+#: model:ir.model.fields,help:droggol_theme_common.field_product_template__dr_tab_ids
+msgid "Display in product detail page on website."
+msgstr "Mostrar en la página de detalle del producto en el sitio web."
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.view_website_sale_website_form
+msgid "Display on all products belong to this website"
+msgstr "Mostrar en todos los productos de este sitio web"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,help:droggol_theme_common.field_product_product__dr_document_ids
+#: model:ir.model.fields,help:droggol_theme_common.field_product_template__dr_document_ids
+msgid "Documents publicly downloadable from eCommerce product page."
+msgstr "Documentos descargables públicamente desde la página del producto."
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_2
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_3
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_4
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_5
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_6
+msgid "Donec non"
+msgstr ""
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_2
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_3
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_4
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_5
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_6
+msgid "Donec ultrices"
+msgstr ""
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_product_product__dr_brand_id
+#: model:ir.model.fields,field_description:droggol_theme_common.field_product_template__dr_brand_id
+msgid "Dr Brand"
+msgstr ""
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_product_product__dr_brand_attribute_ids
+#: model:ir.model.fields,field_description:droggol_theme_common.field_product_template__dr_brand_attribute_ids
+msgid "Dr Brand Attribute"
+msgstr ""
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_res_config_settings__dr_has_custom_module
+msgid "Dr Has Custom Module"
+msgstr ""
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_website_menu__dr_is_special_menu
+msgid "Dr Is Special Menu"
+msgstr ""
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_product_product__dr_offer_ids
+#: model:ir.model.fields,field_description:droggol_theme_common.field_product_template__dr_offer_ids
+msgid "Dr Offer"
+msgstr ""
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_product_product__dr_ptav_ids
+#: model:ir.model.fields,field_description:droggol_theme_common.field_product_template__dr_ptav_ids
+msgid "Dr Ptav"
+msgstr ""
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_products_mixin__dr_show_out_of_stock
+#: model:ir.model.fields,field_description:droggol_theme_common.field_product_product__dr_show_out_of_stock
+#: model:ir.model.fields,field_description:droggol_theme_common.field_product_template__dr_show_out_of_stock
+msgid "Dr Show Out Of Stock"
+msgstr ""
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_product_product__dr_tab_ids
+#: model:ir.model.fields,field_description:droggol_theme_common.field_product_template__dr_tab_ids
+msgid "Dr Tab"
+msgstr ""
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_6
+msgid "Dresses"
+msgstr "Vestidos"
+
+#. module: droggol_theme_common
+#: model:ir.model,name:droggol_theme_common.model_dr_search_report
+msgid "Droggol Search Report"
+msgstr "Reporte de búsquedas Droggol"
+
+#. module: droggol_theme_common
+#: model:ir.actions.act_window,name:droggol_theme_common.dr_theme_config_action
+#: model:ir.model,name:droggol_theme_common.model_dr_theme_config
+#: model:ir.ui.menu,name:droggol_theme_common.dr_theme_config_menu
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.dr_theme_config_view_tree
+msgid "Droggol Theme Config"
+msgstr "Configuración del tema Droggol"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_product_public_category__ds_synonyms_ids
+msgid "Ds Synonyms"
+msgstr ""
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_2
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_3
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_4
+msgid "Duis"
+msgstr ""
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Duration (Hours)"
+msgstr "Duración (horas)"
+
+#. module: droggol_theme_common
+#: model:ir.model,name:droggol_theme_common.model_website_sale_extra_field
+msgid "E-Commerce Extra Info Shown on product page"
+msgstr ""
+"Información adicional de comercio electrónico que se muestra en la página "
+"del producto"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.dr_search_report_view_search
+msgid "Empty Term"
+msgstr "Término vacío"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Enable"
+msgstr "Habilitar"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.res_config_settings_view_form
+msgid "Enable Offline Page"
+msgstr "Activar página sin conexión"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.res_config_settings_view_form
+msgid "Enable Progressive Web Apps"
+msgstr "Activar aplicaciones web progresivas"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Enable advance search"
+msgstr "Activar búsqueda avanzada"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Enable category pills"
+msgstr "Activar píldoras de categorías"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Enable sticky add to cart"
+msgstr "Activar agregar al carrito fijo"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_2
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_3
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_4
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_5
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_6
+msgid "Etiam"
+msgstr ""
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Factor"
+msgstr ""
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Fake max Threshold"
+msgstr "Umbral máximo simulado"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Fake min threshold"
+msgstr "Umbral mínimo simulado"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_website_sale_extra_field__field_id
+msgid "Field"
+msgstr "Campo"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Filter Position"
+msgstr "Posición del filtro"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Filter Style"
+msgstr "Estilo de filtro"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_6
+msgid "Flats"
+msgstr "Zapatos bajos"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.dr_website_content_view_form
+msgid "FontAwesome"
+msgstr ""
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_pwa_screenshots__form_factor
+msgid "Form Factor"
+msgstr "Formato"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_category_synonyms__dr_search_formulate
+#: model:ir.model.fields,field_description:droggol_theme_common.field_product_public_category__dr_search_formulate
+msgid "Formulated Search"
+msgstr "Búsqueda formulada"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_product_product__dr_free_qty
+#: model:ir.model.fields,field_description:droggol_theme_common.field_product_template__dr_free_qty
+msgid "Free To Use Quantity"
+msgstr "Cantidad disponible para uso"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Fuzzy search"
+msgstr "Búsqueda aproximada"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "General"
+msgstr ""
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.view_website_sale_website_form
+msgid "Global"
+msgstr "Global"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.res_config_settings_view_form
+msgid "Grant discounts on sales order lines"
+msgstr "Ofrezca descuentos en las líneas de las órdenes de venta"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_1
+msgid "Grid Rows"
+msgstr "Filas de la cuadrícula"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.dr_product_brand_values_view_search
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.dr_search_report_view_search
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.dr_website_content_view_search
+msgid "Group By"
+msgstr "Agrupar por"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_product_attribute__dr_attribute_popup_id
+#: model:ir.model.fields,field_description:droggol_theme_common.field_product_template_attribute_line__dr_attribute_popup_id
+msgid "Guide"
+msgstr "Guía"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_6
+msgid "Heels"
+msgstr "Tacones"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_1
+msgid "Help center"
+msgstr "Centro de ayuda"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Hide attribute value if it is not matched with any product"
+msgstr "Ocultar el valor del atributo si no coincide con ningún producto"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Hide country flag"
+msgstr "Ocultar bandera del país"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Hide extra attributes"
+msgstr "Ocultar atributos adicionales"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Hide in desktop device"
+msgstr "Ocultar en escritorio"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_website_menu__dr_highlight_menu
+msgid "Highlight Menu"
+msgstr "Menú destacado"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_website_menu__dr_highlight_menu_bg_color
+msgid "Hightlight Background Color"
+msgstr "Color de fondo destacado"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_website_menu__dr_highlight_menu_text_color
+msgid "Hightlight Text Color"
+msgstr "Color del texto destacado"
+
+#. module: droggol_theme_common
+#. odoo-python
+#: code:addons/droggol_theme_common/models/website.py:0
+msgid "Home"
+msgstr "Inicio"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_category_synonyms__id
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_product_brand__id
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_product_label__id
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_product_offer__id
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_product_public_category_label__id
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_product_tabs__id
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_product_tags__id
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_pwa_screenshots__id
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_pwa_shortcuts__id
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_search_report__id
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_snippet_records_collection__id
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_theme_config__id
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_website_content__id
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_website_menu_label__id
+msgid "ID"
+msgstr ""
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_product_offer__icon
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_product_tabs__icon
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_pwa_shortcuts__icon
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_website_content__icon
+msgid "Icon"
+msgstr "Icono"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.res_config_settings_view_form
+msgid "Icon (192x192)"
+msgstr "Icono (192x192)"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.res_config_settings_view_form
+msgid "Icon (512x512)"
+msgstr "Icono (512x512)"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_product_public_category__dr_category_icon
+msgid "Icon Image"
+msgstr "Imagen del icono"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.dr_website_content_view_form
+msgid ""
+"If an image is set, it will be used as the icon; otherwise, the icon field "
+"will be used."
+msgstr ""
+"Si se define una imagen, se usará como icono; de lo contrario, se usará el "
+"campo de icono."
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid ""
+"If you have large number of products this option may affect performance."
+msgstr "Si tienes muchos productos, esta opción puede afectar el rendimiento."
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_product_brand__image
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_pwa_screenshots__image
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_website_content__image
+#: model:ir.model.fields.selection,name:droggol_theme_common.selection__product_attribute__dr_radio_image_style__image
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.product_attribute_view_form_inherit_droggol_theme_common
+msgid "Image"
+msgstr "Imagen"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields.selection,name:droggol_theme_common.selection__product_attribute__dr_radio_image_style__image_compact
+msgid "Image (Compact)"
+msgstr "Imagen (compacta)"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields.selection,name:droggol_theme_common.selection__product_attribute__dr_radio_image_style__image_text
+msgid "Image + Text"
+msgstr "Imagen + texto"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Image Fill"
+msgstr "Relleno de imagen"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Image Size"
+msgstr "Tamaño de la imagen"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_product_attribute__dr_is_brand
+msgid "Is Brand?"
+msgstr "¿Es marca?"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_website_menu__dr_is_highlight_menu
+msgid "Is Highlight Menu?"
+msgstr "¿Es menú destacado?"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_6
+msgid "Jeans"
+msgstr "Jeans"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_6
+msgid "Jewelry"
+msgstr "Joyería"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Keep it at 0 to stop auto delete"
+msgstr "Déjalo en 0 para desactivar la eliminación automática"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_theme_config__key
+msgid "Key"
+msgstr "Clave"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.dr_pwa_screenshots_view_form
+msgid "Know more"
+msgstr "Saber más"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_website_content__identifier
+#: model:ir.model.fields,field_description:droggol_theme_common.field_product_product__dr_label_id
+#: model:ir.model.fields,field_description:droggol_theme_common.field_product_public_category__dr_category_label_id
+#: model:ir.model.fields,field_description:droggol_theme_common.field_product_template__dr_label_id
+#: model:ir.model.fields,field_description:droggol_theme_common.field_website_menu__dr_menu_label_id
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.dr_product_label_view_form
+msgid "Label"
+msgstr "Etiqueta"
+
+#. module: droggol_theme_common
+#: model:ir.actions.act_window,name:droggol_theme_common.dr_product_label_action
+#: model:ir.ui.menu,name:droggol_theme_common.menu_dr_product_label
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.dr_category_label_view_tree
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.dr_product_label_view_search
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.dr_product_label_view_tree
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.dr_website_menu_label_view_tree
+msgid "Labels"
+msgstr "Etiquetas"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_search_report__lang_id
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.dr_search_report_view_search
+msgid "Language"
+msgstr "Idioma"
+
+#. module: droggol_theme_common
+#. odoo-python
+#: code:addons/droggol_theme_common/models/website.py:0
+msgid "Language and Pricelist selector"
+msgstr "Selector de idioma y lista de precios"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Language/Pricelist Selector"
+msgstr "Selector de idioma/lista de precios"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_category_synonyms__write_uid
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_product_brand__write_uid
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_product_label__write_uid
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_product_offer__write_uid
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_product_public_category_label__write_uid
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_product_tabs__write_uid
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_product_tags__write_uid
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_pwa_screenshots__write_uid
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_pwa_shortcuts__write_uid
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_search_report__write_uid
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_snippet_records_collection__write_uid
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_theme_config__write_uid
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_website_content__write_uid
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_website_menu_label__write_uid
+msgid "Last Updated by"
+msgstr "Última actualización por"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_category_synonyms__write_date
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_product_brand__write_date
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_product_label__write_date
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_product_offer__write_date
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_product_public_category_label__write_date
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_product_tabs__write_date
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_product_tags__write_date
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_pwa_screenshots__write_date
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_pwa_shortcuts__write_date
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_search_report__write_date
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_snippet_records_collection__write_date
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_theme_config__write_date
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_website_content__write_date
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_website_menu_label__write_date
+msgid "Last Updated on"
+msgstr "Última actualización el"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Layout"
+msgstr "Distribución"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_3
+msgid "Limited Collection"
+msgstr "Colección limitada"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields.selection,name:droggol_theme_common.selection__dr_website_content__product_info_visibility__link
+msgid "Link"
+msgstr "Enlace"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields.selection,name:droggol_theme_common.selection__dr_website_content__product_info_visibility__list
+msgid "List"
+msgstr "Lista"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_1
+msgid "Listing"
+msgstr "Listado"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_1
+msgid "Masonry"
+msgstr "Mosaico"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Max 6"
+msgstr "Máx. 6"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Maximum sold qty you want to display."
+msgstr "Cantidad máxima vendida que quieres mostrar."
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Maximum view count you want to display."
+msgstr "Cantidad máxima de vistas que quieres mostrar."
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_5
+msgid "Mega Menu Image 0#{title}"
+msgstr "Imagen del megamenú 0#{title}"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_6
+msgid "Mega Menu Image 01"
+msgstr "Imagen del megamenú 01"
+
+#. module: droggol_theme_common
+#: model:ir.actions.act_window,name:droggol_theme_common.dr_website_menu_label_action
+#: model:ir.ui.menu,name:droggol_theme_common.menu_dr_website_menu_label
+msgid "Menu Labels"
+msgstr "Etiquetas del menú"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_website_menu__dr_menu_visible_on
+msgid "Menu Visible On"
+msgstr "Menú visible en"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Min 3 and Max 8"
+msgstr "Mín. 3 y máx. 8"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Min 5 and Max 10"
+msgstr "Mín. 5 y máx. 10"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Minimum sold qty you want to display."
+msgstr "Cantidad mínima vendida que quieres mostrar."
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Minimum view count you want to display."
+msgstr "Cantidad mínima de vistas que quieres mostrar."
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+#: model:ir.model.fields.selection,name:droggol_theme_common.selection__dr_search_report__device_type__mobile
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.dr_search_report_view_search
+msgid "Mobile"
+msgstr "Celular"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Mode"
+msgstr "Modo"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_snippet_records_collection__dr_res_model
+msgid "Model"
+msgstr "Modelo"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_2
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_3
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_4
+msgid "Morbi vel"
+msgstr ""
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_category_synonyms__name
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_product_brand__name
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_product_label__name
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_product_public_category_label__name
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_product_tags__name
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_pwa_screenshots__name
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_pwa_shortcuts__name
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_snippet_records_collection__name
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_website_content__name
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_website_menu_label__name
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.dr_product_brand_values_view_form
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.dr_product_brand_values_view_tree
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.res_config_settings_view_form
+msgid "Name"
+msgstr "Nombre"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields.selection,name:droggol_theme_common.selection__dr_pwa_screenshots__form_factor__narrow
+msgid "Narrow"
+msgstr "Estrecho"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_6
+msgid "New in"
+msgstr "Nuevo en"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_3
+msgid "Newly Launched"
+msgstr "Recién lanzado"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_2
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_3
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_4
+msgid "Nulla vehicula"
+msgstr ""
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_2
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_3
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_4
+msgid "Nullam"
+msgstr ""
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_3
+msgid ""
+"Nullam <span class=\"s_badge badge text-bg-warning\"><i class=\"fa fa-"
+"magic\"/>Popular</span>"
+msgstr ""
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_2
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_3
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_4
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_5
+msgid "Nullam mattis"
+msgstr ""
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_3
+msgid ""
+"Nullam mattis <span class=\"s_badge badge text-bg-success\"><i class=\"fa "
+"fa-magic\"/>Exclusive</span>"
+msgstr ""
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_2
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_3
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_4
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_5
+msgid "Nullam sed"
+msgstr ""
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_product_pricelist_item__dr_offer_finish_msg
+msgid "Offer Finish Message"
+msgstr "Mensaje de fin de la oferta"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_product_pricelist_item__dr_offer_msg
+msgid "Offer Message"
+msgstr "Mensaje de la oferta"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_website_content__dr_offer_products_ids
+msgid "Offer Products"
+msgstr "Productos en oferta"
+
+#. module: droggol_theme_common
+#. odoo-python
+#: code:addons/droggol_theme_common/models/website.py:0
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_product_tags__dr_offer_ids
+msgid "Offers"
+msgstr "Ofertas"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields.selection,name:droggol_theme_common.selection__website_menu__dr_menu_visible_on__desktop
+msgid "Only Desktop"
+msgstr "Solo escritorio"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_1
+msgid "Opening"
+msgstr "Apertura"
+
+#. module: droggol_theme_common
+#. odoo-python
+#: code:addons/droggol_theme_common/models/website.py:0
+msgid "Orders"
+msgstr "Órdenes"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_1
+msgid "Overview"
+msgstr "Información general"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_res_config_settings__dr_pwa_activated
+#: model:ir.model.fields,field_description:droggol_theme_common.field_website__dr_pwa_activated
+msgid "PWA Activated"
+msgstr "PWA activada"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_res_config_settings__dr_pwa_background_color
+#: model:ir.model.fields,field_description:droggol_theme_common.field_website__dr_pwa_background_color
+msgid "PWA Background Color"
+msgstr "Color de fondo de la PWA"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_res_config_settings__dr_pwa_icon_192
+#: model:ir.model.fields,field_description:droggol_theme_common.field_website__dr_pwa_icon_192
+msgid "PWA Icon 192x192"
+msgstr "Icono de la PWA 192x192"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_res_config_settings__dr_pwa_icon_512
+#: model:ir.model.fields,field_description:droggol_theme_common.field_website__dr_pwa_icon_512
+msgid "PWA Icon 512x512"
+msgstr "Icono de la PWA 512x512"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_res_config_settings__dr_pwa_name
+#: model:ir.model.fields,field_description:droggol_theme_common.field_website__dr_pwa_name
+msgid "PWA Name"
+msgstr "Nombre de la PWA"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_res_config_settings__dr_pwa_offline_page
+#: model:ir.model.fields,field_description:droggol_theme_common.field_website__dr_pwa_offline_page
+msgid "PWA Offline Page"
+msgstr "Página sin conexión de la PWA"
+
+#. module: droggol_theme_common
+#: model:ir.actions.act_window,name:droggol_theme_common.dr_pwa_screenshots_action
+#: model:ir.model,name:droggol_theme_common.model_dr_pwa_screenshots
+msgid "PWA Screenshots"
+msgstr "Capturas de la PWA"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_res_config_settings__dr_pwa_short_name
+#: model:ir.model.fields,field_description:droggol_theme_common.field_website__dr_pwa_short_name
+msgid "PWA Short Name"
+msgstr "Nombre corto de la PWA"
+
+#. module: droggol_theme_common
+#: model:ir.actions.act_window,name:droggol_theme_common.dr_pwa_shortcuts_action
+#: model:ir.model,name:droggol_theme_common.model_dr_pwa_shortcuts
+msgid "PWA Shortcuts"
+msgstr "Accesos directos de la PWA"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_res_config_settings__dr_pwa_show_install_banner
+#: model:ir.model.fields,field_description:droggol_theme_common.field_website__dr_pwa_show_install_banner
+msgid "PWA Show Install Banner"
+msgstr "Mostrar banner de instalación de la PWA"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_res_config_settings__dr_pwa_start_url
+#: model:ir.model.fields,field_description:droggol_theme_common.field_website__dr_pwa_start_url
+msgid "PWA Start URL"
+msgstr "URL de inicio de la PWA"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_res_config_settings__dr_pwa_theme_color
+#: model:ir.model.fields,field_description:droggol_theme_common.field_website__dr_pwa_theme_color
+msgid "PWA Theme Color"
+msgstr "Color del tema de la PWA"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_website__dr_pwa_version
+msgid "PWA Version"
+msgstr "Versión de la PWA"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_1
+msgid "Parallax"
+msgstr "Paralaje"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Pills limit"
+msgstr "Límite de píldoras"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_website_content__popup_style
+msgid "Popup Style"
+msgstr "Estilo de ventana emergente"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_1
+msgid "Portfolio"
+msgstr "Portafolio"
+
+#. module: droggol_theme_common
+#: model:ir.model,name:droggol_theme_common.model_product_pricelist_item
+msgid "Pricelist Rule"
+msgstr "Regla de la lista de precios"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Pricelist per customer"
+msgstr "Lista de precios por cliente"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_1
+msgid "Pricing"
+msgstr "Precios"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_product_offer__product_id
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_product_tabs__product_id
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_snippet_records_collection__product_ids
+#: model:ir.model.fields.selection,name:droggol_theme_common.selection__dr_snippet_records_collection__dr_res_model__product_template
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.dr_search_report_view_search
+msgid "Product"
+msgstr "Producto"
+
+#. module: droggol_theme_common
+#: model:ir.model,name:droggol_theme_common.model_product_attribute
+msgid "Product Attribute"
+msgstr "Atributo de producto"
+
+#. module: droggol_theme_common
+#: model:ir.model,name:droggol_theme_common.model_dr_product_brand
+msgid "Product Brand"
+msgstr "Marca del producto"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Product Card"
+msgstr "Tarjeta de producto"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Product Card Actions"
+msgstr "Acciones de la tarjeta de producto"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields.selection,name:droggol_theme_common.selection__dr_search_report__clicked_type__product
+msgid "Product Clicked"
+msgstr "Clic en producto"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_product_label__product_count
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_product_tags__product_count
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_search_report__product_count
+msgid "Product Count"
+msgstr "Número de productos"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Product Detail"
+msgstr "Detalle del producto"
+
+#. module: droggol_theme_common
+#: model:ir.model,name:droggol_theme_common.model_product_template
+msgid "Product Electronic"
+msgstr "Producto electrónico"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_product_product__dr_product_offer_ids
+#: model:ir.model.fields,field_description:droggol_theme_common.field_product_template__dr_product_offer_ids
+#: model:ir.model.fields,field_description:droggol_theme_common.field_website__dr_product_info_ids
+#: model:ir.model.fields.selection,name:droggol_theme_common.selection__dr_website_content__content_type__offer_popup
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.dr_website_content_view_search
+msgid "Product Info"
+msgstr "Información del producto"
+
+#. module: droggol_theme_common
+#: model:ir.model,name:droggol_theme_common.model_dr_product_label
+msgid "Product Label"
+msgstr "Etiqueta del producto"
+
+#. module: droggol_theme_common
+#: model:ir.model,name:droggol_theme_common.model_dr_product_offer
+msgid "Product Offers"
+msgstr "Ofertas de productos"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields.selection,name:droggol_theme_common.selection__dr_website_content__content_type__tab
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.dr_website_content_view_search
+msgid "Product Tab"
+msgstr "Pestaña de producto"
+
+#. module: droggol_theme_common
+#: model:ir.model,name:droggol_theme_common.model_dr_product_tabs
+#: model:ir.model.fields,field_description:droggol_theme_common.field_product_product__dr_product_tab_ids
+#: model:ir.model.fields,field_description:droggol_theme_common.field_product_template__dr_product_tab_ids
+#: model:ir.model.fields,field_description:droggol_theme_common.field_website__dr_product_tab_ids
+msgid "Product Tabs"
+msgstr "Pestañas del producto"
+
+#. module: droggol_theme_common
+#: model:ir.model,name:droggol_theme_common.model_dr_product_tags
+msgid "Product Tags"
+msgstr "Etiquetas de producto"
+
+#. module: droggol_theme_common
+#: model:ir.model,name:droggol_theme_common.model_product_template_attribute_line
+msgid "Product Template Attribute Line"
+msgstr "Linea de atributo de la plantilla de producto"
+
+#. module: droggol_theme_common
+#: model:ir.model,name:droggol_theme_common.model_product_template_attribute_value
+msgid "Product Template Attribute Value"
+msgstr "Valor del atributo del modelo de producto"
+
+#. module: droggol_theme_common
+#: model:ir.model,name:droggol_theme_common.model_product_product
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_snippet_records_collection__product_variant_ids
+msgid "Product Variant"
+msgstr "Variante del producto"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Product View Count"
+msgstr "Cantidad de vistas del producto"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Product navigation"
+msgstr "Navegación de productos"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_product_tags__product_ids
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.dr_product_label_view_form
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.dr_website_content_view_form
+msgid "Products"
+msgstr "Productos"
+
+#. module: droggol_theme_common
+#: model:ir.model,name:droggol_theme_common.model_dr_products_mixin
+msgid "Products Mixin"
+msgstr ""
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Products limit"
+msgstr "Límite de productos"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.res_config_settings_view_form
+msgid "Progressive Web Apps (PWA)"
+msgstr "Aplicaciones web progresivas (PWA)"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_2
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_4
+msgid "Proin"
+msgstr ""
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_3
+msgid ""
+"Proin <span class=\"s_badge badge text-bg-primary\"><i class=\"fa fa-"
+"star\"/>New</span>"
+msgstr ""
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_3
+msgid ""
+"Proin <span class=\"s_badge badge text-bg-primary\"><i class=\"fa fa-"
+"tag\"/>New</span>"
+msgstr ""
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_2
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_3
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_4
+msgid "Proin eu"
+msgstr ""
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_2
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_3
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_4
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_5
+msgid "Proin lobortis"
+msgstr ""
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.res_config_settings_view_form
+msgid "Prompt the user to install the PWA with a custom banner."
+msgstr "Invita al usuario a instalar la PWA con un banner personalizado."
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_2
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_3
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_4
+msgid "Quisque"
+msgstr ""
+
+#. module: droggol_theme_common
+#: model:ir.model.fields.selection,name:droggol_theme_common.selection__product_attribute__display_type__radio_circle
+msgid "Radio Circle"
+msgstr "Círculo de opción"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields.selection,name:droggol_theme_common.selection__product_attribute__display_type__radio_image
+msgid "Radio Image"
+msgstr "Imagen de opción"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields.selection,name:droggol_theme_common.selection__product_attribute__display_type__radio_square
+msgid "Radio Square"
+msgstr "Cuadro de opción"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Recent Sales"
+msgstr "Ventas recientes"
+
+#. module: droggol_theme_common
+#: model:ir.model,name:droggol_theme_common.model_res_config_settings
+msgid "ResConfigSettings"
+msgstr ""
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,help:droggol_theme_common.field_dr_category_synonyms__website_id
+#: model:ir.model.fields,help:droggol_theme_common.field_dr_product_brand__website_id
+#: model:ir.model.fields,help:droggol_theme_common.field_dr_product_tags__website_id
+msgid "Restrict to a specific website."
+msgstr "Restringir a un sitio web específico."
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_1
+msgid "Rich"
+msgstr "Enriquecida"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_1
+msgid "Rich View"
+msgstr "Vista enriquecida"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_website__dr_sale_special_offer
+msgid "Sale Special Offer"
+msgstr "Oferta especial"
+
+#. module: droggol_theme_common
+#: model:ir.model,name:droggol_theme_common.model_sale_order
+msgid "Sales Order"
+msgstr "Orden de venta"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_6
+msgid "Sandals"
+msgstr "Sandalias"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Save"
+msgstr "Guardar"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_6
+msgid "Scarves &amp; Hats"
+msgstr "Bufandas y sombreros"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.dr_pwa_screenshots_view_form
+msgid "Screenshot type must be JPG."
+msgstr "La captura de pantalla debe ser JPG."
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_res_config_settings__dr_pwa_screenshots
+#: model:ir.model.fields,field_description:droggol_theme_common.field_website__dr_pwa_screenshots
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.dr_pwa_screenshots_view_form
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.dr_pwa_screenshots_view_tree
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.res_config_settings_view_form
+msgid "Screenshots"
+msgstr "Capturas de pantalla"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#. odoo-python
+#: code:addons/droggol_theme_common/models/website.py:0
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_1
+msgid "Search"
+msgstr "Buscar"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_category_synonyms__ds_name
+#: model:ir.model.fields,field_description:droggol_theme_common.field_product_attribute_value__ds_name
+#: model:ir.model.fields,field_description:droggol_theme_common.field_product_public_category__ds_name
+msgid "Search DS Name"
+msgstr ""
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+#: model:ir.actions.act_window,name:droggol_theme_common.dr_search_report_action
+#: model:ir.ui.menu,name:droggol_theme_common.dr_search_report_menu
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.dr_search_report_view_form
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.dr_search_report_view_graph
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.dr_search_report_view_pivot
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.dr_search_report_view_tree
+msgid "Search Report"
+msgstr "Reporte de búsquedas"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_search_report__search_term
+msgid "Search Term"
+msgstr "Término de búsqueda"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_search_report__search_time
+msgid "Search Time"
+msgstr "Tiempo de búsqueda"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.dr_search_report_view_search
+msgid "Search Visitor"
+msgstr "Buscar visitante"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Search in Description"
+msgstr "Buscar por descripción"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_product_attribute__dr_search_suggestion
+msgid "Search suggestion type"
+msgstr "Tipo de sugerencia de búsqueda"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_2
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_4
+msgid "See all the products at once."
+msgstr "Ve todos los productos de una vez."
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_product_brand__sequence
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_product_offer__sequence
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_product_tabs__sequence
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_pwa_screenshots__sequence
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_pwa_shortcuts__sequence
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_website_content__sequence
+msgid "Sequence"
+msgstr "Secuencia"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Set 24 if you want to show the quantity sold within the last 24 hours."
+msgstr ""
+"Pon 24 si quieres mostrar la cantidad vendida en las últimas 24 horas."
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_2
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_3
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_4
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_6
+msgid "Shoes"
+msgstr "Zapatos"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Shop"
+msgstr "Tienda"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Shop Filter"
+msgstr "Filtro de tienda"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_6
+msgid "Shop Now"
+msgstr "Compra ahora"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_3
+msgid "Shop Offer Image 01"
+msgstr "Imagen de la oferta de tienda 01"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Shop page main layout."
+msgstr "Distribución principal de la página de tienda."
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_pwa_shortcuts__short_name
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.res_config_settings_view_form
+msgid "Short Name"
+msgstr "Nombre corto"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_res_config_settings__dr_pwa_shortcuts
+#: model:ir.model.fields,field_description:droggol_theme_common.field_website__dr_pwa_shortcuts
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.dr_pwa_shortcuts_view_form
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.dr_pwa_shortcuts_view_tree
+msgid "Shortcuts"
+msgstr "Accesos directos"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_6
+msgid "Shorts"
+msgstr ""
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Show Bottombar"
+msgstr "Mostrar barra inferior"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Show Bottombar On Scroll"
+msgstr "Mostrar barra inferior al desplazar"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.res_config_settings_view_form
+msgid "Show Custom Install Banner"
+msgstr "Mostrar banner de instalación personalizado"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_product_attribute__dr_is_show_shop_search
+msgid "Show Searchbar in Shop Filter"
+msgstr "Mostrar barra de búsqueda en el filtro"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Show add to cart"
+msgstr "Mostrar agregar al carrito"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Show attribute count"
+msgstr "Mostrar cantidad de atributos"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Show availability filter"
+msgstr "Mostrar filtro de disponibilidad"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Show bulk price"
+msgstr "Mostrar precio por volumen"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Show category count"
+msgstr "Mostrar cantidad de categorías"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Show category link in menu sidebar"
+msgstr "Mostrar enlace de categoría en la barra lateral del menú"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Show child categories pills of active category"
+msgstr "Mostrar píldoras de categorías hijas de la categoría activa"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Show compare"
+msgstr "Mostrar comparar"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Show filters in sidebar"
+msgstr "Mostrar filtros en la barra lateral"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Show free delivery progress in cart sidebar"
+msgstr "Mostrar progreso de envío gratis en la barra lateral del carrito"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Show number of people watching product right now."
+msgstr "Mostrar cuántas personas están viendo el producto ahora mismo."
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid ""
+"Show number of quantity sold in the past. e.g. sold within last 24 hours."
+msgstr ""
+"Mostrar la cantidad vendida en el pasado. Por ejemplo, vendidos en las "
+"últimas 24 horas."
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.res_config_settings_view_form
+msgid "Show offline page when there is no internet."
+msgstr "Mostrar la página sin conexión cuando no hay internet."
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Show product category pills on top of the shop page."
+msgstr ""
+"Mostrar píldoras de categorías de producto arriba de la página de tienda."
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Show product count in category sidebar"
+msgstr "Mostrar cantidad de productos en la barra lateral de categorías"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Show product preview swatches"
+msgstr "Mostrar muestras de vista previa del producto"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Show quick view"
+msgstr "Mostrar vista rápida"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Show rating"
+msgstr "Mostrar calificación"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Show rating filter"
+msgstr "Mostrar filtro de calificación"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Show similar products"
+msgstr "Mostrar productos similares"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Show sort and filter button on shop"
+msgstr "Mostrar botón de orden y filtro en la tienda"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Show stock label"
+msgstr "Mostrar etiqueta de existencias"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Show view switcher"
+msgstr "Mostrar selector de vista"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.res_config_settings_view_form
+msgid "Show what the app looks like and what it can do."
+msgstr "Muestra cómo se ve la app y qué puede hacer."
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Show wishlist"
+msgstr "Mostrar favoritos"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_1
+msgid "Showcase"
+msgstr "Vitrina"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Shows button to see next, previous products based on product sequence."
+msgstr ""
+"Muestra un botón para ver el producto siguiente o anterior según la "
+"secuencia."
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+#: model:ir.model.fields.selection,name:droggol_theme_common.selection__dr_website_content__popup_style__sidebar
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_1
+msgid "Sidebar"
+msgstr "Barra lateral"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_product_public_category__dr_category_sidebar_cover
+msgid "Sidebar Cover"
+msgstr "Portada de la barra lateral"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_1
+msgid "Sidebar: Fluid"
+msgstr "Barra lateral: fluida"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_pwa_screenshots__sizes
+msgid "Sizes"
+msgstr "Tallas"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_6
+msgid "Skirts"
+msgstr "Faldas"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_6
+msgid "Slippers"
+msgstr "Pantuflas"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Smart Autocomplete"
+msgstr "Autocompletado inteligente"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Smart Suggestion"
+msgstr "Sugerencia inteligente"
+
+#. module: droggol_theme_common
+#: model:ir.model,name:droggol_theme_common.model_dr_snippet_records_collection
+msgid "Snippet Records Collection"
+msgstr "Colección de registros del bloque"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_6
+msgid "Socks"
+msgstr "Calcetines"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields.selection,name:droggol_theme_common.selection__website_menu__dr_highlight_menu__soft
+msgid "Soft"
+msgstr "Suave"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields.selection,name:droggol_theme_common.selection__website_menu__dr_highlight_menu__solid
+msgid "Solid"
+msgstr "Sólido"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields.selection,name:droggol_theme_common.selection__dr_product_label__style__4
+msgid "Square"
+msgstr "Cuadrado"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.res_config_settings_view_form
+msgid "Start URL"
+msgstr "URL de inicio"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_product_label__style
+#: model:ir.model.fields,field_description:droggol_theme_common.field_product_attribute__dr_radio_image_style
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.dr_product_label_view_search
+msgid "Style"
+msgstr "Estilo"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields.selection,name:droggol_theme_common.selection__dr_search_report__clicked_type__submit
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.dr_search_report_view_search
+msgid "Submited"
+msgstr "Enviado"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.dr_search_report_view_search
+msgid "Suggestion"
+msgstr "Sugerencia"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields.selection,name:droggol_theme_common.selection__dr_search_report__clicked_type__suggestion
+msgid "Suggestion Clicked"
+msgstr "Clic en sugerencia"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_search_report__suggestion_count
+msgid "Suggestion Count"
+msgstr "Cantidad de sugerencias"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_product_template_attribute_value__dr_thumb_image
+msgid "Swatch Image"
+msgstr "Imagen de muestra"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.product_public_category_form_view_inherit_droggol_theme_common
+msgid "Synonyms"
+msgstr "Sinónimos"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_website_content__dr_tab_products_ids
+msgid "Tab Products"
+msgstr "Productos de la pestaña"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_product_tags__dr_tab_ids
+msgid "Tabs"
+msgstr "Pestañas"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_product_offer__tag_id
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_product_tabs__tag_id
+#: model:ir.model.fields.selection,name:droggol_theme_common.selection__dr_product_label__style__1
+msgid "Tag"
+msgstr "Etiqueta"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_1
+msgid "Terms"
+msgstr "Términos"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_product_label__text_color
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_product_public_category_label__text_color
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_website_menu_label__text_color
+msgid "Text Color"
+msgstr "Color del texto"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,help:droggol_theme_common.field_dr_pwa_shortcuts__url
+msgid "The URL opened when a user activates the app shortcut."
+msgstr ""
+"La URL que se abre cuando el usuario activa el acceso directo de la app."
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,help:droggol_theme_common.field_product_attribute__display_type
+msgid "The display type used in the Product Configurator."
+msgstr "El tipo de visualización utilizado en el configurador del producto."
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,help:droggol_theme_common.field_dr_pwa_shortcuts__name
+msgid ""
+"The human-readable label for the app shortcut when displayed to the user."
+msgstr ""
+"La etiqueta legible del acceso directo de la app cuando se le muestra al "
+"usuario."
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,help:droggol_theme_common.field_dr_pwa_shortcuts__short_name
+msgid "The human-readable label used where space is limited."
+msgstr "La etiqueta legible que se usa donde el espacio es limitado."
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,help:droggol_theme_common.field_dr_pwa_shortcuts__description
+msgid "The human-readable purpose for the app shortcut."
+msgstr "La descripción legible del acceso directo de la app."
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.dr_pwa_shortcuts_view_form
+msgid "The icon must be a 192x192 PNG."
+msgstr "El icono debe ser un PNG de 192x192."
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.res_config_settings_view_form
+msgid "Theme Color"
+msgstr "Color del tema"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Theme Configuration"
+msgstr "Configuración del tema"
+
+#. module: droggol_theme_common
+#. odoo-python
+#: code:addons/droggol_theme_common/models/res_config_settings.py:0
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.res_config_settings_view_form
+msgid "Theme Customizations"
+msgstr "Personalizaciones del tema"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.product_public_category_form_view_inherit_droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.product_template_form_view_inherit_droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.view_website_sale_website_form
+msgid "Theme Prime"
+msgstr ""
+
+#. module: droggol_theme_common
+#: model:ir.ui.menu,name:droggol_theme_common.menu_theme_prime_config
+msgid "Theme Prime Configuration"
+msgstr "Configuración de Theme Prime"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.res_config_settings_view_form
+msgid ""
+"These icons are used in places like the home screen, app launcher, task "
+"switcher, splash screen, etc."
+msgstr ""
+"Estos iconos se usan en lugares como la pantalla de inicio, el lanzador de "
+"apps, el selector de tareas, la pantalla de bienvenida, etc."
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid ""
+"This option will hide product price for public users and don't allow them to"
+" place an order"
+msgstr ""
+"Esta opción oculta el precio del producto a los usuarios públicos y no les "
+"permite hacer pedidos"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_product_offer__name
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_product_tabs__name
+msgid "Title"
+msgstr "Título"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid ""
+"To show rating filter, First you have to activate customers 'Rating' option "
+"in product detail page."
+msgstr ""
+"Para mostrar el filtro de calificación, primero debes activar la opción "
+"'Calificación' de clientes en la página de detalle del producto."
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid ""
+"To show rating, First you have to activate customers 'Rating' option in "
+"product detail page."
+msgstr ""
+"Para mostrar la calificación, primero debes activar la opción 'Calificación'"
+" de clientes en la página de detalle del producto."
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Tweak filters behavior on shop."
+msgstr "Ajusta el comportamiento de los filtros en la tienda."
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Tweak search behavior for your website."
+msgstr "Ajusta el comportamiento de búsqueda de tu sitio web."
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Tweak your shop behavior."
+msgstr "Ajusta el comportamiento de tu tienda."
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_website_content__content_type
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.dr_website_content_view_search
+msgid "Type"
+msgstr "Tipo"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_pwa_shortcuts__url
+msgid "URL"
+msgstr ""
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,help:droggol_theme_common.field_dr_category_synonyms__dr_search_formulate
+#: model:ir.model.fields,help:droggol_theme_common.field_product_public_category__dr_search_formulate
+msgid ""
+"Use to search multi level categories         e.g. Men Shirt (Here men and "
+"shirt are different category but will be displayed as one in smart search)"
+msgstr ""
+"Sirve para buscar categorías de varios niveles         por ejemplo Camisa "
+"Hombre (aquí hombre y camisa son categorías distintas pero se mostrarán como"
+" una sola en la búsqueda inteligente)"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,help:droggol_theme_common.field_dr_website_content__identifier
+msgid ""
+"Used for internal purpose to identify your content. Like, In backend display"
+" in dropdown)"
+msgstr ""
+"Se usa internamente para identificar tu contenido. Por ejemplo, se muestra "
+"en el desplegable del backend)"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.res_config_settings_view_form
+msgid "Used in the app install prompt."
+msgstr "Se usa en el aviso de instalación de la app."
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.res_config_settings_view_form
+msgid "Used on the splash screen when the application is first launched."
+msgstr ""
+"Se usa en la pantalla de bienvenida cuando la aplicación se abre por primera"
+" vez."
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.res_config_settings_view_form
+msgid "Used on the user's home screen, launcher, or other places."
+msgstr ""
+"Se usa en la pantalla de inicio del usuario, el lanzador u otros lugares."
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.res_config_settings_view_form
+msgid "Used on toolbar, and may be in the app's preview in task switchers."
+msgstr ""
+"Se usa en la barra de herramientas y puede aparecer en la vista previa de la"
+" app."
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_search_report__user_id
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.dr_search_report_view_search
+msgid "User"
+msgstr "Usuario"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.xml:0
+msgid "User Guide"
+msgstr "Guía del usuario"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_theme_config__value
+msgid "Value"
+msgstr "Valor"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_product_attribute_value__dr_image
+#: model:ir.model.fields,field_description:droggol_theme_common.field_product_template_attribute_value__dr_image
+msgid "Value Image"
+msgstr "Imagen del valor"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields.selection,name:droggol_theme_common.selection__dr_snippet_records_collection__dr_res_model__product_product
+msgid "Variant"
+msgstr "Variante"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_2
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_4
+msgid "View all products"
+msgstr "Ver todos los productos"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_website_content__product_info_visibility
+msgid "Visibility"
+msgstr "Visibilidad"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_2
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_3
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_4
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_5
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_6
+msgid "Vivamus"
+msgstr ""
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_2
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.s_mega_menu_prime_4
+msgid "Want to explore our products?"
+msgstr "¿Quieres explorar nuestros productos?"
+
+#. module: droggol_theme_common
+#: model:ir.model,name:droggol_theme_common.model_website
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_category_synonyms__website_id
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_product_brand__website_id
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_product_tags__website_id
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_pwa_screenshots__website_id
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_pwa_shortcuts__website_id
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_search_report__website_id
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_snippet_records_collection__website_id
+#: model:ir.model.fields,field_description:droggol_theme_common.field_dr_theme_config__website_id
+msgid "Website"
+msgstr "Sitio web"
+
+#. module: droggol_theme_common
+#: model:ir.model,name:droggol_theme_common.model_dr_website_content
+msgid "Website Content"
+msgstr "Contenido del sitio web"
+
+#. module: droggol_theme_common
+#: model:ir.model,name:droggol_theme_common.model_website_menu
+msgid "Website Menu"
+msgstr "Menú del sitio web"
+
+#. module: droggol_theme_common
+#: model:ir.model,name:droggol_theme_common.model_dr_website_menu_label
+msgid "Website Menu Label"
+msgstr "Etiqueta del menú del sitio web"
+
+#. module: droggol_theme_common
+#: model:ir.model,name:droggol_theme_common.model_product_public_category
+msgid "Website Product Category"
+msgstr "Categoría del producto de sitio web"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid ""
+"When products does not match search term, this option will try to fill "
+"associated products."
+msgstr ""
+"Cuando los productos no coinciden con el término de búsqueda, esta opción "
+"intentará completar con productos asociados."
+
+#. module: droggol_theme_common
+#: model:ir.model.fields.selection,name:droggol_theme_common.selection__dr_pwa_screenshots__form_factor__wide
+msgid "Wide"
+msgstr "Ancho"
+
+#. module: droggol_theme_common
+#. odoo-python
+#: code:addons/droggol_theme_common/models/website.py:0
+msgid "Wishlist"
+msgstr "Lista de deseos"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "You can change behaviour of sidebars."
+msgstr "Puedes cambiar el comportamiento de las barras laterales."
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "You can change how products are being added in cart."
+msgstr "Puedes cambiar cómo se agregan los productos al carrito."
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.dr_website_content_view_form
+msgid "You can find icon at"
+msgstr "Puedes encontrar iconos en"
+
+#. module: droggol_theme_common
+#: model:ir.model.fields,help:droggol_theme_common.field_dr_website_content__image
+msgid "You can upload an image that will be used as icon."
+msgstr "Puedes subir una imagen que se usará como icono."
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.res_config_settings_view_form
+msgid "Your application will start from this URL when it is launched."
+msgstr "Tu aplicación arrancará desde esta URL cuando se abra."
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Zoom Product Images"
+msgstr "Ampliar imágenes del producto"
+
+#. module: droggol_theme_common
+#. odoo-javascript
+#: code:addons/droggol_theme_common/static/src/js/theme_config/theme_config.js:0
+msgid "Zoom product images in product detail page and quick view."
+msgstr ""
+"Ampliar las imágenes del producto en la página de detalle y la vista rápida."
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.dr_pwa_screenshots_view_form
+msgid "about screenshots."
+msgstr "sobre las capturas de pantalla."
+
+#. module: droggol_theme_common
+#: model:ir.model.fields.selection,name:droggol_theme_common.selection__dr_snippet_records_collection__dr_res_model__product_public_category
+msgid "category"
+msgstr "categoría"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.product_attribute_view_form_inherit_droggol_theme_common
+msgid "eCommerce"
+msgstr "Comercio electrónico"
+
+#. module: droggol_theme_common
+#: model_terms:ir.ui.view,arch_db:droggol_theme_common.product_attribute_view_form_inherit_droggol_theme_common
+msgid "eCommerce Filter Visibility"
+msgstr "Visibilidad del filtro de comercio electrónico"

@@ -82,6 +82,7 @@
                                         <th>Fecha</th>
                                         <th>Factura</th>
                                         <th>Pago</th>
+                                        <th>N° Recibo</th>
                                         <th>Cliente</th>
                                         <th class="text-end">Monto Pago</th>
                                         <th>Tipo</th>
@@ -94,6 +95,7 @@
                                         <td><span t-field="line.payment_date"/></td>
                                         <td><span t-field="line.invoice_id.name"/></td>
                                         <td><span t-field="line.payment_id.name"/></td>
+                                        <td><span t-field="line.sng_numero_recibo"/></td>
                                         <td><span t-field="line.partner_id.name"/></td>
                                         <td class="text-end">
                                             <span t-field="line.payment_amount"
@@ -109,7 +111,7 @@
                                 </tbody>
                                 <tfoot>
                                     <tr>
-                                        <td colspan="4"><strong>TOTAL</strong></td>
+                                        <td colspan="5"><strong>TOTAL</strong></td>
                                         <td class="text-end">
                                             <strong><span t-esc="sum(doc.commission_line_ids.mapped('payment_amount'))"
                                                   t-options="{'widget': 'monetary', 'display_currency': doc.currency_id}"/></strong>

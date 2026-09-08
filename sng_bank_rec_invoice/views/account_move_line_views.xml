@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_account_move_line_list_bank_rec_widget_invoice_sequence" model="ir.ui.view">
+        <field name="name">account.move.line.list.bank.rec.widget.invoice.sequence</field>
+        <field name="model">account.move.line</field>
+        <field name="inherit_id" ref="account_accountant.view_account_move_line_list_bank_rec_widget"/>
+        <field name="arch" type="xml">
+            <field name="name" position="before">
+                <field name="sng_invoice_sequence" string="Número de factura" optional="show"/>
+            </field>
+        </field>
+    </record>
+</odoo>

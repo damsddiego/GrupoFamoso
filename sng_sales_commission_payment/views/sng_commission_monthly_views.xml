@@ -85,6 +85,7 @@
                                         <field name="is_rolled_over" optional="hide"/>
                                         <field name="invoice_id"/>
                                         <field name="payment_id"/>
+                                        <field name="sng_numero_recibo" optional="show"/>
                                         <field name="partner_id"/>
                                         <field name="payment_amount" sum="Pagado"/>
                                         <field name="tax_profile" widget="badge"

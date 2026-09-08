@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Integración con el widget nativo de conciliación (Enterprise):
+     la sugerencia SNG visible en el panel izquierdo (kanban) y filtros
+     para trabajar por bloques. Si un upgrade de account_accountant mueve
+     estas vistas, el error es ruidoso y aislado: basta reajustar los
+     xpath; el resto del módulo no depende de este archivo. -->
+<odoo>
+
+    <!-- Badge de la sugerencia en la tarjeta de cada línea -->
+    <record id="view_sng_bank_rec_kanban_inherit" model="ir.ui.view">
+        <field name="name">account.bank.statement.line.kanban.bank_rec_widget.sng</field>
+        <field name="model">account.bank.statement.line</field>
+        <field name="inherit_id"
+               ref="account_accountant.view_bank_statement_line_kanban_bank_rec_widget"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='currency_id']" position="after">
+                <field name="sng_sugerencia"/>
+                <field name="sng_confianza"/>
+                <field name="sng_ia_pendiente"/>
+            </xpath>
+            <xpath expr="//span[@t-if='!record.checked.raw_value']"
+                   position="before">
+                <t t-if="!record.is_reconciled.raw_value">
+                    <span t-if="record.sng_ia_pendiente.raw_value"
+                          class="badge text-bg-secondary fw-normal me-1"
+                          title="La IA está analizando esta línea; la sugerencia aparece sola en unos minutos">
+                        IA…
+                    </span>
+                    <span t-elif="record.sng_sugerencia.raw_value"
+                          t-att-class="'badge fw-normal me-1 ' + (record.sng_sugerencia.raw_value == 'pago' ? 'text-bg-success' : record.sng_sugerencia.raw_value == 'factura' ? 'text-bg-info' : record.sng_sugerencia.raw_value == 'revisar' ? 'text-bg-warning' : 'text-bg-danger')"
+                          t-att-title="'Sugerencia — confianza ' + (record.sng_confianza.value || 's/d')">
+                        <t t-out="record.sng_sugerencia.value"/>
+                    </span>
+                </t>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Filtros por sugerencia en el buscador del widget -->
+    <record id="view_sng_bank_rec_search_inherit" model="ir.ui.view">
+        <field name="name">account.bank.statement.line.search.bank_rec_widget.sng</field>
+        <field name="model">account.bank.statement.line</field>
+        <field name="inherit_id"
+               ref="account_accountant.view_bank_statement_line_search_bank_rec_widget"/>
+        <field name="arch" type="xml">
+            <filter name="to_check" position="after">
+                <separator/>
+                <filter name="sng_sug_pago" string="Sugerido: pago registrado"
+                        domain="[('sng_sugerencia', '=', 'pago')]"/>
+                <filter name="sng_sug_factura" string="Sugerido: factura abierta"
+                        domain="[('sng_sugerencia', '=', 'factura')]"/>
+                <filter name="sng_sug_revisar" string="Sugerido: revisar"
+                        domain="[('sng_sugerencia', '=', 'revisar')]"/>
+                <filter name="sng_sug_sin" string="Sin coincidencia"
+                        domain="[('sng_sugerencia', '=', 'sin_match')]"/>
+                <filter name="sng_ia_cola" string="IA en cola"
+                        domain="[('sng_ia_pendiente', '=', True)]"/>
+            </filter>
+            <filter name="invoice_date_group" position="after">
+                <filter name="sng_sugerencia_group" string="Sugerencia"
+                        context="{'group_by': 'sng_sugerencia'}"/>
+            </filter>
+        </field>
+    </record>
+
+</odoo>

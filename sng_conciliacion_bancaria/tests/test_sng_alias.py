@@ -205,6 +205,10 @@ class TestSngAlias(TransactionCase):
         linea, clave = self._linea_sinpe_sin_cedula()
         if not linea:
             self.skipTest('la base no tiene línea SINPE sin conciliar')
+        # La factura debe tener saldo >= monto de la línea: si cubre menos,
+        # queda diferencia a suspense, el widget queda 'invalid' y
+        # _action_validate no valida (el test dependería de qué factura
+        # devuelva primero la base).
         self.env.cr.execute("""
             SELECT m.commercial_partner_id, l.id
             FROM account_move m
@@ -213,16 +217,20 @@ class TestSngAlias(TransactionCase):
                                      WHERE account_type
                                            = 'asset_receivable')
                 AND NOT l.reconciled AND l.debit > 0
+                AND l.amount_residual >= %s
             JOIN res_partner p ON p.id = m.commercial_partner_id
             WHERE m.move_type = 'out_invoice' AND m.state = 'posted'
               AND m.payment_state IN ('not_paid', 'partial')
               AND m.company_id = %s
               AND (p.company_id IS NULL OR p.company_id = %s)
+              AND m.currency_id = %s
             LIMIT 1
-        """, (linea.company_id.id, linea.company_id.id))
+        """, (linea.amount, linea.company_id.id, linea.company_id.id,
+              linea.currency_id.id))
         row = self.env.cr.fetchone()
         if not row:
-            self.skipTest('sin factura abierta en la compañía de la línea')
+            self.skipTest('sin factura abierta con saldo suficiente en la '
+                          'compañía de la línea')
         partner_id, aml_id = row
         aml = self.env['account.move.line'].browse(aml_id)
 

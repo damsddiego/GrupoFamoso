@@ -336,15 +336,46 @@ class AccountBankStatementLine(models.Model):
     # ------------------------------------------------------------------
     def accion_sng_sugerir(self):
         self._sng_verificar_grupo()
-        lineas = self.filtered(
-            lambda l: not l.is_reconciled and l.amount > 0)
+        lineas, pendientes_ia = self._sng_sugerir_lote()
         if not lineas:
             raise UserError(_(
                 'Ninguna de las líneas seleccionadas es un crédito '
                 '(depósito) pendiente de conciliar. Seleccione líneas de '
                 'monto positivo que aún no estén conciliadas; los débitos '
                 'se concilian a mano desde el extracto.'))
+        resueltas = len(lineas) - len(pendientes_ia)
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'type': 'success',
+                'message': _(
+                    'Sugerencias listas en %(r)s línea(s); %(p)s quedaron '
+                    'en cola para la IA (se completan solas en unos '
+                    'minutos, refresque la vista). Aún no se concilió '
+                    'nada: revise la columna Sugerencia y luego pulse '
+                    '"2 · Conciliar lo sugerido" en las que esté de '
+                    'acuerdo.',
+                    r=resueltas, p=len(pendientes_ia)),
+                'sticky': False,
+            },
+        }
+
+    def _sng_sugerir_lote(self):
+        """Núcleo del cálculo de sugerencias, sin guard ni notificación.
+
+        Lo llaman el botón "1 · Sugerir con IA", el importador (recién
+        creadas las líneas) y el cron de barrido: así la sugerencia ya
+        existe cuando la usuaria abre el widget nativo de conciliación.
+        Heurística al instante; lo ambiguo queda marcado ``sng_ia_pendiente``
+        y se dispara el cron de la cola IA. Devuelve
+        ``(procesadas, pendientes_ia)``.
+        """
+        lineas = self.filtered(
+            lambda l: not l.is_reconciled and l.amount > 0)
         pendientes_ia = self.env['account.bank.statement.line']
+        if not lineas:
+            return lineas, pendientes_ia
         alias_idx = self.env['sng.conciliacion.alias']._sng_indice()
         for journal in lineas.journal_id:
             grupo = lineas.filtered(lambda l: l.journal_id == journal)
@@ -367,23 +398,30 @@ class AccountBankStatementLine(models.Model):
             self.env.ref(
                 'sng_conciliacion_bancaria.cron_sng_conciliacion_ia'
             ).sudo()._trigger()
-        resueltas = len(lineas) - len(pendientes_ia)
-        return {
-            'type': 'ir.actions.client',
-            'tag': 'display_notification',
-            'params': {
-                'type': 'success',
-                'message': _(
-                    'Sugerencias listas en %(r)s línea(s); %(p)s quedaron '
-                    'en cola para la IA (se completan solas en unos '
-                    'minutos, refresque la vista). Aún no se concilió '
-                    'nada: revise la columna Sugerencia y luego pulse '
-                    '"2 · Conciliar lo sugerido" en las que esté de '
-                    'acuerdo.',
-                    r=resueltas, p=len(pendientes_ia)),
-                'sticky': False,
-            },
-        }
+        return lineas, pendientes_ia
+
+    def _sng_cron_barrido(self, limite=500):
+        """Cron horario: sugiere las líneas que nadie ha pedido sugerir.
+
+        Cubre lo que no pasa por el importador SNG (líneas creadas a mano
+        o por otros importadores); las del importador SNG ya llegan
+        sugeridas y este barrido no las toca (``sng_sugerencia`` lleno o
+        ``sng_ia_pendiente``). Solo créditos desde ``fecha_inicio``: antes
+        no hay transitoria contra la cual cruzar.
+        """
+        fecha_inicio = fields.Date.from_string(
+            self.env['ir.config_parameter'].sudo().get_param(
+                'sng_conciliacion_bancaria.fecha_inicio') or '2026-07-01')
+        lineas = self.search([
+            ('is_reconciled', '=', False),
+            ('amount', '>', 0),
+            ('sng_sugerencia', '=', False),
+            ('sng_ia_pendiente', '=', False),
+            ('date', '>=', fecha_inicio),
+            ('journal_id.type', '=', 'bank'),
+        ], limit=limite, order='date, id')
+        if lineas:
+            lineas._sng_sugerir_lote()
 
     def _sng_cron_ia(self, lote=20, max_lotes=60):
         """Procesa en segundo plano las líneas marcadas para IA.
@@ -781,27 +819,66 @@ class AccountBankStatementLine(models.Model):
             },
         }
 
-    def _sng_conciliar_una(self):
+    def _sng_amls_sugeridas(self):
+        """Contrapartidas (amls) de la sugerencia, revalidadas al momento:
+        solo líneas aún sin conciliar. Vacío si la sugerencia quedó
+        obsoleta (el pago ya se concilió, las facturas ya se pagaron)."""
         self.ensure_one()
-        if self.sng_sugerencia == 'pago':
-            pago = self.sng_pago_id
-            amls = pago.move_id.line_ids.filtered(
+        if self.sng_sugerencia == 'pago' and self.sng_pago_id:
+            return self.sng_pago_id.move_id.line_ids.filtered(
                 lambda l: l.debit > 0 and not l.reconciled
                 and l.account_id.reconcile
                 and l.account_id.account_type not in
                 ('asset_receivable', 'liability_payable'))
-            if not amls:
-                raise UserError(_('El pago %s ya no tiene línea transitoria '
-                                  'pendiente (¿ya se concilió?).')
-                                % pago.display_name)
-        else:
-            amls = self.sng_factura_ids.line_ids.filtered(
+        if self.sng_sugerencia == 'factura':
+            return self.sng_factura_ids.line_ids.filtered(
                 lambda l: l.account_id.account_type == 'asset_receivable'
                 and not l.reconciled)
-            if not amls:
-                raise UserError(_('Las facturas sugeridas ya no tienen saldo '
-                                  'pendiente.'))
+        return self.env['account.move.line']
+
+    def _sng_conciliar_una(self):
+        self.ensure_one()
+        amls = self._sng_amls_sugeridas()
+        if not amls:
+            if self.sng_sugerencia == 'pago':
+                raise UserError(_('El pago %s ya no tiene línea transitoria '
+                                  'pendiente (¿ya se concilió?).')
+                                % self.sng_pago_id.display_name)
+            raise UserError(_('Las facturas sugeridas ya no tienen saldo '
+                              'pendiente.'))
         widget = self.env['bank.rec.widget'].with_context(
             default_st_line_id=self.id).new({})
         widget._action_add_new_amls(amls)
         widget._action_validate()
+
+
+class BankRecWidget(models.Model):
+    _inherit = 'bank.rec.widget'
+
+    def _action_trigger_matching_rules(self):
+        """Tras las reglas nativas, monta la sugerencia SNG.
+
+        Corre al abrir cada línea en el widget de conciliación (y en su
+        botón Reset): si el motor nativo no encontró contrapartida y la
+        línea trae sugerencia de pago o factura, la usuaria la ve ya
+        cargada y solo pulsa Validar. Nunca toca
+        ``matching_rules_allow_auto_reconcile``: nada se concilia solo.
+        """
+        res = super()._action_trigger_matching_rules()
+        try:
+            if res and (res.get('amls') or res.get('status') == 'write_off'):
+                return res  # el motor nativo ya montó algo: no estorbar
+            if self.matching_rules_allow_auto_reconcile:
+                # hay una regla nativa con auto-conciliación activa: no
+                # mezclar nuestra sugerencia (el cron podría validarla sola)
+                return res
+            st = self.st_line_id
+            if st and not st.is_reconciled \
+                    and st.sng_sugerencia in ('pago', 'factura'):
+                amls = st._sng_amls_sugeridas()
+                if amls:
+                    self._action_add_new_amls(amls)
+        except Exception:  # noqa: BLE001 - la sugerencia jamás rompe el widget
+            _logger.exception('SNG: fallo montando la sugerencia de la '
+                              'línea %s en el widget', self.st_line_id.id)
+        return res

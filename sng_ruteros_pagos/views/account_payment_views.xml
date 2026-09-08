@@ -41,6 +41,8 @@
                            invisible="not sng_ia_numeros_pendientes"/>
                     <field name="sng_vendedor_app_id" readonly="1"
                            invisible="not sng_vendedor_app_id"/>
+                    <field name="sng_cliente_app_id" readonly="1"
+                           invisible="not sng_cliente_app_id"/>
                     <field name="sng_monto_atipico" readonly="1"
                            invisible="not sng_monto_atipico"/>
                     <field name="sng_dup_estado" readonly="1"
