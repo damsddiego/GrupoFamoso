@@ -1,6 +1,6 @@
 {
     'name': 'SNG - Reimpresión de tickets de bodega',
-    'version': '18.0.1.0.0',
+    'version': '18.0.1.1.0',
     'category': 'Inventory',
     'summary': 'Autorizar desde Odoo la reimpresión de un ticket de alistado, con permiso y bitácora',
     'description': """

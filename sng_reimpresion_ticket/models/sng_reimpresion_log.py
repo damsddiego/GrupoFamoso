@@ -37,9 +37,20 @@ class SngReimpresionLog(models.Model):
         required=True,
         index=True,
     )
+    accion = fields.Selection(
+        selection=[('reimpresion', 'Reimpresion (copia)'),
+                   ('primera', 'Enviada a imprimir (nunca se imprimio)')],
+        string='Accion',
+        required=True,
+        default='reimpresion',
+        index=True,
+        help='Reimpresion consume una autorizacion y saca una COPIA. Enviada a '
+             'imprimir reenvia al flujo normal una orden que nunca llego a la '
+             'cola, y sale como ticket comun sin banner.',
+    )
     motivo = fields.Text(string='Motivo', required=True)
     resultado = fields.Selection(
-        selection=[('ok', 'Autorizada'), ('error', 'Fallo')],
+        selection=[('ok', 'Aceptada'), ('error', 'Fallo')],
         string='Resultado',
         required=True,
         index=True,

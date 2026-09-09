@@ -5,10 +5,35 @@
         <field name="name">sng.reimpresion.wizard.form</field>
         <field name="model">sng.reimpresion.wizard</field>
         <field name="arch" type="xml">
-            <form string="Autorizar reimpresión de ticket">
+            <form string="Volver a sacar el ticket">
 
+                <!-- Caso sin salida: nunca se imprimió y la mercadería ya salió. -->
                 <div class="alert alert-danger" role="alert"
-                     invisible="not entrega_despachada">
+                     invisible="modo != 'bloqueado'">
+                    <strong>No hay nada que se pueda hacer desde aquí.</strong>
+                    <br/>
+                    Esta orden <strong>nunca se imprimió</strong>, así que no hay
+                    copia que reimprimir. Y la mercadería <strong>ya salió de
+                    bodega</strong>, así que tampoco corresponde mandar un ticket
+                    de alistado ahora: podría hacer que se surta dos veces.
+                    <br/><br/>
+                    Si falta el documento para archivo, pídalo por otra vía.
+                </div>
+
+                <!-- Nunca se imprimió, pero la entrega sigue abierta. -->
+                <div class="alert alert-info" role="alert"
+                     invisible="modo != 'primera'">
+                    <strong>Esta orden nunca se imprimió.</strong>
+                    <br/>
+                    No hace falta autorizar una copia: no hay ninguna. El
+                    ticket no salió porque la orden nunca llegó a la cola de
+                    impresión. Se va a reenviar al flujo normal y saldrá un
+                    <strong>ticket común, sin marca de COPIA</strong>.
+                </div>
+
+                <!-- Ya se imprimió antes: reimpresión de verdad. -->
+                <div class="alert alert-warning" role="alert"
+                     invisible="modo != 'reimpresion' or not entrega_despachada">
                     <strong>Esta orden ya tiene mercadería despachada.</strong>
                     <br/>
                     Un ticket de alistado para mercadería que ya salió de bodega
@@ -17,7 +42,7 @@
                 </div>
 
                 <div class="alert alert-info" role="alert"
-                     invisible="not consulta_ok or copias_previas &lt; 1">
+                     invisible="modo != 'reimpresion' or not consulta_ok or copias_previas &lt; 1">
                     Esta orden ya se imprimió
                     <field name="copias_previas" class="oe_inline" nolabel="1"/>
                     vez/veces. El ticket nuevo saldrá marcado como copia y con el
@@ -26,34 +51,42 @@
 
                 <div class="alert alert-warning" role="alert"
                      invisible="consulta_ok">
-                    No se pudo consultar cuántas copias existen:
+                    No se pudo consultar el estado de impresión:
                     <field name="consulta_error" class="oe_inline" nolabel="1" readonly="1"/>
                     <br/>
-                    Puede autorizar igual. El agente de impresión lleva su propia
-                    cuenta y numerará la copia correctamente.
+                    Puede autorizar igual. El agente lleva su propia cuenta y
+                    numerará la copia correctamente. Si resulta que la orden
+                    nunca se imprimió, no saldrá papel y quedará registrado el
+                    intento.
                 </div>
 
                 <group>
                     <group>
                         <field name="order_id" options="{'no_open': True}"/>
                         <field name="partner_id" options="{'no_open': True}"/>
+                        <field name="modo"/>
                     </group>
                     <group>
                         <field name="entrega_detalle"/>
+                        <field name="copias_previas" invisible="not consulta_ok"/>
                         <field name="entrega_despachada" invisible="1"/>
                         <field name="consulta_ok" invisible="1"/>
                     </group>
                 </group>
 
-                <group>
+                <group invisible="modo == 'bloqueado'">
                     <field name="motivo" nolabel="1" colspan="2"
-                           placeholder="Por qué hace falta otro ticket. Ej: el papel estaba al revés y salió en blanco."/>
+                           placeholder="Por qué hace falta el ticket. Ej: el papel estaba al revés y salió en blanco."/>
                 </group>
 
                 <footer>
                     <button name="action_confirmar" type="object"
-                            string="Autorizar reimpresión" class="btn-primary"/>
-                    <button string="Cancelar" class="btn-secondary" special="cancel"/>
+                            string="Autorizar reimpresión" class="btn-primary"
+                            invisible="modo != 'reimpresion'"/>
+                    <button name="action_enviar_impresion" type="object"
+                            string="Enviar a imprimir" class="btn-primary"
+                            invisible="modo != 'primera'"/>
+                    <button string="Cerrar" class="btn-secondary" special="cancel"/>
                 </footer>
             </form>
         </field>

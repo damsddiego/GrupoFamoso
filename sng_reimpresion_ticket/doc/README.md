@@ -76,14 +76,42 @@ Invoke-RestMethod -Method Post -Uri "<url>" -ContentType "application/json" -Bod
 ## Qué ve el usuario
 
 El botón **Reimprimir ticket** aparece en la orden de venta confirmada, solo
-para quien tenga el permiso. Abre un asistente que:
+para quien tenga el permiso. El asistente mira cuántas copias registra el ledger
+y ofrece **la acción que corresponde**, que no siempre es reimprimir:
 
-- exige escribir un motivo, que sale impreso en el ticket;
-- muestra cuántas copias existen ya, si se puede consultar el ledger;
-- **advierte en rojo si la orden ya tiene mercadería despachada**, porque un
-  ticket de alistado para algo que ya salió es justo el escenario del doble
-  surtido. Se permite igual: el permiso es el control y la persona decide, pero
-  queda registrada.
+| copias | entrega | qué ofrece | qué sale |
+| --- | --- | --- | --- |
+| 1 o más | cualquiera | **Autorizar reimpresión** | COPIA No.N con `NO SURTIR DE NUEVO` |
+| 0 | abierta | **Enviar a imprimir** | ticket común, sin banner |
+| 0 | despachada | nada | solo explica por qué |
+
+En los tres casos exige un motivo, que queda en la bitácora y, si es
+reimpresión, sale impreso en el ticket.
+
+### Por qué esa tabla y no un solo botón
+
+"No tengo el ticket" son dos problemas distintos con soluciones opuestas:
+
+- **Ya se imprimió y el papel se perdió.** Hay que autorizar una copia.
+- **Nunca se imprimió**, porque el webhook de Odoo no llegó a n8n. No hay nada
+  que reimprimir: hay que reenviar la orden al flujo normal.
+
+Autorizar la reimpresión de algo que nunca se imprimió **no hace nada**: el
+agente busca la orden en `/print_queue`, no la encuentra y registra
+`autorizacion sin entrada en la cola`. Pasó el 09-sep-2026 con S43447 — tres
+intentos, tres errores, cero papel — mientras el asistente mostraba
+"copias previas = 0" sin sacar ninguna conclusión de ese número.
+
+El tercer caso no tiene salida desde Odoo: nunca se imprimió **y** la mercadería
+ya salió. Mandar un ticket de alistado entonces es el doble surtido que todo
+este control existe para evitar, así que el asistente no ofrece botón. Cuando
+sí hay botón de enviar a imprimir, el estado de la entrega **se vuelve a
+verificar al confirmar**, no solo al abrir: el asistente puede quedar abierto
+mientras bodega despacha.
+
+Si la consulta al ledger falla, no se puede distinguir un caso del otro y se
+deja la reimpresión, que es el camino seguro: el agente lleva su propia cuenta
+y numera la copia bien.
 
 ## Dónde queda el registro
 

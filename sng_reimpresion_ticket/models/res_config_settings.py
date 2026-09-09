@@ -20,6 +20,15 @@ class ResConfigSettings(models.TransientModel):
              'reimpresiones sin pasar por Odoo. Solo deberia poder verla el '
              'grupo Ajustes.',
     )
+    sng_reimpresion_print_url = fields.Char(
+        string='URL de impresion (opcional)',
+        config_parameter='sng_reimpresion.print_url',
+        help='A donde se reenvian las ordenes que nunca llegaron a imprimirse. '
+             'Dejar vacio es lo normal: se toma de la regla de automatizacion '
+             '"Imprimir ticket al confirmar orden", que es la misma que ya '
+             'dispara Odoo al confirmar. Solo llenarlo para apuntar a otro '
+             'endpoint.',
+    )
     sng_reimpresion_timeout = fields.Integer(
         string='Tiempo de espera (segundos)',
         config_parameter='sng_reimpresion.timeout',

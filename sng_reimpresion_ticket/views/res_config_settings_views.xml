@@ -18,6 +18,11 @@
                              help="Clave que n8n valida antes de escribir. Es una credencial al portador: quien la tenga puede autorizar reimpresiones sin pasar por Odoo.">
                         <field name="sng_reimpresion_token" password="True"/>
                     </setting>
+                    <setting string="URL de impresión (opcional)"
+                             help="A dónde se reenvían las órdenes que nunca llegaron a imprimirse. Vacío = se toma de la regla de automatización que ya usa Odoo al confirmar.">
+                        <field name="sng_reimpresion_print_url"
+                               placeholder="se toma de la regla de automatización"/>
+                    </setting>
                     <setting string="Tiempo de espera"
                              help="Segundos que Odoo espera la respuesta del webhook.">
                         <field name="sng_reimpresion_timeout"/>
