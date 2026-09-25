@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Comisiones por Pagos de Facturas',
-    'version': '18.0.5.1.0',
+    'version': '18.0.5.2.1',
     'category': 'Accounting/Accounting',
     'summary': 'Comisión mensual por vendedor con escala por tramos sobre pagos recibidos',
     'description': """
@@ -41,9 +41,11 @@
         'views/sng_commission_payment_line_views.xml',
         'views/account_payment_views.xml',
         'report/sng_commission_monthly_report.xml',
+        'report/sng_commission_consolidated_report.xml',
         'wizard/sng_close_commission_wiz.xml',
         'wizard/sng_create_commission_bill_wiz.xml',
         'wizard/sng_generate_commission_wiz.xml',
+        'wizard/sng_commission_report_wiz.xml',
     ],
     'installable': True,
     'application': False,

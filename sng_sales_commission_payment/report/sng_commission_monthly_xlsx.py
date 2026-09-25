@@ -28,28 +28,34 @@ class CommissionMonthlyXlsx(models.AbstractModel):
         sheet = workbook.add_worksheet('Resumen')
         sheet.set_column(0, 0, 35)
         sheet.set_column(1, 2, 18)
-        sheet.set_column(3, 8, 16)
+        sheet.set_column(3, 9, 16)
+        sheet.set_column(4, 4, 24)
         sheet.write(0, 0, 'Comisiones Mensuales', title)
-        headers = ['Vendedor', 'Mes', 'Compañía', 'Base (sin IVA)',
+        subtitle = (data or {}).get('subtitle')
+        if subtitle:
+            sheet.write(1, 0, subtitle)
+        headers = ['Vendedor', 'Mes', 'Compañía', 'Base (sin IVA)', 'Tramo',
                    '% Comisión', 'Reversos', 'Comisión', 'Estado', 'Factura de Comisión']
         for col, text in enumerate(headers):
             sheet.write(2, col, text, header)
+        sheet.freeze_panes(3, 0)
         row = 3
         for m in monthlies:
             sheet.write(row, 0, m.salesperson_id.name or '')
             sheet.write(row, 1, m.period_label or '')
             sheet.write(row, 2, m.company_id.name or '')
             sheet.write_number(row, 3, m.base_amount, money)
-            sheet.write_number(row, 4, m.percentage, pct)
-            sheet.write_number(row, 5, m.adjustment_amount or 0.0, money)
-            sheet.write_number(row, 6, m.commission_amount, money)
-            sheet.write(row, 7, state_labels.get(m.state, m.state))
-            sheet.write(row, 8, m.bill_id.name or '')
+            sheet.write(row, 4, m.tier_id.name or '')
+            sheet.write_number(row, 5, m.percentage, pct)
+            sheet.write_number(row, 6, m.adjustment_amount or 0.0, money)
+            sheet.write_number(row, 7, m.commission_amount, money)
+            sheet.write(row, 8, state_labels.get(m.state, m.state))
+            sheet.write(row, 9, m.bill_id.name or '')
             row += 1
         sheet.write(row, 2, 'TOTAL', bold)
         sheet.write_number(row, 3, sum(monthlies.mapped('base_amount')), money_bold)
-        sheet.write_number(row, 5, sum(monthlies.mapped('adjustment_amount')), money_bold)
-        sheet.write_number(row, 6, sum(monthlies.mapped('commission_amount')), money_bold)
+        sheet.write_number(row, 6, sum(monthlies.mapped('adjustment_amount')), money_bold)
+        sheet.write_number(row, 7, sum(monthlies.mapped('commission_amount')), money_bold)
 
         # ---- Hoja Análisis: resumen por tipo de factura ----
         sheet = workbook.add_worksheet('Análisis IVA')

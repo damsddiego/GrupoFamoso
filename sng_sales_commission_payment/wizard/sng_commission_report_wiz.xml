@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_sng_commission_report_wiz_form" model="ir.ui.view">
+            <field name="name">sng.commission.report.wiz.form</field>
+            <field name="model">sng.commission.report.wiz</field>
+            <field name="arch" type="xml">
+                <form string="Reporte Consolidado de Comisiones">
+                    <group>
+                        <group>
+                            <field name="period"/>
+                            <field name="period_label"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group>
+                            <field name="monthly_count"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="salesperson_ids" widget="many2many_tags"
+                               options="{'no_create': True}"/>
+                    </group>
+                    <div class="alert alert-info" role="alert">
+                        <strong>PDF consolidado:</strong> planilla con todos los vendedores del mes y,
+                        por cada uno, el auxiliar de pagos/facturas y reversos que sustentan su comisión.<br/>
+                        <strong>PDF por vendedor:</strong> un archivo PDF independiente por cada vendedor
+                        (descarga un ZIP; si filtra un solo vendedor, baja su PDF directo), sin la planilla
+                        de los demás, para entregarle a cada uno la verificación de su comisión.
+                    </div>
+                    <footer>
+                        <button name="action_print_pdf"
+                                string="PDF consolidado"
+                                type="object"
+                                class="oe_highlight"/>
+                        <button name="action_print_xlsx"
+                                string="Excel consolidado"
+                                type="object"/>
+                        <button name="action_print_individual_pdf"
+                                string="PDF por vendedor (ZIP)"
+                                type="object"/>
+                        <button string="Cancelar" class="oe_link" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_sng_commission_report_wiz" model="ir.actions.act_window">
+            <field name="name">Reporte consolidado del mes</field>
+            <field name="res_model">sng.commission.report.wiz</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+            <field name="groups_id" eval="[(4, ref('sales_commission_omax.group_sales_commission_user'))]"/>
+        </record>
+
+        <menuitem
+            id="menu_sng_commission_report_wiz"
+            name="Reporte consolidado del mes"
+            parent="sales_commission_omax.menu_sale_commission_root"
+            action="action_sng_commission_report_wiz"
+            groups="sales_commission_omax.group_sales_commission_user"
+            sequence="12"/>
+    </data>
+</odoo>

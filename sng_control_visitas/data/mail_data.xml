@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <record id="mail_activity_type_seguimiento_televentas" model="mail.activity.type">
+        <field name="name">Seguimiento televentas</field>
+        <field name="icon">fa-phone</field>
+        <field name="res_model">sng.televentas.seguimiento</field>
+        <field name="category">default</field>
+        <field name="delay_count">0</field>
+        <field name="sequence">5</field>
+    </record>
+
+    <record id="channel_control_visitas" model="discuss.channel">
+        <field name="name">Control de Visitas y Rutas</field>
+        <field name="channel_type">channel</field>
+        <field name="description">Resumen semanal de cobertura, clientes sin atención y pendientes de televentas</field>
+    </record>
+
+</odoo>

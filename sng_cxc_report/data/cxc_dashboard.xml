@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="spreadsheet_dashboard_cxc_gerencial" model="spreadsheet.dashboard">
+        <field name="name">CxC Gerencial</field>
+        <field name="spreadsheet_binary_data" type="base64" file="sng_cxc_report/data/files/cxc_dashboard.json"/>
+        <field name="main_data_model_ids" eval="[(4, ref('sng_cxc_report.model_sng_cxc_report')), (4, ref('sng_cxc_report.model_sng_cxc_action_plan'))]"/>
+        <field name="dashboard_group_id" ref="spreadsheet_dashboard.spreadsheet_dashboard_group_finance"/>
+        <field name="group_ids" eval="[Command.link(ref('account.group_account_readonly')), Command.link(ref('account.group_account_invoice'))]"/>
+        <field name="sequence">350</field>
+        <field name="is_published">True</field>
+    </record>
+</odoo>

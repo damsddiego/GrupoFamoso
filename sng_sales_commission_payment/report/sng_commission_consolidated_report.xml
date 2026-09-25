@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="paperformat_commission_consolidated_landscape" model="report.paperformat">
+            <field name="name">Comisiones Consolidado - A4 Horizontal</field>
+            <field name="default" eval="False"/>
+            <field name="format">A4</field>
+            <field name="orientation">Landscape</field>
+            <field name="margin_top">30</field>
+            <field name="margin_bottom">12</field>
+            <field name="margin_left">7</field>
+            <field name="margin_right">7</field>
+            <field name="header_line" eval="False"/>
+            <field name="header_spacing">20</field>
+            <field name="dpi">90</field>
+        </record>
+
+        <template id="consolidated_report">
+            <t t-call="web.html_container">
+                <t t-set="o" t-value="wizard"/>
+                <t t-set="currency" t-value="wizard.company_id.currency_id"/>
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Planilla Consolidada de Comisiones por Pagos</h2>
+                        <p>
+                            <strong>Periodo:</strong> <span t-esc="wizard.period_label"/> &#160;|&#160;
+                            <strong>Compañía:</strong> <span t-esc="wizard.company_id.name"/> &#160;|&#160;
+                            <strong>Vendedores:</strong>
+                            <span t-if="wizard.salesperson_ids" t-esc="', '.join(wizard.salesperson_ids.mapped('name'))"/>
+                            <span t-else="">Todos</span>
+                            &#160;|&#160;
+                            <strong>Emitido:</strong> <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d/%m/%Y %H:%M')"/>
+                        </p>
+                        <table class="table table-sm">
+                            <thead>
+                                <tr class="table-light">
+                                    <th>#</th>
+                                    <th>Vendedor</th>
+                                    <th class="text-end">Base (sin IVA)</th>
+                                    <th>Tramo</th>
+                                    <th class="text-end">%</th>
+                                    <th class="text-end">Reversos</th>
+                                    <th class="text-end">Comisión</th>
+                                    <th>Estado</th>
+                                    <th>Factura</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="monthlies" t-as="m">
+                                    <td><span t-esc="m_index + 1"/></td>
+                                    <td><span t-esc="m.salesperson_id.name"/></td>
+                                    <td class="text-end">
+                                        <span t-esc="m.base_amount"
+                                              t-options="{'widget': 'monetary', 'display_currency': currency}"/>
+                                    </td>
+                                    <td><span t-esc="m.tier_id.name or ''"/></td>
+                                    <td class="text-end"><span t-esc="'{:.2f}%'.format(m.percentage)"/></td>
+                                    <td class="text-end text-danger">
+                                        <span t-if="m.adjustment_amount" t-esc="m.adjustment_amount"
+                                              t-options="{'widget': 'monetary', 'display_currency': currency}"/>
+                                    </td>
+                                    <td class="text-end">
+                                        <strong><span t-esc="m.commission_amount"
+                                              t-options="{'widget': 'monetary', 'display_currency': currency}"/></strong>
+                                    </td>
+                                    <td><span t-field="m.state"/></td>
+                                    <td><span t-esc="m.bill_id.name or ''"/></td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="2"><strong>TOTAL (<span t-esc="totals.get('count', 0)"/> vendedores)</strong></td>
+                                    <td class="text-end">
+                                        <strong><span t-esc="totals.get('base_amount', 0.0)"
+                                              t-options="{'widget': 'monetary', 'display_currency': currency}"/></strong>
+                                    </td>
+                                    <td colspan="2"/>
+                                    <td class="text-end text-danger">
+                                        <strong><span t-esc="totals.get('adjustment_amount', 0.0)"
+                                              t-options="{'widget': 'monetary', 'display_currency': currency}"/></strong>
+                                    </td>
+                                    <td class="text-end">
+                                        <strong><span t-esc="totals.get('commission_amount', 0.0)"
+                                              t-options="{'widget': 'monetary', 'display_currency': currency}"/></strong>
+                                    </td>
+                                    <td colspan="2"/>
+                                </tr>
+                            </tfoot>
+                        </table>
+                        <p class="text-muted small">
+                            Las páginas siguientes contienen, por cada vendedor, el auxiliar de pagos y
+                            facturas (y reversos) que sustentan el monto de comisión indicado.
+                        </p>
+                    </div>
+                </t>
+                <t t-foreach="monthlies" t-as="m">
+                    <t t-set="o" t-value="m"/>
+                    <t t-set="doc" t-value="m"/>
+                    <t t-set="section_title" t-value="'Auxiliar de Comisión - %s' % m.salesperson_id.name"/>
+                    <t t-call="web.external_layout">
+                        <t t-call="sng_sales_commission_payment.report_commission_monthly_document"/>
+                    </t>
+                </t>
+            </t>
+        </template>
+
+        <record id="action_report_commission_consolidated_pdf" model="ir.actions.report">
+            <field name="name">Comisiones Consolidado del Mes (PDF)</field>
+            <field name="model">sng.commission.report.wiz</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">sng_sales_commission_payment.consolidated_report</field>
+            <field name="report_file">sng_sales_commission_payment.consolidated_report</field>
+            <field name="paperformat_id" ref="paperformat_commission_consolidated_landscape"/>
+            <field name="print_report_name">'Comisiones consolidado %s - %s' % (object.period_label, object.company_id.name)</field>
+            <field name="binding_type">report</field>
+        </record>
+
+        <record id="action_report_commission_consolidated_xlsx" model="ir.actions.report">
+            <field name="name">Comisiones Consolidado del Mes (Excel)</field>
+            <field name="model">sng.commission.report.wiz</field>
+            <field name="report_type">xlsx</field>
+            <field name="report_name">sng_sales_commission_payment.consolidated_xlsx</field>
+            <field name="report_file">Comisiones consolidado</field>
+            <field name="print_report_name">'Comisiones consolidado %s - %s' % (object.period_label, object.company_id.name)</field>
+            <field name="binding_type">report</field>
+        </record>
+    </data>
+</odoo>

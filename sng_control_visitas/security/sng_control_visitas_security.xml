@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <record id="module_category_control_visitas" model="ir.module.category">
+            <field name="name">Control de visitas</field>
+            <field name="description">Control de visitas de ruta y seguimiento de televentas</field>
+            <field name="sequence">60</field>
+        </record>
+
+        <record id="group_control_visitas_user" model="res.groups">
+            <field name="name">Usuario: seguimiento</field>
+            <field name="category_id" ref="module_category_control_visitas"/>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+            <field name="comment">Registra seguimientos de televentas y completa el bloque comercial de las visitas.</field>
+        </record>
+
+        <record id="group_control_visitas_manager" model="res.groups">
+            <field name="name">Gerencia</field>
+            <field name="category_id" ref="module_category_control_visitas"/>
+            <field name="implied_ids" eval="[(4, ref('group_control_visitas_user'))]"/>
+            <field name="comment">Administra catálogos, rutas y la matriz de control.</field>
+        </record>
+
+        <!-- El menú Ruteros pertenece a sng_ruteros_pagos y está limitado a
+             contabilidad; se abre también a los grupos de control de visitas. -->
+        <record id="sng_ruteros_pagos.menu_ruteros_root" model="ir.ui.menu">
+            <field name="groups_id" eval="[(4, ref('group_control_visitas_user'))]"/>
+        </record>
+    </data>
+
+    <data noupdate="1">
+        <record id="sng_televentas_seguimiento_comp_rule" model="ir.rule">
+            <field name="name">Seguimiento televentas: multi-compañía</field>
+            <field name="model_id" ref="model_sng_televentas_seguimiento"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="sng_control_visitas_linea_comp_rule" model="ir.rule">
+            <field name="name">Matriz control visitas: multi-compañía</field>
+            <field name="model_id" ref="model_sng_control_visitas_linea"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        </record>
+    </data>
+</odoo>

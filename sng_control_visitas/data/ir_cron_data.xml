@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <!-- Domingo 12:00 UTC = 06:00 Costa Rica: deja listos los pendientes
+         de televentas antes del lunes -->
+    <record id="cron_generar_pendientes_televentas" model="ir.cron">
+        <field name="name">SNG Control Visitas: generar pendientes de televentas</field>
+        <field name="model_id" ref="model_sng_control_visitas_linea"/>
+        <field name="state">code</field>
+        <field name="code">model._sng_cron_generar_pendientes()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">weeks</field>
+        <field name="nextcall"
+               eval="(DateTime.now() + timedelta(days=((6 - DateTime.now().weekday()) % 7) or 7)).strftime('%Y-%m-%d 12:00:00')"/>
+        <field name="user_id" ref="base.user_root"/>
+        <field name="active" eval="True"/>
+    </record>
+
+    <!-- Diario 08:00 UTC = 02:00 Costa Rica -->
+    <record id="cron_recalcular_matriz" model="ir.cron">
+        <field name="name">SNG Control Visitas: recalcular matriz</field>
+        <field name="model_id" ref="model_sng_control_visitas_linea"/>
+        <field name="state">code</field>
+        <field name="code">model._sng_cron_recalcular_matriz()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="nextcall"
+               eval="(DateTime.now() + timedelta(days=1)).strftime('%Y-%m-%d 08:00:00')"/>
+        <field name="user_id" ref="base.user_root"/>
+        <field name="active" eval="True"/>
+    </record>
+
+    <!-- Lunes 12:30 UTC = 06:30 Costa Rica -->
+    <record id="cron_resumen_gerencial" model="ir.cron">
+        <field name="name">SNG Control Visitas: resumen gerencial semanal</field>
+        <field name="model_id" ref="model_sng_control_visitas_linea"/>
+        <field name="state">code</field>
+        <field name="code">model._sng_cron_resumen_gerencial()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">weeks</field>
+        <field name="nextcall"
+               eval="(DateTime.now() + timedelta(days=((7 - DateTime.now().weekday()) % 7) or 7)).strftime('%Y-%m-%d 12:30:00')"/>
+        <field name="user_id" ref="base.user_root"/>
+        <field name="active" eval="True"/>
+    </record>
+
+</odoo>

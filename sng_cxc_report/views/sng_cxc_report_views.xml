@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_sng_cxc_report_tree" model="ir.ui.view">
+        <field name="name">sng.cxc.report.tree</field>
+        <field name="model">sng.cxc.report</field>
+        <field name="arch" type="xml">
+            <list string="Cuentas por Cobrar por Cliente" create="0" edit="0" delete="0" default_order="total_receivable desc">
+                <field name="partner_unique_id" string="Codigo"/>
+                <field name="partner_commercial_name" string="Nombre comercial"/>
+                <field name="assigned_salesperson_id" string="Vendedor"/>
+                <field name="sales_route_id" string="Ruta"/>
+                <field name="last_sale_date" string="Ultima venta"/>
+                <field name="payment_term_days" string="Plazo"/>
+                <field name="dpp_days" string="DPP" optional="hide"/>
+                <field name="credit_limit" sum="Total limite"/>
+                <field name="gross_receivable" sum="Cartera bruta" optional="hide"/>
+                <field name="credit_balance" sum="Saldo a favor"/>
+                <field name="not_due_amount" sum="Total no vencido"/>
+                <field name="positive_overdue_amount" string="Vencido" sum="Total vencido"/>
+                <field name="overdue_ratio" string="% Vencido" widget="percentage"/>
+                <field name="bucket_1_15" string="1-15" sum="Total 1-15"/>
+                <field name="bucket_16_30" string="16-30" sum="Total 16-30"/>
+                <field name="bucket_31_45" string="31-45" sum="Total 31-45"/>
+                <field name="bucket_46_60" string="46-60" sum="Total 46-60"/>
+                <field name="bucket_61_90" string="61-90" sum="Total 61-90"/>
+                <field name="bucket_91_plus" string="91+" sum="Total 91+"/>
+                <field name="total_receivable" string="Cartera neta" sum="Cartera neta"/>
+                <field name="consignment_value" string="Valor consig." sum="Total consig." optional="hide"/>
+                <field name="total_exposure" string="Cartera+Consig." sum="Total exposicion" optional="show"/>
+                <field name="over_limit_amount" string="Sobrelimite" sum="Total sobrelimite"/>
+                <field name="bucket_91_ratio" string="% 91+" widget="percentage" optional="hide"/>
+                <field name="dominant_bucket" optional="show"/>
+                <field name="weighted_overdue_days" optional="hide"/>
+                <field name="risk_level" optional="show"/>
+                <field name="priority" optional="show"/>
+                <field name="credit_restriction" optional="show"/>
+                <field name="company_id" optional="show"/>
+                <button name="action_open_pending_documents" type="object" string="Detalle" class="btn-link"/>
+                <button name="action_open_action_plan" type="object" string="Plan" class="btn-link"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_sng_cxc_report_search" model="ir.ui.view">
+        <field name="name">sng.cxc.report.search</field>
+        <field name="model">sng.cxc.report</field>
+        <field name="arch" type="xml">
+            <search string="Buscar CxC por Cliente">
+                <field name="partner_id"/>
+                <field name="partner_unique_id" string="Codigo"/>
+                <field name="partner_commercial_name" string="Nombre comercial"/>
+                <field name="assigned_salesperson_id" string="Vendedor"/>
+                <field name="company_id"/>
+
+                <filter name="filter_with_balance" string="Solo con saldo" domain="[('total_receivable', '!=', 0)]"/>
+                <filter name="filter_overdue" string="Solo vencidos" domain="[('positive_overdue_amount', '!=', 0)]"/>
+                <filter name="filter_p1" string="P1" domain="[('priority', '=', 'p1')]"/>
+                <filter name="filter_credit_restriction" string="Restriccion credito" domain="[('credit_restriction', '=', True)]"/>
+                <filter name="filter_not_due" string="Solo no vencidos" domain="[('not_due_amount', '!=', 0)]"/>
+
+                <group expand="0" string="Agrupar por">
+                    <filter name="group_by_salesperson" string="Vendedor" context="{'group_by': 'assigned_salesperson_id'}"/>
+                    <filter name="group_by_partner" string="Cliente" context="{'group_by': 'partner_id'}"/>
+                    <filter name="group_by_risk" string="Riesgo" context="{'group_by': 'risk_level'}"/>
+                    <filter name="group_by_priority" string="Prioridad" context="{'group_by': 'priority'}"/>
+                    <filter name="group_by_bucket" string="Bucket dominante" context="{'group_by': 'dominant_bucket'}"/>
+                    <filter name="group_by_company" string="Compania" context="{'group_by': 'company_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_sng_cxc_report_pivot" model="ir.ui.view">
+        <field name="name">sng.cxc.report.pivot</field>
+        <field name="model">sng.cxc.report</field>
+        <field name="arch" type="xml">
+            <pivot string="CxC por Cliente">
+                <field name="assigned_salesperson_id" type="row"/>
+                <field name="company_id" type="col"/>
+                <field name="total_receivable" type="measure"/>
+                <field name="gross_receivable" type="measure"/>
+                <field name="credit_balance" type="measure"/>
+                <field name="not_due_amount" type="measure"/>
+                <field name="positive_overdue_amount" type="measure"/>
+                <field name="bucket_1_15" type="measure"/>
+                <field name="bucket_16_30" type="measure"/>
+                <field name="bucket_31_45" type="measure"/>
+                <field name="bucket_46_60" type="measure"/>
+                <field name="bucket_61_90" type="measure"/>
+                <field name="bucket_91_plus" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_sng_cxc_report_graph" model="ir.ui.view">
+        <field name="name">sng.cxc.report.graph</field>
+        <field name="model">sng.cxc.report</field>
+        <field name="arch" type="xml">
+            <graph string="CxC por Cliente" type="bar">
+                <field name="assigned_salesperson_id"/>
+                <field name="total_receivable" type="measure"/>
+                <field name="positive_overdue_amount" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_sng_cxc_report_line_tree" model="ir.ui.view">
+        <field name="name">sng.cxc.report.line.tree</field>
+        <field name="model">sng.cxc.report.line</field>
+        <field name="arch" type="xml">
+            <list string="Documentos pendientes" create="0" edit="0" delete="0">
+                <field name="partner_unique_id" string="Codigo" optional="hide"/>
+                <field name="partner_commercial_name" string="Cliente" optional="hide"/>
+                <field name="move_id" string="Documento"/>
+                <field name="move_name" string="Numero"/>
+                <field name="move_type" string="Tipo"/>
+                <field name="ref" string="Referencia"/>
+                <field name="invoice_date" string="Fecha factura"/>
+                <field name="line_date" string="Fecha asiento"/>
+                <field name="due_date" string="Vencimiento"/>
+                <field name="overdue_days" string="Dias vencidos"/>
+                <field name="aging_bucket" string="Bucket"/>
+                <field name="open_amount" string="Saldo pendiente" sum="Saldo"/>
+                <field name="company_id" optional="show"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_sng_cxc_action_plan_tree" model="ir.ui.view">
+        <field name="name">sng.cxc.action.plan.tree</field>
+        <field name="model">sng.cxc.action.plan</field>
+        <field name="arch" type="xml">
+            <list string="Plan de Accion CxC" create="0" delete="0" default_order="priority, positive_overdue_amount desc">
+                <field name="priority"/>
+                <field name="risk_level"/>
+                <field name="state"/>
+                <field name="partner_unique_id"/>
+                <field name="partner_commercial_name"/>
+                <field name="assigned_salesperson_id"/>
+                <field name="total_receivable" sum="Cartera neta"/>
+                <field name="gross_receivable" sum="Cartera bruta"/>
+                <field name="positive_overdue_amount" string="Vencido" sum="Vencido"/>
+                <field name="overdue_ratio" widget="percentage"/>
+                <field name="bucket_91_plus" sum="91+"/>
+                <field name="dominant_bucket"/>
+                <field name="recommended_action"/>
+                <field name="suggested_responsible"/>
+                <field name="responsible_id"/>
+                <field name="credit_restriction"/>
+                <field name="commitment_date"/>
+                <field name="last_contact_date" optional="hide"/>
+                <field name="promised_amount" optional="hide" sum="Monto prometido"/>
+                <field name="promised_payment_date" optional="hide"/>
+                <field name="comments" optional="hide"/>
+                <field name="company_id" optional="show"/>
+                <field name="is_credit_blocked" optional="show"/>
+                <button name="action_open_pending_documents" type="object" string="Detalle" class="btn-link"/>
+                <button name="action_block_credit" type="object" string="Bloquear"
+                        class="btn-link text-danger"
+                        invisible="is_credit_blocked"/>
+                <button name="action_unblock_credit" type="object" string="Liberar"
+                        class="btn-link text-success"
+                        invisible="not is_credit_blocked"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_sng_cxc_action_plan_form" model="ir.ui.view">
+        <field name="name">sng.cxc.action.plan.form</field>
+        <field name="model">sng.cxc.action.plan</field>
+        <field name="arch" type="xml">
+            <form string="Plan de Accion CxC" create="0" delete="0">
+                <header>
+                    <button name="action_block_credit" type="object"
+                            string="Bloquear credito" class="btn-danger"
+                            invisible="is_credit_blocked"
+                            confirm="Confirma que desea bloquear el credito de este cliente? Todas sus ordenes de venta pendientes de confirmar seran rechazadas."/>
+                    <button name="action_unblock_credit" type="object"
+                            string="Liberar credito" class="btn-success"
+                            invisible="not is_credit_blocked"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="pending,contacted,promise,blocked,paid,closed"/>
+                </header>
+                <sheet>
+                    <div class="alert alert-danger" role="alert"
+                         invisible="not is_credit_blocked">
+                        <strong>Credito bloqueado.</strong> Este cliente no puede confirmar ordenes de venta.
+                    </div>
+                    <group>
+                        <group string="Cliente">
+                            <field name="cutoff_date" readonly="1"/>
+                            <field name="company_id" readonly="1"/>
+                            <field name="partner_id" readonly="1"/>
+                            <field name="partner_unique_id" readonly="1"/>
+                            <field name="partner_commercial_name" readonly="1"/>
+                            <field name="assigned_salesperson_id" readonly="1"/>
+                        </group>
+                        <group string="Clasificacion">
+                            <field name="priority" readonly="1"/>
+                            <field name="risk_level" readonly="1"/>
+                            <field name="dominant_bucket" readonly="1"/>
+                            <field name="weighted_overdue_days" readonly="1"/>
+                            <field name="dpp_days" readonly="1"/>
+                            <field name="consignment_value" readonly="1"/>
+                            <field name="total_exposure" readonly="1"/>
+                            <field name="credit_restriction" readonly="1"/>
+                            <field name="is_credit_blocked" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Cartera al corte">
+                        <field name="total_receivable" readonly="1"/>
+                        <field name="gross_receivable" readonly="1"/>
+                        <field name="credit_balance" readonly="1"/>
+                        <field name="positive_overdue_amount" readonly="1"/>
+                        <field name="bucket_91_plus" readonly="1"/>
+                        <field name="overdue_ratio" readonly="1" widget="percentage"/>
+                        <field name="bucket_91_ratio" readonly="1" widget="percentage"/>
+                    </group>
+                    <group string="Gestion">
+                        <field name="responsible_id"/>
+                        <field name="commitment_date"/>
+                        <field name="last_contact_date"/>
+                        <field name="promised_amount"/>
+                        <field name="promised_payment_date"/>
+                    </group>
+                    <group string="Accion recomendada">
+                        <field name="recommended_action" readonly="1" nolabel="1"/>
+                        <field name="suggested_responsible" readonly="1"/>
+                    </group>
+                    <group string="Comentarios">
+                        <field name="comments" nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_sng_cxc_action_plan_search" model="ir.ui.view">
+        <field name="name">sng.cxc.action.plan.search</field>
+        <field name="model">sng.cxc.action.plan</field>
+        <field name="arch" type="xml">
+            <search string="Buscar Plan de Accion CxC">
+                <field name="partner_id"/>
+                <field name="partner_unique_id"/>
+                <field name="partner_commercial_name"/>
+                <field name="assigned_salesperson_id"/>
+                <field name="responsible_id"/>
+                <field name="company_id"/>
+                <filter name="filter_pending" string="Pendientes" domain="[('state', '=', 'pending')]"/>
+                <filter name="filter_p1" string="P1" domain="[('priority', '=', 'p1')]"/>
+                <filter name="filter_credit_restriction" string="Restriccion credito" domain="[('credit_restriction', '=', True)]"/>
+                <filter name="filter_overdue_commitment" string="Compromiso vencido" domain="[('commitment_date', '&lt;', context_today().strftime('%Y-%m-%d')), ('state', 'not in', ['paid', 'closed'])]"/>
+                <group expand="0" string="Agrupar por">
+                    <filter name="group_by_priority" string="Prioridad" context="{'group_by': 'priority'}"/>
+                    <filter name="group_by_risk" string="Riesgo" context="{'group_by': 'risk_level'}"/>
+                    <filter name="group_by_state" string="Estado" context="{'group_by': 'state'}"/>
+                    <filter name="group_by_salesperson" string="Vendedor" context="{'group_by': 'assigned_salesperson_id'}"/>
+                    <filter name="group_by_responsible" string="Responsable" context="{'group_by': 'responsible_id'}"/>
+                    <filter name="group_by_company" string="Compania" context="{'group_by': 'company_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_sng_cxc_action_plan_pivot" model="ir.ui.view">
+        <field name="name">sng.cxc.action.plan.pivot</field>
+        <field name="model">sng.cxc.action.plan</field>
+        <field name="arch" type="xml">
+            <pivot string="Plan de Accion CxC">
+                <field name="priority" type="row"/>
+                <field name="risk_level" type="col"/>
+                <field name="gross_receivable" type="measure"/>
+                <field name="positive_overdue_amount" type="measure"/>
+                <field name="bucket_91_plus" type="measure"/>
+                <field name="promised_amount" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_sng_cxc_report" model="ir.actions.act_window">
+        <field name="name">Cuentas por Cobrar por Cliente</field>
+        <field name="res_model">sng.cxc.report</field>
+        <field name="view_mode">list,pivot,graph</field>
+        <field name="search_view_id" ref="view_sng_cxc_report_search"/>
+        <field name="domain">[]</field>
+        <field name="context">{'create': False, 'edit': False, 'delete': False}</field>
+        <field name="help" type="html">
+            <p>Ejecute el asistente para generar el snapshot del reporte a una fecha de corte.</p>
+        </field>
+    </record>
+
+    <record id="action_sng_cxc_action_plan" model="ir.actions.act_window">
+        <field name="name">Plan de Accion CxC</field>
+        <field name="res_model">sng.cxc.action.plan</field>
+        <field name="view_mode">list,form,pivot</field>
+        <field name="search_view_id" ref="view_sng_cxc_action_plan_search"/>
+        <field name="context">{'create': False, 'delete': False}</field>
+        <field name="help" type="html">
+            <p>Genere el snapshot CxC para crear o actualizar el plan de accion.</p>
+        </field>
+    </record>
+</odoo>

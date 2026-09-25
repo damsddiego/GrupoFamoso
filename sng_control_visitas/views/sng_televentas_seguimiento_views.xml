@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_sng_televentas_seguimiento_list" model="ir.ui.view">
+        <field name="name">sng.televentas.seguimiento.list</field>
+        <field name="model">sng.televentas.seguimiento</field>
+        <field name="arch" type="xml">
+            <list string="Seguimientos televentas"
+                  decoration-danger="vencido"
+                  decoration-success="estado == 'realizado'"
+                  decoration-muted="estado == 'cancelado'">
+                <field name="semana"/>
+                <field name="fecha_limite" optional="show"/>
+                <field name="partner_id"/>
+                <field name="vendedor_id" optional="show"/>
+                <field name="sales_route_id" optional="show"/>
+                <field name="origen" optional="show"/>
+                <field name="responsable_id" widget="many2one_avatar_user" optional="show"/>
+                <field name="estado" widget="badge"
+                       decoration-warning="estado == 'pendiente'"
+                       decoration-success="estado == 'realizado'"/>
+                <field name="fecha_seguimiento" optional="show"/>
+                <field name="canal" optional="show"/>
+                <field name="resultado" optional="show"/>
+                <field name="currency_id" column_invisible="1"/>
+                <field name="monto_venta" optional="show" sum="Total"/>
+                <field name="proxima_accion_id" optional="show"/>
+                <field name="fecha_proxima_accion" optional="show"/>
+                <field name="vencido" column_invisible="1"/>
+                <field name="sin_comentario" optional="hide"/>
+                <field name="activity_ids" widget="list_activity" optional="hide"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_sng_televentas_seguimiento_form" model="ir.ui.view">
+        <field name="name">sng.televentas.seguimiento.form</field>
+        <field name="model">sng.televentas.seguimiento</field>
+        <field name="arch" type="xml">
+            <form string="Seguimiento televentas">
+                <header>
+                    <button name="action_marcar_realizado" type="object" string="Marcar realizado"
+                            class="btn-primary" invisible="estado != 'pendiente'"/>
+                    <button name="action_cancelar" type="object" string="Cancelar"
+                            invisible="estado != 'pendiente'"/>
+                    <button name="action_reabrir" type="object" string="Reabrir"
+                            invisible="estado == 'pendiente'"/>
+                    <field name="estado" widget="statusbar" statusbar_visible="pendiente,realizado"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group string="Cliente">
+                            <field name="partner_id" readonly="estado != 'pendiente'"/>
+                            <field name="vendedor_id"/>
+                            <field name="sales_route_id"/>
+                            <field name="visita_id"/>
+                            <field name="origen"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group string="Planificación">
+                            <field name="semana"/>
+                            <field name="fecha_limite"/>
+                            <field name="responsable_id" widget="many2one_avatar_user"/>
+                            <field name="vencido" invisible="1"/>
+                        </group>
+                    </group>
+                    <group string="Gestión" col="4">
+                        <field name="fecha_seguimiento"/>
+                        <field name="canal"/>
+                        <field name="resultado"/>
+                        <field name="currency_id" invisible="1"/>
+                        <field name="monto_venta"/>
+                        <field name="sale_order_id"/>
+                        <field name="efectividad" widget="percentage"/>
+                        <field name="proxima_accion_id"/>
+                        <field name="fecha_proxima_accion"/>
+                        <field name="accion_cerrada" readonly="1"/>
+                        <field name="comentario_tipo_id" colspan="4"/>
+                        <field name="comentario" colspan="4"
+                               placeholder="Comentario específico (obligatorio si no se elige uno predeterminado)"/>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_sng_televentas_seguimiento_kanban" model="ir.ui.view">
+        <field name="name">sng.televentas.seguimiento.kanban</field>
+        <field name="model">sng.televentas.seguimiento</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="estado" quick_create="false">
+                <field name="vencido"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="d-flex flex-column">
+                            <strong><field name="partner_id"/></strong>
+                            <div class="text-muted">
+                                <field name="vendedor_id"/> · <field name="sales_route_id"/>
+                            </div>
+                            <div>
+                                <span t-if="record.vencido.raw_value" class="badge text-bg-danger">Vencido</span>
+                                <field name="fecha_limite"/>
+                            </div>
+                            <div><field name="resultado"/></div>
+                            <div class="d-flex justify-content-between mt-1">
+                                <field name="activity_ids" widget="kanban_activity"/>
+                                <field name="responsable_id" widget="many2one_avatar_user"/>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_sng_televentas_seguimiento_calendar" model="ir.ui.view">
+        <field name="name">sng.televentas.seguimiento.calendar</field>
+        <field name="model">sng.televentas.seguimiento</field>
+        <field name="arch" type="xml">
+            <calendar date_start="fecha_limite" color="responsable_id" mode="week"
+                      quick_create="0" event_open_popup="1">
+                <field name="partner_id"/>
+                <field name="estado"/>
+                <field name="resultado"/>
+            </calendar>
+        </field>
+    </record>
+
+    <record id="view_sng_televentas_seguimiento_activity" model="ir.ui.view">
+        <field name="name">sng.televentas.seguimiento.activity</field>
+        <field name="model">sng.televentas.seguimiento</field>
+        <field name="arch" type="xml">
+            <activity string="Seguimientos">
+                <field name="partner_id"/>
+                <templates>
+                    <div t-name="activity-box">
+                        <div><field name="partner_id" display="full"/></div>
+                        <div class="text-muted"><field name="semana"/></div>
+                    </div>
+                </templates>
+            </activity>
+        </field>
+    </record>
+
+    <record id="view_sng_televentas_seguimiento_pivot" model="ir.ui.view">
+        <field name="name">sng.televentas.seguimiento.pivot</field>
+        <field name="model">sng.televentas.seguimiento</field>
+        <field name="arch" type="xml">
+            <pivot string="Análisis televentas">
+                <field name="semana" type="row" interval="week"/>
+                <field name="resultado" type="col"/>
+                <field name="monto_venta" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_sng_televentas_seguimiento_search" model="ir.ui.view">
+        <field name="name">sng.televentas.seguimiento.search</field>
+        <field name="model">sng.televentas.seguimiento</field>
+        <field name="arch" type="xml">
+            <search string="Seguimientos televentas">
+                <field name="partner_id"/>
+                <field name="vendedor_id"/>
+                <field name="sales_route_id"/>
+                <field name="responsable_id"/>
+                <filter name="mis_pendientes" string="Mis pendientes"
+                        domain="[('estado', '=', 'pendiente'), ('responsable_id', '=', uid)]"/>
+                <filter name="pendientes" string="Pendientes" domain="[('estado', '=', 'pendiente')]"/>
+                <filter name="vencidos" string="Vencidos" domain="[('vencido', '=', True)]"/>
+                <filter name="realizados" string="Realizados" domain="[('estado', '=', 'realizado')]"/>
+                <separator/>
+                <filter name="esta_semana" string="Esta semana"
+                        domain="[('semana', '&gt;=', (context_today() - relativedelta(days=context_today().weekday())).strftime('%Y-%m-%d')),
+                                 ('semana', '&lt;=', (context_today() + relativedelta(days=6 - context_today().weekday())).strftime('%Y-%m-%d'))]"/>
+                <filter name="con_venta" string="Con venta"
+                        domain="[('resultado', 'in', ('venta_recuperada', 'pedido_pendiente'))]"/>
+                <filter name="sin_comentario" string="Sin comentario" domain="[('sin_comentario', '=', True)]"/>
+                <group expand="0" string="Agrupar por">
+                    <filter name="group_estado" string="Estado" context="{'group_by': 'estado'}"/>
+                    <filter name="group_semana" string="Semana" context="{'group_by': 'semana:week'}"/>
+                    <filter name="group_vendedor" string="Agente" context="{'group_by': 'vendedor_id'}"/>
+                    <filter name="group_ruta" string="Ruta" context="{'group_by': 'sales_route_id'}"/>
+                    <filter name="group_resultado" string="Resultado" context="{'group_by': 'resultado'}"/>
+                    <filter name="group_origen" string="Origen" context="{'group_by': 'origen'}"/>
+                    <filter name="group_responsable" string="Responsable" context="{'group_by': 'responsable_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_sng_televentas_seguimiento" model="ir.actions.act_window">
+        <field name="name">Seguimiento Televentas</field>
+        <field name="res_model">sng.televentas.seguimiento</field>
+        <field name="view_mode">list,kanban,form,calendar,activity,pivot</field>
+        <field name="search_view_id" ref="view_sng_televentas_seguimiento_search"/>
+        <field name="context">{'search_default_pendientes': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Sin seguimientos de televentas</p>
+            <p>Los pendientes se generan cada lunes para los clientes no visitados o
+               que el agente transfirió a televentas. También puede crearlos a mano.</p>
+        </field>
+    </record>
+</odoo>

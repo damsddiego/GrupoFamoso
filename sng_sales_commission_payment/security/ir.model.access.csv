@@ -8,3 +8,4 @@ access_sng_commission_payment_line_manager,sng.commission.payment.line.manager,m
 access_sng_close_commission_wiz,sng.close.commission.wiz,model_sng_close_commission_wiz,sales_commission_omax.group_sales_commission_manager,1,1,1,1
 access_sng_create_commission_bill_wiz,sng.create.commission.bill.wiz,model_sng_create_commission_bill_wiz,,1,1,1,1
 access_sng_generate_commission_wiz,sng.generate.commission.wiz,model_sng_generate_commission_wiz,,1,1,1,1
+access_sng_commission_report_wiz,sng.commission.report.wiz,model_sng_commission_report_wiz,sales_commission_omax.group_sales_commission_user,1,1,1,1

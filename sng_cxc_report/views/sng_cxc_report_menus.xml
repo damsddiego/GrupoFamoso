@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem
+        id="menu_sng_cxc_report_wizard"
+        name="CxC por Cliente"
+        parent="account.menu_finance_reports"
+        action="action_sng_cxc_report_wizard"
+        sequence="35"
+        groups="account.group_account_readonly,account.group_account_invoice"
+    />
+
+    <menuitem
+        id="menu_sng_cxc_report"
+        name="Consulta CxC por Cliente"
+        parent="account.menu_finance_reports"
+        action="action_sng_cxc_report"
+        sequence="36"
+        groups="account.group_account_readonly,account.group_account_invoice"
+    />
+
+    <menuitem
+        id="menu_sng_cxc_action_plan"
+        name="Plan de Accion CxC"
+        parent="account.menu_finance_reports"
+        action="action_sng_cxc_action_plan"
+        sequence="37"
+        groups="account.group_account_readonly,account.group_account_invoice"
+    />
+</odoo>

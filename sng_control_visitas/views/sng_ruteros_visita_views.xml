@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_sng_ruteros_visita_form_control" model="ir.ui.view">
+        <field name="name">sng.ruteros.visita.form.control.visitas</field>
+        <field name="model">sng.ruteros.visita</field>
+        <field name="inherit_id" ref="sng_ruteros_visitas.view_sng_ruteros_visita_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@class='oe_title']" position="before">
+                <div class="oe_button_box" name="button_box">
+                    <button name="action_sng_ver_seguimientos" type="object"
+                            class="oe_stat_button" icon="fa-phone">
+                        <field name="seguimiento_count" widget="statinfo" string="Televentas"/>
+                    </button>
+                    <button name="action_sng_cerrar_accion" type="object"
+                            class="oe_stat_button" icon="fa-check"
+                            string="Cerrar acción"
+                            invisible="accion_cerrada or not fecha_proxima_accion"/>
+                </div>
+            </xpath>
+            <xpath expr="//group[2]" position="before">
+                <group string="Gestión comercial" col="4" name="gestion_comercial">
+                    <field name="fecha_programada"/>
+                    <field name="resultado_comercial" widget="badge"
+                           decoration-success="resultado_comercial == 'venta_facturada'"
+                           decoration-info="resultado_comercial in ('pedido_pendiente', 'cotizacion_enviada')"
+                           decoration-danger="resultado_comercial in ('no_visitado', 'cliente_cerrado', 'bloqueado_cobro')"/>
+                    <field name="currency_id" invisible="1"/>
+                    <field name="monto_venta"/>
+                    <field name="motivo_sin_venta_id"
+                           invisible="resultado_comercial in ('venta_facturada', 'pedido_pendiente')"/>
+                    <field name="proxima_accion_id"/>
+                    <field name="fecha_proxima_accion"/>
+                    <field name="requiere_seguimiento_televentas"/>
+                    <field name="accion_cerrada" readonly="1"/>
+                    <field name="efectividad" widget="percentage" readonly="1"/>
+                    <field name="sales_route_id" readonly="1"/>
+                    <field name="comentario_tipo_id" colspan="4"/>
+                    <field name="comentario_agente" colspan="4"
+                           placeholder="Comentario específico del agente (obligatorio si no se elige uno predeterminado)"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_sng_ruteros_visita_list_control" model="ir.ui.view">
+        <field name="name">sng.ruteros.visita.list.control.visitas</field>
+        <field name="model">sng.ruteros.visita</field>
+        <field name="inherit_id" ref="sng_ruteros_visitas.view_sng_ruteros_visita_list"/>
+        <field name="arch" type="xml">
+            <field name="resultado" position="after">
+                <field name="resultado_comercial" widget="badge"
+                       decoration-success="resultado_comercial == 'venta_facturada'"
+                       decoration-info="resultado_comercial in ('pedido_pendiente', 'cotizacion_enviada')"
+                       decoration-danger="resultado_comercial in ('no_visitado', 'cliente_cerrado', 'bloqueado_cobro')"/>
+                <field name="currency_id" column_invisible="1"/>
+                <field name="monto_venta" optional="show" sum="Total"/>
+                <field name="motivo_sin_venta_id" optional="show"/>
+                <field name="proxima_accion_id" optional="show"/>
+                <field name="fecha_proxima_accion" optional="show"/>
+                <field name="requiere_seguimiento_televentas" optional="show" widget="boolean_toggle"/>
+                <field name="accion_cerrada" optional="hide"/>
+                <field name="sin_comentario" optional="hide"/>
+            </field>
+            <field name="partner_id" position="after">
+                <field name="sales_route_id" optional="show"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_sng_ruteros_visita_search_control" model="ir.ui.view">
+        <field name="name">sng.ruteros.visita.search.control.visitas</field>
+        <field name="model">sng.ruteros.visita</field>
+        <field name="inherit_id" ref="sng_ruteros_visitas.view_sng_ruteros_visita_search"/>
+        <field name="arch" type="xml">
+            <filter name="fuera_sitio" position="after">
+                <separator/>
+                <filter name="requiere_tv" string="Requiere televentas"
+                        domain="[('requiere_seguimiento_televentas', '=', True)]"/>
+                <filter name="sin_comentario" string="Sin comentario"
+                        domain="[('sin_comentario', '=', True)]"/>
+                <filter name="accion_vencida" string="Acción vencida"
+                        domain="[('accion_cerrada', '=', False), ('fecha_proxima_accion', '!=', False), ('fecha_proxima_accion', '&lt;', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter name="sin_venta" string="Sin venta"
+                        domain="[('resultado_comercial', 'not in', ('venta_facturada', 'pedido_pendiente', 'cotizacion_enviada'))]"/>
+            </filter>
+            <filter name="group_resultado" position="after">
+                <filter name="group_resultado_comercial" string="Resultado de visita"
+                        context="{'group_by': 'resultado_comercial'}"/>
+                <filter name="group_ruta" string="Ruta"
+                        context="{'group_by': 'sales_route_id'}"/>
+                <filter name="group_motivo" string="Motivo sin venta"
+                        context="{'group_by': 'motivo_sin_venta_id'}"/>
+            </filter>
+        </field>
+    </record>
+</odoo>

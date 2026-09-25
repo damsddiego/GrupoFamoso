@@ -346,23 +346,27 @@ class AccountPayment(models.Model):
         # Botón "Marcar como pagado": concilia las facturas seleccionadas y
         # deja que el core marque el pago como pagado (decisión explícita
         # del usuario).
-        self._reconcile_selected_outstanding_moves()
+        for rec in self:
+            rec._reconcile_selected_outstanding_moves()
         return super().action_validate()
 
     def action_draft(self):
         res = super().action_draft()
-        if self.move_id and self.pay_moves:
-            self.move_id.unlink()
+        for rec in self:
+            if rec.move_id and rec.pay_moves:
+                rec.move_id.unlink()
         return res
 
     def action_post(self):
         res = super().action_post()
-        if self.pay_moves:
+        # Puede venir con varios pagos (p. ej. "Registrar pago" masivo desde
+        # la lista de facturas).
+        for rec in self.filtered('pay_moves'):
             # Solo conciliar contra las facturas seleccionadas. El estado lo
             # decide el core: 'in_process' si el método usa cuenta transitoria
             # (queda pendiente de conciliar con el extracto) o 'paid' si la
             # cuenta es de efectivo.
-            self._reconcile_selected_outstanding_moves()
+            rec._reconcile_selected_outstanding_moves()
         return res
 
     def unlink(self):

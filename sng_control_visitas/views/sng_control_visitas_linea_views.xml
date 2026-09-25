@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_sng_control_visitas_linea_list" model="ir.ui.view">
+        <field name="name">sng.control.visitas.linea.list</field>
+        <field name="model">sng.control.visitas.linea</field>
+        <field name="arch" type="xml">
+            <list string="Matriz de control" create="false" edit="false"
+                  decoration-danger="alerta_gerencial == 'sin_atencion'"
+                  decoration-warning="alerta_gerencial == 'seguimiento_vencido'"
+                  decoration-info="alerta_gerencial == 'mas_90_dias'">
+                <header>
+                    <button name="%(sng_control_visitas.action_sng_control_visitas_generar_wizard)d"
+                            type="action" string="Recalcular período" display="always"
+                            groups="sng_control_visitas.group_control_visitas_manager"/>
+                </header>
+                <field name="periodo" optional="hide"/>
+                <field name="unique_id" optional="show"/>
+                <field name="commercial_name"/>
+                <field name="name" optional="hide"/>
+                <field name="sales_route_id" optional="show"/>
+                <field name="vendedor_id" optional="show"/>
+                <field name="phone" optional="hide"/>
+                <field name="payment_term_name" optional="hide"/>
+                <field name="pricelist_name" optional="hide"/>
+                <field name="last_invoice_date" optional="show"/>
+                <field name="dias_sin_facturar" optional="show"/>
+                <field name="frecuencia_visita" optional="hide"/>
+                <field name="fecha_visita_programada" optional="hide"/>
+                <field name="fecha_visita_realizada" optional="show"/>
+                <field name="resultado_visita" optional="show"/>
+                <field name="currency_id" column_invisible="1"/>
+                <field name="monto_venta_visita" optional="show" sum="Total"/>
+                <field name="motivo_sin_venta_id" optional="hide"/>
+                <field name="proxima_accion_agente_id" optional="hide"/>
+                <field name="fecha_proxima_accion_agente" optional="hide"/>
+                <field name="requiere_seguimiento_televentas" optional="hide"/>
+                <field name="fecha_seguimiento" optional="show"/>
+                <field name="canal" optional="hide"/>
+                <field name="resultado_televentas" optional="show"/>
+                <field name="monto_venta_televentas" optional="show" sum="Total"/>
+                <field name="proxima_accion_televentas_id" optional="hide"/>
+                <field name="fecha_proxima_accion_televentas" optional="hide"/>
+                <field name="estado_atencion" widget="badge" optional="show"
+                       decoration-success="estado_atencion == 'visitado'"
+                       decoration-info="estado_atencion == 'solo_televentas'"
+                       decoration-warning="estado_atencion == 'pendiente_visita'"/>
+                <field name="efectividad_visita" widget="percentage" optional="hide"/>
+                <field name="efectividad_televentas" widget="percentage" optional="hide"/>
+                <field name="cliente_desatendido" optional="hide"/>
+                <field name="responsable_proximo_paso" optional="show"/>
+                <field name="alerta_gerencial" widget="badge" optional="show"
+                       decoration-danger="alerta_gerencial == 'sin_atencion'"
+                       decoration-warning="alerta_gerencial == 'seguimiento_vencido'"
+                       decoration-info="alerta_gerencial == 'mas_90_dias'"
+                       decoration-success="alerta_gerencial == 'ok'"/>
+                <field name="registros_sin_comentario" optional="hide"/>
+                <button name="action_abrir_visita" type="object" icon="fa-map-marker"
+                        title="Abrir visita" invisible="not visita_id"/>
+                <button name="action_abrir_seguimiento" type="object" icon="fa-phone"
+                        title="Abrir / crear seguimiento"/>
+                <field name="visita_id" column_invisible="1"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_sng_control_visitas_linea_form" model="ir.ui.view">
+        <field name="name">sng.control.visitas.linea.form</field>
+        <field name="model">sng.control.visitas.linea</field>
+        <field name="arch" type="xml">
+            <form string="Línea de matriz" create="false" edit="false">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_abrir_visita" type="object" class="oe_stat_button"
+                                icon="fa-map-marker" string="Visita" invisible="not visita_id"/>
+                        <button name="action_abrir_seguimiento" type="object" class="oe_stat_button"
+                                icon="fa-phone" string="Seguimiento"/>
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="commercial_name"/></h1>
+                        <h3><field name="name"/></h3>
+                    </div>
+                    <group>
+                        <group string="Cliente">
+                            <field name="partner_id"/>
+                            <field name="unique_id"/>
+                            <field name="sales_route_id"/>
+                            <field name="vendedor_id"/>
+                            <field name="tipo_atencion"/>
+                            <field name="frecuencia_visita"/>
+                            <field name="phone"/>
+                            <field name="payment_term_name"/>
+                            <field name="pricelist_name"/>
+                            <field name="address"/>
+                        </group>
+                        <group string="Período y alertas">
+                            <field name="periodo"/>
+                            <field name="fecha_corte"/>
+                            <field name="last_invoice_date"/>
+                            <field name="dias_sin_facturar"/>
+                            <field name="estado_atencion"/>
+                            <field name="cliente_desatendido"/>
+                            <field name="responsable_proximo_paso"/>
+                            <field name="alerta_gerencial"/>
+                            <field name="registros_sin_comentario"/>
+                            <field name="fecha_generacion"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Visita del agente">
+                            <field name="visita_id"/>
+                            <field name="fecha_visita_programada"/>
+                            <field name="fecha_visita_realizada"/>
+                            <field name="resultado_visita"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="monto_venta_visita"/>
+                            <field name="motivo_sin_venta_id"/>
+                            <field name="proxima_accion_agente_id"/>
+                            <field name="fecha_proxima_accion_agente"/>
+                            <field name="requiere_seguimiento_televentas"/>
+                            <field name="efectividad_visita" widget="percentage"/>
+                            <field name="comentario_agente"/>
+                        </group>
+                        <group string="Seguimiento televentas">
+                            <field name="seguimiento_id"/>
+                            <field name="seguimiento_pendiente_id"/>
+                            <field name="fecha_seguimiento"/>
+                            <field name="canal"/>
+                            <field name="resultado_televentas"/>
+                            <field name="monto_venta_televentas"/>
+                            <field name="proxima_accion_televentas_id"/>
+                            <field name="fecha_proxima_accion_televentas"/>
+                            <field name="efectividad_televentas" widget="percentage"/>
+                            <field name="comentario_televentas"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_sng_control_visitas_linea_pivot" model="ir.ui.view">
+        <field name="name">sng.control.visitas.linea.pivot</field>
+        <field name="model">sng.control.visitas.linea</field>
+        <field name="arch" type="xml">
+            <pivot string="Tablero de control">
+                <field name="sales_route_id" type="row"/>
+                <field name="total" type="measure"/>
+                <field name="es_visitado" type="measure"/>
+                <field name="es_solo_televentas" type="measure"/>
+                <field name="es_desatendido" type="measure"/>
+                <field name="es_venta_facturada" type="measure"/>
+                <field name="es_venta_recuperada" type="measure"/>
+                <field name="es_seguimiento_vencido" type="measure"/>
+                <field name="es_mas_90_dias" type="measure"/>
+                <field name="monto_venta_visita" type="measure"/>
+                <field name="monto_venta_televentas" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_sng_control_visitas_linea_graph" model="ir.ui.view">
+        <field name="name">sng.control.visitas.linea.graph</field>
+        <field name="model">sng.control.visitas.linea</field>
+        <field name="arch" type="xml">
+            <graph string="Cobertura por ruta" type="bar" stacked="1">
+                <field name="sales_route_id"/>
+                <field name="estado_atencion"/>
+                <field name="total" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_sng_control_visitas_linea_search" model="ir.ui.view">
+        <field name="name">sng.control.visitas.linea.search</field>
+        <field name="model">sng.control.visitas.linea</field>
+        <field name="arch" type="xml">
+            <search string="Matriz de control">
+                <field name="periodo"/>
+                <field name="commercial_name"/>
+                <field name="partner_id"/>
+                <field name="unique_id"/>
+                <field name="sales_route_id"/>
+                <field name="vendedor_id"/>
+                <filter name="periodo_actual" string="Mes actual"
+                        domain="[('periodo', '=', context_today().strftime('%Y-%m'))]"/>
+                <separator/>
+                <filter name="sin_atencion" string="Clientes sin atención"
+                        domain="[('alerta_gerencial', '=', 'sin_atencion')]"/>
+                <filter name="vencidos" string="Seguimiento vencido"
+                        domain="[('alerta_gerencial', '=', 'seguimiento_vencido')]"/>
+                <filter name="mas_90" string="Más de N días sin facturar"
+                        domain="[('alerta_gerencial', '=', 'mas_90_dias')]"/>
+                <filter name="ok" string="OK" domain="[('alerta_gerencial', '=', 'ok')]"/>
+                <separator/>
+                <filter name="visitados" string="Visitados" domain="[('estado_atencion', '=', 'visitado')]"/>
+                <filter name="solo_tv" string="Solo televentas" domain="[('estado_atencion', '=', 'solo_televentas')]"/>
+                <filter name="pend_visita" string="Pendiente visita" domain="[('estado_atencion', '=', 'pendiente_visita')]"/>
+                <filter name="sin_gestion" string="Sin gestión" domain="[('estado_atencion', '=', 'sin_gestion')]"/>
+                <separator/>
+                <filter name="pend_agente" string="Pendientes del agente" domain="[('responsable_proximo_paso', '=', 'agente')]"/>
+                <filter name="pend_tv" string="Pendientes de televentas" domain="[('responsable_proximo_paso', '=', 'televentas')]"/>
+                <filter name="pend_ambos" string="Pendientes compartidos" domain="[('responsable_proximo_paso', '=', 'ambos')]"/>
+                <filter name="sin_comentario" string="Registros sin comentario" domain="[('registros_sin_comentario', '&gt;', 0)]"/>
+                <group expand="0" string="Agrupar por">
+                    <filter name="group_periodo" string="Período" context="{'group_by': 'periodo'}"/>
+                    <filter name="group_ruta" string="Ruta" context="{'group_by': 'sales_route_id'}"/>
+                    <filter name="group_vendedor" string="Agente" context="{'group_by': 'vendedor_id'}"/>
+                    <filter name="group_estado" string="Estado de atención" context="{'group_by': 'estado_atencion'}"/>
+                    <filter name="group_alerta" string="Alerta gerencial" context="{'group_by': 'alerta_gerencial'}"/>
+                    <filter name="group_responsable" string="Responsable" context="{'group_by': 'responsable_proximo_paso'}"/>
+                    <filter name="group_resultado" string="Resultado visita" context="{'group_by': 'resultado_visita'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_sng_control_visitas_linea" model="ir.actions.act_window">
+        <field name="name">Matriz de Control</field>
+        <field name="res_model">sng.control.visitas.linea</field>
+        <field name="view_mode">list,pivot,graph,form</field>
+        <field name="search_view_id" ref="view_sng_control_visitas_linea_search"/>
+        <field name="context">{'search_default_periodo_actual': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">La matriz del mes aún no se ha generado</p>
+            <p>Use "Recalcular período" o espere al cron diario.</p>
+        </field>
+    </record>
+</odoo>

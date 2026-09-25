@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_sng_cxc_report_wizard_form" model="ir.ui.view">
+        <field name="name">sng.cxc.report.wizard.form</field>
+        <field name="model">sng.cxc.report.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Reporte CxC por Cliente">
+                <group>
+                    <field name="cutoff_date" required="1"/>
+                </group>
+                <footer>
+                    <button name="action_open_report" type="object" string="Consultar" class="btn-primary"/>
+                    <button name="action_export_xlsx" type="object" string="Exportar Excel"/>
+                    <button string="Cancelar" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_sng_cxc_report_wizard" model="ir.actions.act_window">
+        <field name="name">Cuentas por Cobrar por Cliente</field>
+        <field name="res_model">sng.cxc.report.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_sng_cxc_report_wizard_form"/>
+        <field name="target">new</field>
+    </record>
+</odoo>

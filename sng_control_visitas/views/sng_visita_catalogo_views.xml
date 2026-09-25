@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_sng_visita_catalogo_list" model="ir.ui.view">
+        <field name="name">sng.visita.catalogo.list</field>
+        <field name="model">sng.visita.catalogo</field>
+        <field name="arch" type="xml">
+            <list editable="bottom" default_group_by="tipo">
+                <field name="sequence" widget="handle"/>
+                <field name="tipo"/>
+                <field name="name"/>
+                <field name="codigo" groups="base.group_no_one"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_sng_visita_catalogo_search" model="ir.ui.view">
+        <field name="name">sng.visita.catalogo.search</field>
+        <field name="model">sng.visita.catalogo</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <filter name="motivos" string="Motivos sin venta" domain="[('tipo', '=', 'motivo_sin_venta')]"/>
+                <filter name="acciones" string="Próximas acciones" domain="[('tipo', '=', 'proxima_accion')]"/>
+                <filter name="com_agente" string="Comentarios agente" domain="[('tipo', '=', 'comentario_agente')]"/>
+                <filter name="com_tv" string="Comentarios televentas" domain="[('tipo', '=', 'comentario_televentas')]"/>
+                <separator/>
+                <filter name="inactivos" string="Archivados" domain="[('active', '=', False)]"/>
+                <group expand="0" string="Agrupar por">
+                    <filter name="group_tipo" string="Tipo" context="{'group_by': 'tipo'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_sng_visita_catalogo" model="ir.actions.act_window">
+        <field name="name">Catálogos de visitas</field>
+        <field name="res_model">sng.visita.catalogo</field>
+        <field name="view_mode">list</field>
+        <field name="context">{'search_default_group_tipo': 1}</field>
+    </record>
+</odoo>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_partner_form_control_visitas" model="ir.ui.view">
+        <field name="name">res.partner.form.control.visitas</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <div name="button_box" position="inside">
+                <button name="action_sng_ver_visitas" type="object" class="oe_stat_button"
+                        icon="fa-map-marker" invisible="customer_rank == 0"
+                        groups="sng_control_visitas.group_control_visitas_user,account.group_account_invoice">
+                    <field name="sng_visita_count" widget="statinfo" string="Visitas"/>
+                </button>
+                <button name="action_sng_ver_seguimientos" type="object" class="oe_stat_button"
+                        icon="fa-phone" invisible="customer_rank == 0"
+                        groups="sng_control_visitas.group_control_visitas_user,account.group_account_invoice">
+                    <field name="sng_seguimiento_count" widget="statinfo" string="Televentas"/>
+                </button>
+            </div>
+            <page name="sales_purchases" position="after">
+                <page name="control_visitas" string="Control de visitas"
+                      invisible="customer_rank == 0"
+                      groups="sng_control_visitas.group_control_visitas_user,account.group_account_invoice">
+                    <group>
+                        <group string="Atención">
+                            <field name="sng_tipo_atencion"/>
+                            <field name="sng_frecuencia_visita"/>
+                            <field name="sng_excluir_matriz"/>
+                        </group>
+                        <group string="Fechas">
+                            <field name="sng_fecha_ultima_visita"/>
+                            <field name="sng_fecha_proxima_visita"/>
+                            <field name="sng_fecha_ultimo_contacto_televentas"/>
+                        </group>
+                    </group>
+                </page>
+            </page>
+        </field>
+    </record>
+</odoo>

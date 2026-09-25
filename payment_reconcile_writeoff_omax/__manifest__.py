@@ -2,7 +2,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 {
     'name' : 'Reconcile Payment with Invoices, Bills. Support Write-off feature',
-    'version': '18.0.1.0',
+    'version': '18.0.1.1',
     'category': 'Accounting,Sales,Purchases',
     'sequence': 1,
     'author': 'OMAX Informatics',

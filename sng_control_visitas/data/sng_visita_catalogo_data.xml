@@ -1,0 +1,431 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <!-- Motivos sin venta (hoja Catálogos, columna B) -->
+    <record id="catalogo_motivo_sin_inventario_disponible" model="sng.visita.catalogo">
+        <field name="name">Sin inventario disponible</field>
+        <field name="tipo">motivo_sin_venta</field>
+        <field name="codigo">sin_inventario_disponible</field>
+        <field name="sequence">10</field>
+    </record>
+    <record id="catalogo_motivo_precio_fuera_de_expectativa" model="sng.visita.catalogo">
+        <field name="name">Precio fuera de expectativa</field>
+        <field name="tipo">motivo_sin_venta</field>
+        <field name="codigo">precio_fuera_de_expectativa</field>
+        <field name="sequence">20</field>
+    </record>
+    <record id="catalogo_motivo_cliente_con_inventario_suficiente" model="sng.visita.catalogo">
+        <field name="name">Cliente con inventario suficiente</field>
+        <field name="tipo">motivo_sin_venta</field>
+        <field name="codigo">cliente_con_inventario_suficiente</field>
+        <field name="sequence">30</field>
+    </record>
+    <record id="catalogo_motivo_no_estaba_el_decisor" model="sng.visita.catalogo">
+        <field name="name">No estaba el decisor</field>
+        <field name="tipo">motivo_sin_venta</field>
+        <field name="codigo">no_estaba_el_decisor</field>
+        <field name="sequence">40</field>
+    </record>
+    <record id="catalogo_motivo_local_cerrado" model="sng.visita.catalogo">
+        <field name="name">Local cerrado</field>
+        <field name="tipo">motivo_sin_venta</field>
+        <field name="codigo">local_cerrado</field>
+        <field name="sequence">50</field>
+    </record>
+    <record id="catalogo_motivo_problema_de_cobro" model="sng.visita.catalogo">
+        <field name="name">Problema de cobro</field>
+        <field name="tipo">motivo_sin_venta</field>
+        <field name="codigo">problema_de_cobro</field>
+        <field name="sequence">60</field>
+    </record>
+    <record id="catalogo_motivo_datos_de_contacto_incorrectos" model="sng.visita.catalogo">
+        <field name="name">Datos de contacto incorrectos</field>
+        <field name="tipo">motivo_sin_venta</field>
+        <field name="codigo">datos_de_contacto_incorrectos</field>
+        <field name="sequence">70</field>
+    </record>
+    <record id="catalogo_motivo_competencia" model="sng.visita.catalogo">
+        <field name="name">Competencia</field>
+        <field name="tipo">motivo_sin_venta</field>
+        <field name="codigo">competencia</field>
+        <field name="sequence">80</field>
+    </record>
+    <record id="catalogo_motivo_baja_rotacion" model="sng.visita.catalogo">
+        <field name="name">Baja rotación</field>
+        <field name="tipo">motivo_sin_venta</field>
+        <field name="codigo">baja_rotacion</field>
+        <field name="sequence">90</field>
+    </record>
+    <record id="catalogo_motivo_temporada_baja" model="sng.visita.catalogo">
+        <field name="name">Temporada baja</field>
+        <field name="tipo">motivo_sin_venta</field>
+        <field name="codigo">temporada_baja</field>
+        <field name="sequence">100</field>
+    </record>
+    <record id="catalogo_motivo_no_requiere_producto_actualmente" model="sng.visita.catalogo">
+        <field name="name">No requiere producto actualmente</field>
+        <field name="tipo">motivo_sin_venta</field>
+        <field name="codigo">no_requiere_producto_actualmente</field>
+        <field name="sequence">110</field>
+    </record>
+    <record id="catalogo_motivo_presupuesto_agotado" model="sng.visita.catalogo">
+        <field name="name">Presupuesto agotado</field>
+        <field name="tipo">motivo_sin_venta</field>
+        <field name="codigo">presupuesto_agotado</field>
+        <field name="sequence">120</field>
+    </record>
+    <record id="catalogo_motivo_pedido_reciente" model="sng.visita.catalogo">
+        <field name="name">Pedido reciente</field>
+        <field name="tipo">motivo_sin_venta</field>
+        <field name="codigo">pedido_reciente</field>
+        <field name="sequence">130</field>
+    </record>
+    <record id="catalogo_motivo_cambio_de_administrador" model="sng.visita.catalogo">
+        <field name="name">Cambio de administrador</field>
+        <field name="tipo">motivo_sin_venta</field>
+        <field name="codigo">cambio_de_administrador</field>
+        <field name="sequence">140</field>
+    </record>
+    <record id="catalogo_motivo_cliente_solicita_credito" model="sng.visita.catalogo">
+        <field name="name">Cliente solicita crédito</field>
+        <field name="tipo">motivo_sin_venta</field>
+        <field name="codigo">cliente_solicita_credito</field>
+        <field name="sequence">150</field>
+    </record>
+    <record id="catalogo_motivo_otro" model="sng.visita.catalogo">
+        <field name="name">Otro</field>
+        <field name="tipo">motivo_sin_venta</field>
+        <field name="codigo">otro</field>
+        <field name="sequence">160</field>
+    </record>
+
+    <!-- Próximas acciones (columna C) -->
+    <record id="catalogo_accion_enviar_cotizacion" model="sng.visita.catalogo">
+        <field name="name">Enviar cotización</field>
+        <field name="tipo">proxima_accion</field>
+        <field name="codigo">enviar_cotizacion</field>
+        <field name="sequence">10</field>
+    </record>
+    <record id="catalogo_accion_confirmar_pedido" model="sng.visita.catalogo">
+        <field name="name">Confirmar pedido</field>
+        <field name="tipo">proxima_accion</field>
+        <field name="codigo">confirmar_pedido</field>
+        <field name="sequence">20</field>
+    </record>
+    <record id="catalogo_accion_revisar_inventario" model="sng.visita.catalogo">
+        <field name="name">Revisar inventario</field>
+        <field name="tipo">proxima_accion</field>
+        <field name="codigo">revisar_inventario</field>
+        <field name="sequence">30</field>
+    </record>
+    <record id="catalogo_accion_coordinar_nueva_visita" model="sng.visita.catalogo">
+        <field name="name">Coordinar nueva visita</field>
+        <field name="tipo">proxima_accion</field>
+        <field name="codigo">coordinar_nueva_visita</field>
+        <field name="sequence">40</field>
+    </record>
+    <record id="catalogo_accion_gestionar_cobro" model="sng.visita.catalogo">
+        <field name="name">Gestionar cobro</field>
+        <field name="tipo">proxima_accion</field>
+        <field name="codigo">gestionar_cobro</field>
+        <field name="sequence">50</field>
+    </record>
+    <record id="catalogo_accion_actualizar_datos" model="sng.visita.catalogo">
+        <field name="name">Actualizar datos</field>
+        <field name="tipo">proxima_accion</field>
+        <field name="codigo">actualizar_datos</field>
+        <field name="sequence">60</field>
+    </record>
+    <record id="catalogo_accion_llamar_la_siguiente_semana" model="sng.visita.catalogo">
+        <field name="name">Llamar la siguiente semana</field>
+        <field name="tipo">proxima_accion</field>
+        <field name="codigo">llamar_la_siguiente_semana</field>
+        <field name="sequence">70</field>
+    </record>
+    <record id="catalogo_accion_enviar_catalogo" model="sng.visita.catalogo">
+        <field name="name">Enviar catálogo</field>
+        <field name="tipo">proxima_accion</field>
+        <field name="codigo">enviar_catalogo</field>
+        <field name="sequence">80</field>
+    </record>
+    <record id="catalogo_accion_escalar_gerencia" model="sng.visita.catalogo">
+        <field name="name">Escalar a gerencia</field>
+        <field name="tipo">proxima_accion</field>
+        <field name="codigo">escalar_gerencia</field>
+        <field name="sequence">90</field>
+    </record>
+    <record id="catalogo_accion_cerrar_seguimiento" model="sng.visita.catalogo">
+        <field name="name">Cerrar seguimiento</field>
+        <field name="tipo">proxima_accion</field>
+        <field name="codigo">cerrar_seguimiento</field>
+        <field name="sequence">100</field>
+    </record>
+    <record id="catalogo_accion_solicitar_autorizacion_de_descuento" model="sng.visita.catalogo">
+        <field name="name">Solicitar autorización de descuento</field>
+        <field name="tipo">proxima_accion</field>
+        <field name="codigo">solicitar_autorizacion_de_descuento</field>
+        <field name="sequence">110</field>
+    </record>
+    <record id="catalogo_accion_coordinar_muestra_de_producto" model="sng.visita.catalogo">
+        <field name="name">Coordinar muestra de producto</field>
+        <field name="tipo">proxima_accion</field>
+        <field name="codigo">coordinar_muestra_de_producto</field>
+        <field name="sequence">120</field>
+    </record>
+    <record id="catalogo_accion_validar_disponibilidad_de_inventario" model="sng.visita.catalogo">
+        <field name="name">Validar disponibilidad de inventario</field>
+        <field name="tipo">proxima_accion</field>
+        <field name="codigo">validar_disponibilidad_de_inventario</field>
+        <field name="sequence">130</field>
+    </record>
+    <record id="catalogo_accion_transferir_natalia" model="sng.visita.catalogo">
+        <field name="name">Transferir seguimiento a televentas</field>
+        <field name="tipo">proxima_accion</field>
+        <field name="codigo">transferir_natalia</field>
+        <field name="sequence">140</field>
+    </record>
+
+    <!-- Comentarios predeterminados del agente (columna G) -->
+    <record id="catalogo_com_agente_01" model="sng.visita.catalogo">
+        <field name="name">Cliente atendido; se revisaron necesidades, inventario disponible y oportunidad de compra.</field>
+        <field name="tipo">comentario_agente</field>
+        <field name="codigo">agente_01</field>
+        <field name="sequence">10</field>
+    </record>
+    <record id="catalogo_com_agente_02" model="sng.visita.catalogo">
+        <field name="name">Cliente confirmó pedido; queda pendiente emisión o facturación.</field>
+        <field name="tipo">comentario_agente</field>
+        <field name="codigo">agente_02</field>
+        <field name="sequence">20</field>
+    </record>
+    <record id="catalogo_com_agente_03" model="sng.visita.catalogo">
+        <field name="name">Cliente solicita cotización; queda pendiente confirmación de cantidades y referencias.</field>
+        <field name="tipo">comentario_agente</field>
+        <field name="codigo">agente_03</field>
+        <field name="sequence">30</field>
+    </record>
+    <record id="catalogo_com_agente_04" model="sng.visita.catalogo">
+        <field name="name">Cotización enviada durante la visita; se acordó fecha de seguimiento.</field>
+        <field name="tipo">comentario_agente</field>
+        <field name="codigo">agente_04</field>
+        <field name="sequence">40</field>
+    </record>
+    <record id="catalogo_com_agente_05" model="sng.visita.catalogo">
+        <field name="name">Cliente no compró porque mantiene inventario suficiente; revisar nuevamente en la próxima ruta.</field>
+        <field name="tipo">comentario_agente</field>
+        <field name="codigo">agente_05</field>
+        <field name="sequence">50</field>
+    </record>
+    <record id="catalogo_com_agente_06" model="sng.visita.catalogo">
+        <field name="name">No fue posible atender al decisor; se coordinó un nuevo contacto.</field>
+        <field name="tipo">comentario_agente</field>
+        <field name="codigo">agente_06</field>
+        <field name="sequence">60</field>
+    </record>
+    <record id="catalogo_com_agente_07" model="sng.visita.catalogo">
+        <field name="name">Local cerrado al momento de la visita; requiere reprogramación.</field>
+        <field name="tipo">comentario_agente</field>
+        <field name="codigo">agente_07</field>
+        <field name="sequence">70</field>
+    </record>
+    <record id="catalogo_com_agente_08" model="sng.visita.catalogo">
+        <field name="name">Cliente bloqueado por cobro; se remite la gestión a Crédito y Cobro.</field>
+        <field name="tipo">comentario_agente</field>
+        <field name="codigo">agente_08</field>
+        <field name="sequence">80</field>
+    </record>
+    <record id="catalogo_com_agente_09" model="sng.visita.catalogo">
+        <field name="name">Cliente solicita ajuste de precio; requiere revisión comercial.</field>
+        <field name="tipo">comentario_agente</field>
+        <field name="codigo">agente_09</field>
+        <field name="sequence">90</field>
+    </record>
+    <record id="catalogo_com_agente_10" model="sng.visita.catalogo">
+        <field name="name">Cliente reporta baja rotación; se recomienda revisar surtido y propuesta.</field>
+        <field name="tipo">comentario_agente</field>
+        <field name="codigo">agente_10</field>
+        <field name="sequence">100</field>
+    </record>
+    <record id="catalogo_com_agente_11" model="sng.visita.catalogo">
+        <field name="name">Cliente compró recientemente; próxima gestión según frecuencia asignada.</field>
+        <field name="tipo">comentario_agente</field>
+        <field name="codigo">agente_11</field>
+        <field name="sequence">110</field>
+    </record>
+    <record id="catalogo_com_agente_12" model="sng.visita.catalogo">
+        <field name="name">Cliente no requiere producto actualmente; mantener seguimiento programado.</field>
+        <field name="tipo">comentario_agente</field>
+        <field name="codigo">agente_12</field>
+        <field name="sequence">120</field>
+    </record>
+    <record id="catalogo_com_agente_13" model="sng.visita.catalogo">
+        <field name="name">Datos de contacto o responsable desactualizados; se requiere corrección.</field>
+        <field name="tipo">comentario_agente</field>
+        <field name="codigo">agente_13</field>
+        <field name="sequence">130</field>
+    </record>
+    <record id="catalogo_com_agente_14" model="sng.visita.catalogo">
+        <field name="name">Cliente manifiesta preferencia por la competencia; revisar propuesta de valor.</field>
+        <field name="tipo">comentario_agente</field>
+        <field name="codigo">agente_14</field>
+        <field name="sequence">140</field>
+    </record>
+    <record id="catalogo_com_agente_15" model="sng.visita.catalogo">
+        <field name="name">Cliente solicita muestra o catálogo antes de confirmar compra.</field>
+        <field name="tipo">comentario_agente</field>
+        <field name="codigo">agente_15</field>
+        <field name="sequence">150</field>
+    </record>
+    <record id="catalogo_com_agente_16" model="sng.visita.catalogo">
+        <field name="name">Cliente con visita bimensual; próxima gestión según frecuencia acordada.</field>
+        <field name="tipo">comentario_agente</field>
+        <field name="codigo">agente_16</field>
+        <field name="sequence">160</field>
+    </record>
+    <record id="catalogo_com_agente_17" model="sng.visita.catalogo">
+        <field name="name">Visita no realizada por cambio de ruta o limitación de tiempo; debe justificarse y reprogramarse.</field>
+        <field name="tipo">comentario_agente</field>
+        <field name="codigo">agente_17</field>
+        <field name="sequence">170</field>
+    </record>
+    <record id="catalogo_com_agente_18" model="sng.visita.catalogo">
+        <field name="name">Cliente cerrado o sin operación; se solicita validación para depurar la cartera.</field>
+        <field name="tipo">comentario_agente</field>
+        <field name="codigo">agente_18</field>
+        <field name="sequence">180</field>
+    </record>
+    <record id="catalogo_com_agente_19" model="sng.visita.catalogo">
+        <field name="name">Cliente solicita crédito o ampliación de condiciones; requiere análisis y autorización.</field>
+        <field name="tipo">comentario_agente</field>
+        <field name="codigo">agente_19</field>
+        <field name="sequence">190</field>
+    </record>
+    <record id="catalogo_com_agente_20" model="sng.visita.catalogo">
+        <field name="name">Otro resultado; detallar claramente situación, compromiso y fecha del próximo paso.</field>
+        <field name="tipo">comentario_agente</field>
+        <field name="codigo">agente_20</field>
+        <field name="sequence">200</field>
+    </record>
+
+    <!-- Comentarios predeterminados de televentas (columna H) -->
+    <record id="catalogo_com_tv_01" model="sng.visita.catalogo">
+        <field name="name">Se contactó al cliente después de la ruta; se confirmó necesidad y se definió seguimiento.</field>
+        <field name="tipo">comentario_televentas</field>
+        <field name="codigo">televentas_01</field>
+        <field name="sequence">10</field>
+    </record>
+    <record id="catalogo_com_tv_02" model="sng.visita.catalogo">
+        <field name="name">Se recuperó la venta mediante seguimiento telefónico; pedido confirmado.</field>
+        <field name="tipo">comentario_televentas</field>
+        <field name="codigo">televentas_02</field>
+        <field name="sequence">20</field>
+    </record>
+    <record id="catalogo_com_tv_03" model="sng.visita.catalogo">
+        <field name="name">Cliente solicita cotización; se envió información y queda pendiente confirmación.</field>
+        <field name="tipo">comentario_televentas</field>
+        <field name="codigo">televentas_03</field>
+        <field name="sequence">30</field>
+    </record>
+    <record id="catalogo_com_tv_04" model="sng.visita.catalogo">
+        <field name="name">Cliente mantiene inventario suficiente; no requiere compra esta semana.</field>
+        <field name="tipo">comentario_televentas</field>
+        <field name="codigo">televentas_04</field>
+        <field name="sequence">40</field>
+    </record>
+    <record id="catalogo_com_tv_05" model="sng.visita.catalogo">
+        <field name="name">No respondió; se realizaron intentos por llamada y WhatsApp.</field>
+        <field name="tipo">comentario_televentas</field>
+        <field name="codigo">televentas_05</field>
+        <field name="sequence">50</field>
+    </record>
+    <record id="catalogo_com_tv_06" model="sng.visita.catalogo">
+        <field name="name">Cliente solicita llamada en otra fecha; seguimiento reprogramado.</field>
+        <field name="tipo">comentario_televentas</field>
+        <field name="codigo">televentas_06</field>
+        <field name="sequence">60</field>
+    </record>
+    <record id="catalogo_com_tv_07" model="sng.visita.catalogo">
+        <field name="name">Cliente indica que no recibió visita; se traslada alerta al agente responsable.</field>
+        <field name="tipo">comentario_televentas</field>
+        <field name="codigo">televentas_07</field>
+        <field name="sequence">70</field>
+    </record>
+    <record id="catalogo_com_tv_08" model="sng.visita.catalogo">
+        <field name="name">Cliente fue visitado, pero requiere seguimiento para completar el pedido.</field>
+        <field name="tipo">comentario_televentas</field>
+        <field name="codigo">televentas_08</field>
+        <field name="sequence">80</field>
+    </record>
+    <record id="catalogo_com_tv_09" model="sng.visita.catalogo">
+        <field name="name">Cliente no muestra interés actualmente; se mantiene en seguimiento según frecuencia.</field>
+        <field name="tipo">comentario_televentas</field>
+        <field name="codigo">televentas_09</field>
+        <field name="sequence">90</field>
+    </record>
+    <record id="catalogo_com_tv_10" model="sng.visita.catalogo">
+        <field name="name">Datos de contacto incorrectos; se solicita actualización al agente.</field>
+        <field name="tipo">comentario_televentas</field>
+        <field name="codigo">televentas_10</field>
+        <field name="sequence">100</field>
+    </record>
+    <record id="catalogo_com_tv_11" model="sng.visita.catalogo">
+        <field name="name">Cliente bloqueado por cobro; se remite a Crédito y Cobro.</field>
+        <field name="tipo">comentario_televentas</field>
+        <field name="codigo">televentas_11</field>
+        <field name="sequence">110</field>
+    </record>
+    <record id="catalogo_com_tv_12" model="sng.visita.catalogo">
+        <field name="name">Cliente cerrado o sin operación; requiere validación comercial.</field>
+        <field name="tipo">comentario_televentas</field>
+        <field name="codigo">televentas_12</field>
+        <field name="sequence">120</field>
+    </record>
+    <record id="catalogo_com_tv_13" model="sng.visita.catalogo">
+        <field name="name">Cliente solicita hablar directamente con el agente de ventas.</field>
+        <field name="tipo">comentario_televentas</field>
+        <field name="codigo">televentas_13</field>
+        <field name="sequence">130</field>
+    </record>
+    <record id="catalogo_com_tv_14" model="sng.visita.catalogo">
+        <field name="name">Cliente solicita catálogo, imágenes o lista de precios antes de decidir.</field>
+        <field name="tipo">comentario_televentas</field>
+        <field name="codigo">televentas_14</field>
+        <field name="sequence">140</field>
+    </record>
+    <record id="catalogo_com_tv_15" model="sng.visita.catalogo">
+        <field name="name">Cliente confirma que compró recientemente; no requiere pedido adicional.</field>
+        <field name="tipo">comentario_televentas</field>
+        <field name="codigo">televentas_15</field>
+        <field name="sequence">150</field>
+    </record>
+    <record id="catalogo_com_tv_16" model="sng.visita.catalogo">
+        <field name="name">Cliente reporta falta de inventario de un producto; se consulta disponibilidad.</field>
+        <field name="tipo">comentario_televentas</field>
+        <field name="codigo">televentas_16</field>
+        <field name="sequence">160</field>
+    </record>
+    <record id="catalogo_com_tv_17" model="sng.visita.catalogo">
+        <field name="name">Cliente solicita una condición comercial o descuento; se escala para aprobación.</field>
+        <field name="tipo">comentario_televentas</field>
+        <field name="codigo">televentas_17</field>
+        <field name="sequence">170</field>
+    </record>
+    <record id="catalogo_com_tv_18" model="sng.visita.catalogo">
+        <field name="name">Cliente no fue atendido por ausencia del decisor; se coordina nueva llamada.</field>
+        <field name="tipo">comentario_televentas</field>
+        <field name="codigo">televentas_18</field>
+        <field name="sequence">180</field>
+    </record>
+    <record id="catalogo_com_tv_19" model="sng.visita.catalogo">
+        <field name="name">Seguimiento completado sin venta; se registra motivo y próxima fecha.</field>
+        <field name="tipo">comentario_televentas</field>
+        <field name="codigo">televentas_19</field>
+        <field name="sequence">190</field>
+    </record>
+    <record id="catalogo_com_tv_20" model="sng.visita.catalogo">
+        <field name="name">Otro resultado; detallar claramente gestión, compromiso y fecha del próximo paso.</field>
+        <field name="tipo">comentario_televentas</field>
+        <field name="codigo">televentas_20</field>
+        <field name="sequence">200</field>
+    </record>
+</odoo>
