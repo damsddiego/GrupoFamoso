@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Casilla en el formulario de la ubicación. Se muestra en internas y en
+         vistas: marcar la vista de un almacén excluye todo lo que cuelga de ella. -->
+    <record id="view_location_form_sng_no_disponible" model="ir.ui.view">
+        <field name="name">stock.location.form.sng.no.disponible.venta</field>
+        <field name="model">stock.location</field>
+        <field name="inherit_id" ref="stock.view_location_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='usage']" position="after">
+                <field name="sng_no_disponible_venta"
+                       invisible="usage not in ('internal', 'view')"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Filtro para revisar de un vistazo qué está marcado. -->
+    <record id="view_location_search_sng_no_disponible" model="ir.ui.view">
+        <field name="name">stock.location.search.sng.no.disponible.venta</field>
+        <field name="model">stock.location</field>
+        <field name="inherit_id" ref="stock.view_location_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <separator/>
+                <filter name="sng_no_disponible_venta"
+                        string="No disponibles para venta"
+                        domain="[('sng_no_disponible_venta', '=', True)]"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
