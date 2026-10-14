@@ -3,7 +3,7 @@
     'name': 'SNG Dashboard Gerencial',
     'summary': 'Dashboard para toma de decisiones: ventas, cobros, cartera, '
                'inventario y análisis IA con recomendaciones',
-    'version': '1.1.0',
+    'version': '1.1.1',
     'category': 'Accounting',
     'author': 'SNG',
     'license': 'LGPL-3',

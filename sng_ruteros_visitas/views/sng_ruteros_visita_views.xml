@@ -23,7 +23,9 @@
                 <field name="distancia_m" optional="show"/>
                 <field name="duracion_min" optional="hide"/>
                 <field name="sale_order_id" optional="show"/>
+                <field name="sale_order_app_id" optional="hide"/>
                 <field name="payment_id" optional="show"/>
+                <field name="payment_app_id" optional="hide"/>
                 <field name="company_id" groups="base.group_multi_company"/>
             </list>
         </field>
@@ -49,6 +51,13 @@
                         equivalencia en el parámetro de sistema
                         <b>sng_ruteros_pagos.cliente_equivalencias</b> y use
                         "Reintentar resolver cliente").
+                    </div>
+                    <div class="alert alert-warning" role="alert"
+                         invisible="not sale_order_app_id and not payment_app_id">
+                        La app ligó esta visita a una orden o pago que no
+                        existe en esta base (o es de otra compañía). La visita
+                        se conservó sin ese documento; el ID original queda
+                        abajo en "sin resolver".
                     </div>
                     <div class="oe_title">
                         <h1><field name="name" readonly="1"/></h1>
@@ -77,6 +86,10 @@
                                invisible="not vendedor_app_id"/>
                         <field name="partner_app_id" readonly="1"
                                invisible="not partner_app_id"/>
+                        <field name="sale_order_app_id" readonly="1"
+                               invisible="not sale_order_app_id"/>
+                        <field name="payment_app_id" readonly="1"
+                               invisible="not payment_app_id"/>
                         <field name="sng_uuid" readonly="1" groups="base.group_no_one"/>
                         <field name="sng_from_app" readonly="1" groups="base.group_no_one"/>
                     </group>

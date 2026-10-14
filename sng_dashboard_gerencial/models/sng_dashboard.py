@@ -1062,7 +1062,7 @@ class SngDashboardGerencial(models.AbstractModel):
                 'sng_dashboard_gerencial.anthropic_api_key).'))
         model = (icp.get_param('sng_ruteros_pagos.anthropic_model')
                  or icp.get_param('sng_dashboard_gerencial.anthropic_model')
-                 or 'claude-opus-4-8').strip()
+                 or 'claude-sonnet-5-5').strip()
         # timeout < limit_time_real (120s) para que un cuelgue de la API
         # devuelva un error limpio en vez de que el master mate al worker.
         return anthropic.Anthropic(
@@ -1284,19 +1284,24 @@ class SngDashboardAnalisis(models.Model):
                 'ventas_por_vendedor_mes_actual':
                     Dashboard._sng_ventas_vendedor(cids, hoy),
             }
+        # Sonnet 5.5 razona por defecto (thinking adaptativo); el esfuerzo
+        # acota cuánto razona y max_tokens debe cubrir razonamiento + JSON.
         response = client.messages.create(
             model=ia_model,
-            max_tokens=4096,
+            max_tokens=8192,
             system=sistema,
             messages=[{
                 'role': 'user',
                 'content': json.dumps(payload, ensure_ascii=False,
                                       default=str),
             }],
-            output_config={'format': {
-                'type': 'json_schema',
-                'schema': SNG_IA_DASHBOARD_SCHEMA,
-            }},
+            output_config={
+                'effort': 'medium',
+                'format': {
+                    'type': 'json_schema',
+                    'schema': SNG_IA_DASHBOARD_SCHEMA,
+                },
+            },
         )
         if response.stop_reason == 'refusal':
             raise UserError(_('La IA rechazó la solicitud (refusal).'))

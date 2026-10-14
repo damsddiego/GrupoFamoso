@@ -7,10 +7,35 @@
             <field name="arch" type="xml">
                 <form string="Cerrar Mes por Compañía">
                     <group>
-                        <field name="period"/>
-                        <field name="company_id" groups="base.group_multi_company"/>
-                        <field name="pending_count"/>
+                        <group>
+                            <field name="period"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="pending_count"/>
+                        </group>
+                        <group>
+                            <field name="uncommissioned_payment_count"/>
+                            <field name="uncommissioned_pair_count"/>
+                            <label for="no_salesperson_invoice_count"/>
+                            <div>
+                                <field name="no_salesperson_invoice_count" class="oe_inline"/>
+                                <button name="action_view_no_salesperson_invoices" type="object"
+                                        string="Ver facturas" class="btn btn-link oe_inline"
+                                        icon="fa-external-link"
+                                        invisible="not no_salesperson_invoice_count"/>
+                            </div>
+                            <field name="no_salesperson_invoice_ids" invisible="1"/>
+                        </group>
                     </group>
+                    <div class="alert alert-info" role="alert" invisible="not uncommissioned_payment_count">
+                        Antes de cerrar se generarán automáticamente las comisiones de los
+                        <strong><field name="uncommissioned_payment_count" class="oe_inline"/></strong>
+                        pagos del mes que todavía no tienen línea de comisión, para que entren a este mes.
+                    </div>
+                    <div class="alert alert-danger" role="alert" invisible="not no_salesperson_invoice_count">
+                        Hay facturas cobradas en el mes sin vendedor (ni en la factura ni en el cliente):
+                        no generarán comisión. Asígneles vendedor y vuelva a abrir este asistente
+                        antes de cerrar, o ciérrelo sabiendo que quedarán fuera.
+                    </div>
                     <div class="alert alert-warning" role="alert">
                         Se cerrarán todas las comisiones pendientes del mes seleccionado.
                         Los meses cerrados ya no se recalculan y los pagos que lleguen con

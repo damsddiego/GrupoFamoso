@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="login_shop_notice" inherit_id="web.login" name="Aviso tienda solo para clientes">
+        <xpath expr="//form" position="before">
+            <div t-if="website and website.sng_shop_login_required" class="alert alert-info small" role="status">
+                El catálogo de <t t-out="website.name"/> es exclusivo para clientes.
+                Inicia sesión para verlo. Si aún no tienes acceso, pídelo a tu asesor de ventas.
+            </div>
+        </xpath>
+    </template>
+</odoo>

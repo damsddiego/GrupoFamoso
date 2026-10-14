@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- tipo_documento vale 'FE' por defecto tambien en asientos contables;
+         cr_import_vendor_bills exige actividad economica a todo FE/FEC, lo que
+         bloquea "Restablecer a borrador" en asientos de banco/caja/inventario. -->
+    <record id="view_move_form_asiento_sin_actividad" model="ir.ui.view">
+        <field name="name">account.move.form.sng.asiento.sin.actividad</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="cr_import_vendor_bills.view_move_form_inherit"/>
+        <field name="priority">99</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='economic_activity_id']" position="attributes">
+                <attribute name="required">move_type in ('out_invoice', 'out_refund') or (move_type != 'entry' and tipo_documento in ('FE', 'FEC'))</attribute>
+                <attribute name="invisible">move_type == 'entry' or (move_type not in ('out_invoice', 'out_refund') and tipo_documento not in ('FE', 'FEC'))</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>

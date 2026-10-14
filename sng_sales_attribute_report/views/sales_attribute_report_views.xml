@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_sales_attribute_report_wizard_form" model="ir.ui.view">
+        <field name="name">sng.sales.attribute.report.wizard.form</field>
+        <field name="model">sng.sales.attribute.report.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Facturación por atributos" create="0" delete="0">
+                <header>
+                    <button name="action_view_on_screen" type="object" string="Consultar" class="btn-primary" icon="fa-search"/>
+                    <button name="action_print_pdf" type="object" string="PDF" class="btn-secondary" icon="fa-file-pdf-o"/>
+                    <button name="action_print_excel" type="object" string="Excel" class="btn-secondary" icon="fa-file-excel-o"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>Facturación por atributos</h1>
+                        <p class="text-muted">Facturas y notas de crédito por compañía, moneda, vendedor y producto.</p>
+                    </div>
+                    <group>
+                        <group string="Período y compañías">
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                            <field name="company_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                        </group>
+                        <group string="Clasificación de productos">
+                            <field name="attribute_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                            <field name="attribute_value_ids" widget="many2many_tags" options="{'no_create': True}" domain="[('attribute_id', 'in', attribute_ids)]"/>
+                            <field name="salesperson_ids" widget="many2many_tags" options="{'no_create': True}" placeholder="Vacío incluye todos"/>
+                        </group>
+                    </group>
+                    <div class="alert alert-info" role="alert">
+                        Los valores de un mismo atributo se combinan como <strong>O</strong>; atributos distintos se combinan como <strong>Y</strong>. El rango máximo es de un año.
+                    </div>
+                    <field name="show_results" invisible="1"/>
+                    <field name="excel_file" invisible="1"/>
+                    <field name="excel_filename" invisible="1"/>
+                    <notebook invisible="not show_results">
+                        <page string="Vendedores" name="salespersons">
+                            <field name="salesperson_line_ids" nolabel="1" readonly="1">
+                                <list create="0" delete="0" edit="0" decoration-success="net_total &gt; 0" decoration-danger="net_total &lt; 0">
+                                    <field name="company_id" optional="show"/>
+                                    <field name="currency_id" optional="hide"/>
+                                    <field name="salesperson_name"/>
+                                    <field name="invoice_count" sum="Total"/>
+                                    <field name="invoice_qty" sum="Total"/>
+                                    <field name="invoice_total" sum="Total"/>
+                                    <field name="credit_note_count" sum="Total"/>
+                                    <field name="credit_qty" sum="Total"/>
+                                    <field name="credit_total" sum="Total"/>
+                                    <field name="net_qty" sum="Total"/>
+                                    <field name="net_total" sum="Total"/>
+                                    <button name="action_open_documents" type="object" string="Documentos" icon="fa-external-link"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Productos" name="products">
+                            <field name="product_line_ids" nolabel="1" readonly="1">
+                                <list create="0" delete="0" edit="0" decoration-success="net_total &gt; 0" decoration-danger="net_total &lt; 0">
+                                    <field name="company_id" optional="show"/>
+                                    <field name="currency_id" optional="hide"/>
+                                    <field name="product_id"/>
+                                    <field name="invoice_count" sum="Total"/>
+                                    <field name="invoice_qty" sum="Total"/>
+                                    <field name="average_invoice_price"/>
+                                    <field name="invoice_total" sum="Total"/>
+                                    <field name="credit_note_count" sum="Total"/>
+                                    <field name="credit_qty" sum="Total"/>
+                                    <field name="credit_total" sum="Total"/>
+                                    <field name="net_qty" sum="Total"/>
+                                    <field name="net_total" sum="Total"/>
+                                    <button name="action_open_documents" type="object" string="Documentos" icon="fa-external-link"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Notas de crédito" name="credit_notes">
+                            <field name="credit_note_line_ids" nolabel="1" readonly="1">
+                                <list create="0" delete="0" edit="0">
+                                    <field name="company_id" optional="show"/>
+                                    <field name="currency_id" optional="hide"/>
+                                    <field name="credit_note_id"/>
+                                    <field name="salesperson_id"/>
+                                    <field name="origin_move_id"/>
+                                    <field name="subtotal" sum="Total"/>
+                                    <field name="total" sum="Total"/>
+                                    <button name="action_open_credit_note" type="object" string="Ver nota" icon="fa-external-link"/>
+                                    <button name="action_open_origin" type="object" string="Ver origen" icon="fa-link" invisible="not origin_move_id"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Excluidos" name="excluded">
+                            <field name="excluded_line_ids" nolabel="1" readonly="1">
+                                <list create="0" delete="0" edit="0" decoration-warning="accounting_state == 'Borrador'" decoration-danger="hacienda_state == 'Rechazado'">
+                                    <field name="company_id" optional="show"/>
+                                    <field name="currency_id" optional="hide"/>
+                                    <field name="move_type"/>
+                                    <field name="accounting_state"/>
+                                    <field name="hacienda_state"/>
+                                    <field name="document_count" sum="Total"/>
+                                    <field name="subtotal" sum="Total"/>
+                                    <field name="total" sum="Total"/>
+                                    <button name="action_open_documents" type="object" string="Documentos" icon="fa-external-link"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_sales_attribute_report_wizard" model="ir.actions.act_window">
+        <field name="name">Facturación por atributos</field>
+        <field name="res_model">sng.sales.attribute.report.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_sales_attribute_report_wizard_form"/>
+        <field name="target">current</field>
+    </record>
+
+    <menuitem id="menu_sales_attribute_report"
+              name="Facturación por atributos"
+              parent="account.menu_finance_reports"
+              action="action_sales_attribute_report_wizard"
+              sequence="115"
+              groups="account.group_account_invoice,account.group_account_readonly"/>
+</odoo>

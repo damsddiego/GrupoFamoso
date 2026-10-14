@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_eh_access_profile_form_enforce" model="ir.ui.view">
+        <field name="name">eh.access.profile.form.sng.enforce</field>
+        <field name="model">eh.access.profile</field>
+        <field name="inherit_id" ref="eh_access_studio.view_eh_access_profile_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='node_line_ids']/list/field[@name='target_label']" position="after">
+                <field name="enforce_server" widget="boolean_toggle"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

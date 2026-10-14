@@ -112,11 +112,24 @@ class SngRuterosVisita(models.Model):
         check_company=True,
         help='Orden creada durante la visita (si aplica).',
     )
+    sale_order_app_id = fields.Integer(
+        string='ID orden app (sin resolver)',
+        copy=False,
+        help='ID de orden de venta que mandó la app y no existe en esta '
+             'base (o es de otra compañía). La visita se conserva sin la '
+             'orden para no perder la evidencia GPS.',
+    )
     payment_id = fields.Many2one(
         'account.payment',
         string='Pago',
         check_company=True,
         help='Cobro registrado durante la visita (si aplica).',
+    )
+    payment_app_id = fields.Integer(
+        string='ID pago app (sin resolver)',
+        copy=False,
+        help='ID de pago que mandó la app y no existe en esta base (o es '
+             'de otra compañía). La visita se conserva sin el pago.',
     )
     observaciones = fields.Text(string='Observaciones')
     sng_from_app = fields.Boolean(string='Desde app', default=True)
@@ -229,6 +242,57 @@ class SngRuterosVisita(models.Model):
             avisos.append((indice, aviso))
         return avisos
 
+    # (campo Many2one, modelo, campo donde queda el ID original, etiqueta)
+    _SNG_DOCUMENTOS_APP = (
+        ('sale_order_id', 'sale.order', 'sale_order_app_id', 'la orden'),
+        ('payment_id', 'account.payment', 'payment_app_id', 'el pago'),
+    )
+
+    @api.model
+    def _sng_sanear_documentos(self, vals_list):
+        """Quita de la visita la orden o el pago que la app ligó y que aquí
+        no existe o pertenece a otra compañía.
+
+        La app guarda la visita con el ID del pedido que creó en el momento;
+        si después ese pedido se borra (o la cola de la tableta llega tarde
+        y el ID ya no está), el INSERT viola la FK de `sale_order_id` y la
+        app reintenta la misma visita sin fin (1350 intentos el 2026-10-08
+        por la orden 40941). Con otra compañía el `check_company` lanza
+        UserError y pasa lo mismo. La visita entra sin el documento y guarda
+        el ID original en `sale_order_app_id` / `payment_app_id`.
+        Devuelve [(índice en vals_list, aviso para el chatter)].
+        """
+        avisos = []
+        for indice, vals in enumerate(vals_list):
+            compania_id = vals.get('company_id') or self.env.company.id
+            for campo, modelo, campo_app, etiqueta in self._SNG_DOCUMENTOS_APP:
+                original = vals.get(campo)
+                if not original:
+                    continue
+                # sudo: la app se conecta con un usuario interno que no tiene
+                # por qué ver ventas ni pagos; solo se comprueba existencia.
+                doc = self.env[modelo].sudo().browse(original).exists()
+                if doc and doc.company_id.id == compania_id:
+                    continue
+                vals[campo] = False
+                vals[campo_app] = original
+                if doc:
+                    aviso = _(
+                        'La app mandó %(doc)s %(id)s, que pertenece a la '
+                        'compañía %(cia)s y no a la de la visita; se dejó '
+                        'la visita sin ese documento.',
+                        doc=etiqueta, id=original,
+                        cia=doc.company_id.display_name)
+                else:
+                    aviso = _(
+                        'La app mandó %(doc)s %(id)s, que no existe en esta '
+                        'base (probablemente se borró); se dejó la visita '
+                        'sin ese documento.',
+                        doc=etiqueta, id=original)
+                _logger.warning('sng.ruteros.visita: %s', aviso)
+                avisos.append((indice, aviso))
+        return avisos
+
     @api.model
     def _sng_sanear_vendedor(self, vals_list):
         """Resuelve el ID de vendedor que manda la app contra esta base.
@@ -313,7 +377,8 @@ class SngRuterosVisita(models.Model):
         # justo la evidencia GPS del cobro que sí entró.
         nuevos_vals = [v for _, v in vals_a_crear]
         avisos = (
-            self._sng_sanear_cliente(nuevos_vals)
+            self._sng_sanear_documentos(nuevos_vals)
+            + self._sng_sanear_cliente(nuevos_vals)
             + self._sng_sanear_vendedor(nuevos_vals)
         )
         self._sng_completar_vendedor(nuevos_vals)

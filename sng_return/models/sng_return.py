@@ -66,6 +66,21 @@ class SngReturn(models.Model):
         required=True,
         default=lambda self: self.env.company,
     )
+    # Vendedor segun sales_commission_omax: contacto con is_salesperson,
+    # asignado al cliente por compania. Se guarda para poder agrupar y no
+    # depende del vendedor asignado, para que un cambio posterior en el
+    # cliente no reescriba devoluciones viejas.
+    salesperson_id = fields.Many2one(
+        "res.partner",
+        string="Vendedor",
+        domain="[('is_salesperson', '=', True)]",
+        compute="_compute_salesperson_id",
+        store=True,
+        readonly=False,
+        precompute=True,
+        tracking=True,
+        index=True,
+    )
     state = fields.Selection(
         [
             ("draft", "Borrador"),
@@ -156,6 +171,15 @@ class SngReturn(models.Model):
         string="Cant. NC activas",
         compute="_compute_credit_note_count",
     )
+
+    @api.depends("partner_id", "company_id")
+    def _compute_salesperson_id(self):
+        for record in self:
+            partner = record.partner_id.with_company(record.company_id)
+            record.salesperson_id = (
+                partner.assigned_salesperson_id
+                or partner.commercial_partner_id.assigned_salesperson_id
+            )
 
     @api.depends("credit_note_ids", "credit_note_ids.state")
     def _compute_credit_note_count(self):

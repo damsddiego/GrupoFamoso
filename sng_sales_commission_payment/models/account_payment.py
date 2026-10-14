@@ -155,6 +155,18 @@ class AccountPayment(models.Model):
         for invoice, partial, amount in partials_data:
             if invoice.move_type not in ('out_invoice', 'out_refund') or invoice.state != 'posted':
                 continue
+            if invoice.sng_commission_exclude:
+                # Factura marcada para no comisionar: si quedó una línea en un
+                # mes pendiente se elimina; las de meses cerrados no se tocan.
+                stale = Line.search([
+                    ('payment_id', '=', self.id),
+                    ('invoice_id', '=', invoice.id),
+                    ('line_type', '=', 'commission'),
+                ]).filtered(lambda l: l.monthly_id.state == 'draft')
+                if stale:
+                    affected |= stale.mapped('monthly_id')
+                    stale.unlink()
+                continue
 
             salesperson = self._get_salesperson_for_commission(invoice)
             if not salesperson:

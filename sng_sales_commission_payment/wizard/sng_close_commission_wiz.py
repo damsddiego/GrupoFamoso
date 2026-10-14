@@ -23,6 +23,30 @@ class SngCloseCommissionWiz(models.TransientModel):
         string='Comisiones Pendientes',
         compute='_compute_pending_count',
     )
+    uncommissioned_payment_count = fields.Integer(
+        string='Pagos sin comisión generada',
+        compute='_compute_uncommissioned',
+        help='Cobros confirmados en el mes, aplicados a facturas, que todavía no '
+             'tienen línea de comisión. Se generan automáticamente al cerrar.',
+    )
+    uncommissioned_pair_count = fields.Integer(
+        string='Pares pago/factura sin comisión',
+        compute='_compute_uncommissioned',
+    )
+    no_salesperson_invoice_count = fields.Integer(
+        string='Facturas sin vendedor',
+        compute='_compute_uncommissioned',
+        help='Facturas cobradas en el mes sin vendedor en la factura ni en el '
+             'cliente: no generan comisión hasta que se les asigne uno.',
+    )
+    no_salesperson_invoice_ids = fields.Many2many(
+        'account.move',
+        compute='_compute_uncommissioned',
+    )
+
+    def _get_bounds(self):
+        self.ensure_one()
+        return self.env['sng.commission.monthly']._sng_period_bounds(self.period)
 
     def _get_pending_monthlies(self):
         self.ensure_one()
@@ -39,8 +63,40 @@ class SngCloseCommissionWiz(models.TransientModel):
         for wiz in self:
             wiz.pending_count = len(wiz._get_pending_monthlies()) if wiz.period else 0
 
+    @api.depends('period', 'company_id')
+    def _compute_uncommissioned(self):
+        Monthly = self.env['sng.commission.monthly']
+        for wiz in self:
+            if not wiz.period or not wiz.company_id:
+                rows = []
+            else:
+                first, last = wiz._get_bounds()
+                rows = Monthly._sng_find_uncommissioned(wiz.company_id, first, last)
+            generable = [r for r in rows if r['salesperson_id']]
+            orphan_invoice_ids = sorted({r['invoice_id'] for r in rows if not r['salesperson_id']})
+            wiz.uncommissioned_pair_count = len(generable)
+            wiz.uncommissioned_payment_count = len({r['payment_id'] for r in generable})
+            wiz.no_salesperson_invoice_count = len(orphan_invoice_ids)
+            wiz.no_salesperson_invoice_ids = [(6, 0, orphan_invoice_ids)]
+
+    def action_view_no_salesperson_invoices(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Facturas cobradas sin vendedor'),
+            'res_model': 'account.move',
+            'view_mode': 'list,form',
+            'domain': [('id', 'in', self.no_salesperson_invoice_ids.ids)],
+            'context': {'create': False},
+        }
+
     def action_close_month(self):
         self.ensure_one()
+        first, last = self._get_bounds()
+        Monthly = self.env['sng.commission.monthly']
+        # Primero se generan los cobros del mes que aún no tienen comisión:
+        # pueden crear comisiones mensuales nuevas (vendedores sin registro).
+        Monthly._sng_generate_pending(self.company_id, first, last)
         monthlies = self._get_pending_monthlies()
         if not monthlies:
             raise UserError(_(

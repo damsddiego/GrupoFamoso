@@ -178,15 +178,110 @@ class SngCommissionMonthly(models.Model):
             else:
                 rec.state = 'draft'
 
+    @api.model
+    def _sng_period_bounds(self, period):
+        """(primer día, último día) del mes de `period`."""
+        first = period.replace(day=1)
+        return first, first + relativedelta(months=1, days=-1)
+
+    @api.model
+    def _sng_find_uncommissioned(self, company, date_from, date_to):
+        """Pares (pago, factura) de cobros confirmados en el rango que aún no
+        tienen línea de comisión.
+
+        Replica en SQL la lógica de ``account.payment._generate_commission_lines``
+        (pago entrante confirmado, conciliado con factura de cliente publicada,
+        mes por fecha de confirmación con respaldo en la fecha contable y
+        vendedor de la factura, asignado a la factura o asignado al cliente).
+
+        Devuelve una lista de dicts ``{'payment_id', 'invoice_id', 'salesperson_id'}``;
+        ``salesperson_id`` es None cuando no hay vendedor resoluble (esos pares
+        nunca generan comisión hasta que se asigne un vendedor).
+        """
+        self.env['account.payment'].flush_model()
+        self.env['account.move'].flush_model(['state', 'move_type', 'salesperson_id', 'assigned_salesperson_id', 'sng_commission_exclude'])
+        self.env['account.partial.reconcile'].flush_model()
+        self.env['sng.commission.payment.line'].flush_model()
+        self.env['res.partner'].flush_model(['is_salesperson', 'assigned_salesperson_id'])
+        self.env.cr.execute("""
+            WITH pays AS (
+                SELECT p.id AS pid, p.move_id, p.partner_id
+                FROM account_payment p
+                JOIN account_move m ON m.id = p.move_id
+                WHERE p.payment_type = 'inbound'
+                  AND p.state IN ('in_process', 'paid')
+                  AND p.company_id = %(company)s
+                  AND COALESCE(p.sng_confirmation_date, m.date) BETWEEN %(date_from)s AND %(date_to)s
+            ),
+            pairs AS (
+                SELECT DISTINCT pays.pid, pays.partner_id, inv.id AS inv_id,
+                       inv.salesperson_id, inv.assigned_salesperson_id
+                FROM pays
+                JOIN account_move_line pl ON pl.move_id = pays.move_id
+                JOIN account_account aa ON aa.id = pl.account_id AND aa.account_type = 'asset_receivable'
+                JOIN account_partial_reconcile pr ON pr.credit_move_id = pl.id OR pr.debit_move_id = pl.id
+                JOIN account_move_line il
+                  ON il.id = CASE WHEN pr.credit_move_id = pl.id THEN pr.debit_move_id ELSE pr.credit_move_id END
+                JOIN account_move inv
+                  ON inv.id = il.move_id AND inv.move_type IN ('out_invoice', 'out_refund') AND inv.state = 'posted'
+                 AND NOT COALESCE(inv.sng_commission_exclude, FALSE)
+            )
+            SELECT pr.pid, pr.inv_id,
+                   COALESCE(
+                     (SELECT sp.id FROM res_partner sp WHERE sp.id = pr.salesperson_id AND sp.is_salesperson),
+                     (SELECT sp.id FROM res_partner sp WHERE sp.id = pr.assigned_salesperson_id AND sp.is_salesperson),
+                     (SELECT sp.id FROM res_partner sp
+                        JOIN res_partner cust ON (cust.assigned_salesperson_id->>%(company_key)s)::int = sp.id
+                       WHERE cust.id = pr.partner_id AND sp.is_salesperson)
+                   ) AS salesperson_id
+            FROM pairs pr
+            WHERE NOT EXISTS (
+                SELECT 1 FROM sng_commission_payment_line l
+                WHERE l.payment_id = pr.pid AND l.invoice_id = pr.inv_id AND l.line_type = 'commission')
+            ORDER BY pr.pid, pr.inv_id
+        """, {
+            'company': company.id,
+            'company_key': str(company.id),
+            'date_from': date_from,
+            'date_to': date_to,
+        })
+        return [
+            {'payment_id': pid, 'invoice_id': inv_id, 'salesperson_id': sp_id}
+            for pid, inv_id, sp_id in self.env.cr.fetchall()
+        ]
+
+    @api.model
+    def _sng_generate_pending(self, company, date_from, date_to):
+        """Genera las líneas de comisión que faltan para los cobros confirmados
+        en el rango. Devuelve los pagos procesados."""
+        rows = self._sng_find_uncommissioned(company, date_from, date_to)
+        payment_ids = sorted({r['payment_id'] for r in rows if r['salesperson_id']})
+        payments = self.env['account.payment'].sudo().browse(payment_ids)
+        for payment in payments:
+            payment._generate_commission_lines()
+        if payments:
+            _logger.info(
+                "Comisiones pendientes generadas para %s (%s → %s): %s pagos.",
+                company.name, date_from, date_to, len(payments),
+            )
+        return payments
+
     def action_close(self):
-        """Recalcula y cierra el mes: deja de aceptar cambios; los pagos
-        tardíos de este periodo se acumularán en el siguiente mes abierto."""
+        """Genera las comisiones pendientes del mes, recalcula y cierra: deja
+        de aceptar cambios; los pagos tardíos de este periodo se acumularán
+        en el siguiente mes abierto."""
         for rec in self:
             if rec.state != 'draft':
                 raise UserError(_(
                     "Solo se pueden cerrar comisiones en estado Pendiente (%(name)s está en %(state)s).",
                     name=rec.name, state=dict(rec._fields['state']._description_selection(rec.env)).get(rec.state),
                 ))
+        # Antes de cerrar, los cobros del mes que aún no tienen línea (p. ej.
+        # conciliados después de confirmarse) se generan para que entren a
+        # este mes y no rueden al siguiente.
+        for company, period in {(rec.company_id, rec.period) for rec in self}:
+            first, last = self._sng_period_bounds(period)
+            self._sng_generate_pending(company, first, last)
         self._recompute_commission()
         self.write({
             'closed': True,

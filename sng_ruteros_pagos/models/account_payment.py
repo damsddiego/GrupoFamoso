@@ -977,7 +977,7 @@ class AccountPayment(models.Model):
                 'Configure la API key en Ajustes → Técnico → Parámetros del '
                 'sistema, clave "sng_ruteros_pagos.anthropic_api_key".'))
         model = (icp.get_param('sng_ruteros_pagos.anthropic_model')
-                 or 'claude-opus-4-8').strip()
+                 or 'claude-sonnet-5-5').strip()
         return anthropic.Anthropic(api_key=api_key, timeout=90.0, max_retries=1), model
 
     def _sng_ia_matching_facturas(self, raise_errors=False):
@@ -1049,18 +1049,23 @@ class AccountPayment(models.Model):
                 for f in candidatas
             ],
         }
+        # Sonnet 5.5 razona por defecto (thinking adaptativo). Clasificación
+        # rápida: esfuerzo bajo y max_tokens con margen para el razonamiento.
         response = client.messages.create(
             model=ia_model,
-            max_tokens=2048,
+            max_tokens=4096,
             system=SNG_IA_SYSTEM,
             messages=[{
                 'role': 'user',
                 'content': json.dumps(payload, ensure_ascii=False),
             }],
-            output_config={'format': {
-                'type': 'json_schema',
-                'schema': SNG_IA_MATCH_SCHEMA,
-            }},
+            output_config={
+                'effort': 'low',
+                'format': {
+                    'type': 'json_schema',
+                    'schema': SNG_IA_MATCH_SCHEMA,
+                },
+            },
         )
         if response.stop_reason == 'refusal':
             raise UserError(_('La IA rechazó la solicitud (refusal).'))
@@ -1369,16 +1374,19 @@ class AccountPayment(models.Model):
         }
         response = client.messages.create(
             model=ia_model,
-            max_tokens=1024,
+            max_tokens=4096,
             system=SNG_IA_DUP_SYSTEM,
             messages=[{
                 'role': 'user',
                 'content': json.dumps(payload, ensure_ascii=False),
             }],
-            output_config={'format': {
-                'type': 'json_schema',
-                'schema': SNG_IA_DUP_SCHEMA,
-            }},
+            output_config={
+                'effort': 'low',
+                'format': {
+                    'type': 'json_schema',
+                    'schema': SNG_IA_DUP_SCHEMA,
+                },
+            },
         )
         if response.stop_reason == 'refusal':
             raise UserError(_('La IA rechazó la solicitud (refusal).'))
@@ -1629,14 +1637,17 @@ class AccountPayment(models.Model):
                 } for f in filas]}
                 response = client.messages.create(
                     model=ia_model,
-                    max_tokens=4096,
+                    max_tokens=8192,
                     system=SNG_IA_MOROSIDAD_SYSTEM,
                     messages=[{'role': 'user', 'content': json.dumps(
                         payload, ensure_ascii=False)}],
-                    output_config={'format': {
-                        'type': 'json_schema',
-                        'schema': SNG_IA_MOROSIDAD_SCHEMA,
-                    }},
+                    output_config={
+                        'effort': 'medium',
+                        'format': {
+                            'type': 'json_schema',
+                            'schema': SNG_IA_MOROSIDAD_SCHEMA,
+                        },
+                    },
                 )
                 texto_json = next(
                     (b.text for b in response.content if b.type == 'text'), '')
@@ -1776,16 +1787,19 @@ class AccountPayment(models.Model):
         payload = {'recibos_del_dia': [p._sng_datos_para_ia() for p in self]}
         response = client.messages.create(
             model=ia_model,
-            max_tokens=4096,
+            max_tokens=8192,
             system=SNG_IA_RESUMEN_SYSTEM,
             messages=[{
                 'role': 'user',
                 'content': json.dumps(payload, ensure_ascii=False),
             }],
-            output_config={'format': {
-                'type': 'json_schema',
-                'schema': SNG_IA_RESUMEN_SCHEMA,
-            }},
+            output_config={
+                'effort': 'medium',
+                'format': {
+                    'type': 'json_schema',
+                    'schema': SNG_IA_RESUMEN_SCHEMA,
+                },
+            },
         )
         if response.stop_reason == 'refusal':
             raise UserError(_('La IA rechazó la solicitud (refusal).'))

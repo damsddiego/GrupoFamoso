@@ -11,7 +11,7 @@
 
         <record id="config_anthropic_model" model="ir.config_parameter">
             <field name="key">sng_dashboard_gerencial.anthropic_model</field>
-            <field name="value">claude-opus-4-8</field>
+            <field name="value">claude-sonnet-5-5</field>
         </record>
 
         <!-- Cobertura objetivo (meses) del sugerido de compras en la

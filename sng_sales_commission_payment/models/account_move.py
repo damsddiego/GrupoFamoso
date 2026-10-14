@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from odoo import fields, models
+from odoo import api, fields, models
 
 
 class AccountMove(models.Model):
@@ -14,6 +14,22 @@ class AccountMove(models.Model):
         copy=False,
         groups='sales_commission_omax.group_sales_commission_user',
     )
+
+    sng_commission_exclude = fields.Boolean(
+        string='Excluir de comisión',
+        copy=False,
+        index=True,
+        help='Los cobros aplicados a esta factura no generan comisión de ventas '
+             '(p. ej. facturas creadas solo para cancelar saldos a favor). Al marcarla '
+             'se eliminan sus líneas de comisión de meses aún pendientes; las de meses '
+             'cerrados no se tocan.',
+    )
+
+    def write(self, vals):
+        res = super().write(vals)
+        if vals.get('sng_commission_exclude'):
+            self._sng_unlink_draft_commission_lines()
+        return res
 
     def button_draft(self):
         res = super(AccountMove, self).button_draft()

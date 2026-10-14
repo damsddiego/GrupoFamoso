@@ -389,7 +389,7 @@ class SngCreditoSolicitud(models.Model):
                 '(sng_ruteros_pagos.anthropic_api_key o '
                 'sng_credito_ia.anthropic_api_key).'))
         model = (icp.get_param('sng_credito_ia.anthropic_model')
-                 or 'claude-opus-4-8').strip()
+                 or 'claude-sonnet-5-5').strip()
         return anthropic.Anthropic(api_key=api_key, timeout=180.0,
                                    max_retries=1), model
 
@@ -449,15 +449,20 @@ class SngCreditoSolicitud(models.Model):
         })
 
         client, ia_model = self._sng_ia_get_client()
+        # Sonnet 5.5 razona por defecto (thinking adaptativo); el esfuerzo
+        # acota cuánto razona y max_tokens debe cubrir razonamiento + JSON.
         response = client.messages.create(
             model=ia_model,
-            max_tokens=4096,
+            max_tokens=8192,
             system=SNG_IA_CREDITO_SYSTEM,
             messages=[{'role': 'user', 'content': contenido}],
-            output_config={'format': {
-                'type': 'json_schema',
-                'schema': SNG_IA_CREDITO_SCHEMA,
-            }},
+            output_config={
+                'effort': 'medium',
+                'format': {
+                    'type': 'json_schema',
+                    'schema': SNG_IA_CREDITO_SCHEMA,
+                },
+            },
         )
         if response.stop_reason == 'refusal':
             raise UserError(_('La IA rechazó procesar la solicitud (refusal).'))

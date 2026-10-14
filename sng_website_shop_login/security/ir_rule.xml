@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Reglas globales (se suman con AND a las de grupo): solo vacían el catálogo
+         para el usuario público de un sitio con la opción activa. En backend
+         `website` es un recordset vacío y la condición no aplica. -->
+    <record id="rule_product_template_shop_login" model="ir.rule">
+        <field name="name">Tienda solo para clientes: productos ocultos al público</field>
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="domain_force">[('id', '=', 0)] if website and website.sng_shop_login_required and user._is_public() else [(1, '=', 1)]</field>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+    <record id="rule_product_product_shop_login" model="ir.rule">
+        <field name="name">Tienda solo para clientes: variantes ocultas al público</field>
+        <field name="model_id" ref="product.model_product_product"/>
+        <field name="domain_force">[('id', '=', 0)] if website and website.sng_shop_login_required and user._is_public() else [(1, '=', 1)]</field>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+</odoo>

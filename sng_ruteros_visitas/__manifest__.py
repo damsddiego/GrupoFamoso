@@ -4,7 +4,7 @@
     'summary': 'Registro de visitas de los ruteros a clientes (GPS, distancia, '
                'resultado) enviadas desde la app app_ruteros. Deja rastro de '
                'las visitas que no terminan en venta ni cobro.',
-    'version': '1.3.0',
+    'version': '1.3.1',
     'category': 'Sales',
     'author': 'SNG',
     'website': 'https://sngcloud.com',

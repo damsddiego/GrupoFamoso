@@ -11,6 +11,7 @@
                 <field name="name"/>
                 <field name="date_request"/>
                 <field name="partner_id"/>
+                <field name="salesperson_id" optional="show"/>
                 <field name="reason_id"/>
                 <field name="warehouse_id" optional="show"/>
                 <field name="receipt_state" widget="badge" optional="show"
@@ -100,6 +101,8 @@
                     <group>
                         <group>
                             <field name="partner_id" readonly="state != 'draft'"/>
+                            <field name="salesperson_id" readonly="state != 'draft'"
+                                   options="{'no_create': True}"/>
                             <field name="date_request" readonly="state != 'draft'"/>
                             <field name="reason_id" readonly="state != 'draft'"/>
                             <field name="user_id" widget="many2one_avatar_user" readonly="state != 'draft'"/>
@@ -302,6 +305,7 @@
                 <field name="name"/>
                 <field name="partner_id"/>
                 <field name="reason_id"/>
+                <field name="salesperson_id"/>
                 <field name="user_id"/>
                 <filter string="Borrador" name="filter_draft" domain="[('state', '=', 'draft')]"/>
                 <filter string="Confirmado" name="filter_confirmed" domain="[('state', '=', 'confirmed')]"/>
@@ -310,6 +314,7 @@
                 <filter string="Archivado" name="filter_inactive" domain="[('active', '=', False)]"/>
                 <group expand="0" string="Agrupar por">
                     <filter string="Cliente" name="group_partner" context="{'group_by': 'partner_id'}"/>
+                    <filter string="Vendedor" name="group_salesperson" context="{'group_by': 'salesperson_id'}"/>
                     <filter string="Motivo" name="group_reason" context="{'group_by': 'reason_id'}"/>
                     <filter string="Estado" name="group_state" context="{'group_by': 'state'}"/>
                     <filter string="Responsable" name="group_user" context="{'group_by': 'user_id'}"/>

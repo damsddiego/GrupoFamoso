@@ -1,6 +1,6 @@
 {
     "name": "SNG Return",
-    "version": "18.0.1.6.0",
+    "version": "18.0.1.7.0",
     "category": "Sales",
     "summary": "Registro de devoluciones de clientes con historial de ventas facturadas",
     "author": "SNG",
@@ -12,6 +12,7 @@
         "sale_stock",
         "account",
         "cr_electronic_invoice",
+        "sales_commission_omax",
     ],
     "data": [
         "security/security.xml",

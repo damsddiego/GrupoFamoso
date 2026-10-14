@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="sales_attribute_report_document">
+        <t t-call="web.html_container">
+            <style>
+                @font-face {
+                    font-family: 'Space Grotesk';
+                    src: url('<t t-esc="brand_assets['space_regular']"/>') format('truetype');
+                    font-weight: 400;
+                }
+                @font-face {
+                    font-family: 'Space Grotesk';
+                    src: url('<t t-esc="brand_assets['space_bold']"/>') format('truetype');
+                    font-weight: 700;
+                }
+                @font-face {
+                    font-family: 'Currency Glyph';
+                    src: url('<t t-esc="brand_assets['currency_font']"/>') format('truetype');
+                }
+                .sng-report { font-family: 'Space Grotesk', sans-serif; color: #123E47; font-size: 9px; }
+                .sng-report h1 { font-size: 23px; margin: 0; color: #123E47; font-weight: 700; }
+                .sng-report h2 { font-size: 15px; margin: 14px 0 6px; color: #1BAAA0; font-weight: 700; }
+                .sng-report h3 { font-size: 12px; margin: 10px 0 5px; color: #F84E77; font-weight: 700; }
+                .sng-top { border-bottom: 4px solid #1BAAA0; padding-bottom: 7px; margin-bottom: 9px; }
+                .sng-logo { max-height: 42px; max-width: 145px; }
+                .sng-meta { color: #56666A; line-height: 1.45; margin-top: 5px; }
+                .sng-company { background: #123E47; color: white; padding: 7px 10px; border-radius: 3px; margin-top: 8px; }
+                .sng-kpis { width: 100%; border-spacing: 6px; border-collapse: separate; margin: 6px 0; }
+                .sng-kpi { width: 25%; background: #E6F7F5; border-top: 3px solid #1BAAA0; padding: 7px; text-align: center; }
+                .sng-kpi.pink { background: #FDE8EE; border-top-color: #F84E77; }
+                .sng-kpi .label { display: block; color: #56666A; font-size: 8px; }
+                .sng-kpi .value { display: block; color: #123E47; font-size: 14px; font-weight: 700; margin-top: 2px; }
+                .currency-glyph { font-family: 'Currency Glyph'; }
+                table.sng-table { width: 100%; border-collapse: collapse; margin-bottom: 7px; }
+                table.sng-table th { background: #123E47; color: white; padding: 4px; border: 1px solid #D7E2E4; font-weight: 700; text-align: center; }
+                table.sng-table td { padding: 3px 4px; border: 1px solid #D7E2E4; vertical-align: top; }
+                table.sng-table tr:nth-child(even) td { background: #F5FAFA; }
+                table.sng-table .number { text-align: right; white-space: nowrap; }
+                table.sng-table .total td { background: #F84E77 !important; color: white; font-weight: 700; }
+                .muted { color: #75868A; }
+                .page-break { page-break-before: always; }
+                .avoid-break { page-break-inside: avoid; }
+                .audit-note { border-left: 4px solid #F84E77; background: #FDE8EE; padding: 6px 9px; margin-bottom: 6px; }
+            </style>
+            <t t-set="money" t-value="lambda amount: '{:,.2f}'.format(amount or 0.0)"/>
+            <t t-foreach="report_data.get('groups', [])" t-as="group">
+                <div class="page sng-report">
+                    <div class="sng-top">
+                        <table style="width: 100%; border: 0;">
+                            <tr>
+                                <td style="width: 72%; border: 0; vertical-align: middle;">
+                                    <h1>Facturación por atributos</h1>
+                                    <div class="sng-meta">
+                                        <strong>Período:</strong> <span t-esc="report_data.get('date_from_display')"/> al <span t-esc="report_data.get('date_to_display')"/><br/>
+                                        <strong>Atributos:</strong> <span t-esc="report_data.get('attribute_label')"/><br/>
+                                        <strong>Vendedores:</strong> <span t-esc="report_data.get('salesperson_label')"/>
+                                    </div>
+                                </td>
+                                <td style="width: 28%; border: 0; text-align: right; vertical-align: middle;">
+                                    <img class="sng-logo" t-att-src="brand_assets['logo']" alt="SNG Cloud"/>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <div class="sng-company">
+                        <strong t-esc="group['company_name']"/> · <span t-esc="group['currency_name']"/>
+                    </div>
+                    <t t-set="totals" t-value="group['totals']"/>
+                    <table class="sng-kpis">
+                        <tr>
+                            <td class="sng-kpi">
+                                <span class="label">Total facturado</span>
+                                <span class="value"><span class="currency-glyph" t-esc="group['currency_symbol']"/> <span t-esc="money(totals['invoice_total'])"/></span>
+                            </td>
+                            <td class="sng-kpi pink">
+                                <span class="label">Notas de crédito</span>
+                                <span class="value"><span class="currency-glyph" t-esc="group['currency_symbol']"/> <span t-esc="money(totals['credit_total'])"/></span>
+                            </td>
+                            <td class="sng-kpi">
+                                <span class="label">Total neto</span>
+                                <span class="value"><span class="currency-glyph" t-esc="group['currency_symbol']"/> <span t-esc="money(totals['net_total'])"/></span>
+                            </td>
+                            <td class="sng-kpi pink">
+                                <span class="label">Cantidad neta</span>
+                                <span class="value" t-esc="money(totals['net_qty'])"/>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <h2>Resumen por vendedor</h2>
+                    <table class="sng-table">
+                        <thead><tr>
+                            <th>Vendedor</th><th>Facturas</th><th>Cantidad</th><th>Total facturado</th>
+                            <th>NC</th><th>Cantidad NC</th><th>Total NC</th><th>Total neto</th>
+                        </tr></thead>
+                        <tbody>
+                            <tr t-foreach="group['salespersons']" t-as="line">
+                                <td t-esc="line['salesperson_name']"/>
+                                <td class="number" t-esc="line['invoice_count']"/>
+                                <td class="number" t-esc="money(line['invoice_qty'])"/>
+                                <td class="number"><span class="currency-glyph" t-esc="group['currency_symbol']"/> <span t-esc="money(line['invoice_total'])"/></td>
+                                <td class="number" t-esc="line['credit_note_count']"/>
+                                <td class="number" t-esc="money(line['credit_qty'])"/>
+                                <td class="number"><span class="currency-glyph" t-esc="group['currency_symbol']"/> <span t-esc="money(line['credit_total'])"/></td>
+                                <td class="number"><span class="currency-glyph" t-esc="group['currency_symbol']"/> <span t-esc="money(line['net_total'])"/></td>
+                            </tr>
+                            <tr class="total">
+                                <td>TOTAL</td><td class="number" t-esc="totals['invoice_count']"/>
+                                <td class="number" t-esc="money(totals['invoice_qty'])"/>
+                                <td class="number"><span class="currency-glyph" t-esc="group['currency_symbol']"/> <span t-esc="money(totals['invoice_total'])"/></td>
+                                <td class="number" t-esc="totals['credit_note_count']"/>
+                                <td class="number" t-esc="money(totals['credit_qty'])"/>
+                                <td class="number"><span class="currency-glyph" t-esc="group['currency_symbol']"/> <span t-esc="money(totals['credit_total'])"/></td>
+                                <td class="number"><span class="currency-glyph" t-esc="group['currency_symbol']"/> <span t-esc="money(totals['net_total'])"/></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h2>Productos que produjeron estos números</h2>
+                    <table class="sng-table">
+                        <thead><tr>
+                            <th>Referencia</th><th>Producto</th><th>Cant. factura</th><th>Precio neto promedio</th>
+                            <th>Total factura</th><th>Cant. NC</th><th>Total NC</th><th>Cantidad neta</th><th>Total neto</th>
+                        </tr></thead>
+                        <tbody>
+                            <tr t-foreach="group['products']" t-as="line">
+                                <td t-esc="line['reference']"/><td t-esc="line['product_name']"/>
+                                <td class="number" t-esc="money(line['invoice_qty'])"/>
+                                <td class="number"><span class="currency-glyph" t-esc="group['currency_symbol']"/> <span t-esc="money(line['average_invoice_price'])"/></td>
+                                <td class="number"><span class="currency-glyph" t-esc="group['currency_symbol']"/> <span t-esc="money(line['invoice_total'])"/></td>
+                                <td class="number" t-esc="money(line['credit_qty'])"/>
+                                <td class="number"><span class="currency-glyph" t-esc="group['currency_symbol']"/> <span t-esc="money(line['credit_total'])"/></td>
+                                <td class="number" t-esc="money(line['net_qty'])"/>
+                                <td class="number"><span class="currency-glyph" t-esc="group['currency_symbol']"/> <span t-esc="money(line['net_total'])"/></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h2 class="page-break">Auxiliar de precios y descuentos</h2>
+                    <table class="sng-table">
+                        <thead><tr>
+                            <th>Referencia</th><th>Producto</th><th>Movimiento</th><th>Moneda</th>
+                            <th>Precio original</th><th>Descuento</th><th>Precio neto</th><th>Precio con impuesto</th>
+                            <th>Cantidad</th><th>Subtotal</th><th>Total</th>
+                        </tr></thead>
+                        <tbody>
+                            <tr t-foreach="group['prices']" t-as="line">
+                                <td t-esc="line['reference']"/><td t-esc="line['product_name']"/><td t-esc="line['move_type_name']"/><td t-esc="line['document_currency_name']"/>
+                                <td class="number" t-esc="money(line['price_unit'])"/><td class="number"><span t-esc="money(line['discount'])"/>%</td>
+                                <td class="number" t-esc="money(line['net_unit_price'])"/><td class="number" t-esc="money(line['total_unit_price'])"/>
+                                <td class="number" t-esc="money(line['quantity'])"/>
+                                <td class="number"><span class="currency-glyph" t-esc="group['currency_symbol']"/> <span t-esc="money(line['subtotal'])"/></td>
+                                <td class="number"><span class="currency-glyph" t-esc="group['currency_symbol']"/> <span t-esc="money(line['total'])"/></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="avoid-break">
+                        <h2>Notas de crédito aceptadas</h2>
+                        <table class="sng-table">
+                            <thead><tr><th>Nota</th><th>Fecha</th><th>Vendedor</th><th>Subtotal</th><th>Total</th><th>Factura origen</th><th>Fecha origen</th><th>Hacienda origen</th></tr></thead>
+                            <tbody>
+                                <tr t-if="not group['credit_notes']"><td colspan="8" class="muted">No hay notas de crédito aceptadas para esta selección.</td></tr>
+                                <tr t-foreach="group['credit_notes']" t-as="line">
+                                    <td t-esc="line['credit_note_name']"/><td t-esc="line['credit_note_date']"/><td t-esc="line['salesperson_name']"/>
+                                    <td class="number"><span class="currency-glyph" t-esc="group['currency_symbol']"/> <span t-esc="money(line['subtotal'])"/></td>
+                                    <td class="number"><span class="currency-glyph" t-esc="group['currency_symbol']"/> <span t-esc="money(line['total'])"/></td>
+                                    <td t-esc="line['origin_name']"/><td t-esc="line['origin_date']"/><td t-esc="line['origin_hacienda']"/>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="avoid-break">
+                        <h2>Auditoría de documentos excluidos</h2>
+                        <div class="audit-note">Estos documentos se muestran para revisión, pero no afectan el total neto.</div>
+                        <table class="sng-table">
+                            <thead><tr><th>Tipo</th><th>Estado contable</th><th>Estado Hacienda</th><th>Documentos</th><th>Subtotal</th><th>Total</th></tr></thead>
+                            <tbody>
+                                <tr t-if="not group['excluded']"><td colspan="6" class="muted">No hay documentos excluidos.</td></tr>
+                                <tr t-foreach="group['excluded']" t-as="line">
+                                    <td t-esc="line['move_type_name']"/><td t-esc="line['accounting_state_name']"/><td t-esc="line['hacienda_state_name']"/>
+                                    <td class="number" t-esc="line['document_count']"/>
+                                    <td class="number"><span class="currency-glyph" t-esc="group['currency_symbol']"/> <span t-esc="money(line['subtotal'])"/></td>
+                                    <td class="number"><span class="currency-glyph" t-esc="group['currency_symbol']"/> <span t-esc="money(line['total'])"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="muted" style="text-align: right; margin-top: 8px;">SNG Cloud · sngcloud.app</div>
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>
