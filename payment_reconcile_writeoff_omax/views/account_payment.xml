@@ -19,20 +19,36 @@
                         <span invisible="payment_type != 'inbound'">Unpaid Invoices</span>
                         <span invisible="payment_type != 'outbound'">Unpaid Bills</span>
                     </h2>
-                    <button name="action_reload_outstanding_moves" type="object" string="Reload Outstanding" class="oe_highlight" invisible="state != 'draft'"/>
+                    <button name="action_reload_outstanding_moves" type="object" string="Recargar pendientes" class="oe_highlight" invisible="state != 'draft'"
+                            help="Vuelve a leer las facturas con saldo del cliente. Conserva las que ya estaban marcadas y quita las que se pagaron con otro pago."/>
+                    <div class="alert alert-danger mt-2" role="alert" invisible="not outstanding_not_payable_names">
+                        <strong>Hay facturas marcadas que ya no tienen saldo pendiente:</strong>
+                        <field name="outstanding_not_payable_names" class="d-inline ms-1" nolabel="1"/>.
+                        <span>Fueron pagadas con otro pago o anuladas. Desmárquelas o pulse «Recargar pendientes»; de lo contrario el pago no se podrá confirmar.</span>
+                    </div>
 		            <field name="outstanding_move_lines" readonly="state != 'draft'">
-		                <list create="false" editable="bottom">
+		                <list create="false" editable="bottom"
+		                      decoration-danger="select_to_pay and not is_payable"
+		                      decoration-muted="not select_to_pay and not is_payable"
+		                      decoration-warning="is_payable and payment_state == 'partial'">
 		                    <field name="id" column_invisible="1"/>
+		                    <field name="is_payable" column_invisible="1"/>
+		                    <field name="move_state" column_invisible="1"/>
 		                    <field name="select_to_pay"/>
 		                    <field name="name"/>
 		                    <field name="account_move_id" column_invisible="1"/>
 		                    <field name="company_id" column_invisible="1"/>
 		                    <field name="invoice_date"/>
+		                    <field name="payment_state" widget="badge"
+		                           decoration-success="payment_state in ('paid', 'in_payment')"
+		                           decoration-warning="payment_state == 'partial'"
+		                           decoration-danger="payment_state == 'reversed'"
+		                           decoration-info="payment_state == 'not_paid'"/>
 		                    <field name="move_currency_id"/>
 		                    <field name="amount_untaxed" optional="hide"/>
 		                    <field name="amount_total" sum="amount_total"/>
 		                    <field name="amount_residual" widget="monetary" sum="amount_residual" />
-		                    <button name="open_invoice" class="fa fa-eye" title="View" type="object"/>		                    
+		                    <button name="open_invoice" class="fa fa-eye" title="View" type="object"/>
 		                </list>
 		            </field>
 	        	</div>

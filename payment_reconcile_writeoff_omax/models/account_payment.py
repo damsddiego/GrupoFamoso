@@ -7,6 +7,7 @@ from datetime import date
 
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError, ValidationError
+from odoo.tools import float_is_zero
 
 
 _logger = logging.getLogger(__name__)
@@ -29,6 +30,45 @@ class AccountPayment(models.Model):
     writeoff_account_id = fields.Many2one(comodel_name='account.account', string="Writeoff Account", copy=False, domain="[('deprecated', '=', False)]", 
         check_company=True)
     writeoff_notes = fields.Char('Writeoff Notes')
+    outstanding_not_payable_names = fields.Char(
+        string='Documentos seleccionados sin saldo',
+        compute='_compute_outstanding_not_payable_names',
+        help="Facturas marcadas para pagar que ya no tienen saldo pendiente "
+             "(fueron pagadas con otro pago o anuladas).",
+    )
+
+    @api.depends('outstanding_move_lines.select_to_pay', 'outstanding_move_lines.is_payable')
+    def _compute_outstanding_not_payable_names(self):
+        for payment in self:
+            bad = payment._get_selected_not_payable_lines()
+            payment.outstanding_not_payable_names = ', '.join(bad.mapped('display_name')) or False
+
+    def _get_selected_not_payable_lines(self):
+        """Lineas marcadas para pagar cuyo documento ya no se puede aplicar."""
+        self.ensure_one()
+        return self.outstanding_move_lines.filtered(
+            lambda l: l.select_to_pay and not l.is_payable
+        )
+
+    def _check_selected_outstanding_moves(self):
+        """Falla con un mensaje claro si alguna factura marcada ya no tiene saldo.
+
+        Sin esta validacion el error aparecia mas adelante como
+        "No Outstanding Account found", que apunta a la configuracion del
+        diario cuando el problema real es la factura.
+        """
+        for payment in self.filtered('pay_moves'):
+            bad = payment._get_selected_not_payable_lines()
+            if bad:
+                raise UserError(_(
+                    "No se puede confirmar el pago %(payment)s porque estas facturas "
+                    "marcadas ya no tienen saldo pendiente (fueron pagadas con otro "
+                    "pago o anuladas):\n%(docs)s\n\n"
+                    "Desmárquelas o use el botón «Recargar pendientes» para "
+                    "actualizar la lista.",
+                    payment=payment.display_name or payment.memo or payment.id,
+                    docs='\n'.join('- %s' % name for name in bad.mapped('display_name')),
+                ))
 
     def _check_company(self, fnames=None):
         today = fields.Date.context_today(self)
@@ -64,15 +104,11 @@ class AccountPayment(models.Model):
             sorted(TEMP_PAYMENT_COMPANY_CHECK_BYPASS_FIELDS),
         )
 
-    def _load_outstanding_moves(self):
-        """Populate outstanding_move_lines with open documents for the partner."""
+    def _search_outstanding_moves(self):
+        """Documentos abiertos del tercero que este pago podria aplicar."""
         self.ensure_one()
-        if not self.partner_id:
-            raise UserError(_("Please select a partner before loading documents."))
-        if not self.currency_id:
-            raise UserError(_("Please select a currency before loading documents."))
         move_type = ['out_invoice'] if self.payment_type == 'inbound' else ['in_invoice']
-        moves = self.env["account.move"].search([
+        return self.env["account.move"].search([
             ('state', '=', 'posted'),
             ('company_id', '=', self.company_id.id),
             ('partner_id', '=', self.partner_id.id),
@@ -80,26 +116,68 @@ class AccountPayment(models.Model):
             ('amount_residual', '!=', 0),
             ('currency_id', '=', self.currency_id.id),
         ], order='invoice_date')
+
+    def _load_outstanding_moves(self, keep_selection=False):
+        """Populate outstanding_move_lines with open documents for the partner.
+
+        Con ``keep_selection`` se conservan marcadas las facturas que ya
+        estaban seleccionadas y siguen con saldo; las que ya se pagaron por
+        otro medio desaparecen de la lista.
+        """
+        self.ensure_one()
+        if not self.partner_id:
+            raise UserError(_("Please select a partner before loading documents."))
+        if not self.currency_id:
+            raise UserError(_("Please select a currency before loading documents."))
+        moves = self._search_outstanding_moves()
         if not moves:
             raise UserError(_("No posted invoices/bills with a residual amount were found for this partner."))
 
-        move_lines = [(5, 0, 0)]  # clear existing lines
+        selected_ids = set()
+        if keep_selection:
+            selected_ids = set(
+                self.outstanding_move_lines.filtered('select_to_pay').mapped('account_move_id').ids
+            )
+        # Borrado explicito de las lineas anteriores (mas seguro que (5, 0, 0)
+        # cuando se refrescan varios pagos en la misma transaccion).
+        self.outstanding_move_lines.unlink()
+        move_lines = []
         for move in moves:
             move_lines.append((0, 0, {
                 'name': move.name,
                 'account_move_id': move.id,
+                'select_to_pay': move.id in selected_ids,
             }))
-        # reset write-off suggestion but keep original payment amount (comes from external app)
-        self.writeoff_amt = 0
+        if not keep_selection:
+            # reset write-off suggestion but keep original payment amount (comes from external app)
+            self.writeoff_amt = 0
         self.outstanding_move_lines = move_lines
 
+    def _refresh_outstanding_moves(self):
+        """Refresco silencioso de la lista conservando la seleccion.
+
+        Se usa al volver un pago a borrador: entre tanto otras facturas
+        pudieron pagarse con otro pago y deben salir de la lista para que la
+        confirmacion no falle. Nunca lanza error; si no hay nada que mostrar
+        deja la lista vacia.
+        """
+        for payment in self.filtered(lambda p: p.pay_moves and p.partner_id and p.currency_id):
+            moves = payment._search_outstanding_moves()
+            if moves:
+                payment._load_outstanding_moves(keep_selection=True)
+            else:
+                payment.outstanding_move_lines.unlink()
+
     def action_reload_outstanding_moves(self):
-        """Button to reload outstanding invoices/bills while in draft."""
+        """Button to reload outstanding invoices/bills while in draft.
+
+        Conserva la seleccion de las facturas que siguen con saldo.
+        """
         self.ensure_one()
         if self.state != 'draft':
             raise UserError(_("You can reload outstanding documents only in draft payments."))
         self.pay_moves = True
-        self._load_outstanding_moves()
+        self._load_outstanding_moves(keep_selection=True)
         return True
 
     #change lines selection then set 'Retencion Amount' as 0 and also change 'Amount' of payment
@@ -172,6 +250,7 @@ class AccountPayment(models.Model):
             # que re-conciliar.
             return
         if self.pay_moves:
+            self._check_selected_outstanding_moves()
             outstanding_move_ids = self.outstanding_move_lines.filtered(lambda pl: pl.select_to_pay)
             total_invoice_amount = 0
             if outstanding_move_ids:
@@ -195,29 +274,26 @@ class AccountPayment(models.Model):
                 paid_amount = outstanding_move_id.amount_residual
                 
                 sign = 1 if move.is_outbound() else -1
-                if self.pay_moves:
-                    if move.invoice_outstanding_credits_debits_widget == False and self.payment_type == 'inbound':
-                        raise UserError(_(
-                            "Warning:\n"
-                            "The payment's Journal Entry was not created.\n\n"
-                            "Reason:\n"
-                            "No Outstanding Account found for the payment. As a result, "
-                            "It cannot create the Payment's Journal Entry.\n\n"
-                            "Configuration Path:\n"
-                            "Accounting -> Configuration -> Journals -> Incoming Payments Tab \n"
-                            "-> Set the Outstanding Receipts Account against the Payment Method"
-                        ))
-                    if move.invoice_outstanding_credits_debits_widget == False and self.payment_type == 'outbound':
-                        raise UserError(_(
-                            "Warning:\n"
-                            "The payment's Journal Entry was not created.\n\n"
-                            "Reason:\n"
-                            "No Outstanding Account found for the payment. As a result, "
-                            "It cannot create the Payment's Journal Entry.\n\n"
-                            "Configuration Path:\n"
-                            "Accounting -> Configuration -> Journals -> Outgoing Payments Tab \n"
-                            "-> Set the Outstanding Payments Account against the Payment Method"
-                        ))
+                if self.pay_moves and move.invoice_outstanding_credits_debits_widget == False:
+                    # Llegar aqui con una factura abierta significa que el pago
+                    # no genero un credito pendiente aplicable (p. ej. la
+                    # cuenta transitoria del metodo de pago no esta definida).
+                    # El caso "factura ya pagada" se detecta antes, en
+                    # _check_selected_outstanding_moves, con su propio mensaje.
+                    tab = _("Pagos entrantes") if self.payment_type == 'inbound' else _("Pagos salientes")
+                    raise UserError(_(
+                        "No se encontró un crédito pendiente de este pago para aplicarlo "
+                        "a la factura %(doc)s (saldo %(residual)s, estado de pago %(pstate)s).\n\n"
+                        "Revise la cuenta transitoria del método de pago «%(method)s» en el "
+                        "diario «%(journal)s» (Contabilidad → Configuración → Diarios → "
+                        "pestaña %(tab)s).",
+                        doc=move.name,
+                        residual=move.amount_residual,
+                        pstate=move.payment_state,
+                        method=self.payment_method_line_id.name,
+                        journal=self.journal_id.display_name,
+                        tab=tab,
+                    ))
                 #if paid_amount
                 for line in move.invoice_outstanding_credits_debits_widget.get('content'):
                     if line.get('account_payment_id') == self.id and self.is_reconciled == False and paid_amount:
@@ -355,9 +431,16 @@ class AccountPayment(models.Model):
         for rec in self:
             if rec.move_id and rec.pay_moves:
                 rec.move_id.unlink()
+        # Al borrar el asiento las facturas de este pago vuelven a quedar
+        # abiertas; las que entre tanto se pagaron con otro pago salen de la
+        # lista para que la proxima confirmacion no falle.
+        self._refresh_outstanding_moves()
         return res
 
     def action_post(self):
+        # Validar antes de que el core genere el asiento: asi el usuario ve
+        # el motivo real y no se crea nada que luego haya que revertir.
+        self._check_selected_outstanding_moves()
         res = super().action_post()
         # Puede venir con varios pagos (p. ej. "Registrar pago" masivo desde
         # la lista de facturas).
@@ -379,7 +462,9 @@ class OutStandingAccountMove(models.Model):
     _description = 'Outstanding Account Moves'
     _check_company_auto = True
 
-    pyament_id = fields.Many2one('account.payment', string='Payment', required=True)#O2M
+    # ondelete='cascade': sin esto, el comando (5, 0, 0) del one2many intenta
+    # poner pyament_id en NULL en vez de borrar las lineas y viola el NOT NULL.
+    pyament_id = fields.Many2one('account.payment', string='Payment', required=True, ondelete='cascade')#O2M
     select_to_pay = fields.Boolean('Select', copy=0)
     name = fields.Char(string="Number")
     account_move_id = fields.Many2one('account.move', string='Move', required=True)
@@ -402,7 +487,34 @@ class OutStandingAccountMove(models.Model):
         related='account_move_id.amount_residual', readonly=True,
         currency_field='move_currency_id'
     )
-    
+    move_state = fields.Selection(
+        related='account_move_id.state', string='Estado', readonly=True)
+    payment_state = fields.Selection(
+        related='account_move_id.payment_state', string='Estado de pago', readonly=True)
+    is_payable = fields.Boolean(
+        string='Aplicable',
+        compute='_compute_is_payable',
+        help="Falso cuando el documento ya no tiene saldo pendiente o no está "
+             "publicado; en ese caso el pago no puede aplicarse a él.",
+    )
+
+    @api.depends('account_move_id.state', 'account_move_id.amount_residual',
+                 'account_move_id.currency_id')
+    def _compute_is_payable(self):
+        for line in self:
+            move = line.account_move_id
+            rounding = move.currency_id.rounding or 0.01
+            line.is_payable = bool(
+                move
+                and move.state == 'posted'
+                and not float_is_zero(move.amount_residual, precision_rounding=rounding)
+            )
+
+    @api.depends('name', 'account_move_id.name')
+    def _compute_display_name(self):
+        for line in self:
+            line.display_name = line.account_move_id.name or line.name or ''
+
     def open_invoice(self):
         self.ensure_one()
         name = ''
