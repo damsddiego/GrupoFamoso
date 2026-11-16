@@ -146,9 +146,11 @@ class TestCruces(Base):
                    [linea(9, 21e6)], mens, pend)
         res = {r['compania_id']: r for r in e['resumen']}
         self.assertIsNone(res[GF]['proyeccion'])
+        self.assertIsNone(res[GF]['siguiente_tramo'])
         self.assertFalse(res[GF]['estimado'])
         self.assertEqual(res[PROTIRE]['en_proceso'], 7.0)
         self.assertEqual(e['totales']['comision'], 630000.0)
+        self.assertEqual(e['totales']['en_proceso'], 7.0)  # lo de GF rueda al mes siguiente
 
     def test_reversos(self):
         lineas = [linea(1, 0.0, 'reversal', ajuste=-598.0, motivo_reverso='canceled', periodo_original='2026-10-01')]
@@ -157,6 +159,45 @@ class TestCruces(Base):
         self.assertEqual(r['ajuste'], -598.0)
         self.assertEqual(r['pagos'][0]['motivo'], 'Pago anulado')
         self.assertEqual(r['pagos'][0]['periodo_original'], '2026-10-01')
+
+    def test_contactos_duplicados_cuentan_como_yo(self):
+        DUP = 11
+        p_dup = pago(1, vendedor_id=DUP, vendedor='YO DUPLICADO', comision_de={DUP: 'YO DUPLICADO'})
+        mens = [{'compania_id': GF, 'compania': 'GF', 'salesperson_id': YO, 'vendedor': 'Yo', 'estado': 'draft',
+                 'base': 100.0, 'porcentaje': 0.0, 'comision': 0.0, 'ajustes': 0.0},
+                {'compania_id': GF, 'compania': 'GF', 'salesperson_id': DUP, 'vendedor': 'YO DUPLICADO',
+                 'estado': 'draft', 'base': 50.0, 'porcentaje': 0.0, 'comision': 0.0, 'ajustes': 0.0}]
+        e = cruces.armar_estado({YO, DUP}, 'Yo', '2026-11-01', mens, [linea(1, 50.0)], {1: p_dup}, [1],
+                                TRAMOS, [], {})
+        c = e['cruces']
+        self.assertEqual(c['registrados_por_otro']['cantidad'], 0)
+        self.assertEqual(c['comision_de_otro']['cantidad'], 0)
+        self.assertEqual(c['reportados']['pagos'][0]['registrado_por']['tipo'], 'yo')
+        self.assertEqual(len(e['resumen']), 2)  # cada contacto conserva su mensual y su tramo
+        self.assertEqual(e['vendedor']['ids'], [YO, DUP])
+        self.assertEqual(cruces.normalizar_nombre('  Juan   pérez '), 'JUAN PÉREZ')
+
+    def test_anulado_duplicado_tiene_prioridad_sobre_rehecho(self):
+        anulado = pago(1, estado='canceled', comision_de={})
+        original = pago(2)
+        e = cruces.armar_estado(YO, 'Yo', '2026-11-01', [], [], {1: anulado, 2: original}, [1, 2], TRAMOS, [],
+                                {1: original}, duplicados={1: original})
+        a = e['cruces']['anulados']
+        self.assertEqual(a['pagos'][0]['clase'], 'duplicado')
+        self.assertEqual((a['duplicados'], a['rehechos']), (1, 0))
+
+    def test_motivo_fuera_de_mes_y_de_otro_vendedor(self):
+        fuera = pago(1, comision_de={}, fecha_confirmacion='2026-12-02')
+        ajeno = pago(2, comision_de={})
+        pend = [{'payment_id': 1, 'compania_id': GF, 'compania': 'GF', 'salesperson_id': YO, 'base': 0.0,
+                 'en_mes': False},
+                {'payment_id': 2, 'compania_id': GF, 'compania': 'GF', 'salesperson_id': OTRO,
+                 'vendedor': 'Otro', 'base': 0.0, 'en_mes': True}]
+        e = estado([fuera, ajeno], [1, 2], pendientes=pend)
+        motivos = {p['id']: p['motivo'] for p in e['cruces']['sin_comision']['pagos']}
+        self.assertIn('02/12/2026', motivos[1])
+        self.assertEqual(motivos[2], 'La factura es de otro vendedor: Otro')
+        self.assertEqual(e['resumen'][0]['en_proceso'], 0.0)
 
 
 if __name__ == '__main__':

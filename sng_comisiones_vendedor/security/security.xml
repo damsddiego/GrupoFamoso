@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Quién puede llamar sng.comision.estado.obtener_estado. Asignarlo SOLO
+         al usuario RPC con el que se conecta la app de ruteros; la oficina de
+         comisiones ya tiene acceso por sales_commission_omax.group_sales_commission_user. -->
+    <record id="group_comisiones_app" model="res.groups">
+        <field name="name">Comisiones: consulta desde la app de ruteros</field>
+        <field name="category_id" ref="base.module_category_hidden"/>
+        <field name="comment">Permite a la app de ruteros leer el estado de comisiones de cualquier vendedor (pantalla «Mis comisiones»).</field>
+    </record>
+</odoo>

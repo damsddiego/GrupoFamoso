@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Estado de comisiones del vendedor',
-    'version': '18.0.1.0.0',
+    'version': '18.0.1.1.0',
     'category': 'Sales/Commission',
     'summary': 'Cruces de pagos y comisiones por vendedor para la app (Mis comisiones) y la oficina',
     'description': """
@@ -23,6 +23,10 @@
           pagos que él registró cuya comisión es de otro.
         - Pagos sin comisión con su motivo, y reversos del mes.
 
+        Seguridad: solo el grupo «Comisiones: consulta desde la app de ruteros»
+        (asignarlo al usuario RPC de la app) y los usuarios de comisiones
+        pueden llamar el método.
+
         Incluye un cron (apagado al instalar) que genera las líneas de
         comisión que faltan de los cobros de la app.
     """,
@@ -33,6 +37,7 @@
         'sng_ruteros_pagos',
     ],
     'data': [
+        'security/security.xml',
         'security/ir.model.access.csv',
         'data/ir_cron.xml',
         'wizard/sng_comision_estado_wizard_views.xml',
