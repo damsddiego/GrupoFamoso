@@ -45,6 +45,14 @@ class SngCommissionReportWiz(models.TransientModel):
         string='Comisiones encontradas',
         compute='_compute_monthly_count',
     )
+    include_analysis = fields.Boolean(
+        string='Incluir análisis',
+        default=True,
+        help='Agrega por vendedor de dónde salen los pagos (con el cuadre contra '
+             'el monto de comisión), las notas de crédito sobre facturas ya '
+             'cobradas, los cobros de meses anteriores y los reversos que no '
+             'se devolvieron.',
+    )
 
     @api.depends('period')
     def _compute_period_label(self):
@@ -138,34 +146,43 @@ class SngCommissionReportWiz(models.TransientModel):
         self.ensure_one()
         monthlies = self._ensure_monthlies()
         report = self.env.ref('sng_sales_commission_payment.action_report_commission_monthly_pdf')
-        if len(monthlies) == 1:
-            return report.report_action(monthlies, config=False)
+        # La casilla "Incluir análisis" viaja como `data` del render; con
+        # report_action no se puede (con data no viajan los docids), por eso
+        # también el caso de un solo vendedor se renderiza aquí.
+        render_data = {'include_analysis': self.include_analysis}
+        files = []
+        for monthly in monthlies:
+            pdf, _ext = report._render_qweb_pdf(report.report_name, res_ids=monthly.ids, data=render_data)
+            filename = 'Comision %s - %s.pdf' % (
+                self._safe_filename(monthly.salesperson_id.name),
+                self._safe_filename(monthly.period_label),
+            )
+            files.append((filename, pdf))
 
-        buffer = io.BytesIO()
-        with zipfile.ZipFile(buffer, 'w', zipfile.ZIP_DEFLATED) as zf:
-            for monthly in monthlies:
-                pdf, _ext = report._render_qweb_pdf(report.report_name, res_ids=monthly.ids)
-                filename = 'Comision %s - %s.pdf' % (
-                    self._safe_filename(monthly.salesperson_id.name),
-                    self._safe_filename(monthly.period_label),
-                )
-                zf.writestr(filename, pdf)
+        if len(files) == 1:
+            name, content, mimetype = files[0][0], files[0][1], 'application/pdf'
+        else:
+            buffer = io.BytesIO()
+            with zipfile.ZipFile(buffer, 'w', zipfile.ZIP_DEFLATED) as zf:
+                for filename, pdf in files:
+                    zf.writestr(filename, pdf)
+            name = 'Comisiones por vendedor %s - %s.zip' % (
+                self._safe_filename(self.period_label),
+                self._safe_filename(self.company_id.name),
+            )
+            content, mimetype = buffer.getvalue(), 'application/zip'
 
-        zip_name = 'Comisiones por vendedor %s - %s.zip' % (
-            self._safe_filename(self.period_label),
-            self._safe_filename(self.company_id.name),
-        )
         Attachment = self.env['ir.attachment']
-        # Limpia los ZIP anteriores del mismo usuario para no acumular adjuntos.
+        # Limpia los archivos anteriores del mismo usuario para no acumular adjuntos.
         Attachment.search([
             ('res_model', '=', self._name),
             ('create_uid', '=', self.env.uid),
         ]).unlink()
         attachment = Attachment.create({
-            'name': zip_name,
+            'name': name,
             'type': 'binary',
-            'datas': base64.b64encode(buffer.getvalue()),
-            'mimetype': 'application/zip',
+            'datas': base64.b64encode(content),
+            'mimetype': mimetype,
             'res_model': self._name,
             'res_id': self.id,
         })

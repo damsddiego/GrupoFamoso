@@ -164,11 +164,14 @@ class BankRecWidget(models.Model):
     _inherit = 'bank.rec.widget'
 
     def _action_validate(self):
+        # La línea se toma ANTES del super: validar invalida el caché y el
+        # widget (registro en memoria) pierde st_line_id cuando viene del
+        # navegador, que no manda default_st_line_id en el contexto.
+        st = self.st_line_id
         res = super()._action_validate()
         # Aprender de TODA conciliación validada (flujo SNG, manual desde el
         # widget o auto-reconcile). Nunca puede tumbar la conciliación.
         try:
-            st = self.st_line_id
             if st.amount > 0:
                 _liq, _susp, otras = st._seek_for_lines()
                 partners = otras.mapped('partner_id')
@@ -178,7 +181,7 @@ class BankRecWidget(models.Model):
                         st.date)
         except Exception:  # noqa: BLE001
             _logger.exception('SNG aprendizaje: no se pudo aprender de la '
-                              'línea %s', self.st_line_id.id)
+                              'línea %s', st.id)
         return res
 
 

@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'SNG Conciliación Bancaria con IA',
-    'version': '18.0.1.3.0',
+    'version': '18.0.1.5.0',
     'category': 'Accounting',
     'summary': 'Importa el estado de cuenta del banco (BAC) y deja cada línea '
                'montada con su pago/factura sugerido para conciliar en el '
                'módulo nativo de Odoo',
     'author': 'SNG',
     'license': 'LGPL-3',
-    'depends': ['account_accountant'],
+    'depends': ['account_accountant', 'account_bank_statement_import_csv'],
     'data': [
         'security/sng_conciliacion_security.xml',
         'security/ir.model.access.csv',

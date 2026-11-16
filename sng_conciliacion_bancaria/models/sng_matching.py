@@ -32,6 +32,10 @@ except ImportError:
 
 SNG_IA_KEY_SIN_CONFIGURAR = 'CONFIGURAR_API_KEY'
 
+# Va al inicio del motivo de las sugerencias de pago cuando el diario usa
+# como suspenso la misma transitoria de los pagos (ver _sng_suspense_choca).
+SNG_AVISO_SUSPENSE = 'SIN BOTÓN VALIDAR (suspenso del diario = transitoria)'
+
 SNG_IA_CONCILIA_SYSTEM = (
     'Eres un conciliador bancario de un grupo empresarial costarricense. '
     'Recibes un JSON con líneas de un estado de cuenta bancario (créditos '
@@ -240,6 +244,25 @@ class AccountBankStatementLine(models.Model):
             linea.sng_diferencia = (linea.amount - total) if total else 0.0
 
     # ------------------------------------------------------------------
+    # Disparo inmediato del barrido
+    # ------------------------------------------------------------------
+    @api.model_create_multi
+    def create(self, vals_list):
+        """Créditos bancarios creados por cualquier vía (importador nativo,
+        a mano, API) disparan el barrido al instante en vez de esperar la
+        hora. El importador SNG sugiere en línea y lo evita con el contexto
+        ``sng_sin_barrido``."""
+        lineas = super().create(vals_list)
+        if not self.env.context.get('sng_sin_barrido') and any(
+                l.amount > 0 and l.journal_id.type == 'bank' for l in lineas):
+            cron = self.env.ref(
+                'sng_conciliacion_bancaria.cron_sng_conciliacion_barrido',
+                raise_if_not_found=False)
+            if cron:
+                cron.sudo()._trigger()
+        return lineas
+
+    # ------------------------------------------------------------------
     # Guard
     # ------------------------------------------------------------------
     def _sng_verificar_grupo(self):
@@ -331,6 +354,28 @@ class AccountBankStatementLine(models.Model):
             nombres.append((pid, _norm_texto(nombre)))
         return por_vat, por_tel, nombres
 
+    @api.model
+    def _sng_pagos_tomados(self, journal, excluir):
+        """IDs de pagos ya sugeridos a otras líneas pendientes del diario
+        (fuera de ``excluir``): un pago cruza con una sola línea."""
+        return set(self.search([
+            ('journal_id', '=', journal.id),
+            ('is_reconciled', '=', False),
+            ('sng_sugerencia', '=', 'pago'),
+            ('sng_pago_id', '!=', False),
+            ('id', 'not in', excluir.ids),
+        ]).mapped('sng_pago_id').ids)
+
+    @api.model
+    def _sng_suspense_choca(self, journal):
+        """True si el suspenso del diario es la misma cuenta que usan sus
+        pagos entrantes. En ese caso el widget nativo deja la línea
+        'invalid' (toda línea en la cuenta de suspenso cuenta como sin
+        resolver) y no muestra Validar aunque el pago montado cuadre."""
+        suspense = journal.suspense_account_id
+        return bool(suspense) and suspense in \
+            journal.inbound_payment_method_line_ids.payment_account_id
+
     # ------------------------------------------------------------------
     # Acción principal: sugerir
     # ------------------------------------------------------------------
@@ -384,13 +429,28 @@ class AccountBankStatementLine(models.Model):
                 journal.id,
                 fields.Date.subtract(min(fechas), days=10),
                 fields.Date.add(max(fechas), days=5))
+            # un pago cruza con una sola línea: fuera los ya sugeridos a
+            # otras líneas, y cada pago que se asigna aquí sale del índice
+            tomados = self._sng_pagos_tomados(journal, grupo)
+            pagos = {monto: [c for c in cands if c['pago_id'] not in tomados]
+                     for monto, cands in pagos.items()}
+            if self._sng_suspense_choca(journal):
+                _logger.warning(
+                    'SNG Conciliación: el diario %s (id %s) usa como suspenso '
+                    'la misma transitoria de sus pagos; el widget no mostrará '
+                    'Validar en las sugerencias de pago', journal.name,
+                    journal.id)
             por_vat, por_tel, nombres = self._sng_indice_clientes(
                 journal.company_id.id)
-            for linea in grupo:
+            for linea in grupo.sorted(lambda l: (l.date, l.id)):
                 resuelta = linea._sng_heuristica(pagos, por_vat, por_tel,
                                                  nombres, alias_idx)
                 if not resuelta:
                     pendientes_ia |= linea
+                elif linea.sng_sugerencia == 'pago' and linea.sng_pago_id:
+                    monto = round(linea.amount, 2)
+                    pagos[monto] = [c for c in pagos.get(monto, [])
+                                    if c['pago_id'] != linea.sng_pago_id.id]
         # La IA corre en segundo plano (cron disparado): un request web no
         # aguanta cientos de llamadas al API.
         if pendientes_ia:
@@ -412,6 +472,8 @@ class AccountBankStatementLine(models.Model):
         fecha_inicio = fields.Date.from_string(
             self.env['ir.config_parameter'].sudo().get_param(
                 'sng_conciliacion_bancaria.fecha_inicio') or '2026-07-01')
+        # las que se limpian quedan sin sugerencia y entran en esta corrida
+        self._sng_limpiar_obsoletas()
         lineas = self.search([
             ('is_reconciled', '=', False),
             ('amount', '>', 0),
@@ -422,6 +484,62 @@ class AccountBankStatementLine(models.Model):
         ], limit=limite, order='date, id')
         if lineas:
             lineas._sng_sugerir_lote()
+        if len(lineas) == limite:
+            # quedan más: seguir de inmediato en vez de esperar la hora
+            self.env.ref(
+                'sng_conciliacion_bancaria.cron_sng_conciliacion_barrido'
+            ).sudo()._trigger()
+
+    @api.model
+    def _sng_limpiar_obsoletas(self):
+        """Borra las sugerencias que ya no se pueden aplicar, para que el
+        barrido las recalcule: pagos cuya transitoria ya se concilió por
+        otro lado (o se borraron), facturas ya pagadas y pagos sugeridos a
+        más de una línea (se conserva la de mejor confianza)."""
+        self.env.flush_all()
+        self.env.cr.execute("""
+            SELECT l.id FROM account_bank_statement_line l
+            WHERE l.sng_sugerencia = 'pago'
+              AND NOT COALESCE(l.is_reconciled, FALSE)
+              AND NOT EXISTS (
+                SELECT 1 FROM account_payment p
+                JOIN account_move_line a ON a.move_id = p.move_id
+                    AND a.debit > 0 AND NOT COALESCE(a.reconciled, FALSE)
+                JOIN account_account c ON c.id = a.account_id
+                    AND c.reconcile
+                    AND c.account_type NOT IN
+                        ('asset_receivable', 'liability_payable')
+                WHERE p.id = l.sng_pago_id)
+        """)
+        obsoletas = self.browse([r[0] for r in self.env.cr.fetchall()])
+        obsoletas |= self.search([
+            ('sng_sugerencia', '=', 'factura'),
+            ('is_reconciled', '=', False),
+        ]).filtered(lambda l: not l._sng_amls_sugeridas())
+        self.env.cr.execute("""
+            SELECT array_agg(id ORDER BY
+                       CASE sng_confianza WHEN 'alta' THEN 0
+                                          WHEN 'media' THEN 1 ELSE 2 END, id)
+            FROM account_bank_statement_line
+            WHERE sng_sugerencia = 'pago' AND sng_pago_id IS NOT NULL
+              AND NOT COALESCE(is_reconciled, FALSE)
+              AND id NOT IN %s
+            GROUP BY sng_pago_id HAVING COUNT(*) > 1
+        """, (tuple(obsoletas.ids) or (0,),))
+        for (ids,) in self.env.cr.fetchall():
+            obsoletas |= self.browse(ids[1:])
+        if obsoletas:
+            _logger.info('SNG Conciliación: %s sugerencia(s) obsoleta(s) o '
+                         'repetida(s) limpiadas', len(obsoletas))
+            obsoletas.write({
+                'sng_sugerencia': False,
+                'sng_pago_id': False,
+                'sng_factura_ids': [(5, 0, 0)],
+                'sng_confianza': False,
+                'sng_motivo': False,
+                'sng_ia': False,
+            })
+        return obsoletas
 
     def _sng_cron_ia(self, lote=20, max_lotes=60):
         """Procesa en segundo plano las líneas marcadas para IA.
@@ -567,6 +685,8 @@ class AccountBankStatementLine(models.Model):
             else:
                 motivo = '%s | cliente de otra compañía: %s' % (
                     motivo, partner.display_name)
+        if tipo == 'pago' and self._sng_suspense_choca(self.journal_id):
+            motivo = '%s | %s' % (SNG_AVISO_SUSPENSE, motivo)
         self.write({
             'sng_sugerencia': tipo,
             'sng_confianza': confianza,
@@ -655,13 +775,17 @@ class AccountBankStatementLine(models.Model):
         payload_lineas = []
         candidatos_validos = {}  # linea_id -> {'pagos': set, 'facturas': set,
                                  #              'partners': set}
+        # pagos ya sugeridos a otras líneas: no se ofrecen a la IA
+        tomados = {j.id: self._sng_pagos_tomados(j, self)
+                   for j in self.journal_id}
         for linea in self:
             senales = self._sng_senales(linea.payment_ref)
             pagos = self._sng_pagos_pendientes(
                 linea.journal_id.id,
                 fields.Date.subtract(linea.date, days=10),
                 fields.Date.add(linea.date, days=5))
-            cand_pagos = [c for c in pagos.get(round(linea.amount, 2), [])]
+            cand_pagos = [c for c in pagos.get(round(linea.amount, 2), [])
+                          if c['pago_id'] not in tomados[linea.journal_id.id]]
             # clientes por nombre aproximado (top 5)
             cand_partners = []
             if senales['nombre']:
@@ -741,6 +865,7 @@ class AccountBankStatementLine(models.Model):
             raise UserError(_('La IA no devolvió resultado.'))
         por_linea = {r['linea_id']: r
                      for r in json.loads(texto).get('resultados', [])}
+        asignados = set()  # la IA no puede dar el mismo pago a dos líneas
         for linea in self:
             r = por_linea.get(linea.id)
             validos = candidatos_validos[linea.id]
@@ -758,7 +883,13 @@ class AccountBankStatementLine(models.Model):
                 partner_id = None
             motivo = r.get('motivo') or ''
             confianza = r.get('confianza') or 'baja'
-            if decision == 'pago' and pago_id in validos['pagos']:
+            if decision == 'pago' and pago_id in asignados:
+                linea._sng_escribir(
+                    'revisar', {'partner_id': partner_id}, 'baja',
+                    _('El pago que eligió la IA ya quedó sugerido en otra '
+                      'línea del mismo monto'), por_ia=True)
+            elif decision == 'pago' and pago_id in validos['pagos']:
+                asignados.add(pago_id)
                 pago = self.env['account.payment'].browse(pago_id)
                 linea._sng_escribir(
                     'pago', {'pago_id': pago_id,

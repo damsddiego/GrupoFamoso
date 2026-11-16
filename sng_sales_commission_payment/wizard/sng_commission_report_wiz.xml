@@ -19,13 +19,17 @@
                     <group>
                         <field name="salesperson_ids" widget="many2many_tags"
                                options="{'no_create': True}"/>
+                        <field name="include_analysis"/>
                     </group>
                     <div class="alert alert-info" role="alert">
                         <strong>PDF consolidado:</strong> planilla con todos los vendedores del mes y,
                         por cada uno, el auxiliar de pagos/facturas y reversos que sustentan su comisión.<br/>
                         <strong>PDF por vendedor:</strong> un archivo PDF independiente por cada vendedor
                         (descarga un ZIP; si filtra un solo vendedor, baja su PDF directo), sin la planilla
-                        de los demás, para entregarle a cada uno la verificación de su comisión.
+                        de los demás, para entregarle a cada uno la verificación de su comisión.<br/>
+                        <strong>Incluir análisis:</strong> agrega por vendedor de dónde salen los pagos (con el cuadre
+                        contra el monto de comisión), las notas de crédito sobre facturas ya cobradas, los cobros de
+                        meses anteriores y los reversos que no se devolvieron.
                     </div>
                     <footer>
                         <button name="action_print_pdf"

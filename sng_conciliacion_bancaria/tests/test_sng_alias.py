@@ -201,10 +201,8 @@ class TestSngAlias(TransactionCase):
     # ------------------------------------------------------------------
     # Hooks de conciliación real (widget) y undo
     # ------------------------------------------------------------------
-    def test_widget_aprende_y_undo_desaprende(self):
-        linea, clave = self._linea_sinpe_sin_cedula()
-        if not linea:
-            self.skipTest('la base no tiene línea SINPE sin conciliar')
+    def _factura_que_cubre(self, linea):
+        """(partner_id, aml) de una factura abierta que cubre la línea."""
         # La factura debe tener saldo >= monto de la línea: si cubre menos,
         # queda diferencia a suspense, el widget queda 'invalid' y
         # _action_validate no valida (el test dependería de qué factura
@@ -231,8 +229,30 @@ class TestSngAlias(TransactionCase):
         if not row:
             self.skipTest('sin factura abierta con saldo suficiente en la '
                           'compañía de la línea')
-        partner_id, aml_id = row
-        aml = self.env['account.move.line'].browse(aml_id)
+        return row[0], self.env['account.move.line'].browse(row[1])
+
+    def test_widget_desde_navegador_aprende(self):
+        """El navegador manda st_line_id como valor del registro, no como
+        default del contexto: tras validar, el widget ya no lo conserva."""
+        linea, clave = self._linea_sinpe_sin_cedula()
+        if not linea:
+            self.skipTest('la base no tiene línea SINPE sin conciliar')
+        partner_id, aml = self._factura_que_cubre(linea)
+        widget = self.env['bank.rec.widget'].new({'st_line_id': linea.id})
+        widget._action_trigger_matching_rules()
+        widget._action_add_new_amls(aml)
+        widget._js_action_validate()
+        self.assertTrue(linea.is_reconciled)
+        fila = self.Alias.search([('alias', '=', clave[1]),
+                                  ('partner_id', '=', partner_id)])
+        self.assertEqual(fila.contador, 1,
+                         'validar desde el navegador debe aprender')
+
+    def test_widget_aprende_y_undo_desaprende(self):
+        linea, clave = self._linea_sinpe_sin_cedula()
+        if not linea:
+            self.skipTest('la base no tiene línea SINPE sin conciliar')
+        partner_id, aml = self._factura_que_cubre(linea)
 
         widget = self.env['bank.rec.widget'].with_context(
             default_st_line_id=linea.id).new({})

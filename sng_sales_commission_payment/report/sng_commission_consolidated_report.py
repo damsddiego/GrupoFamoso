@@ -40,5 +40,9 @@ class CommissionConsolidatedXlsx(models.AbstractModel):
     def generate_xlsx_report(self, workbook, data, wizards):
         wizard = wizards[:1]
         monthlies = wizard._get_monthlies() if wizard else self.env['sng.commission.monthly']
-        data = dict(data or {}, subtitle=wizard._get_subtitle() if wizard else '')
+        data = dict(
+            data or {},
+            subtitle=wizard._get_subtitle() if wizard else '',
+            include_analysis=wizard.include_analysis if wizard else True,
+        )
         return super().generate_xlsx_report(workbook, data, monthlies)

@@ -1,52 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Wizard de importación -->
-    <record id="view_sng_conciliacion_importar_form" model="ir.ui.view">
-        <field name="name">sng.conciliacion.importar.form</field>
-        <field name="model">sng.conciliacion.importar</field>
-        <field name="arch" type="xml">
-            <form>
-                <field name="estado" invisible="1"/>
-                <group invisible="estado == 'hecho'">
-                    <field name="archivo" widget="binary"
-                           filename="archivo_nombre"/>
-                    <field name="archivo_nombre" invisible="1"/>
-                    <field name="formato" invisible="1"/>
-                    <field name="diario_id"
-                           invisible="formato != 'bn'"
-                           required="formato == 'bn'"
-                           options="{'no_create': true}"/>
-                </group>
-                <div class="alert alert-info" role="status"
-                     invisible="estado == 'hecho' or formato != 'bn'">
-                    El CSV del Banco Nacional no trae el número de cuenta ni
-                    saldos: elija el diario del banco con cuidado.
-                </div>
-                <div invisible="estado != 'hecho'">
-                    <field name="resultado" nolabel="1"/>
-                    <field name="statement_id" invisible="1"/>
-                </div>
-                <footer>
-                    <button name="accion_importar" type="object"
-                            string="Importar" class="btn-primary"
-                            invisible="estado == 'hecho'"/>
-                    <button name="accion_ver_lineas" type="object"
-                            string="Ver líneas importadas" class="btn-primary"
-                            invisible="estado != 'hecho'"/>
-                    <button string="Cerrar" special="cancel"/>
-                </footer>
-            </form>
-        </field>
-    </record>
-
-    <record id="action_sng_conciliacion_importar"
-            model="ir.actions.act_window">
-        <field name="name">Importar estado de cuenta (BAC xlsx / BN csv)</field>
-        <field name="res_model">sng.conciliacion.importar</field>
-        <field name="view_mode">form</field>
-        <field name="target">new</field>
-    </record>
-
     <!-- Lista de líneas del extracto con sugerencias -->
     <record id="view_sng_statement_line_list" model="ir.ui.view">
         <field name="name">sng.account.bank.statement.line.list</field>
@@ -54,10 +7,6 @@
         <field name="arch" type="xml">
             <list create="false" default_order="date desc, sequence">
                 <header>
-                    <button name="%(action_sng_conciliacion_importar)d"
-                            type="action" display="always"
-                            string="Importar estado de cuenta"
-                            help="Abre el asistente para cargar otro estado de cuenta (xlsx del BAC o CSV del Banco Nacional). Reimportar el mismo archivo no duplica líneas."/>
                     <button name="accion_sng_sugerir" type="object"
                             string="1 · Sugerir con IA (no concilia)"
                             class="btn-primary"
@@ -232,8 +181,9 @@
             <p class="o_view_nocontent_smiling_face">
                 Aún no hay líneas de extracto importadas
             </p>
-            <p>Pulse el botón "Importar estado de cuenta" (arriba) para
-            cargar el xlsx del BAC. Luego, aquí:
+            <p>Importe el estado de cuenta (xlsx del BAC o CSV del Banco
+            Nacional) desde Contabilidad, con el botón Importar del diario
+            del banco. Luego, aquí:
             seleccione las líneas y pulse "1 · Sugerir con IA" para que el
             sistema proponga con qué pago o factura cruza cada una, revise
             las columnas Sugerencia y Motivo, y por último pulse
@@ -350,10 +300,6 @@
     <menuitem id="menu_sng_conciliacion_lineas" name="Líneas del extracto"
               parent="menu_sng_conciliacion_root"
               action="action_sng_statement_lines" sequence="10"/>
-    <menuitem id="menu_sng_conciliacion_importar"
-              name="Importar estado de cuenta BAC"
-              parent="menu_sng_conciliacion_root"
-              action="action_sng_conciliacion_importar" sequence="20"/>
     <menuitem id="menu_sng_conciliacion_alias" name="Aprendizajes"
               parent="menu_sng_conciliacion_root"
               action="action_sng_alias" sequence="30"/>

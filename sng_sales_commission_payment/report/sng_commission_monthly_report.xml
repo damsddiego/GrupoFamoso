@@ -161,6 +161,223 @@
                         </tfoot>
                     </table>
                 </t>
+
+                <!-- Análisis: de dónde salen los pagos y casos a revisar. El
+                     consolidado puede apagarlo con la casilla del asistente;
+                     sin la variable (impresión directa) siempre sale. -->
+                <t t-if="include_analysis is None or include_analysis">
+                    <t t-set="cur" t-value="doc.currency_id"/>
+                    <t t-set="origin" t-value="doc._sng_analysis_origin()"/>
+                    <h4 class="mt-4">Análisis de la comisión</h4>
+
+                    <h5 class="mt-3">De dónde salen los pagos</h5>
+                    <p class="small text-muted">La comisión va al vendedor de la factura, no a quien cobra:
+                        por eso también entran pagos de la oficina, de otras tabletas y registrados a mano.
+                        "Tableta del vendedor" son los cobros que él mismo registró en la app de ruteros.</p>
+                    <table class="table table-sm">
+                        <thead>
+                            <tr class="table-light">
+                                <th>Origen del pago</th>
+                                <th class="text-end">Pagos</th>
+                                <th class="text-end">Cobrado</th>
+                                <th class="text-end">Base (sin IVA)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="origin['groups']" t-as="group">
+                                <td><span t-esc="group['label']"/></td>
+                                <td class="text-end"><span t-esc="group['payment_count']"/></td>
+                                <td class="text-end"><span t-esc="group['payment_amount']" t-options="{'widget': 'monetary', 'display_currency': cur}"/></td>
+                                <td class="text-end"><span t-esc="group['commission_base']" t-options="{'widget': 'monetary', 'display_currency': cur}"/></td>
+                            </tr>
+                            <tr t-if="origin['reversals']['payment_count']">
+                                <td>Reversos de meses cerrados</td>
+                                <td class="text-end"><span t-esc="origin['reversals']['payment_count']"/></td>
+                                <td class="text-end"><span t-esc="origin['reversals']['payment_amount']" t-options="{'widget': 'monetary', 'display_currency': cur}"/></td>
+                                <td class="text-end"><span t-esc="0.0" t-options="{'widget': 'monetary', 'display_currency': cur}"/></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <t t-set="check" t-value="origin['check']"/>
+                    <table class="table table-sm table-borderless w-50">
+                        <tr>
+                            <td>Base (suma de los pagos)</td>
+                            <td class="text-end"><span t-esc="check['base']" t-options="{'widget': 'monetary', 'display_currency': cur}"/></td>
+                        </tr>
+                        <tr>
+                            <td>× % del tramo</td>
+                            <td class="text-end"><span t-esc="'{:.2f}%'.format(check['percentage'])"/></td>
+                        </tr>
+                        <tr>
+                            <td>= Base × %</td>
+                            <td class="text-end"><span t-esc="check['gross']" t-options="{'widget': 'monetary', 'display_currency': cur}"/></td>
+                        </tr>
+                        <tr>
+                            <td>Reversos</td>
+                            <td class="text-end"><span t-esc="check['adjustment']" t-options="{'widget': 'monetary', 'display_currency': cur}"/></td>
+                        </tr>
+                        <tr class="border-top">
+                            <td><strong>Comisión calculada</strong></td>
+                            <td class="text-end"><strong><span t-esc="check['computed']" t-options="{'widget': 'monetary', 'display_currency': cur}"/></strong></td>
+                        </tr>
+                        <tr>
+                            <td>Comisión del módulo</td>
+                            <td class="text-end"><span t-esc="check['module']" t-options="{'widget': 'monetary', 'display_currency': cur}"/></td>
+                        </tr>
+                        <tr t-if="check['difference']">
+                            <td class="text-danger"><strong>Diferencia</strong>
+                                <small t-if="doc.state == 'draft'"><br/>Mes abierto: el módulo recalcula al cerrar.</small></td>
+                            <td class="text-end text-danger"><strong><span t-esc="check['difference']" t-options="{'widget': 'monetary', 'display_currency': cur}"/></strong></td>
+                        </tr>
+                    </table>
+
+                    <t t-set="credit_notes" t-value="doc._sng_analysis_credit_notes()"/>
+                    <t t-if="credit_notes['rows']">
+                        <h5 class="mt-3">Notas de crédito sobre facturas ya cobradas</h5>
+                        <p class="small text-muted">Notas hechas el día del pago o después sobre facturas cobradas este mes.
+                            La comisión es sobre lo cobrado: la parte de una factura que se salda con una nota no comisiona,
+                            así que una nota aplicada a facturas se compensa sola, y lo que queda sin aplicar es saldo a favor
+                            del cliente. Solo lo que se le devuelve en efectivo al cliente es comisión pagada de más.</p>
+                        <table class="table table-sm">
+                            <thead>
+                                <tr class="table-light">
+                                    <th>Nota</th>
+                                    <th>Hecha</th>
+                                    <th>Factura</th>
+                                    <th>Cliente</th>
+                                    <th class="text-end">Monto nota</th>
+                                    <th class="text-end">Aplicada a facturas</th>
+                                    <th class="text-end">Sin aplicar</th>
+                                    <th class="text-end">Devuelta en efectivo</th>
+                                    <th t-if="credit_notes['other']" class="text-end">Otro asiento</th>
+                                    <th class="text-end">Comisión de más</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="credit_notes['rows']" t-as="row">
+                                    <td><span t-esc="row['credit_note']"/><br t-if="row['reason']"/><small t-if="row['reason']" class="text-muted" t-esc="row['reason']"/></td>
+                                    <td><span t-esc="row['credit_note_date']" t-options="{'widget': 'date'}"/></td>
+                                    <td><span t-esc="row['invoice']"/></td>
+                                    <td><span t-esc="row['partner']"/></td>
+                                    <td class="text-end"><span t-esc="row['total']" t-options="{'widget': 'monetary', 'display_currency': cur}"/></td>
+                                    <td class="text-end"><span t-esc="row['to_invoices']" t-options="{'widget': 'monetary', 'display_currency': cur}"/></td>
+                                    <td class="text-end"><span t-esc="row['unapplied']" t-options="{'widget': 'monetary', 'display_currency': cur}"/></td>
+                                    <td class="text-end"><span t-esc="row['refunded']" t-options="{'widget': 'monetary', 'display_currency': cur}"/></td>
+                                    <td t-if="credit_notes['other']" class="text-end"><span t-esc="row['other']" t-options="{'widget': 'monetary', 'display_currency': cur}"/></td>
+                                    <td class="text-end"><span t-esc="row['overpaid']" t-options="{'widget': 'monetary', 'display_currency': cur}"/></td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="4"><strong>TOTAL (<span t-esc="credit_notes['credit_note_count']"/> notas)</strong></td>
+                                    <td class="text-end"><strong><span t-esc="credit_notes['total']" t-options="{'widget': 'monetary', 'display_currency': cur}"/></strong></td>
+                                    <td class="text-end"><strong><span t-esc="credit_notes['to_invoices']" t-options="{'widget': 'monetary', 'display_currency': cur}"/></strong></td>
+                                    <td class="text-end"><strong><span t-esc="credit_notes['unapplied']" t-options="{'widget': 'monetary', 'display_currency': cur}"/></strong></td>
+                                    <td class="text-end"><strong><span t-esc="credit_notes['refunded']" t-options="{'widget': 'monetary', 'display_currency': cur}"/></strong></td>
+                                    <td t-if="credit_notes['other']" class="text-end"><strong><span t-esc="credit_notes['other']" t-options="{'widget': 'monetary', 'display_currency': cur}"/></strong></td>
+                                    <td class="text-end"><strong><span t-esc="credit_notes['overpaid']" t-options="{'widget': 'monetary', 'display_currency': cur}"/></strong></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </t>
+
+                    <t t-set="prior" t-value="doc._sng_analysis_prior_collections()"/>
+                    <t t-if="prior['rows']">
+                        <h5 class="mt-3">Cobros de meses anteriores que entraron en este mes</h5>
+                        <p class="small text-muted">Pagos con fecha de un mes anterior que se confirmaron tarde o cuyo
+                            mes ya estaba cerrado. Se pagaron con el % de este mes; la diferencia es contra el % que
+                            tuvo el vendedor en el mes original (positiva = habría ganado más en aquel mes; si no tuvo
+                            mensual ese mes no hay comparación). Es informativa: la regla del módulo es comisionar en
+                            el mes de la confirmación.</p>
+                        <table class="table table-sm">
+                            <thead>
+                                <tr class="table-light">
+                                    <th>Pago</th>
+                                    <th>Cliente</th>
+                                    <th>Fecha pago</th>
+                                    <th>Confirmado</th>
+                                    <th>Motivo</th>
+                                    <th class="text-end">Base</th>
+                                    <th class="text-end">Comisión</th>
+                                    <th class="text-end">% mes original</th>
+                                    <th class="text-end">Diferencia</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="prior['rows']" t-as="row">
+                                    <td><span t-esc="row['payment']"/><br t-if="row['receipt']"/><small t-if="row['receipt']" class="text-muted" t-esc="row['receipt']"/></td>
+                                    <td><span t-esc="row['partner']"/></td>
+                                    <td><span t-esc="row['payment_date']" t-options="{'widget': 'date'}"/></td>
+                                    <td><span t-esc="row['confirmation_date']" t-options="{'widget': 'date'}"/></td>
+                                    <td><span t-esc="row['reason']"/></td>
+                                    <td class="text-end"><span t-esc="row['commission_base']" t-options="{'widget': 'monetary', 'display_currency': cur}"/></td>
+                                    <td class="text-end"><span t-esc="row['commission']" t-options="{'widget': 'monetary', 'display_currency': cur}"/></td>
+                                    <td class="text-end">
+                                        <span t-if="row['original_percentage'] is not None" t-esc="'{:.2f}%'.format(row['original_percentage'])"/>
+                                        <span t-else="">sin mensual</span>
+                                    </td>
+                                    <td class="text-end"><span t-esc="row['difference']" t-options="{'widget': 'monetary', 'display_currency': cur}"/></td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="5"><strong>TOTAL (<span t-esc="prior['payment_count']"/> pagos)</strong></td>
+                                    <td class="text-end"><strong><span t-esc="prior['commission_base']" t-options="{'widget': 'monetary', 'display_currency': cur}"/></strong></td>
+                                    <td class="text-end"><strong><span t-esc="prior['commission']" t-options="{'widget': 'monetary', 'display_currency': cur}"/></strong></td>
+                                    <td/>
+                                    <td class="text-end"><strong><span t-esc="prior['difference']" t-options="{'widget': 'monetary', 'display_currency': cur}"/></strong></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </t>
+
+                    <t t-set="unreturned" t-value="doc._sng_analysis_unreturned_reversals()"/>
+                    <t t-if="unreturned['rows']">
+                        <h5 class="mt-3">Reversos que no se devolvieron</h5>
+                        <p class="small text-muted">Pagos que se desaplicaron de un mes cerrado (se le restó la comisión)
+                            y se volvieron a aplicar sin generar comisión nueva. "No devuelto" es la parte del reverso que
+                            corresponde a lo reaplicado y que le toca a este vendedor.</p>
+                        <table class="table table-sm">
+                            <thead>
+                                <tr class="table-light">
+                                    <th>Pago</th>
+                                    <th>Cliente</th>
+                                    <th>Mes original</th>
+                                    <th>Factura del reverso</th>
+                                    <th>Aplicado ahora a</th>
+                                    <th>Qué hacer</th>
+                                    <th class="text-end">Se le restó</th>
+                                    <th class="text-end">No devuelto</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="unreturned['rows']" t-as="row">
+                                    <td><span t-esc="row['payment']"/><br t-if="row['receipt']"/><small t-if="row['receipt']" class="text-muted" t-esc="row['receipt']"/></td>
+                                    <td><span t-esc="row['partner']"/></td>
+                                    <td><span t-esc="row['original_period']"/></td>
+                                    <td><span t-esc="row['reversed_invoice']"/></td>
+                                    <td>
+                                        <span t-esc="row['new_invoices']"/><br/>
+                                        <small class="text-muted">Desaplicado
+                                            <span t-esc="row['unapplied_amount']" t-options="{'widget': 'monetary', 'display_currency': cur}"/>,
+                                            reaplicado
+                                            <span t-esc="row['reapplied_amount']" t-options="{'widget': 'monetary', 'display_currency': cur}"/></small>
+                                    </td>
+                                    <td><small t-esc="row['action']"/></td>
+                                    <td class="text-end"><span t-esc="row['reversed_amount']" t-options="{'widget': 'monetary', 'display_currency': cur}"/></td>
+                                    <td class="text-end"><span t-esc="row['amount']" t-options="{'widget': 'monetary', 'display_currency': cur}"/></td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="6"><strong>TOTAL</strong></td>
+                                    <td class="text-end"><strong><span t-esc="unreturned['reversed_amount']" t-options="{'widget': 'monetary', 'display_currency': cur}"/></strong></td>
+                                    <td class="text-end"><strong><span t-esc="unreturned['amount']" t-options="{'widget': 'monetary', 'display_currency': cur}"/></strong></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </t>
+                </t>
             </div>
         </template>
 

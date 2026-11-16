@@ -93,6 +93,7 @@
                         </p>
                     </div>
                 </t>
+                <t t-set="include_analysis" t-value="wizard.include_analysis"/>
                 <t t-foreach="monthlies" t-as="m">
                     <t t-set="o" t-value="m"/>
                     <t t-set="doc" t-value="m"/>

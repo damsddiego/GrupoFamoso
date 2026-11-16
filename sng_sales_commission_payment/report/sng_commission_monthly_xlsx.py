@@ -135,3 +135,171 @@ class CommissionMonthlyXlsx(models.AbstractModel):
                 row += 1
             sheet.write(row, 6, 'TOTAL', bold)
             sheet.write_number(row, 7, sum(reversals.mapped('commission_adjustment')), money_bold)
+
+        if (data or {}).get('include_analysis', True):
+            self._sng_write_analysis_sheets(workbook, monthlies, header, bold, money, money_bold, pct, date_fmt)
+
+    def _sng_write_analysis_sheets(self, workbook, monthlies, header, bold, money, money_bold, pct, date_fmt):
+        """Hojas del análisis de la comisión (ver sng_commission_monthly_analysis)."""
+
+        def write_date(sheet, row, col, value):
+            if value:
+                sheet.write_datetime(row, col, value, date_fmt)
+
+        # ---- Origen y cuadre ----
+        sheet = workbook.add_worksheet('Origen y cuadre')
+        sheet.set_column(0, 0, 30)
+        sheet.set_column(1, 1, 16)
+        sheet.set_column(2, 2, 48)
+        sheet.set_column(3, 3, 9)
+        sheet.set_column(4, 5, 18)
+        headers = ['Vendedor', 'Mes', 'Origen del pago', 'Pagos', 'Cobrado', 'Base (sin IVA)']
+        for col, text in enumerate(headers):
+            sheet.write(0, col, text, header)
+        sheet.freeze_panes(1, 0)
+        row = 1
+        for m in monthlies:
+            origin = m._sng_analysis_origin()
+            name, period = m.salesperson_id.name or '', m.period_label or ''
+            for group in origin['groups']:
+                sheet.write_row(row, 0, [name, period, group['label'], group['payment_count']])
+                sheet.write_number(row, 4, group['payment_amount'], money)
+                sheet.write_number(row, 5, group['commission_base'], money)
+                row += 1
+            reversals = origin['reversals']
+            if reversals['payment_count']:
+                sheet.write_row(row, 0, [name, period, 'Reversos de meses cerrados', reversals['payment_count']])
+                sheet.write_number(row, 4, reversals['payment_amount'], money)
+                sheet.write_number(row, 5, 0.0, money)
+                row += 1
+            check = origin['check']
+            for label, value, fmt in (
+                ('Base (suma de los pagos)', check['base'], money),
+                ('% del tramo', check['percentage'], pct),
+                ('Base × %', check['gross'], money),
+                ('Reversos', check['adjustment'], money),
+                ('Comisión calculada', check['computed'], money_bold),
+                ('Comisión del módulo', check['module'], money_bold),
+                ('Diferencia', check['difference'], money),
+            ):
+                sheet.write_row(row, 0, [name, period])
+                sheet.write(row, 2, label, bold)
+                sheet.write_number(row, 5, value, fmt)
+                row += 1
+            row += 1
+
+        # ---- Notas de crédito sobre facturas ya cobradas ----
+        sheet = workbook.add_worksheet('Notas de crédito')
+        sheet.set_column(0, 0, 30)
+        sheet.set_column(1, 1, 16)
+        sheet.set_column(2, 4, 22)
+        sheet.set_column(5, 5, 35)
+        sheet.set_column(6, 7, 14)
+        sheet.set_column(8, 13, 18)
+        sheet.write(0, 0, 'Notas hechas el día del pago o después sobre facturas cobradas en el mes. La comisión es '
+                          'sobre lo cobrado: una nota aplicada a facturas se compensa sola (esa parte no comisiona); '
+                          'solo lo devuelto en efectivo al cliente es comisión pagada de más.')
+        headers = ['Vendedor', 'Mes', 'Nota de crédito', 'Motivo', 'Factura', 'Cliente',
+                   'Nota hecha', 'Pago confirmado', 'Monto nota', 'Aplicada a facturas', 'Sin aplicar',
+                   'Devuelta en efectivo', 'Otro asiento', 'Comisión de más']
+        for col, text in enumerate(headers):
+            sheet.write(1, col, text, header)
+        sheet.freeze_panes(2, 0)
+        row = 2
+        keys = ('total', 'to_invoices', 'unapplied', 'refunded', 'other', 'overpaid')
+        totals = dict.fromkeys(keys, 0.0)
+        for m in monthlies:
+            result = m._sng_analysis_credit_notes()
+            for item in result['rows']:
+                sheet.write_row(row, 0, [m.salesperson_id.name or '', m.period_label or '', item['credit_note'] or '',
+                                         item['reason'], item['invoice'] or '', item['partner'] or ''])
+                write_date(sheet, row, 6, item['credit_note_date'])
+                write_date(sheet, row, 7, item['confirmation_date'])
+                for col, key in enumerate(keys, 8):
+                    sheet.write_number(row, col, item[key], money)
+                row += 1
+            for key in keys:
+                totals[key] += result[key]
+        sheet.write(row, 7, 'TOTAL', bold)
+        for col, key in enumerate(keys, 8):
+            sheet.write_number(row, col, totals[key], money_bold)
+
+        # ---- Cobros de meses anteriores ----
+        sheet = workbook.add_worksheet('Cobros meses anteriores')
+        sheet.set_column(0, 0, 30)
+        sheet.set_column(1, 1, 16)
+        sheet.set_column(2, 3, 22)
+        sheet.set_column(4, 4, 35)
+        sheet.set_column(5, 5, 22)
+        sheet.set_column(6, 7, 14)
+        sheet.set_column(8, 8, 30)
+        sheet.set_column(9, 12, 16)
+        headers = ['Vendedor', 'Mes', 'Pago', 'Recibo', 'Cliente', 'Factura', 'Fecha pago', 'Confirmado',
+                   'Motivo', 'Base', 'Comisión', '% mes original', 'Diferencia']
+        for col, text in enumerate(headers):
+            sheet.write(0, col, text, header)
+        sheet.freeze_panes(1, 0)
+        row = 1
+        totals = [0.0, 0.0, 0.0]
+        for m in monthlies:
+            result = m._sng_analysis_prior_collections()
+            for item in result['rows']:
+                sheet.write_row(row, 0, [m.salesperson_id.name or '', m.period_label or '', item['payment'] or '',
+                                         item['receipt'], item['partner'] or '', item['invoice'] or ''])
+                write_date(sheet, row, 6, item['payment_date'])
+                write_date(sheet, row, 7, item['confirmation_date'])
+                sheet.write(row, 8, item['reason'])
+                sheet.write_number(row, 9, item['commission_base'], money)
+                sheet.write_number(row, 10, item['commission'], money)
+                if item['original_percentage'] is None:
+                    sheet.write(row, 11, 'sin mensual')
+                else:
+                    sheet.write_number(row, 11, item['original_percentage'], pct)
+                sheet.write_number(row, 12, item['difference'], money)
+                row += 1
+            totals[0] += result['commission_base']
+            totals[1] += result['commission']
+            totals[2] += result['difference']
+        sheet.write(row, 8, 'TOTAL', bold)
+        sheet.write_number(row, 9, totals[0], money_bold)
+        sheet.write_number(row, 10, totals[1], money_bold)
+        sheet.write_number(row, 12, totals[2], money_bold)
+
+        # ---- Reversos que no se devolvieron ----
+        sheet = workbook.add_worksheet('Reversos sin devolver')
+        sheet.set_column(0, 0, 30)
+        sheet.set_column(1, 1, 16)
+        sheet.set_column(2, 3, 22)
+        sheet.set_column(4, 4, 35)
+        sheet.set_column(5, 5, 16)
+        sheet.set_column(6, 7, 26)
+        sheet.set_column(8, 9, 16)
+        sheet.set_column(10, 10, 60)
+        sheet.set_column(11, 12, 16)
+        sheet.write(0, 0, 'Pagos desaplicados de un mes cerrado (se restó la comisión) y vueltos a aplicar sin generar '
+                          'comisión nueva. "No devuelto" es la parte del reverso que corresponde a lo reaplicado y que '
+                          'le toca a este vendedor.')
+        headers = ['Vendedor', 'Mes', 'Pago', 'Recibo', 'Cliente', 'Mes original', 'Factura del reverso',
+                   'Aplicado ahora a', 'Desaplicado', 'Reaplicado', 'Qué hacer', 'Se le restó', 'No devuelto']
+        for col, text in enumerate(headers):
+            sheet.write(1, col, text, header)
+        sheet.freeze_panes(2, 0)
+        row = 2
+        total_reversed = total = 0.0
+        for m in monthlies:
+            result = m._sng_analysis_unreturned_reversals()
+            for item in result['rows']:
+                sheet.write_row(row, 0, [m.salesperson_id.name or '', m.period_label or '', item['payment'] or '',
+                                         item['receipt'], item['partner'] or '', item['original_period'],
+                                         item['reversed_invoice'] or '', item['new_invoices']])
+                sheet.write_number(row, 8, item['unapplied_amount'], money)
+                sheet.write_number(row, 9, item['reapplied_amount'], money)
+                sheet.write(row, 10, item['action'])
+                sheet.write_number(row, 11, item['reversed_amount'], money)
+                sheet.write_number(row, 12, item['amount'], money)
+                row += 1
+            total_reversed += result['reversed_amount']
+            total += result['amount']
+        sheet.write(row, 10, 'TOTAL', bold)
+        sheet.write_number(row, 11, total_reversed, money_bold)
+        sheet.write_number(row, 12, total, money_bold)
