@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_sng_comision_estado_wizard_line_list" model="ir.ui.view">
+        <field name="name">sng.comision.estado.wizard.line.list</field>
+        <field name="model">sng.comision.estado.wizard.line</field>
+        <field name="arch" type="xml">
+            <list create="0" delete="0" edit="0">
+                <field name="payment_id"/>
+                <field name="recibo"/>
+                <field name="fecha"/>
+                <field name="fecha_confirmacion" optional="hide"/>
+                <field name="cliente"/>
+                <field name="compania" optional="show"/>
+                <field name="monto" sum="Total"/>
+                <field name="base" sum="Base" optional="show"/>
+                <field name="estado"/>
+                <field name="verificado" widget="boolean"/>
+                <field name="registrado_por"/>
+                <field name="facturas" optional="hide"/>
+                <field name="detalle"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_sng_comision_estado_wizard_form" model="ir.ui.view">
+        <field name="name">sng.comision.estado.wizard.form</field>
+        <field name="model">sng.comision.estado.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Estado de comisiones">
+                <group>
+                    <group>
+                        <field name="vendedor_id" options="{'no_create': True}"/>
+                    </group>
+                    <group>
+                        <field name="periodo"/>
+                    </group>
+                </group>
+                <field name="resumen_html" nolabel="1" invisible="not resumen_html"/>
+                <notebook invisible="not resumen_html">
+                    <page string="Reportados" name="reportados">
+                        <field name="reportados_ids" readonly="1"
+                               context="{'list_view_ref': 'sng_comisiones_vendedor.view_sng_comision_estado_wizard_line_list'}"/>
+                    </page>
+                    <page string="Anulados" name="anulados">
+                        <field name="anulados_ids" readonly="1"
+                               context="{'list_view_ref': 'sng_comisiones_vendedor.view_sng_comision_estado_wizard_line_list'}"/>
+                    </page>
+                    <page string="Registrados por otro" name="registrados_por_otro">
+                        <field name="registrados_por_otro_ids" readonly="1"
+                               context="{'list_view_ref': 'sng_comisiones_vendedor.view_sng_comision_estado_wizard_line_list'}"/>
+                    </page>
+                    <page string="Comisión de otro" name="comision_de_otro">
+                        <field name="comision_de_otro_ids" readonly="1"
+                               context="{'list_view_ref': 'sng_comisiones_vendedor.view_sng_comision_estado_wizard_line_list'}"/>
+                    </page>
+                    <page string="Sin comisión" name="sin_comision">
+                        <field name="sin_comision_ids" readonly="1"
+                               context="{'list_view_ref': 'sng_comisiones_vendedor.view_sng_comision_estado_wizard_line_list'}"/>
+                    </page>
+                    <page string="Reversos" name="reversos">
+                        <field name="reversos_ids" readonly="1"
+                               context="{'list_view_ref': 'sng_comisiones_vendedor.view_sng_comision_estado_wizard_line_list'}"/>
+                    </page>
+                </notebook>
+                <footer>
+                    <button name="action_consultar" string="Consultar" type="object" class="oe_highlight"/>
+                    <button string="Cerrar" class="oe_link" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_sng_comision_estado_wizard" model="ir.actions.act_window">
+        <field name="name">Estado de comisiones por vendedor</field>
+        <field name="res_model">sng.comision.estado.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem
+        id="menu_sng_comision_estado_wizard"
+        name="Estado por vendedor"
+        parent="sales_commission_omax.menu_sale_commission_root"
+        action="action_sng_comision_estado_wizard"
+        groups="sales_commission_omax.group_sales_commission_user"
+        sequence="15"/>
+</odoo>

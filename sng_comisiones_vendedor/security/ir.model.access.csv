@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_sng_comision_estado_wizard,sng.comision.estado.wizard,model_sng_comision_estado_wizard,sales_commission_omax.group_sales_commission_user,1,1,1,1
+access_sng_comision_estado_wizard_line,sng.comision.estado.wizard.line,model_sng_comision_estado_wizard_line,sales_commission_omax.group_sales_commission_user,1,1,1,1

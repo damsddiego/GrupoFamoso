@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Apagado al instalar: lo enciende la oficina. Genera las líneas de
+             comisión que faltan de los cobros de la app (no pasan por
+             action_post), igual que el cierre de mes. -->
+        <record id="cron_generar_comisiones_pendientes" model="ir.cron">
+            <field name="name">Comisiones: generar líneas de los cobros de la app</field>
+            <field name="model_id" ref="model_sng_comision_estado"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_generar_pendientes()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">hours</field>
+            <field name="active" eval="False"/>
+        </record>
+    </data>
+</odoo>
