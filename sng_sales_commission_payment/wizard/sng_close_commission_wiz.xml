@@ -5,11 +5,12 @@
             <field name="name">sng.close.commission.wiz.form</field>
             <field name="model">sng.close.commission.wiz</field>
             <field name="arch" type="xml">
-                <form string="Cerrar Mes por Compañía">
+                <form string="Cerrar Mes por Cuadro">
                     <group>
                         <group>
                             <field name="period"/>
-                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="scheme_id" options="{'no_create': True}"/>
+                            <field name="company_names"/>
                             <field name="pending_count"/>
                         </group>
                         <group>
@@ -23,7 +24,6 @@
                                         icon="fa-external-link"
                                         invisible="not no_salesperson_invoice_count"/>
                             </div>
-                            <field name="no_salesperson_invoice_ids" invisible="1"/>
                         </group>
                     </group>
                     <div class="alert alert-info" role="alert" invisible="not uncommissioned_payment_count">
@@ -37,7 +37,8 @@
                         antes de cerrar, o ciérrelo sabiendo que quedarán fuera.
                     </div>
                     <div class="alert alert-warning" role="alert">
-                        Se cerrarán todas las comisiones pendientes del mes seleccionado.
+                        Se cerrarán todas las comisiones pendientes del cuadro en el mes seleccionado,
+                        con lo cobrado en todas sus compañías.
                         Los meses cerrados ya no se recalculan y los pagos que lleguen con
                         fecha de ese mes se acumularán en el siguiente mes abierto.
                     </div>
@@ -55,7 +56,7 @@
         </record>
 
         <record id="action_sng_close_commission_wiz" model="ir.actions.act_window">
-            <field name="name">Cerrar mes por compañía</field>
+            <field name="name">Cerrar mes por cuadro</field>
             <field name="res_model">sng.close.commission.wiz</field>
             <field name="view_mode">form</field>
             <field name="target">new</field>
@@ -64,7 +65,7 @@
 
         <menuitem
             id="menu_sng_close_commission_wiz"
-            name="Cerrar mes por compañía"
+            name="Cerrar mes por cuadro"
             parent="sales_commission_omax.menu_sale_commission_root"
             action="action_sng_close_commission_wiz"
             groups="sales_commission_omax.group_sales_commission_manager"

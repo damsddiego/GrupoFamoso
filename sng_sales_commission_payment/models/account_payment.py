@@ -224,6 +224,8 @@ class AccountPayment(models.Model):
                     self.name, invoice.name, period, open_period,
                 )
             monthly = Monthly._get_or_create(salesperson, self.company_id, open_period)
+            if not monthly:
+                continue
             Line.create(dict(vals, monthly_id=monthly.id, payment_id=self.id, invoice_id=invoice.id))
             affected |= monthly
 

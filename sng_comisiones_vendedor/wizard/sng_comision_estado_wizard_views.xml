@@ -64,6 +64,7 @@
                 </notebook>
                 <footer>
                     <button name="action_consultar" string="Consultar" type="object" class="oe_highlight"/>
+                    <button name="action_descargar_excel" string="Descargar Excel" type="object" class="btn-secondary"/>
                     <button string="Cerrar" class="oe_link" special="cancel"/>
                 </footer>
             </form>

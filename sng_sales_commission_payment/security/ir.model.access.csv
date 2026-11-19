@@ -1,4 +1,6 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_sng_commission_scheme_user,sng.commission.scheme.user,model_sng_commission_scheme,sales_commission_omax.group_sales_commission_user,1,0,0,0
+access_sng_commission_scheme_manager,sng.commission.scheme.manager,model_sng_commission_scheme,sales_commission_omax.group_sales_commission_manager,1,1,1,1
 access_sng_commission_tier_user,sng.commission.tier.user,model_sng_commission_tier,sales_commission_omax.group_sales_commission_user,1,0,0,0
 access_sng_commission_tier_manager,sng.commission.tier.manager,model_sng_commission_tier,sales_commission_omax.group_sales_commission_manager,1,1,1,1
 access_sng_commission_monthly_user,sng.commission.monthly.user,model_sng_commission_monthly,sales_commission_omax.group_sales_commission_user,1,0,0,0

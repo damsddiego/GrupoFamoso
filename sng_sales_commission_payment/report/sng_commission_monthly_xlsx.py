@@ -9,6 +9,9 @@ class CommissionMonthlyXlsx(models.AbstractModel):
     _description = 'Comisión Mensual (Excel)'
 
     def generate_xlsx_report(self, workbook, data, monthlies):
+        # sudo: cada comisión sale completa, con las líneas de todas las
+        # compañías de su cuadro aunque el usuario no las tenga activas.
+        monthlies = monthlies.sudo()
         Line = self.env['sng.commission.payment.line']
         tax_labels = dict(Line._fields['tax_profile']._description_selection(self.env))
         state_labels = dict(monthlies._fields['state']._description_selection(self.env))
@@ -34,7 +37,7 @@ class CommissionMonthlyXlsx(models.AbstractModel):
         subtitle = (data or {}).get('subtitle')
         if subtitle:
             sheet.write(1, 0, subtitle)
-        headers = ['Vendedor', 'Mes', 'Compañía', 'Base (sin IVA)', 'Tramo',
+        headers = ['Vendedor', 'Mes', 'Cuadro', 'Base (sin IVA)', 'Tramo',
                    '% Comisión', 'Reversos', 'Comisión', 'Estado', 'Factura de Comisión']
         for col, text in enumerate(headers):
             sheet.write(2, col, text, header)
@@ -43,7 +46,7 @@ class CommissionMonthlyXlsx(models.AbstractModel):
         for m in monthlies:
             sheet.write(row, 0, m.salesperson_id.name or '')
             sheet.write(row, 1, m.period_label or '')
-            sheet.write(row, 2, m.company_id.name or '')
+            sheet.write(row, 2, m.scheme_id.name or '')
             sheet.write_number(row, 3, m.base_amount, money)
             sheet.write(row, 4, m.tier_id.name or '')
             sheet.write_number(row, 5, m.percentage, pct)
@@ -56,6 +59,30 @@ class CommissionMonthlyXlsx(models.AbstractModel):
         sheet.write_number(row, 3, sum(monthlies.mapped('base_amount')), money_bold)
         sheet.write_number(row, 6, sum(monthlies.mapped('adjustment_amount')), money_bold)
         sheet.write_number(row, 7, sum(monthlies.mapped('commission_amount')), money_bold)
+
+        # ---- Hoja Por compañía: de qué compañía viene cada comisión ----
+        sheet = workbook.add_worksheet('Por compañía')
+        sheet.set_column(0, 0, 35)
+        sheet.set_column(1, 1, 18)
+        sheet.set_column(2, 3, 30)
+        sheet.set_column(4, 7, 18)
+        headers = ['Vendedor', 'Mes', 'Cuadro', 'Compañía', 'Cobrado (con IVA)',
+                   'Base (sin IVA)', 'Comisión', 'Reversos']
+        for col, text in enumerate(headers):
+            sheet.write(0, col, text, header)
+        sheet.freeze_panes(1, 0)
+        row = 1
+        for m in monthlies:
+            for item in m._get_company_breakdown():
+                sheet.write(row, 0, m.salesperson_id.name or '')
+                sheet.write(row, 1, m.period_label or '')
+                sheet.write(row, 2, m.scheme_id.name or '')
+                sheet.write(row, 3, item['company'].name or '')
+                sheet.write_number(row, 4, item['payment_amount'], money)
+                sheet.write_number(row, 5, item['base'], money)
+                sheet.write_number(row, 6, item['commission'], money)
+                sheet.write_number(row, 7, item['adjustment'], money)
+                row += 1
 
         # ---- Hoja Análisis: resumen por tipo de factura ----
         sheet = workbook.add_worksheet('Análisis IVA')

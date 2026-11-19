@@ -6,18 +6,24 @@ from odoo.exceptions import UserError
 
 class SngCloseCommissionWiz(models.TransientModel):
     _name = 'sng.close.commission.wiz'
-    _description = 'Cerrar Comisiones del Mes por Compañía'
+    _description = 'Cerrar Comisiones del Mes por Cuadro'
 
     period = fields.Date(
         string='Mes a Cerrar',
         required=True,
         help='Cualquier día del mes: se cierran todas las comisiones de ese mes.',
     )
-    company_id = fields.Many2one(
-        'res.company',
-        string='Compañía',
+    scheme_id = fields.Many2one(
+        'sng.commission.scheme',
+        string='Cuadro',
         required=True,
-        default=lambda self: self.env.company,
+        default=lambda self: self._default_scheme_id(),
+        context={'active_test': False},
+        help='Se cierran las comisiones de todas las compañías del cuadro.',
+    )
+    company_names = fields.Char(
+        related='scheme_id.company_names',
+        string='Compañías',
     )
     pending_count = fields.Integer(
         string='Comisiones Pendientes',
@@ -44,6 +50,19 @@ class SngCloseCommissionWiz(models.TransientModel):
         compute='_compute_uncommissioned',
     )
 
+    @api.model
+    def _default_scheme_id(self):
+        return self.env['sng.commission.scheme']._get_for_company(
+            self.env.company, fields.Date.context_today(self))
+
+    @api.onchange('period')
+    def _onchange_period(self):
+        """Propone el cuadro que rige en ese mes para la compañía actual."""
+        if self.period:
+            scheme = self.env['sng.commission.scheme']._get_for_company(self.env.company, self.period)
+            if scheme:
+                self.scheme_id = scheme
+
     def _get_bounds(self):
         self.ensure_one()
         return self.env['sng.commission.monthly']._sng_period_bounds(self.period)
@@ -53,25 +72,25 @@ class SngCloseCommissionWiz(models.TransientModel):
         if not self.period:
             return self.env['sng.commission.monthly']
         return self.env['sng.commission.monthly'].search([
-            ('company_id', '=', self.company_id.id),
+            ('scheme_id', '=', self.scheme_id.id),
             ('period', '=', self.period.replace(day=1)),
             ('state', '=', 'draft'),
         ])
 
-    @api.depends('period', 'company_id')
+    @api.depends('period', 'scheme_id')
     def _compute_pending_count(self):
         for wiz in self:
             wiz.pending_count = len(wiz._get_pending_monthlies()) if wiz.period else 0
 
-    @api.depends('period', 'company_id')
+    @api.depends('period', 'scheme_id')
     def _compute_uncommissioned(self):
         Monthly = self.env['sng.commission.monthly']
         for wiz in self:
-            if not wiz.period or not wiz.company_id:
-                rows = []
-            else:
+            rows = []
+            if wiz.period and wiz.scheme_id:
                 first, last = wiz._get_bounds()
-                rows = Monthly._sng_find_uncommissioned(wiz.company_id, first, last)
+                for company in wiz.scheme_id.sudo().company_ids:
+                    rows += Monthly._sng_find_uncommissioned(company, first, last)
             generable = [r for r in rows if r['salesperson_id']]
             orphan_invoice_ids = sorted({r['invoice_id'] for r in rows if not r['salesperson_id']})
             wiz.uncommissioned_pair_count = len(generable)
@@ -96,12 +115,13 @@ class SngCloseCommissionWiz(models.TransientModel):
         Monthly = self.env['sng.commission.monthly']
         # Primero se generan los cobros del mes que aún no tienen comisión:
         # pueden crear comisiones mensuales nuevas (vendedores sin registro).
-        Monthly._sng_generate_pending(self.company_id, first, last)
+        for company in self.scheme_id.sudo().company_ids:
+            Monthly._sng_generate_pending(company, first, last)
         monthlies = self._get_pending_monthlies()
         if not monthlies:
             raise UserError(_(
-                'No hay comisiones pendientes para %(company)s en el mes seleccionado.',
-                company=self.company_id.name,
+                'No hay comisiones pendientes del cuadro %(scheme)s en el mes seleccionado.',
+                scheme=self.scheme_id.name,
             ))
         monthlies.action_close()
 

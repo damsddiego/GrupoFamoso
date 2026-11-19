@@ -7,7 +7,7 @@ from odoo.exceptions import ValidationError
 class SngCommissionTier(models.Model):
     _name = 'sng.commission.tier'
     _description = 'Tramo de Comisión (Cuadro de Comisiones)'
-    _order = 'company_id, min_amount, id'
+    _order = 'scheme_id, min_amount, id'
 
     name = fields.Char(
         string='Nombre',
@@ -25,16 +25,16 @@ class SngCommissionTier(models.Model):
         required=True,
         help='Porcentaje aplicado sobre TODO el acumulado mensual cuando se alcanza este tramo.',
     )
-    company_id = fields.Many2one(
-        'res.company',
-        string='Compañía',
+    scheme_id = fields.Many2one(
+        'sng.commission.scheme',
+        string='Cuadro',
         required=True,
-        default=lambda self: self.env.company,
         index=True,
+        ondelete='cascade',
     )
     currency_id = fields.Many2one(
         'res.currency',
-        related='company_id.currency_id',
+        related='scheme_id.currency_id',
         string='Moneda',
     )
     active = fields.Boolean(default=True)
@@ -51,9 +51,9 @@ class SngCommissionTier(models.Model):
             'El monto mínimo no puede ser negativo.',
         ),
         (
-            'unique_min_amount_company',
-            'UNIQUE(company_id, min_amount)',
-            'Ya existe un tramo con ese monto mínimo para la compañía.',
+            'unique_min_amount_scheme',
+            'UNIQUE(scheme_id, min_amount)',
+            'Ya existe un tramo con ese monto mínimo en el cuadro.',
         ),
     ]
 
@@ -67,11 +67,11 @@ class SngCommissionTier(models.Model):
             )
 
     @api.model
-    def get_tier_for_amount(self, amount, company):
-        """Devuelve el tramo aplicable (mayor min_amount <= amount) para la compañía."""
+    def get_tier_for_amount(self, amount, scheme):
+        """Devuelve el tramo aplicable (mayor min_amount <= amount) del cuadro."""
         return self.search(
             [
-                ('company_id', '=', company.id),
+                ('scheme_id', '=', scheme.id),
                 ('active', '=', True),
                 ('min_amount', '<=', amount),
             ],
@@ -80,6 +80,6 @@ class SngCommissionTier(models.Model):
         )
 
     @api.model
-    def get_percentage_for_amount(self, amount, company):
-        tier = self.get_tier_for_amount(amount, company)
+    def get_percentage_for_amount(self, amount, scheme):
+        tier = self.get_tier_for_amount(amount, scheme)
         return tier.percentage if tier else 0.0

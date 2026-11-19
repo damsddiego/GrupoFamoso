@@ -1,7 +1,11 @@
 # -*- coding: utf-8 -*-
+import base64
+
 from markupsafe import Markup, escape
 
 from odoo import _, api, fields, models
+
+from ..models import libro_excel
 
 CRUCES = [
     ('reportados', 'Reportados por el vendedor'),
@@ -63,6 +67,37 @@ class SngComisionEstadoWizard(models.TransientModel):
             'name': _('Estado de comisiones'),
         }
 
+    def _excel(self):
+        """(nombre, contenido) del libro de Excel con el estado recién
+        consultado: no depende de haber dado «Consultar» antes."""
+        self.ensure_one()
+        estado = self.env['sng.comision.estado'].obtener_estado(self.vendedor_id.id, str(self.periodo))
+        nombre = 'Estado de comisiones - %s - %s.xlsx' % (estado['vendedor']['nombre'], estado['periodo'][:7])
+        return nombre, libro_excel.generar(estado)
+
+    def action_descargar_excel(self):
+        self.ensure_one()
+        nombre, contenido = self._excel()
+        Attachment = self.env['ir.attachment']
+        # Limpia los archivos anteriores del mismo usuario para no acumular adjuntos.
+        Attachment.search([
+            ('res_model', '=', self._name),
+            ('create_uid', '=', self.env.uid),
+        ]).unlink()
+        adjunto = Attachment.create({
+            'name': nombre,
+            'type': 'binary',
+            'datas': base64.b64encode(contenido),
+            'mimetype': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'res_model': self._name,
+            'res_id': self.id,
+        })
+        return {
+            'type': 'ir.actions.act_url',
+            'url': '/web/content/%d?download=true' % adjunto.id,
+            'target': 'download',
+        }
+
     def _linea(self, cruce, p):
         if cruce == 'anulados':
             detalle = p.get('detalle', '')
@@ -99,14 +134,29 @@ class SngComisionEstadoWizard(models.TransientModel):
     def _html(self, estado):
         filas = Markup('')
         for r in estado['resumen']:
-            sig = r['siguiente_tramo']
-            falta = ('%s para %s %%' % (_colones(sig['falta']), sig['porcentaje'])) if sig else 'Tramo máximo'
+            # En un mes cerrado no hay siguiente tramo (no es «tramo máximo»).
+            falta = libro_excel.siguiente_tramo_texto(r)
             filas += Markup(
                 '<tr><td>%s</td><td>%s%s</td><td class="text-end">%s</td><td class="text-end">%s %%</td>'
                 '<td class="text-end">%s</td><td class="text-end">%s</td><td class="text-end">%s</td><td>%s</td></tr>'
-            ) % (r['compania'], r['estado_texto'], ' (estimado)' if r['estimado'] else '',
+            ) % (r['cuadro'], r['estado_texto'], ' (estimado)' if r['estimado'] else '',
                  _colones(r['base']), r['porcentaje'], _colones(r['comision']), _colones(r['ajustes']),
                  _colones(r['en_proceso']), falta)
+        # De qué compañía viene cada comisión (un cuadro puede juntar varias).
+        desglose = Markup('')
+        for r in estado['resumen']:
+            for cia in r.get('companias') or []:
+                desglose += Markup(
+                    '<tr><td>%s</td><td>%s</td><td class="text-end">%s</td><td class="text-end">%s</td>'
+                    '<td class="text-end">%s</td><td class="text-end">%s</td></tr>'
+                ) % (r['cuadro'], cia['compania'], _colones(cia['cobrado']), _colones(cia['base']),
+                     _colones(cia['comision']), _colones(cia['ajustes']))
+        if desglose:
+            desglose = Markup(
+                '<h6>Por compañía</h6><table class="table table-sm"><thead><tr><th>Cuadro</th>'
+                '<th>Compañía</th><th class="text-end">Cobrado</th><th class="text-end">Base</th>'
+                '<th class="text-end">Comisión</th><th class="text-end">Ajustes</th></tr></thead>'
+                '<tbody>%s</tbody></table>') % desglose
         c = estado['cruces']
         pe = c['reportados']['por_estado']
         chips = Markup(' · ').join(escape(t) for t in (
@@ -123,11 +173,11 @@ class SngComisionEstadoWizard(models.TransientModel):
             'Reversos %s (%s)' % (c['reversos']['cantidad'], _colones(c['reversos']['ajuste'])),
         ))
         return Markup(
-            '<table class="table table-sm"><thead><tr><th>Compañía</th><th>Estado</th>'
+            '<table class="table table-sm"><thead><tr><th>Cuadro</th><th>Estado</th>'
             '<th class="text-end">Base</th><th class="text-end">Tramo</th><th class="text-end">Comisión</th>'
             '<th class="text-end">Ajustes</th><th class="text-end">En proceso</th><th>Siguiente tramo</th>'
-            '</tr></thead><tbody>%s</tbody></table><p>%s</p>'
-        ) % (filas, chips)
+            '</tr></thead><tbody>%s</tbody></table>%s<p>%s</p>'
+        ) % (filas, desglose, chips)
 
 
 class SngComisionEstadoWizardLine(models.TransientModel):

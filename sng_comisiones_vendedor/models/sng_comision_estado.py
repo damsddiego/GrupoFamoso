@@ -82,13 +82,18 @@ class SngComisionEstado(models.AbstractModel):
         return cruces.armar_estado(
             vendedores.ids, vendedor.name, str(periodo),
             mensuales=[{
-                'compania_id': m.company_id.id, 'compania': m.company_id.name,
+                'mensual_id': m.id, 'cuadro_id': m.scheme_id.id, 'cuadro': m.scheme_id.name,
                 'salesperson_id': m.salesperson_id.id, 'vendedor': m.salesperson_id.name,
                 'estado': m.state, 'base': m.base_amount, 'porcentaje': m.percentage,
                 'comision': m.commission_amount, 'ajustes': m.adjustment_amount,
+                'companias': [{
+                    'compania_id': fila['company'].id, 'compania': fila['company'].name,
+                    'cobrado': round(fila['payment_amount'], 2), 'base': round(fila['base'], 2),
+                    'comision': round(fila['commission'], 2), 'ajustes': round(fila['adjustment'], 2),
+                } for fila in m._get_company_breakdown()],
             } for m in mensuales],
             lineas=[{
-                'payment_id': l.payment_id.id, 'compania_id': l.monthly_id.company_id.id,
+                'payment_id': l.payment_id.id, 'compania_id': l.payment_id.company_id.id,
                 'line_type': l.line_type, 'base': l.commission_base,
                 'ajuste': l.commission_adjustment, 'motivo_reverso': l.reversal_reason or '',
                 'periodo_original': str(l.original_monthly_id.period or ''),
@@ -96,6 +101,7 @@ class SngComisionEstado(models.AbstractModel):
             pagos=pagos,
             reportados_ids=reportados.ids,
             tramos=self._tramos(env),
+            cuadros=self._cuadros(env, periodo),
             pendientes=pendientes,
             reemplazos={k: pagos[v.id] for k, v in reemplazos.items()},
             duplicados={k: pagos[v.id] for k, v in duplicados.items()},
@@ -143,7 +149,7 @@ class SngComisionEstado(models.AbstractModel):
                 'periodo': str(mes),
                 'etiqueta': '%s %s' % (MESES[mes.month - 1], mes.year),
                 'estados': [{
-                    'compania': m.company_id.name, 'estado': m.state,
+                    'cuadro': m.scheme_id.name, 'estado': m.state,
                     'estado_texto': cruces.ESTADOS_MES.get(m.state, m.state),
                 } for m in del_mes],
             })
@@ -151,10 +157,23 @@ class SngComisionEstado(models.AbstractModel):
 
     @api.model
     def _tramos(self, env):
+        """Escala de cada cuadro de comisiones: {cuadro: [(mínimo, %), ...]}."""
         tramos = {}
         for t in env['sng.commission.tier'].search([('active', '=', True)]):
-            tramos.setdefault(t.company_id.id, []).append((t.min_amount, t.percentage))
+            tramos.setdefault(t.scheme_id.id, []).append((t.min_amount, t.percentage))
         return tramos
+
+    @api.model
+    def _cuadros(self, env, periodo):
+        """Cuadro que rige para cada compañía en el mes: de ahí sale a qué
+        comisión va a entrar un cobro que todavía no tiene línea."""
+        Scheme = env['sng.commission.scheme']
+        cuadros = {}
+        for company in env['res.company'].search([]):
+            cuadro = Scheme._get_for_company(company, periodo)
+            if cuadro:
+                cuadros[company.id] = {'id': cuadro.id, 'nombre': cuadro.name}
+        return cuadros
 
     @api.model
     def _pendientes(self, env, vendedores, reportados, desde, hasta):

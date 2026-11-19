@@ -21,9 +21,13 @@ Entradas (todas con tipos JSON simples):
 - ``lineas``: líneas de comisión de los mensuales del vendedor en el periodo:
   ``payment_id, compania_id, line_type, base, ajuste, motivo_reverso,
   periodo_original``.
-- ``mensuales``: ``compania_id, compania, salesperson_id, vendedor, estado,
-  base, porcentaje, comision, ajustes``.
-- ``tramos``: {compania_id: [(monto_minimo, porcentaje), ...]}.
+- ``mensuales``: ``mensual_id, cuadro_id, cuadro, salesperson_id, vendedor,
+  estado, base, porcentaje, comision, ajustes, companias``. Un mensual junta lo
+  cobrado en todas las compañías de su cuadro; ``companias`` es el desglose:
+  ``compania_id, compania, cobrado, base, comision, ajustes``.
+- ``tramos``: {cuadro_id: [(monto_minimo, porcentaje), ...]}.
+- ``cuadros``: {compania_id: {'id', 'nombre'}}, el cuadro que rige para cada
+  compañía en el mes. Una compañía sin cuadro no comisiona.
 - ``pendientes``: pares (pago, factura) cobrados que todavía no tienen línea:
   ``payment_id, compania_id, compania, salesperson_id, vendedor, base,
   en_mes``. ``en_mes`` es False para los de pagos reportados en el mes cuya
@@ -88,9 +92,9 @@ def registrado_por(pago, vendedor_ids):
     return {'tipo': 'vendedor', 'nombre': pago.get('vendedor') or '?'}
 
 
-def tramo(tramos, compania_id, base):
+def tramo(tramos, cuadro_id, base):
     """(porcentaje alcanzado, siguiente tramo o None) para la base."""
-    escala = sorted(tramos.get(compania_id) or [])
+    escala = sorted(tramos.get(cuadro_id) or [])
     porcentaje, siguiente = 0.0, None
     for minimo, pct in escala:
         if base >= minimo:
@@ -172,9 +176,9 @@ def _grupo(pagos, **extra):
     return datos
 
 
-def _resumen_vacio(compania_id, compania, salesperson_id, vendedor):
+def _resumen_vacio(cuadro_id, cuadro, salesperson_id, vendedor):
     return {
-        'compania_id': compania_id, 'compania': compania or '',
+        'mensual_id': False, 'cuadro_id': cuadro_id, 'cuadro': cuadro or '', 'companias': [],
         'salesperson_id': salesperson_id or False, 'vendedor': vendedor or '',
         'estado': 'draft', 'estado_texto': ESTADOS_MES['draft'], 'estimado': True,
         'base': 0.0, 'porcentaje': 0.0, 'comision': 0.0, 'ajustes': 0.0, 'en_proceso': 0.0,
@@ -184,23 +188,26 @@ def _resumen_vacio(compania_id, compania, salesperson_id, vendedor):
 
 def armar_estado(vendedor_ids, vendedor_nombre, periodo, mensuales, lineas, pagos,
                  reportados_ids, tramos, pendientes, reemplazos,
-                 periodos=None, generado=None, duplicados=None):
+                 periodos=None, generado=None, duplicados=None, cuadros=None):
     """Estado de comisiones del vendedor para un mes (dict listo para JSON)."""
     ids = _ids(vendedor_ids)
     duplicados = duplicados or {}
+    cuadros = cuadros or {}
     lineas = list(lineas or [])
     comisiones = [l for l in lineas if l['line_type'] == 'commission']
     base_por_pago = {}
     for l in comisiones:
         base_por_pago[l['payment_id']] = base_por_pago.get(l['payment_id'], 0.0) + l['base']
 
-    # Resumen: uno por compañía y contacto del vendedor (un duplicado tiene su
-    # propio mensual y su propio tramo en Odoo).
+    # Resumen: uno por mensual, o sea por cuadro y contacto del vendedor (un
+    # duplicado tiene su propio mensual y su propio tramo en Odoo).
     resumen = {}
     for m in mensuales:
-        clave = (m['compania_id'], m.get('salesperson_id') or None)
-        r = _resumen_vacio(m['compania_id'], m['compania'], m.get('salesperson_id'), m.get('vendedor'))
+        clave = (m['cuadro_id'], m.get('salesperson_id') or None)
+        r = _resumen_vacio(m['cuadro_id'], m['cuadro'], m.get('salesperson_id'), m.get('vendedor'))
         r.update({
+            'mensual_id': m.get('mensual_id') or False,
+            'companias': [dict(c) for c in m.get('companias') or []],
             'estado': m['estado'],
             'estado_texto': ESTADOS_MES.get(m['estado'], m['estado']),
             'estimado': m['estado'] == 'draft',
@@ -215,21 +222,24 @@ def armar_estado(vendedor_ids, vendedor_nombre, periodo, mensuales, lineas, pago
         sp = f.get('salesperson_id')
         if sp not in ids or not f.get('en_mes', True) or (f.get('base') or 0) <= 0:
             continue
-        cid = f['compania_id']
+        cuadro = cuadros.get(f['compania_id'])
+        if not cuadro:
+            continue  # compañía sin cuadro vigente: ese cobro no va a comisionar
+        cid = cuadro['id']
         clave = (cid, sp) if (cid, sp) in resumen else (cid, None)
         if clave not in resumen:
             clave = (cid, sp)
-            resumen[clave] = _resumen_vacio(cid, f.get('compania'), sp, f.get('vendedor'))
+            resumen[clave] = _resumen_vacio(cid, cuadro.get('nombre'), sp, f.get('vendedor'))
         resumen[clave]['en_proceso'] += f['base']
         en_proceso_por_pago[f['payment_id']] = en_proceso_por_pago.get(f['payment_id'], 0.0) + f['base']
     for r in resumen.values():
         r['en_proceso'] = round(r['en_proceso'], 2)
         if r['estado'] != 'draft':
             continue  # mes cerrado: el tramo ya no cambia; lo pendiente rueda al siguiente mes
-        _pct, r['siguiente_tramo'] = tramo(tramos, r['compania_id'], r['base'])
+        _pct, r['siguiente_tramo'] = tramo(tramos, r['cuadro_id'], r['base'])
         if r['en_proceso']:
             base = r['base'] + r['en_proceso']
-            pct, siguiente = tramo(tramos, r['compania_id'], base)
+            pct, siguiente = tramo(tramos, r['cuadro_id'], base)
             r['proyeccion'] = {
                 'base': round(base, 2),
                 'porcentaje': pct,
@@ -304,18 +314,18 @@ def armar_estado(vendedor_ids, vendedor_nombre, periodo, mensuales, lineas, pago
                              periodo_original=l.get('periodo_original') or '',
                              ajuste=round(l.get('ajuste') or 0.0, 2)))
 
-    companias = sorted(resumen.values(), key=lambda r: -r['base'])
+    comisiones = sorted(resumen.values(), key=lambda r: -r['base'])
     return {
         'vendedor': {'id': min(ids), 'ids': sorted(ids), 'nombre': vendedor_nombre},
         'periodo': periodo,
         'generado': generado or '',
         'periodos': periodos or [],
-        'resumen': companias,
+        'resumen': comisiones,
         'totales': {
-            'base': round(sum(r['base'] for r in companias), 2),
-            'comision': round(sum(r['comision'] for r in companias), 2),
+            'base': round(sum(r['base'] for r in comisiones), 2),
+            'comision': round(sum(r['comision'] for r in comisiones), 2),
             # Solo lo que va a entrar a este mes (en un mes cerrado rueda al siguiente).
-            'en_proceso': round(sum(r['en_proceso'] for r in companias if r['estado'] == 'draft'), 2),
+            'en_proceso': round(sum(r['en_proceso'] for r in comisiones if r['estado'] == 'draft'), 2),
         },
         'cruces': {
             'reportados': _grupo(items_reportados, por_estado=por_estado),

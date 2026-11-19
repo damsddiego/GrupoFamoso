@@ -41,11 +41,11 @@ class TestEstadoCopiaProd(TransactionCase):
             self.assertEqual(estado['periodo'], '2026-10-01')
             self.assertEqual(len(estado['periodos']), 7)
             for r in estado['resumen']:
-                mensual = self.env['sng.commission.monthly'].search([
-                    ('period', '=', OCTUBRE), ('company_id', '=', r['compania_id']),
-                    ('salesperson_id', '=', r['salesperson_id']),
-                ] if r['salesperson_id'] else [('id', '=', 0)])
+                mensual = self.env['sng.commission.monthly'].browse(r['mensual_id'] or [])
                 if mensual:
+                    self.assertEqual(mensual.period, OCTUBRE)
+                    self.assertEqual(r['cuadro_id'], mensual.scheme_id.id)
+                    self.assertAlmostEqual(sum(c['base'] for c in r['companias']), r['base'], places=2)
                     self.assertAlmostEqual(r['base'], mensual.base_amount, places=2)
                     self.assertAlmostEqual(r['comision'], mensual.commission_amount, places=2)
                     self.assertFalse(r['estimado'])

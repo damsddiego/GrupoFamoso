@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Estado de comisiones del vendedor',
-    'version': '18.0.1.1.0',
+    'version': '18.0.2.0.0',
     'category': 'Sales/Commission',
     'summary': 'Cruces de pagos y comisiones por vendedor para la app (Mis comisiones) y la oficina',
     'description': """
@@ -12,7 +12,8 @@
         ruteros llama por RPC para mostrar «Mis comisiones», y un asistente con
         la misma información para la oficina:
 
-        - Resumen por compañía: base, tramo, comisión (estimada si el mes está
+        - Resumen por comisión (un cuadro puede juntar varias compañías, con su
+          desglose): base, tramo, comisión (estimada si el mes está
           abierto), ajustes, cobros en proceso y cuánto falta para el
           siguiente tramo.
         - Pagos reportados por el vendedor contra verificados, no aplicados,
@@ -22,6 +23,7 @@
         - Comisión del vendedor registrada por otro vendedor o por oficina, y
           pagos que él registró cuya comisión es de otro.
         - Pagos sin comisión con su motivo, y reversos del mes.
+        - El asistente descarga todo en un Excel: resumen y una hoja por cruce.
 
         Seguridad: solo el grupo «Comisiones: consulta desde la app de ruteros»
         (asignarlo al usuario RPC de la app) y los usuarios de comisiones

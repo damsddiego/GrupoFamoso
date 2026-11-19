@@ -18,13 +18,14 @@
         <template id="consolidated_report">
             <t t-call="web.html_container">
                 <t t-set="o" t-value="wizard"/>
-                <t t-set="currency" t-value="wizard.company_id.currency_id"/>
+                <t t-set="currency" t-value="wizard.scheme_id.currency_id"/>
                 <t t-call="web.external_layout">
                     <div class="page">
                         <h2>Planilla Consolidada de Comisiones por Pagos</h2>
                         <p>
                             <strong>Periodo:</strong> <span t-esc="wizard.period_label"/> &#160;|&#160;
-                            <strong>Compañía:</strong> <span t-esc="wizard.company_id.name"/> &#160;|&#160;
+                            <strong>Cuadro:</strong> <span t-esc="wizard.scheme_id.name"/>
+                            (<span t-esc="wizard.company_names"/>) &#160;|&#160;
                             <strong>Vendedores:</strong>
                             <span t-if="wizard.salesperson_ids" t-esc="', '.join(wizard.salesperson_ids.mapped('name'))"/>
                             <span t-else="">Todos</span>
@@ -112,7 +113,7 @@
             <field name="report_name">sng_sales_commission_payment.consolidated_report</field>
             <field name="report_file">sng_sales_commission_payment.consolidated_report</field>
             <field name="paperformat_id" ref="paperformat_commission_consolidated_landscape"/>
-            <field name="print_report_name">'Comisiones consolidado %s - %s' % (object.period_label, object.company_id.name)</field>
+            <field name="print_report_name">'Comisiones consolidado %s - %s' % (object.period_label, object.scheme_id.name)</field>
             <field name="binding_type">report</field>
         </record>
 
@@ -122,7 +123,7 @@
             <field name="report_type">xlsx</field>
             <field name="report_name">sng_sales_commission_payment.consolidated_xlsx</field>
             <field name="report_file">Comisiones consolidado</field>
-            <field name="print_report_name">'Comisiones consolidado %s - %s' % (object.period_label, object.company_id.name)</field>
+            <field name="print_report_name">'Comisiones consolidado %s - %s' % (object.period_label, object.scheme_id.name)</field>
             <field name="binding_type">report</field>
         </record>
     </data>

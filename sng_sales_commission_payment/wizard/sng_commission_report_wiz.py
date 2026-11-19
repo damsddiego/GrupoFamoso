@@ -21,12 +21,18 @@ class SngCommissionReportWiz(models.TransientModel):
         default=lambda self: fields.Date.context_today(self).replace(day=1),
         help='Cualquier día del mes: se toman todas las comisiones de ese mes.',
     )
-    company_id = fields.Many2one(
-        'res.company',
-        string='Compañía',
+    scheme_id = fields.Many2one(
+        'sng.commission.scheme',
+        string='Cuadro',
         required=True,
-        default=lambda self: self.env.company,
-        domain=lambda self: [('id', 'in', self.env.companies.ids)],
+        default=lambda self: self._default_scheme_id(),
+        context={'active_test': False},
+        help='Cuadro de comisiones del mes. Para meses anteriores a un cuadro '
+             'de varias compañías, elija el cuadro que tenía cada compañía.',
+    )
+    company_names = fields.Char(
+        related='scheme_id.company_names',
+        string='Compañías',
     )
     salesperson_ids = fields.Many2many(
         'res.partner',
@@ -54,6 +60,19 @@ class SngCommissionReportWiz(models.TransientModel):
              'se devolvieron.',
     )
 
+    @api.model
+    def _default_scheme_id(self):
+        return self.env['sng.commission.scheme']._get_for_company(
+            self.env.company, fields.Date.context_today(self))
+
+    @api.onchange('period')
+    def _onchange_period(self):
+        """Propone el cuadro que rige en ese mes para la compañía actual."""
+        if self.period:
+            scheme = self.env['sng.commission.scheme']._get_for_company(self.env.company, self.period)
+            if scheme:
+                self.scheme_id = scheme
+
     @api.depends('period')
     def _compute_period_label(self):
         for wiz in self:
@@ -62,10 +81,10 @@ class SngCommissionReportWiz(models.TransientModel):
             else:
                 wiz.period_label = ''
 
-    @api.depends('period', 'company_id', 'salesperson_ids')
+    @api.depends('period', 'scheme_id', 'salesperson_ids')
     def _compute_monthly_count(self):
         for wiz in self:
-            wiz.monthly_count = len(wiz._get_monthlies()) if wiz.period and wiz.company_id else 0
+            wiz.monthly_count = len(wiz._get_monthlies()) if wiz.period and wiz.scheme_id else 0
 
     def _get_period(self):
         self.ensure_one()
@@ -74,7 +93,7 @@ class SngCommissionReportWiz(models.TransientModel):
     def _get_domain(self):
         self.ensure_one()
         domain = [
-            ('company_id', '=', self.company_id.id),
+            ('scheme_id', '=', self.scheme_id.id),
             ('period', '=', self._get_period()),
         ]
         if self.salesperson_ids:
@@ -82,9 +101,9 @@ class SngCommissionReportWiz(models.TransientModel):
         return domain
 
     def _get_monthlies(self):
-        """Comisiones mensuales del periodo/compañía, ordenadas por vendedor."""
+        """Comisiones mensuales del periodo y cuadro, ordenadas por vendedor."""
         self.ensure_one()
-        if not self.period or not self.company_id:
+        if not self.period or not self.scheme_id:
             return self.env['sng.commission.monthly']
         return self.env['sng.commission.monthly'].search(
             self._get_domain(), order='salesperson_id, id')
@@ -96,8 +115,9 @@ class SngCommissionReportWiz(models.TransientModel):
         else:
             sellers = _('Todos')
         return _(
-            'Periodo: %(period)s | Compañía: %(company)s | Vendedores: %(sellers)s',
-            period=self.period_label, company=self.company_id.name, sellers=sellers,
+            'Periodo: %(period)s | Cuadro: %(scheme)s (%(companies)s) | Vendedores: %(sellers)s',
+            period=self.period_label, scheme=self.scheme_id.name,
+            companies=self.company_names, sellers=sellers,
         )
 
     def _get_totals(self, monthlies):
@@ -113,8 +133,8 @@ class SngCommissionReportWiz(models.TransientModel):
         monthlies = self._get_monthlies()
         if not monthlies:
             raise UserError(_(
-                'No hay comisiones mensuales para %(company)s en %(period)s con los filtros indicados.',
-                company=self.company_id.name, period=self.period_label,
+                'No hay comisiones mensuales del cuadro %(scheme)s en %(period)s con los filtros indicados.',
+                scheme=self.scheme_id.name, period=self.period_label,
             ))
         return monthlies
 
@@ -168,7 +188,7 @@ class SngCommissionReportWiz(models.TransientModel):
                     zf.writestr(filename, pdf)
             name = 'Comisiones por vendedor %s - %s.zip' % (
                 self._safe_filename(self.period_label),
-                self._safe_filename(self.company_id.name),
+                self._safe_filename(self.scheme_id.name),
             )
             content, mimetype = buffer.getvalue(), 'application/zip'
 

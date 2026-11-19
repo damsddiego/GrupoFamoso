@@ -4,8 +4,11 @@ import logging
 
 from dateutil.relativedelta import relativedelta
 
+from markupsafe import Markup
+
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
+from odoo.tools import formatLang
 
 _logger = logging.getLogger(__name__)
 
@@ -43,16 +46,33 @@ class SngCommissionMonthly(models.Model):
         compute='_compute_period_label',
         store=True,
     )
+    scheme_id = fields.Many2one(
+        'sng.commission.scheme',
+        string='Cuadro',
+        required=True,
+        index=True,
+        ondelete='restrict',
+        help='Cuadro de comisiones del mes: la comisión junta lo cobrado en '
+             'todas sus compañías.',
+    )
+    company_ids = fields.Many2many(
+        'res.company',
+        related='scheme_id.company_ids',
+        string='Compañías',
+    )
+    company_names = fields.Char(
+        related='scheme_id.company_names',
+        string='Compañías del Cuadro',
+    )
     company_id = fields.Many2one(
         'res.company',
         string='Compañía',
-        required=True,
-        default=lambda self: self.env.company,
         index=True,
+        help='Solo cuando el cuadro tiene una compañía; la factura de comisión lo exige.',
     )
     currency_id = fields.Many2one(
         'res.currency',
-        related='company_id.currency_id',
+        related='scheme_id.currency_id',
         string='Moneda',
     )
     line_ids = fields.One2many(
@@ -132,6 +152,11 @@ class SngCommissionMonthly(models.Model):
         copy=False,
         readonly=True,
     )
+    company_breakdown_html = fields.Html(
+        string='Por Compañía',
+        compute='_compute_company_breakdown_html',
+        sanitize=False,
+    )
     bill_id = fields.Many2one(
         'account.move',
         string='Factura de Comisión',
@@ -142,9 +167,9 @@ class SngCommissionMonthly(models.Model):
 
     _sql_constraints = [
         (
-            'unique_salesperson_period_company',
-            'UNIQUE(salesperson_id, period, company_id)',
-            'Ya existe una comisión mensual para este vendedor y periodo.',
+            'unique_salesperson_period_scheme',
+            'UNIQUE(salesperson_id, period, scheme_id)',
+            'Ya existe una comisión mensual para este vendedor, periodo y cuadro.',
         ),
     ]
 
@@ -276,12 +301,20 @@ class SngCommissionMonthly(models.Model):
                     "Solo se pueden cerrar comisiones en estado Pendiente (%(name)s está en %(state)s).",
                     name=rec.name, state=dict(rec._fields['state']._description_selection(rec.env)).get(rec.state),
                 ))
+        # Con un cuadro nuevo sin reagrupar, parte de lo cobrado seguiría en
+        # borradores del cuadro anterior y este cierre saldría incompleto.
+        if self._sng_regroup_pending_for_close():
+            raise UserError(_(
+                "Hay comisiones pendientes de este mes que todavía están en el cuadro anterior de su "
+                "compañía. Use «Reagrupar meses abiertos» en el cuadro de comisiones y vuelva a cerrar."
+            ))
         # Antes de cerrar, los cobros del mes que aún no tienen línea (p. ej.
         # conciliados después de confirmarse) se generan para que entren a
         # este mes y no rueden al siguiente.
-        for company, period in {(rec.company_id, rec.period) for rec in self}:
+        for scheme, period in {(rec.scheme_id, rec.period) for rec in self}:
             first, last = self._sng_period_bounds(period)
-            self._sng_generate_pending(company, first, last)
+            for company in scheme.sudo().company_ids:
+                self._sng_generate_pending(company, first, last)
         self._recompute_commission()
         self.write({
             'closed': True,
@@ -317,17 +350,37 @@ class SngCommissionMonthly(models.Model):
 
     @api.model
     def _get_open_period(self, salesperson, company, period):
-        """Devuelve el primer periodo >= period cuyo mensual del vendedor no
-        esté cerrado/facturado (o no exista). Máximo 24 meses hacia adelante."""
+        """Devuelve el primer periodo >= period en que el mensual del vendedor
+        para la compañía (el de su cuadro vigente en ese mes) no esté
+        cerrado/facturado, o no exista. Máximo 24 meses hacia adelante.
+
+        False si la compañía no tiene cuadro vigente en ``period``: sin cuadro
+        no hay comisión.
+        """
+        Scheme = self.env['sng.commission.scheme']
         current = period
         for _i in range(24):
-            monthly = self.search([
-                ('salesperson_id', '=', salesperson.id),
-                ('company_id', '=', company.id),
-                ('period', '=', current),
-            ], limit=1)
-            if not monthly or monthly.state == 'draft':
-                return current
+            scheme = Scheme._get_for_company(company, current)
+            if not scheme:
+                if current == period:
+                    _logger.info(
+                        "Sin cuadro de comisiones vigente para %s en %s; no se genera comisión.",
+                        company.name, period,
+                    )
+                    return False
+            else:
+                # El mes está cerrado si el vendedor ya tiene ahí un mensual
+                # cerrado de CUALQUIER cuadro de esta compañía, no solo del que
+                # rige hoy: un cuadro archivado o con otra vigencia no reabre
+                # un mes que ya se cerró.
+                closed = self.search_count([
+                    ('salesperson_id', '=', salesperson.id),
+                    ('scheme_id.company_ids', 'in', company.ids),
+                    ('period', '=', current),
+                    ('state', '!=', 'draft'),
+                ], limit=1)
+                if not closed:
+                    return current
             current = current + relativedelta(months=1)
         _logger.warning(
             "No se encontró un periodo abierto para %s en %s partiendo de %s; se omite la comisión.",
@@ -337,16 +390,21 @@ class SngCommissionMonthly(models.Model):
 
     @api.model
     def _get_or_create(self, salesperson, company, period):
-        """Devuelve (creando si no existe) el registro mensual del vendedor."""
+        """Devuelve (creando si no existe) el mensual del vendedor en el cuadro
+        que rige para la compañía en ese mes. Vacío si no rige ninguno."""
+        scheme = self.env['sng.commission.scheme']._get_for_company(company, period)
+        if not scheme:
+            return self.browse()
         rec = self.search([
             ('salesperson_id', '=', salesperson.id),
-            ('company_id', '=', company.id),
+            ('scheme_id', '=', scheme.id),
             ('period', '=', period),
         ], limit=1)
         if not rec:
             rec = self.create({
                 'salesperson_id': salesperson.id,
-                'company_id': company.id,
+                'scheme_id': scheme.id,
+                'company_id': scheme.company_ids.id if len(scheme.company_ids) == 1 else False,
                 'period': period,
             })
         return rec
@@ -357,14 +415,17 @@ class SngCommissionMonthly(models.Model):
         Los reversos no suman base (no cambian el tramo): su ajuste monetario
         se descuenta directo del monto de comisión del mes.
         """
-        Tier = self.env['sng.commission.tier']
-        for rec in self:
+        # sudo: el mensual junta líneas de todas las compañías del cuadro y el
+        # usuario puede no tener activas todas; con sus permisos la base
+        # saldría solo de las que ve.
+        Tier = self.env['sng.commission.tier'].sudo()
+        for rec in self.sudo():
             if rec.state != 'draft':
                 continue
             base = sum(rec.line_ids.filtered(
                 lambda l: l.line_type == 'commission').mapped('commission_base'))
             adjustment = sum(rec.line_ids.mapped('commission_adjustment'))
-            tier = Tier.get_tier_for_amount(base, rec.company_id)
+            tier = Tier.get_tier_for_amount(base, rec.scheme_id)
             percentage = tier.percentage if tier else 0.0
             rec.write({
                 'base_amount': base,
@@ -374,9 +435,55 @@ class SngCommissionMonthly(models.Model):
                 'commission_amount': base * percentage / 100.0 + adjustment,
             })
 
+    def _get_company_breakdown(self):
+        """Cuánto de la comisión viene de cada compañía del cuadro: una entrada
+        por compañía de los pagos, con lo cobrado, la base, la comisión que le
+        toca (base × % del mensual) y sus reversos. Es informativo: el tramo
+        sale de la base total.
+
+        sudo: quien ve el mensual ve el desglose completo, aunque alguna de
+        las compañías no sea suya.
+        """
+        self.ensure_one()
+        rows = {}
+        for line in self.sudo().line_ids:
+            company = line.company_id
+            row = rows.setdefault(company.id, {
+                'company': company, 'payment_amount': 0.0, 'base': 0.0,
+                'commission': 0.0, 'adjustment': 0.0,
+            })
+            if line.line_type == 'commission':
+                row['payment_amount'] += line.payment_amount
+                row['base'] += line.commission_base
+            row['adjustment'] += line.commission_adjustment
+        for row in rows.values():
+            row['commission'] = row['base'] * self.percentage / 100.0
+        return [rows[company_id] for company_id in sorted(rows)]
+
+    @api.depends('line_ids.commission_base', 'line_ids.commission_adjustment',
+                 'line_ids.payment_amount', 'percentage')
+    def _compute_company_breakdown_html(self):
+        def money(rec, amount):
+            return formatLang(rec.env, amount, currency_obj=rec.currency_id)
+
+        for rec in self:
+            body = Markup().join(
+                Markup('<tr><td>%s</td><td class="text-end">%s</td><td class="text-end">%s</td>'
+                       '<td class="text-end">%s</td><td class="text-end">%s</td></tr>') % (
+                    row['company'].name, money(rec, row['payment_amount']), money(rec, row['base']),
+                    money(rec, row['commission']), money(rec, row['adjustment']))
+                for row in rec._get_company_breakdown())
+            rec.company_breakdown_html = Markup(
+                '<table class="table table-sm"><thead><tr><th>%s</th><th class="text-end">%s</th>'
+                '<th class="text-end">%s</th><th class="text-end">%s</th><th class="text-end">%s</th>'
+                '</tr></thead><tbody>%s</tbody></table>') % (
+                _('Compañía'), _('Cobrado (con IVA)'), _('Base (sin IVA)'),
+                _('Comisión'), _('Reversos'), body)
+
     def _get_tax_profile_summary(self):
         """Resumen por tipo de factura para los reportes PDF/XLSX."""
         self.ensure_one()
+        self = self.sudo()  # todas las líneas del mensual, no solo las de las compañías activas
         Line = self.env['sng.commission.payment.line']
         labels = dict(Line._fields['tax_profile']._description_selection(self.env))
         summary = []

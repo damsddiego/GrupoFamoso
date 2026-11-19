@@ -23,8 +23,22 @@ except ImportError:  # fuera de Odoo
 
 YO, OTRO = 10, 20
 GF, PROTIRE = 1, 2
-TRAMOS = {GF: [(0.0, 0.0), (12e6, 2.75), (20e6, 3.0), (30e6, 3.5)],
-          PROTIRE: [(0.0, 0.0), (12e6, 2.75), (20e6, 3.0), (30e6, 3.5)]}
+# Cada compañía con su propio cuadro, y un cuadro de grupo que junta las dos.
+C_GF, C_PROTIRE, GRUPO = 101, 102, 7
+CUADROS = {GF: {'id': C_GF, 'nombre': 'GF'}, PROTIRE: {'id': C_PROTIRE, 'nombre': 'PROTIRE'}}
+CUADROS_GRUPO = {GF: {'id': GRUPO, 'nombre': 'Grupo'}, PROTIRE: {'id': GRUPO, 'nombre': 'Grupo'}}
+TRAMOS = {C_GF: [(0.0, 0.0), (12e6, 2.75), (20e6, 3.0), (30e6, 3.5)],
+          C_PROTIRE: [(0.0, 0.0), (12e6, 2.75), (20e6, 3.0), (30e6, 3.5)],
+          GRUPO: [(0.0, 0.0), (12e6, 2.75), (20e6, 3.0), (25e6, 3.5), (35e6, 4.0)]}
+MENSUAL_GRUPO = {
+    'mensual_id': 99, 'cuadro_id': GRUPO, 'cuadro': 'Grupo', 'salesperson_id': 10, 'vendedor': 'Yo',
+    'estado': 'draft', 'base': 29144491.09, 'porcentaje': 3.5, 'comision': 1020057.19, 'ajustes': 0.0,
+    'companias': [
+        {'compania_id': GF, 'compania': 'GF', 'cobrado': 3467028.70, 'base': 3068166.99,
+         'comision': 107385.84, 'ajustes': 0.0},
+        {'compania_id': PROTIRE, 'compania': 'Protire', 'cobrado': 29466246.23, 'base': 26076324.10,
+         'comision': 912671.34, 'ajustes': 0.0},
+    ]}
 
 
 def pago(pid, **k):
@@ -47,25 +61,31 @@ def linea(pid, base, tipo='commission', **k):
     return datos
 
 
+def mensual(**k):
+    datos = {'mensual_id': 1, 'cuadro_id': C_GF, 'cuadro': 'GF', 'estado': 'draft', 'base': 0.0,
+             'porcentaje': 0.0, 'comision': 0.0, 'ajustes': 0.0, 'companias': []}
+    datos.update(k)
+    return datos
+
+
 def estado(pagos, reportados, lineas=(), mensuales=None, pendientes=(), reemplazos=None):
     if mensuales is None:
         base = sum(l['base'] for l in lineas if l['line_type'] == 'commission')
-        mensuales = [{'compania_id': GF, 'compania': 'GF', 'estado': 'draft', 'base': base,
-                      'porcentaje': 0.0, 'comision': 0.0, 'ajustes': 0.0}]
+        mensuales = [mensual(base=base)]
     return cruces.armar_estado(
         YO, 'Yo', '2026-11-01', mensuales, list(lineas), {p['id']: p for p in pagos},
-        reportados, TRAMOS, list(pendientes), reemplazos or {})
+        reportados, TRAMOS, list(pendientes), reemplazos or {}, cuadros=CUADROS)
 
 
 @tagged('post_install', '-at_install')
 class TestCruces(Base):
 
     def test_tramo_y_siguiente(self):
-        self.assertEqual(cruces.tramo(TRAMOS, GF, 11e6), (0.0, {'minimo': 12e6, 'porcentaje': 2.75, 'falta': 1e6}))
-        pct, sig = cruces.tramo(TRAMOS, GF, 25e6)
+        self.assertEqual(cruces.tramo(TRAMOS, C_GF, 11e6), (0.0, {'minimo': 12e6, 'porcentaje': 2.75, 'falta': 1e6}))
+        pct, sig = cruces.tramo(TRAMOS, C_GF, 25e6)
         self.assertEqual(pct, 3.0)
         self.assertEqual(sig['falta'], 5e6)
-        self.assertEqual(cruces.tramo(TRAMOS, GF, 40e6), (3.5, None))
+        self.assertEqual(cruces.tramo(TRAMOS, C_GF, 40e6), (3.5, None))
 
     def test_reportados_por_estado(self):
         pagos = [pago(1), pago(2, verificado=False), pago(3, estado='draft'),
@@ -128,8 +148,7 @@ class TestCruces(Base):
 
     def test_proyeccion_cruza_tramo(self):
         lineas = [linea(1, 11.5e6)]
-        mens = [{'compania_id': GF, 'compania': 'GF', 'estado': 'draft', 'base': 11.5e6,
-                 'porcentaje': 0.0, 'comision': 0.0, 'ajustes': -100.0}]
+        mens = [mensual(base=11.5e6, ajustes=-100.0)]
         pend = [{'payment_id': 2, 'compania_id': GF, 'compania': 'GF', 'salesperson_id': YO, 'base': 1e6}]
         r = estado([pago(1), pago(2, comision_de={})], [1, 2], lineas, mens, pend)['resumen'][0]
         self.assertTrue(r['estimado'])
@@ -137,18 +156,18 @@ class TestCruces(Base):
         self.assertEqual(r['proyeccion']['porcentaje'], 2.75)
         self.assertEqual(r['proyeccion']['comision'], round(12.5e6 * 0.0275 - 100.0, 2))
 
-    def test_mes_cerrado_no_proyecta_y_pendiente_crea_compania(self):
-        mens = [{'compania_id': GF, 'compania': 'GF', 'estado': 'closed', 'base': 21e6,
-                 'porcentaje': 3.0, 'comision': 630000.0, 'ajustes': 0.0}]
+    def test_mes_cerrado_no_proyecta_y_pendiente_crea_resumen(self):
+        mens = [mensual(estado='closed', base=21e6, porcentaje=3.0, comision=630000.0)]
         pend = [{'payment_id': 2, 'compania_id': GF, 'compania': 'GF', 'salesperson_id': YO, 'base': 5.0},
                 {'payment_id': 3, 'compania_id': PROTIRE, 'compania': 'PROTIRE', 'salesperson_id': YO, 'base': 7.0}]
         e = estado([pago(2, comision_de={}), pago(3, comision_de={}, compania_id=PROTIRE)], [2, 3],
                    [linea(9, 21e6)], mens, pend)
-        res = {r['compania_id']: r for r in e['resumen']}
-        self.assertIsNone(res[GF]['proyeccion'])
-        self.assertIsNone(res[GF]['siguiente_tramo'])
-        self.assertFalse(res[GF]['estimado'])
-        self.assertEqual(res[PROTIRE]['en_proceso'], 7.0)
+        res = {r['cuadro_id']: r for r in e['resumen']}
+        self.assertIsNone(res[C_GF]['proyeccion'])
+        self.assertIsNone(res[C_GF]['siguiente_tramo'])
+        self.assertFalse(res[C_GF]['estimado'])
+        self.assertEqual(res[C_PROTIRE]['en_proceso'], 7.0)
+        self.assertEqual((res[C_PROTIRE]['cuadro'], res[C_PROTIRE]['mensual_id']), ('PROTIRE', False))
         self.assertEqual(e['totales']['comision'], 630000.0)
         self.assertEqual(e['totales']['en_proceso'], 7.0)  # lo de GF rueda al mes siguiente
 
@@ -163,10 +182,8 @@ class TestCruces(Base):
     def test_contactos_duplicados_cuentan_como_yo(self):
         DUP = 11
         p_dup = pago(1, vendedor_id=DUP, vendedor='YO DUPLICADO', comision_de={DUP: 'YO DUPLICADO'})
-        mens = [{'compania_id': GF, 'compania': 'GF', 'salesperson_id': YO, 'vendedor': 'Yo', 'estado': 'draft',
-                 'base': 100.0, 'porcentaje': 0.0, 'comision': 0.0, 'ajustes': 0.0},
-                {'compania_id': GF, 'compania': 'GF', 'salesperson_id': DUP, 'vendedor': 'YO DUPLICADO',
-                 'estado': 'draft', 'base': 50.0, 'porcentaje': 0.0, 'comision': 0.0, 'ajustes': 0.0}]
+        mens = [mensual(mensual_id=1, salesperson_id=YO, vendedor='Yo', base=100.0),
+                mensual(mensual_id=2, salesperson_id=DUP, vendedor='YO DUPLICADO', base=50.0)]
         e = cruces.armar_estado({YO, DUP}, 'Yo', '2026-11-01', mens, [linea(1, 50.0)], {1: p_dup}, [1],
                                 TRAMOS, [], {})
         c = e['cruces']
@@ -198,6 +215,34 @@ class TestCruces(Base):
         self.assertIn('02/12/2026', motivos[1])
         self.assertEqual(motivos[2], 'La factura es de otro vendedor: Otro')
         self.assertEqual(e['resumen'][0]['en_proceso'], 0.0)
+
+    def test_un_resumen_por_mensual_de_grupo(self):
+        e = cruces.armar_estado(YO, 'Yo', '2026-11-01', [MENSUAL_GRUPO], [], {}, [], TRAMOS, [], {},
+                                cuadros=CUADROS_GRUPO)
+        (r,) = e['resumen']
+        self.assertEqual((r['mensual_id'], r['cuadro_id'], r['cuadro']), (99, GRUPO, 'Grupo'))
+        self.assertEqual([c['compania_id'] for c in r['companias']], [GF, PROTIRE])
+        self.assertNotIn('compania_id', r)
+        self.assertNotIn('compania', r)
+        self.assertEqual(r['siguiente_tramo'], {'minimo': 35e6, 'porcentaje': 4.0, 'falta': 5855508.91})
+
+    def test_pendiente_de_otra_compania_suma_al_mismo_resumen(self):
+        pendiente = {'payment_id': 5, 'compania_id': GF, 'compania': 'GF', 'salesperson_id': YO,
+                     'vendedor': 'Yo', 'base': 6000000.0, 'en_mes': True}
+        e = cruces.armar_estado(YO, 'Yo', '2026-11-01', [MENSUAL_GRUPO], [], {5: pago(5)}, [], TRAMOS,
+                                [pendiente], {}, cuadros=CUADROS_GRUPO)
+        (r,) = e['resumen']
+        self.assertEqual(r['en_proceso'], 6000000.0)
+        self.assertEqual(r['proyeccion']['base'], 35144491.09)
+        self.assertEqual(r['proyeccion']['porcentaje'], 4.0)
+        self.assertEqual(r['proyeccion']['comision'], 1405779.64)
+
+    def test_pendiente_de_compania_sin_cuadro_no_cuenta(self):
+        pendiente = {'payment_id': 5, 'compania_id': 99, 'compania': 'Sin cuadro', 'salesperson_id': YO,
+                     'vendedor': 'Yo', 'base': 500.0, 'en_mes': True}
+        e = estado([pago(5, comision_de={}, compania_id=99)], [5], pendientes=[pendiente])
+        self.assertEqual(e['totales']['en_proceso'], 0.0)
+        self.assertEqual(len(e['resumen']), 1)
 
 
 if __name__ == '__main__':

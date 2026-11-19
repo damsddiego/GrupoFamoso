@@ -57,8 +57,9 @@ class TestCommissionAnalysis(TransactionCase):
         monthly = self._monthly(EDUARDO, PROTIRE)
         origin = monthly._sng_analysis_origin()
         self.assertAlmostEqual(origin['check']['base'], 26076324.10, places=2)
-        self.assertAlmostEqual(origin['check']['gross'], 782289.72, places=2)
-        self.assertAlmostEqual(origin['check']['module'], 759690.30, places=2)
+        # Octubre se recalculó el 2026-11-16 con el cuadro nuevo: 3 % → 3.5 %.
+        self.assertAlmostEqual(origin['check']['gross'], 912671.34, places=2)
+        self.assertAlmostEqual(origin['check']['module'], 890071.92, places=2)
         self.assertAlmostEqual(origin['reversals']['commission_adjustment'], -22599.42, places=2)
         own = [g for g in origin['groups'] if g['label'] == 'Tableta del vendedor']
         self.assertEqual(len(own), 1)
@@ -88,8 +89,9 @@ class TestCommissionAnalysis(TransactionCase):
         self.assertAlmostEqual(result['reversed_amount'], 18617.08, places=2)
 
     def test_eduardo_protire_prior_collections(self):
-        """Cinco cobros de septiembre confirmados en octubre: septiembre fue al
-        3.5 % y octubre al 3 %."""
+        """Cinco cobros de septiembre confirmados en octubre: los dos meses
+        quedaron al 3.5 % (octubre desde el recálculo del 2026-11-16), así que
+        ya no hay diferencia de tasa."""
         result = self._monthly(EDUARDO, PROTIRE)._sng_analysis_prior_collections()
         september = self.env['account.payment'].browse([1074779, 1031740, 996706, 996714, 1075570])
         rows = [row for row in result['rows'] if row['payment'] in september.mapped('name')]
@@ -98,16 +100,17 @@ class TestCommissionAnalysis(TransactionCase):
         for row in rows:
             self.assertEqual(row['reason'], 'Confirmado tarde')
             self.assertAlmostEqual(row['original_percentage'], 3.5)
-            self.assertAlmostEqual(row['difference'], row['commission_base'] * 0.005, delta=0.006)
+            self.assertAlmostEqual(row['difference'], 0.0, delta=0.006)
 
     def test_eduardo_protire_credit_notes(self):
-        """11 notas hechas sobre facturas cobradas en octubre: ninguna se
-        devolvió en efectivo, así que no hay comisión de más; cada nota sale una
-        vez y sus destinos suman su total."""
+        """Notas hechas sobre facturas cobradas en octubre (11 al 2026-11-13;
+        siguen entrando notas nuevas): ninguna se devolvió en efectivo, así que
+        no hay comisión de más; cada nota sale una vez y sus destinos suman su
+        total."""
         result = self._monthly(EDUARDO, PROTIRE)._sng_analysis_credit_notes()
-        self.assertEqual(result['credit_note_count'], 11)
-        self.assertEqual(len({row['credit_note'] for row in result['rows']}), 11)
-        self.assertAlmostEqual(result['total'], 275637.79, places=2)
+        self.assertGreaterEqual(result['credit_note_count'], 11)
+        self.assertEqual(len({row['credit_note'] for row in result['rows']}), result['credit_note_count'])
+        self.assertGreaterEqual(result['total'], 275637.79)
         self.assertAlmostEqual(result['refunded'], 0.0, places=2)
         self.assertAlmostEqual(result['overpaid'], 0.0, places=2)
         for row in result['rows']:

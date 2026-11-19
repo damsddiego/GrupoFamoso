@@ -19,7 +19,8 @@
                            decoration-success="state == 'paid'" decoration-info="state == 'billed'"
                            decoration-warning="state == 'closed'"/>
                     <field name="bill_id"/>
-                    <field name="company_id" groups="base.group_multi_company"/>
+                    <field name="scheme_id"/>
+                    <field name="company_names" optional="hide"/>
                     <field name="currency_id" column_invisible="1"/>
                 </list>
             </field>
@@ -58,7 +59,8 @@
                                 <field name="salesperson_id"/>
                                 <field name="period"/>
                                 <field name="period_label"/>
-                                <field name="company_id" groups="base.group_multi_company"/>
+                                <field name="scheme_id" readonly="1"/>
+                                <field name="company_names"/>
                                 <field name="closed_date" invisible="not closed"/>
                                 <field name="closed_by_id" invisible="not closed"/>
                                 <field name="closed" invisible="1"/>
@@ -75,6 +77,9 @@
                             </group>
                         </group>
                         <notebook>
+                            <page string="Por Compañía" name="by_company">
+                                <field name="company_breakdown_html" nolabel="1" colspan="2"/>
+                            </page>
                             <page string="Detalle de Pagos" name="detail">
                                 <field name="commission_line_ids">
                                     <list create="0" delete="0" decoration-warning="is_rolled_over">
@@ -130,6 +135,7 @@
                     <group expand="0" string="Agrupar por">
                         <filter string="Vendedor" name="group_by_salesperson" context="{'group_by': 'salesperson_id'}"/>
                         <filter string="Periodo" name="group_by_period" context="{'group_by': 'period'}"/>
+                        <filter string="Cuadro" name="group_by_scheme" context="{'group_by': 'scheme_id'}"/>
                         <filter string="Estado" name="group_by_state" context="{'group_by': 'state'}"/>
                     </group>
                 </search>

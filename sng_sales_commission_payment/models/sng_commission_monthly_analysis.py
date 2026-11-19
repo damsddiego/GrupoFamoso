@@ -43,6 +43,7 @@ class SngCommissionMonthly(models.Model):
     def _sng_analysis_origin(self):
         """Pagos del mes agrupados por origen y cuadre base × % − reversos."""
         self.ensure_one()
+        self = self.sudo()  # el mensual completo, sean cuales sean las compañías activas
         groups = {}
         for line in self.commission_line_ids:
             key = self._sng_payment_origin(line.payment_id)
@@ -100,6 +101,7 @@ class SngCommissionMonthly(models.Model):
         pago, el módulo ya crea el reverso (ver reversos del mes).
         """
         self.ensure_one()
+        self = self.sudo()  # el mensual completo, sean cuales sean las compañías activas
         for model in ('sng.commission.payment.line', 'account.move', 'account.move.line',
                       'account.partial.reconcile', 'account.payment'):
             self.env[model].flush_model()
@@ -197,6 +199,18 @@ class SngCommissionMonthly(models.Model):
     # 3. Cobros de meses anteriores que entraron en este mes
     # ------------------------------------------------------------------
 
+    def _sng_original_percentage(self, company, period):
+        """% que tuvo este vendedor en el mes ``period`` para la compañía: el
+        del mensual de ese mes cuyo cuadro la incluye. None si no tuvo mensual
+        (sin % real contra el cual comparar)."""
+        self.ensure_one()
+        monthly = self.sudo().search([
+            ('salesperson_id', '=', self.salesperson_id.id),
+            ('scheme_id.company_ids', 'in', company.ids),
+            ('period', '=', period.replace(day=1)),
+        ], limit=1)
+        return monthly.percentage if monthly else None
+
     def _sng_analysis_prior_collections(self):
         """Pagos con fecha de un mes anterior que se comisionaron en este mes,
         porque se confirmaron tarde o porque su mes ya estaba cerrado. Compara
@@ -208,6 +222,7 @@ class SngCommissionMonthly(models.Model):
         diferencia que calcular.
         """
         self.ensure_one()
+        self = self.sudo()  # el mensual completo, sean cuales sean las compañías activas
         first = self.period.replace(day=1)
         lines = self.commission_line_ids.filtered(
             lambda l: l.is_rolled_over or (l.payment_date and l.payment_date < first))
@@ -220,15 +235,10 @@ class SngCommissionMonthly(models.Model):
             else:
                 original = line.payment_date.replace(day=1)
                 reason = _('Confirmado tarde')
-            if original not in percentages:
-                monthly = self.search([
-                    ('salesperson_id', '=', self.salesperson_id.id),
-                    ('company_id', '=', self.company_id.id),
-                    ('period', '=', original),
-                ], limit=1)
-                # Sin mensual en aquel mes no hay % real contra el cual comparar.
-                percentages[original] = monthly.percentage if monthly else None
-            original_pct = percentages[original]
+            key = (line.company_id, original)
+            if key not in percentages:
+                percentages[key] = self._sng_original_percentage(line.company_id, original)
+            original_pct = percentages[key]
             has_original = original_pct is not None
             rows.append({
                 'payment': line.payment_id.name,
@@ -272,6 +282,7 @@ class SngCommissionMonthly(models.Model):
         veces.
         """
         self.ensure_one()
+        self = self.sudo()  # el mensual completo, sean cuales sean las compañías activas
         for model in ('sng.commission.payment.line', 'account.payment', 'account.move',
                       'account.move.line', 'account.partial.reconcile'):
             self.env[model].flush_model()

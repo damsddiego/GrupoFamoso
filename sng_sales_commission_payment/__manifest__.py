@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Comisiones por Pagos de Facturas',
-    'version': '18.0.5.5.0',
+    'version': '18.0.6.0.0',
     'category': 'Accounting/Accounting',
     'summary': 'Comisión mensual por vendedor con escala por tramos sobre pagos recibidos',
     'description': """
@@ -13,7 +13,10 @@
         comisiones por tramos (escala).
 
         Características:
-        - Cuadro de comisiones global por tramos (monto mínimo mensual → %).
+
+        - Cuadro de comisiones por tramos (monto mínimo mensual → %), para una o
+          varias compañías: con varias, el vendedor tiene una sola comisión al
+          mes que suma lo cobrado en todas.
         - Acumulado mensual por vendedor sobre el monto sin impuestos pagado
           (proporcional a cada pago, incluso parciales).
         - La tasa del tramo alcanzado se aplica a todo el acumulado del mes.
@@ -37,6 +40,7 @@
         'data/product_data.xml',
         'data/commission_tier_data.xml',
         'views/sng_commission_tier_views.xml',
+        'views/sng_commission_scheme_views.xml',
         'views/sng_commission_monthly_views.xml',
         'views/sng_commission_payment_line_views.xml',
         'views/account_payment_views.xml',

@@ -39,6 +39,14 @@ class SngCreateCommissionBillWiz(models.TransientModel):
                 'Cierre primero los meses que desea facturar.'
             ))
 
+        grouped = to_bill.filtered(lambda m: len(m.scheme_id.sudo().company_ids) > 1)[:1]
+        if grouped:
+            raise UserError(_(
+                'La comisión de %(salesperson)s junta varias compañías (cuadro %(scheme)s) '
+                'y no se factura desde aquí.',
+                salesperson=grouped.salesperson_id.name, scheme=grouped.scheme_id.name,
+            ))
+
         commission_product = self.env.ref('sng_sales_commission_payment.sng_sales_commission_product')
         bill_ids = self.env['account.move']
 

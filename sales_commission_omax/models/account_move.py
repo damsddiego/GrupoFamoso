@@ -410,17 +410,34 @@ class AccountMove(models.Model):
             )
         return amount
 
+    def _get_invoice_payment_commission(self):
+        self.ensure_one()
+        salesperson = self.salesperson_id or self.invoice_user_id.partner_id
+        if not salesperson:
+            return self.env["sales.commission"]
+        return self.env["sales.commission"].sudo().search([('company_id','=',self.env.company.id), ('salesperson_ids','in',salesperson.id),('start_date','<=',self.invoice_date),('end_date','>=',self.invoice_date), ('commission_apply_on','=','invoice_payment')])
+
     @api.depends('move_type', 'line_ids.amount_residual')
     def _compute_payments_widget_reconciled_info(self):
+        # Una factura que volvió a quedar con saldo pierde su comisión. Las
+        # líneas se eliminan (no se dejan sueltas sin factura, porque seguirían
+        # sumando al vendedor) y con sudo, porque este cómputo lo dispara
+        # cualquier usuario que abra la factura. Va antes del super():
+        # unlink() invalida la caché y borraría el widget recién calculado.
+        stale_lines = self.env['sales.commission.analysis']
+        for move in self:
+            # move.id: en un onchange el registro es virtual y no se toca la BD
+            if move.id and move.move_type == 'out_invoice' and move.amount_residual and move.commission_analysis_line:
+                if move._get_invoice_payment_commission():
+                    stale_lines |= move.commission_analysis_line
+        if stale_lines:
+            stale_lines.sudo().unlink()
         super(AccountMove, self)._compute_payments_widget_reconciled_info()
         #commission_on_payment=self.env['ir.config_parameter'].sudo().get_param('commission_on_payment')
         #if commission_on_payment == 'True':
         for move in self:
             if move.move_type == 'out_invoice':
-                salesperson = move.salesperson_id or move.invoice_user_id.partner_id
-                if not salesperson:
-                    continue
-                commission = self.env["sales.commission"].sudo().search([('company_id','=',self.env.company.id), ('salesperson_ids','in',salesperson.id),('start_date','<=',move.invoice_date),('end_date','>=',move.invoice_date), ('commission_apply_on','=','invoice_payment')])
+                commission = move._get_invoice_payment_commission()
                 if not move.amount_residual and not move.commission_analysis_line and commission:
                     #Standard
                     if commission.commission_type == 'standard':
@@ -440,8 +457,4 @@ class AccountMove(models.Model):
                                 order_lines =  move.invoice_line_ids.filtered(lambda l: l.product_id.categ_id.id == commission_line.category_id.id)
                                 move.create_product_categ_commission_analysis_line(commission, commission_line, order_lines)
 
-                if commission:
-                    if move.amount_residual and move.commission_analysis_line:
-                        move.commission_analysis_line = False
-    
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

@@ -282,6 +282,8 @@ class SngCommissionPaymentLine(models.Model):
                 )
                 continue
             monthly = Monthly._get_or_create(line.salesperson_id, line.company_id, open_period)
+            if not monthly:
+                continue
             Line.create({
                 'line_type': 'reversal',
                 'reversal_of_line_id': line.id,
