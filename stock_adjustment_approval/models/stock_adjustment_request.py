@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
+from markupsafe import Markup
+
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError, ValidationError
+from odoo.tools import float_compare, float_is_zero
 
 
 class StockAdjustmentRequest(models.Model):
@@ -82,11 +85,20 @@ class StockAdjustmentRequest(models.Model):
         string='Movimientos',
         compute='_compute_move_count',
     )
+    stock_changed = fields.Boolean(
+        string='Stock cambió desde el envío',
+        compute='_compute_stock_changed',
+    )
 
     @api.depends('line_ids.move_ids')
     def _compute_move_count(self):
         for req in self:
             req.move_count = len(req.line_ids.mapped('move_ids'))
+
+    @api.depends('line_ids.stock_changed')
+    def _compute_stock_changed(self):
+        for req in self:
+            req.stock_changed = any(req.line_ids.mapped('stock_changed'))
 
     # ------------------------------------------------------------------
     # Secuencia
@@ -126,6 +138,17 @@ class StockAdjustmentRequest(models.Model):
         if not self.line_ids:
             raise UserError(_('No hay líneas para aprobar.'))
 
+        changed = self.line_ids.filtered('stock_changed')
+        changed_notes = [
+            _('%(product)s: teórico al enviar %(theoretical)s, stock al aprobar %(current)s, se aplica %(adjustment)s')
+            % {
+                'product': line.product_id.display_name,
+                'theoretical': line.theoretical_quantity,
+                'current': line.current_quantity,
+                'adjustment': line.adjustment_quantity,
+            }
+            for line in changed
+        ]
         for line in self.line_ids:
             line._apply_adjustment()
 
@@ -134,9 +157,19 @@ class StockAdjustmentRequest(models.Model):
             'approved_by': self.env.user.id,
             'approval_date': fields.Datetime.now(),
         })
-        self.message_post(
-            body=_('Solicitud aprobada y ajustes aplicados por %s.') % self.env.user.name,
-        )
+        body = _('Solicitud aprobada y ajustes aplicados por %s.') % self.env.user.name
+        if changed_notes:
+            body = Markup('%s<br/>%s<ul>%s</ul>') % (
+                body,
+                _('El stock cambió entre el envío y la aprobación; se aplicó el ajuste sobre el stock actual:'),
+                Markup().join(Markup('<li>%s</li>') % note for note in changed_notes),
+            )
+        self.message_post(body=body)
+
+    def action_refresh_quantities(self):
+        """Recarga el formulario para recalcular el stock actual de las líneas."""
+        self.ensure_one()
+        return True
 
     def action_reject(self):
         self.ensure_one()
@@ -251,16 +284,43 @@ class StockAdjustmentRequestLine(models.Model):
         digits='Product Unit of Measure',
         copy=False,
     )
-    counted_quantity = fields.Float(
-        string='Cantidad Contada',
+    adjustment_quantity = fields.Float(
+        string='Ajuste (+/-)',
         required=True,
         digits='Product Unit of Measure',
         default=0.0,
+        help='Lo que se suma o resta al stock: -5 resta cinco unidades, 1 suma una. '
+             'Es lo que se aplica al aprobar, sobre el stock que haya ese día.',
     )
-    difference = fields.Float(
-        string='Diferencia',
-        compute='_compute_difference',
+    counted_quantity = fields.Float(
+        string='Cantidad Resultante (al enviar)',
         readonly=True,
+        copy=False,
+        digits='Product Unit of Measure',
+        help='Teórico al enviar + ajuste. Se conserva para los reportes.',
+    )
+    projected_quantity = fields.Float(
+        string='Quedará en',
+        compute='_compute_projected_quantity',
+        readonly=True,
+        digits='Product Unit of Measure',
+        help='Stock actual + ajuste: cómo queda la ubicación si se aprueba ahora.',
+    )
+    stock_changed = fields.Boolean(
+        string='Stock cambió',
+        compute='_compute_projected_quantity',
+        help='El stock actual ya no es el teórico que se tomó al enviar.',
+    )
+    quantity_at_approval = fields.Float(
+        string='Stock al Aprobar',
+        readonly=True,
+        copy=False,
+        digits='Product Unit of Measure',
+    )
+    applied_difference = fields.Float(
+        string='Diferencia Aplicada',
+        readonly=True,
+        copy=False,
         digits='Product Unit of Measure',
     )
     applied = fields.Boolean(
@@ -320,13 +380,23 @@ class StockAdjustmentRequestLine(models.Model):
             self.lot_id = lots
         return self.lot_id
 
-    @api.constrains('counted_quantity')
-    def _check_counted_quantity_positive(self):
+    @api.constrains('request_id', 'product_id', 'location_id', 'lot_id', 'package_id', 'owner_id')
+    def _check_unique_stock_key(self):
         for line in self:
-            if line.counted_quantity < 0:
+            key = line._stock_key()
+            if any(other != line and other._stock_key() == key for other in line.request_id.line_ids):
                 raise ValidationError(
-                    _('La cantidad contada no puede ser negativa. Producto: %s') % line.product_id.display_name
+                    _('El producto %(product)s está repetido en la solicitud para la ubicación %(location)s. '
+                      'Deje una sola línea con la cantidad contada.')
+                    % {
+                        'product': line.product_id.display_name,
+                        'location': line.location_id.display_name,
+                    }
                 )
+
+    def _stock_key(self):
+        self.ensure_one()
+        return (self.product_id, self.location_id, self.lot_id, self.package_id, self.owner_id)
 
     # ------------------------------------------------------------------
     # Compute
@@ -337,20 +407,30 @@ class StockAdjustmentRequestLine(models.Model):
             if not line.product_id or not line.location_id:
                 line.current_quantity = 0.0
                 continue
-            quant = self.env['stock.quant']._gather(
-                line.product_id,
-                line.location_id,
-                lot_id=line.lot_id,
-                package_id=line.package_id,
-                owner_id=line.owner_id,
-                strict=True,
-            )
-            line.current_quantity = sum(quant.mapped('quantity'))
+            line.current_quantity = sum(line._get_quants().mapped('quantity'))
 
-    @api.depends('current_quantity', 'counted_quantity')
-    def _compute_difference(self):
+    @api.depends('current_quantity', 'adjustment_quantity', 'theoretical_quantity', 'state')
+    def _compute_projected_quantity(self):
         for line in self:
-            line.difference = line.counted_quantity - line.current_quantity
+            rounding = line.product_id.uom_id.rounding or 0.01
+            line.projected_quantity = line.current_quantity + line.adjustment_quantity
+            line.stock_changed = line.state == 'submitted' and float_compare(
+                line.current_quantity, line.theoretical_quantity, precision_rounding=rounding,
+            ) != 0
+
+    def _get_quants(self):
+        """Quants exactos de la línea. `_gather(strict=True)` con lote también devuelve
+        los quants sin lote de la ubicación, así que se filtran por el lote de la línea."""
+        self.ensure_one()
+        quants = self.env['stock.quant']._gather(
+            self.product_id,
+            self.location_id,
+            lot_id=self.lot_id,
+            package_id=self.package_id,
+            owner_id=self.owner_id,
+            strict=True,
+        )
+        return quants.filtered(lambda q: q.lot_id == self.lot_id)
 
     # ------------------------------------------------------------------
     # Lógica de aplicación
@@ -365,27 +445,53 @@ class StockAdjustmentRequestLine(models.Model):
             raise UserError(
                 _('El producto %s requiere lote/número de serie. Por favor asígnelo.') % self.product_id.display_name
             )
+        rounding = self.product_id.uom_id.rounding
+        if float_is_zero(self.adjustment_quantity, precision_rounding=rounding):
+            raise UserError(
+                _('El ajuste de %s es 0. Escriba cuánto suma (1) o resta (-1).') % self.product_id.display_name
+            )
+        self._check_result_not_negative(self.current_quantity)
+
+    def _check_result_not_negative(self, stock):
+        self.ensure_one()
+        result = stock + self.adjustment_quantity
+        if float_compare(result, 0, precision_rounding=self.product_id.uom_id.rounding) < 0:
+            raise UserError(
+                _('%(product)s en %(location)s quedaría en %(result)s: hay %(stock)s y el ajuste es %(adjustment)s.')
+                % {
+                    'product': self.product_id.display_name,
+                    'location': self.location_id.display_name,
+                    'result': result,
+                    'stock': stock,
+                    'adjustment': self.adjustment_quantity,
+                }
+            )
 
     def _snapshot_quantity(self):
         self.ensure_one()
         self.theoretical_quantity = self.current_quantity
+        self.counted_quantity = self.current_quantity + self.adjustment_quantity
 
     def _apply_adjustment(self):
         self.ensure_one()
         if self.applied:
             return
 
+        # Se aplica el ajuste con signo sobre el stock de hoy. Hasta la 18.0.1.0.2 se
+        # fijaba una cantidad contada absoluta, lo que revertía las ventas y entradas
+        # hechas entre el envío y la aprobación (SAI2026100109, SAI2026090069).
         Quant = self.env['stock.quant']
-        quant = Quant._gather(
-            self.product_id,
-            self.location_id,
-            lot_id=self.lot_id,
-            package_id=self.package_id,
-            owner_id=self.owner_id,
-            strict=True,
-        )
-        if quant:
-            quant = quant[0]
+        quants = self._get_quants()
+        stock = sum(quants.mapped('quantity'))
+        self._check_result_not_negative(stock)
+        difference = self.adjustment_quantity
+        self.write({
+            'quantity_at_approval': stock,
+            'applied_difference': difference,
+        })
+
+        if quants:
+            quant = quants[0]
         else:
             quant = Quant.with_context(inventory_mode=True).create({
                 'product_id': self.product_id.id,
@@ -401,14 +507,21 @@ class StockAdjustmentRequestLine(models.Model):
         last_move_id = last_move.id if last_move else 0
 
         quant = quant.with_context(inventory_name=inventory_name)
-        quant.inventory_quantity = self.counted_quantity
+        quant.inventory_quantity = quant.quantity + difference
         quant._apply_inventory()
 
-        new_moves = self.env['stock.move'].search([
+        domain = [
             ('id', '>', last_move_id),
             ('product_id', '=', self.product_id.id),
             ('is_inventory', '=', True),
-        ])
+            ('company_id', '=', quant.company_id.id),
+            '|',
+            ('location_id', '=', self.location_id.id),
+            ('location_dest_id', '=', self.location_id.id),
+        ]
+        if self.lot_id:
+            domain.append(('move_line_ids.lot_id', '=', self.lot_id.id))
+        new_moves = self.env['stock.move'].search(domain)
         if new_moves:
             self.move_ids = [(6, 0, new_moves.ids)]
 

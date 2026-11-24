@@ -1,7 +1,9 @@
 from odoo.exceptions import UserError
+from odoo.tests import tagged
 from odoo.tests.common import TransactionCase
 
 
+@tagged('post_install', '-at_install')
 class TestStockAdjustmentRequest(TransactionCase):
     @classmethod
     def setUpClass(cls):
@@ -32,7 +34,7 @@ class TestStockAdjustmentRequest(TransactionCase):
             'request_id': self.request.id,
             'product_id': self.product.id,
             'location_id': self.location.id,
-            'counted_quantity': 1.0,
+            'adjustment_quantity': -1.0,
             **values,
         })
 

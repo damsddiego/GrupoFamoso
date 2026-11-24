@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Aprobación de Ajustes de Inventario',
-    'version': '18.0.1.0.2',
+    'version': '18.0.1.1.0',
     'category': 'Inventory/Inventory',
     'summary': 'Flujo de aprobación para ajustes de inventario',
     'description': """
         Permite que usuarios de inventario soliciten ajustes de stock
-        y que administradores de inventario los aprueben o rechacen
-        antes de que se apliquen al sistema.
+        (con signo: -5 resta cinco unidades, 1 suma una) y que
+        administradores de inventario los aprueben o rechacen antes de
+        que se apliquen al sistema. Al aprobar se aplica el ajuste sobre
+        el stock del momento.
     """,
     'author': 'SNG',
     'depends': ['stock', 'product'],
