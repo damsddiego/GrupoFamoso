@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="actividad_acomodando_bodega" model="gf.bodega.actividad">
+        <field name="name">Acomodando bodega</field>
+        <field name="sequence">10</field>
+    </record>
+    <record id="actividad_otras_funciones" model="gf.bodega.actividad">
+        <field name="name">Otras funciones</field>
+        <field name="sequence">20</field>
+    </record>
+</odoo>

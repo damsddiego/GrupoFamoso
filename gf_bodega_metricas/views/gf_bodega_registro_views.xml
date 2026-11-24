@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="gf_bodega_registro_view_list" model="ir.ui.view">
+        <field name="name">gf.bodega.registro.list</field>
+        <field name="model">gf.bodega.registro</field>
+        <field name="arch" type="xml">
+            <list string="Métricas de bodega" create="false"
+                  decoration-info="estado == 'en_curso'"
+                  decoration-muted="estado == 'abandonado'">
+                <field name="fecha_inicio"/>
+                <field name="fecha_fin" optional="show"/>
+                <field name="empleado_nombre"/>
+                <field name="tipo"/>
+                <field name="actividad_id" optional="show"/>
+                <field name="sale_order_id" optional="show"/>
+                <field name="picking_id" optional="hide"/>
+                <field name="company_id" optional="hide" groups="base.group_multi_company"/>
+                <field name="duracion_min" sum="Total"/>
+                <field name="lineas" sum="Total" optional="show"/>
+                <field name="unidades_pedidas" sum="Total" optional="hide"/>
+                <field name="unidades_entregadas" sum="Total" optional="show"/>
+                <field name="dispositivo" optional="hide"/>
+                <field name="estado" widget="badge"
+                       decoration-info="estado == 'en_curso'"
+                       decoration-success="estado in ('validado', 'finalizado')"
+                       decoration-warning="estado == 'abandonado'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="gf_bodega_registro_view_form" model="ir.ui.view">
+        <field name="name">gf.bodega.registro.form</field>
+        <field name="model">gf.bodega.registro</field>
+        <field name="arch" type="xml">
+            <form string="Registro de bodega" create="false">
+                <header>
+                    <field name="estado" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group string="Empleado">
+                            <field name="empleado_nombre"/>
+                            <field name="empleado_key"/>
+                            <field name="dispositivo"/>
+                        </group>
+                        <group string="Tiempo">
+                            <field name="fecha_inicio"/>
+                            <field name="fecha_fin"/>
+                            <field name="duracion_min"/>
+                        </group>
+                        <group string="Trabajo">
+                            <field name="tipo"/>
+                            <field name="actividad_id" invisible="tipo != 'actividad'"/>
+                            <field name="sale_order_id" invisible="tipo != 'alistado'"/>
+                            <field name="picking_id" invisible="tipo != 'alistado'"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group string="Alistado" invisible="tipo != 'alistado'">
+                            <field name="lineas"/>
+                            <field name="unidades_pedidas"/>
+                            <field name="unidades_entregadas"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="gf_bodega_registro_view_pivot" model="ir.ui.view">
+        <field name="name">gf.bodega.registro.pivot</field>
+        <field name="model">gf.bodega.registro</field>
+        <field name="arch" type="xml">
+            <pivot string="Métricas de bodega" sample="1">
+                <field name="empleado_nombre" type="row"/>
+                <field name="tipo" type="col"/>
+                <field name="duracion_min" type="measure"/>
+                <field name="lineas" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="gf_bodega_registro_view_graph" model="ir.ui.view">
+        <field name="name">gf.bodega.registro.graph</field>
+        <field name="model">gf.bodega.registro</field>
+        <field name="arch" type="xml">
+            <graph string="Métricas de bodega" type="bar" stacked="1" sample="1">
+                <field name="empleado_nombre"/>
+                <field name="tipo"/>
+                <field name="duracion_min" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="gf_bodega_registro_view_search" model="ir.ui.view">
+        <field name="name">gf.bodega.registro.search</field>
+        <field name="model">gf.bodega.registro</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="empleado_nombre"/>
+                <field name="sale_order_id"/>
+                <field name="actividad_id"/>
+                <field name="dispositivo"/>
+                <filter string="Hoy" name="hoy"
+                        domain="[('fecha_inicio', '&gt;=', datetime.datetime.combine(context_today(), datetime.time(0, 0, 0)).to_utc().strftime('%Y-%m-%d %H:%M:%S'))]"/>
+                <filter string="Últimos 7 días" name="ultimos_7_dias"
+                        domain="[('fecha_inicio', '&gt;=', datetime.datetime.combine(context_today() - relativedelta(days=6), datetime.time(0, 0, 0)).to_utc().strftime('%Y-%m-%d %H:%M:%S'))]"/>
+                <filter string="Fecha de inicio" name="filtro_fecha_inicio" date="fecha_inicio"/>
+                <separator/>
+                <filter string="Alistado" name="alistado" domain="[('tipo', '=', 'alistado')]"/>
+                <filter string="Actividades" name="actividades" domain="[('tipo', '=', 'actividad')]"/>
+                <separator/>
+                <filter string="En curso" name="en_curso" domain="[('estado', '=', 'en_curso')]"/>
+                <filter string="Completados" name="completados" domain="[('estado', 'in', ('validado', 'finalizado'))]"/>
+                <filter string="Abandonados" name="abandonados" domain="[('estado', '=', 'abandonado')]"/>
+                <group expand="0" string="Agrupar por">
+                    <filter string="Empleado" name="group_empleado" context="{'group_by': 'empleado_nombre'}"/>
+                    <filter string="Día" name="group_dia" context="{'group_by': 'fecha_inicio:day'}"/>
+                    <filter string="Tipo" name="group_tipo" context="{'group_by': 'tipo'}"/>
+                    <filter string="Actividad" name="group_actividad" context="{'group_by': 'actividad_id'}"/>
+                    <filter string="Tableta" name="group_dispositivo" context="{'group_by': 'dispositivo'}"/>
+                    <filter string="Compañía" name="group_company" context="{'group_by': 'company_id'}"
+                            groups="base.group_multi_company"/>
+                    <filter string="Estado" name="group_estado" context="{'group_by': 'estado'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="gf_bodega_registro_action" model="ir.actions.act_window">
+        <field name="name">Métricas de bodega</field>
+        <field name="res_model">gf.bodega.registro</field>
+        <field name="view_mode">pivot,list,graph,form</field>
+        <field name="search_view_id" ref="gf_bodega_registro_view_search"/>
+        <field name="context">{'search_default_ultimos_7_dias': 1, 'search_default_completados': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Todavía no hay registros</p>
+            <p>Los registros los crea la app GF de las tabletas cuando un empleado alista
+                una orden o marca una actividad de bodega.</p>
+        </field>
+    </record>
+</odoo>

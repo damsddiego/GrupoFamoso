@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_order_form_gf_alistado_tableta" model="ir.ui.view">
+        <field name="name">sale.order.form.gf.alistado.tableta</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="gf_sale_alistado_por.view_order_form_gf_alistado_por"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='x_gf_alistado_por']" position="after">
+                <field name="x_gf_alistado_empleado" readonly="1" invisible="not x_gf_alistado_por"/>
+                <field name="x_gf_alistado_dispositivo" readonly="1" invisible="not x_gf_alistado_por"/>
+                <field name="x_gf_alistado_desde" readonly="1" invisible="not x_gf_alistado_por"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

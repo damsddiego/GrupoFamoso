@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_gf_bodega_actividad_user,gf.bodega.actividad usuario,model_gf_bodega_actividad,stock.group_stock_user,1,0,0,0
+access_gf_bodega_actividad_manager,gf.bodega.actividad responsable,model_gf_bodega_actividad,stock.group_stock_manager,1,1,1,1
+access_gf_bodega_registro_user,gf.bodega.registro usuario,model_gf_bodega_registro,stock.group_stock_user,1,1,1,0
+access_gf_bodega_registro_manager,gf.bodega.registro responsable,model_gf_bodega_registro,stock.group_stock_manager,1,1,1,1
