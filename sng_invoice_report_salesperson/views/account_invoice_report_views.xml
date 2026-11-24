@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Lista de Análisis de facturas: columna «Vendedor (Contacto)» visible
+         por defecto, después de «Cliente (Código - Nombre)». -->
+    <record id="account_invoice_report_view_tree_salesperson" model="ir.ui.view">
+        <field name="name">account.invoice.report.view.list.salesperson</field>
+        <field name="model">account.invoice.report</field>
+        <field name="inherit_id" ref="sng_invoice_report_custom.account_invoice_report_view_tree_inherit"/>
+        <field name="arch" type="xml">
+            <field name="partner_code_name" position="after">
+                <field name="salesperson_id" optional="show"/>
+            </field>
+        </field>
+    </record>
+
+    <!-- Búsqueda: campo y agrupación por vendedor contacto. -->
+    <record id="view_account_invoice_report_search_salesperson" model="ir.ui.view">
+        <field name="name">account.invoice.report.search.salesperson</field>
+        <field name="model">account.invoice.report</field>
+        <field name="inherit_id" ref="account.view_account_invoice_report_search"/>
+        <field name="arch" type="xml">
+            <field name="invoice_user_id" position="after">
+                <field name="salesperson_id"/>
+            </field>
+            <filter name="user" position="after">
+                <filter string="Vendedor (Contacto)" name="salesperson_contact"
+                        context="{'group_by': 'salesperson_id'}"/>
+            </filter>
+        </field>
+    </record>
+
+    <!-- Gráfica y pivote: disponible para agrupar. -->
+    <record id="view_account_invoice_report_graph_salesperson" model="ir.ui.view">
+        <field name="name">account.invoice.report.graph.salesperson</field>
+        <field name="model">account.invoice.report</field>
+        <field name="inherit_id" ref="account.view_account_invoice_report_graph"/>
+        <field name="arch" type="xml">
+            <graph position="inside">
+                <field name="salesperson_id" invisible="1"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_account_invoice_report_pivot_salesperson" model="ir.ui.view">
+        <field name="name">account.invoice.report.pivot.salesperson</field>
+        <field name="model">account.invoice.report</field>
+        <field name="inherit_id" ref="account.view_account_invoice_report_pivot"/>
+        <field name="arch" type="xml">
+            <pivot position="inside">
+                <field name="salesperson_id" type="row" invisible="1"/>
+            </pivot>
+        </field>
+    </record>
+</odoo>

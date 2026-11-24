@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Sobreescribe el tablero «Facturación» de spreadsheet_dashboard_account
+         con la versión generada por tools/generar_tablero.py, en la que el
+         filtro «Vendedor» y la tabla de vendedores usan salesperson_id
+         (contacto vendedor) en vez de invoice_user_id (usuario). Como este
+         módulo depende de spreadsheet_dashboard_account, se carga después y
+         su versión prevalece en cada actualización. -->
+    <record id="spreadsheet_dashboard_account.dashboard_invoicing" model="spreadsheet.dashboard">
+        <field name="spreadsheet_binary_data" type="base64"
+               file="sng_invoice_report_salesperson/data/files/invoicing_dashboard.json"/>
+    </record>
+</odoo>
