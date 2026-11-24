@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="gf_bodega_actividad_view_list" model="ir.ui.view">
+        <field name="name">gf.bodega.actividad.list</field>
+        <field name="model">gf.bodega.actividad</field>
+        <field name="arch" type="xml">
+            <list string="Actividades de bodega" editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="gf_bodega_actividad_view_search" model="ir.ui.view">
+        <field name="name">gf.bodega.actividad.search</field>
+        <field name="model">gf.bodega.actividad</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <filter string="Archivadas" name="inactive" domain="[('active', '=', False)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="gf_bodega_actividad_action" model="ir.actions.act_window">
+        <field name="name">Actividades de bodega</field>
+        <field name="res_model">gf.bodega.actividad</field>
+        <field name="view_mode">list</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Cree una actividad de bodega</p>
+            <p>Las actividades activas aparecen en la tableta, en el botón "Actividad" del
+                listado de órdenes, para registrar el tiempo que no es alistado.</p>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_gf_bodega_registro"
+              name="Métricas de bodega"
+              parent="stock.menu_warehouse_report"
+              action="gf_bodega_registro_action"
+              sequence="90"/>
+
+    <menuitem id="menu_gf_bodega_actividad"
+              name="Actividades de bodega"
+              parent="stock.menu_stock_config_settings"
+              action="gf_bodega_actividad_action"
+              groups="stock.group_stock_manager"
+              sequence="90"/>
+</odoo>
