@@ -12,6 +12,17 @@ por defecto el usuario (`invoice_user_id`):
   ese contacto. La gráfica, al hacer clic en un punto, abre la lista anterior
   con la columna nueva.
 
+## Clic en la gráfica
+
+En cualquier tablero, si la gráfica está agrupada por fecha (por ejemplo
+`invoice_date:month`), el clic en un punto abre **todos** los registros del
+rango de la gráfica, con los filtros globales aplicados. **Ctrl+clic**
+(Cmd+clic en Mac) abre solo ese punto, como hace Odoo de fábrica. Fuera de
+los tableros no cambia nada. El parche está en
+`static/src/bundle/clic_grafica_periodo.js`; sus pruebas de hoot
+(`static/tests/`) requieren el runner de JavaScript de Odoo con navegador
+(no se pueden correr en este servidor sin Chrome).
+
 ## Tablero
 
 `data/files/invoicing_dashboard.json` **no se edita a mano**. Se genera con:
