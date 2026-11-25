@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Motivos de anulación -->
+    <record id="view_sng_motivo_anulacion_list" model="ir.ui.view">
+        <field name="name">sng.motivo.anulacion.list</field>
+        <field name="model">sng.motivo.anulacion</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="requiere_refactura"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_sng_motivo_anulacion" model="ir.actions.act_window">
+        <field name="name">Motivos de anulación</field>
+        <field name="res_model">sng.motivo.anulacion</field>
+        <field name="view_mode">list</field>
+        <field name="context">{'active_test': False}</field>
+    </record>
+
+    <menuitem id="menu_sng_motivo_anulacion"
+              name="Motivos de anulación"
+              parent="account.account_account_menu"
+              action="action_sng_motivo_anulacion"
+              sequence="90"/>
+
+    <!-- Política de devolución por código de referencia -->
+    <record id="view_reference_code_tree_politica" model="ir.ui.view">
+        <field name="name">reference.code.tree.politica.devolucion</field>
+        <field name="model">reference.code</field>
+        <field name="inherit_id" ref="cr_electronic_invoice.view_reference_code_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="sng_politica_devolucion"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Control de anulaciones -->
+    <record id="view_sng_control_anulaciones_list" model="ir.ui.view">
+        <field name="name">account.move.control.anulaciones.list</field>
+        <field name="model">account.move</field>
+        <field name="priority">99</field>
+        <field name="arch" type="xml">
+            <list create="0" delete="0"
+                  decoration-warning="sng_estado_control == 'sin_refactura'"
+                  decoration-danger="sng_estado_control == 'recepcion_pendiente'">
+                <field name="invoice_date"/>
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="reversed_entry_id" string="Factura anulada"/>
+                <field name="reference_code_id" string="Código"/>
+                <field name="sng_motivo_anulacion_id"/>
+                <field name="ref" optional="hide"/>
+                <field name="sng_return_id" string="Devolución" optional="show"/>
+                <field name="stock_return_picking_id" optional="show"/>
+                <field name="sng_estado_recepcion" optional="show"/>
+                <field name="sng_factura_sustituta_id"/>
+                <field name="sng_estado_sustituta" optional="show"/>
+                <field name="amount_untaxed_signed" sum="Total" string="Monto sin impuestos"/>
+                <field name="invoice_user_id" widget="many2one_avatar_user" optional="hide"/>
+                <field name="create_uid" string="Creada por" optional="show"/>
+                <field name="company_id" groups="base.group_multi_company" optional="show"/>
+                <field name="sng_estado_control" widget="badge"
+                       decoration-success="sng_estado_control == 'ok'"
+                       decoration-warning="sng_estado_control == 'sin_refactura'"
+                       decoration-danger="sng_estado_control == 'recepcion_pendiente'"/>
+                <field name="state" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_sng_control_anulaciones_search" model="ir.ui.view">
+        <field name="name">account.move.control.anulaciones.search</field>
+        <field name="model">account.move</field>
+        <field name="priority">99</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name" string="Nota de crédito"
+                       filter_domain="['|', ('name', 'ilike', self), ('ref', 'ilike', self)]"/>
+                <field name="partner_id"/>
+                <field name="reversed_entry_id" string="Factura anulada"/>
+                <field name="sng_motivo_anulacion_id"/>
+                <field name="create_uid" string="Creada por"/>
+                <filter name="sin_refactura" string="Sin refactura"
+                        domain="[('sng_estado_control', '=', 'sin_refactura')]"/>
+                <filter name="recepcion_pendiente" string="Recepción pendiente"
+                        domain="[('sng_estado_control', '=', 'recepcion_pendiente')]"/>
+                <separator/>
+                <filter name="anulaciones" string="Anulaciones (código 01)"
+                        domain="[('reference_code_id.code', '=', '01')]"/>
+                <filter name="de_devoluciones" string="De Devoluciones"
+                        domain="[('sng_return_id', '!=', False)]"/>
+                <separator/>
+                <filter name="fecha" string="Fecha" date="invoice_date"/>
+                <group expand="0" string="Agrupar por">
+                    <filter name="group_estado" string="Control"
+                            context="{'group_by': 'sng_estado_control'}"/>
+                    <filter name="group_motivo" string="Motivo"
+                            context="{'group_by': 'sng_motivo_anulacion_id'}"/>
+                    <filter name="group_codigo" string="Código de referencia"
+                            context="{'group_by': 'reference_code_id'}"/>
+                    <filter name="group_usuario" string="Creada por"
+                            context="{'group_by': 'create_uid'}"/>
+                    <filter name="group_mes" string="Mes"
+                            context="{'group_by': 'invoice_date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_sng_control_anulaciones" model="ir.actions.act_window">
+        <field name="name">Control de anulaciones</field>
+        <field name="res_model">account.move</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('move_type', '=', 'out_refund'), ('state', '=', 'posted')]</field>
+        <field name="context">{'default_move_type': 'out_refund', 'search_default_sin_refactura': 1, 'search_default_recepcion_pendiente': 1}</field>
+        <field name="search_view_id" ref="view_sng_control_anulaciones_search"/>
+        <field name="view_ids" eval="[(5, 0, 0),
+            (0, 0, {'view_mode': 'list', 'view_id': ref('view_sng_control_anulaciones_list')}),
+            (0, 0, {'view_mode': 'form', 'view_id': ref('account.view_move_form')})]"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No hay notas de crédito pendientes de revisar
+            </p>
+            <p>
+                Aquí aparecen las anulaciones sin factura sustituta confirmada y las
+                notas de crédito con una recepción que nadie validó ni canceló.
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="menu_sng_control_anulaciones"
+              name="Control de anulaciones"
+              parent="account.menu_finance_receivables"
+              action="action_sng_control_anulaciones"
+              sequence="15"/>
+</odoo>

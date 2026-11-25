@@ -1,1 +1,3 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_sng_motivo_anulacion_user,sng.motivo.anulacion usuario,model_sng_motivo_anulacion,base.group_user,1,0,0,0
+access_sng_motivo_anulacion_manager,sng.motivo.anulacion contabilidad,model_sng_motivo_anulacion,account.group_account_manager,1,1,1,1

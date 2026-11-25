@@ -1,8 +1,22 @@
 from odoo import models, fields, api, _
-from odoo.exceptions import ValidationError
-import logging
+from odoo.exceptions import AccessError, UserError, ValidationError
+from odoo.tools import float_compare
 
-_logger = logging.getLogger(__name__)
+# Datos del comprobante electrónico que una factura sustituta no hereda.
+CAMPOS_FE_SIN_HEREDAR = (
+    "number_electronic",
+    "sequence",
+    "date_issuance",
+    "state_tributacion",
+    "einvoice_had_rejection",
+    "xml_comprobante",
+    "fname_xml_comprobante",
+    "xml_respuesta_tributacion",
+    "fname_xml_respuesta_tributacion",
+    "state_email",
+    "electronic_invoice_return_message",
+    "consecutive_number_receiver",
+)
 
 
 class AccountMove(models.Model):
@@ -16,12 +30,17 @@ class AccountMove(models.Model):
         help='Total amount of credit notes created for this invoice'
     )
 
-    # Fields for stock return management
+    # La nota de crédito hecha desde la factura no mueve inventario: la
+    # mercadería que regresa entra por Devoluciones (sng_return). Estos dos
+    # campos guardan la recepción de las notas de crédito anteriores a ese
+    # cambio y la que informa sng_return en las suyas.
     return_location_id = fields.Many2one(
         'stock.location',
-        string='Return Location',
+        string='Ubicación de devolución',
         domain="[('usage', '=', 'internal')]",
-        help='Location where returned products will be stored. If empty, products will not be returned to inventory.'
+        copy=False,
+        readonly=True,
+        help='Ubicación a la que regresó la mercadería de esta nota de crédito.'
     )
 
     has_stock_delivery = fields.Boolean(
@@ -31,18 +50,71 @@ class AccountMove(models.Model):
         help='Indicates if this invoice comes from a sale order with a completed delivery'
     )
 
-    return_location_required = fields.Boolean(
-        string='Return Location Required',
-        compute='_compute_return_location_required',
-        store=False,
-        help='Indicates if return location is mandatory for this credit note'
-    )
-
     stock_return_picking_id = fields.Many2one(
         'stock.picking',
-        string='Return Picking',
+        string='Recepción de devolución',
+        copy=False,
         readonly=True,
-        help='Stock picking generated for this credit note return'
+        # El control de anulaciones se recalcula cuando cambia el estado de
+        # la recepción: sin índice, cada traslado recorrería account_move.
+        index='btree_not_null',
+        help='Recepción de la mercadería devuelta por esta nota de crédito.'
+    )
+    sng_estado_recepcion = fields.Selection(
+        related='stock_return_picking_id.state',
+        string='Estado de la recepción',
+    )
+
+    sng_motivo_anulacion_id = fields.Many2one(
+        'sng.motivo.anulacion',
+        string='Motivo de anulación',
+        copy=False,
+        tracking=True,
+        ondelete='restrict',
+        help='Obligatorio en las notas de crédito de cliente que anulan el '
+             'documento de referencia (código 01).'
+    )
+    sng_factura_anulada_id = fields.Many2one(
+        'account.move',
+        string='Sustituye a la factura',
+        copy=False,
+        readonly=True,
+        index='btree_not_null',
+        check_company=True,
+        help='Factura anulada que esta factura sustituye.'
+    )
+    sng_factura_sustituta_id = fields.Many2one(
+        'account.move',
+        string='Factura sustituta',
+        copy=False,
+        readonly=True,
+        index='btree_not_null',
+        check_company=True,
+        help='Factura emitida en lugar de la que anuló esta nota de crédito.'
+    )
+    sng_estado_sustituta = fields.Selection(
+        related='sng_factura_sustituta_id.state',
+        string='Estado de la sustituta',
+    )
+    sng_puede_crear_sustituta = fields.Boolean(
+        compute='_compute_sng_puede_crear_sustituta',
+    )
+    sng_puede_crear_nc = fields.Boolean(
+        compute='_compute_sng_puede_crear_nc',
+    )
+    sng_estado_control = fields.Selection(
+        [
+            ('ok', 'En orden'),
+            ('sin_refactura', 'Sin refactura'),
+            ('recepcion_pendiente', 'Recepción pendiente'),
+        ],
+        string='Control de anulación',
+        compute='_compute_sng_estado_control',
+        store=True,
+        help='Sin refactura: anulación total (código 01) con un motivo que '
+             'requiere refactura y cuya factura sustituta no existe o no está '
+             'confirmada. Recepción pendiente: nota de crédito anterior con '
+             'una recepción que nadie validó ni canceló.'
     )
 
     @api.depends('reversed_entry_id', 'reversed_entry_id.invoice_line_ids.sale_line_ids.order_id.picking_ids')
@@ -67,15 +139,6 @@ class AccountMove(models.Model):
                 )
                 move.has_stock_delivery = bool(completed_deliveries)
 
-    @api.depends('move_type', 'has_stock_delivery')
-    def _compute_return_location_required(self):
-        """Determine if return location is required for this credit note"""
-        for move in self:
-            # Return location is required only for credit notes with stock delivery
-            move.return_location_required = (
-                move.move_type == 'out_refund' and move.has_stock_delivery
-            )
-
     @api.depends('reversed_entry_id', 'reversed_entry_id.line_ids', 'state')
     def _compute_credit_note_total(self):
         """Compute the total amount of credit notes for an invoice"""
@@ -91,35 +154,183 @@ class AccountMove(models.Model):
             else:
                 move.credit_note_total = 0.0
 
-    def _post(self, soft=True):
-        """Override to create stock return when credit note is posted"""
-        # Call parent method first
-        res = super(AccountMove, self)._post(soft=soft)
+    @api.model
+    def _sng_puede_crear_nota_credito(self):
+        return self.env.su or self.env.user.has_group(
+            'cr_electronic_invoice_credit_limit.group_sng_crear_nota_credito'
+        )
 
-        # Create stock return for credit notes with return location
+    @api.depends_context('uid')
+    def _compute_sng_puede_crear_nc(self):
+        self.sng_puede_crear_nc = self._sng_puede_crear_nota_credito()
+
+    @api.model
+    def _sng_check_puede_crear_nota_credito(self):
+        """La regla de registro del grupo ya lo impide; aquí se explica."""
+        if not self._sng_puede_crear_nota_credito():
+            raise AccessError(_(
+                "No tiene permiso para crear notas de crédito de cliente. "
+                "Pídala a un usuario autorizado (grupo «Crear notas de crédito "
+                "de cliente»)."
+            ))
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        default_type = self.env.context.get('default_move_type')
+        if any(vals.get('move_type', default_type) == 'out_refund' for vals in vals_list):
+            self._sng_check_puede_crear_nota_credito()
+        return super().create(vals_list)
+
+    def write(self, vals):
+        if vals.get('move_type') == 'out_refund' and any(
+            move.move_type != 'out_refund' for move in self
+        ):
+            self._sng_check_puede_crear_nota_credito()
+        return super().write(vals)
+
+    def _sng_es_anulacion_total(self):
+        """NC de cliente código 01 por el monto completo de su factura."""
+        self.ensure_one()
+        original = self.reversed_entry_id
+        return (
+            self.move_type == 'out_refund'
+            and self.reference_code_id.code == '01'
+            and original.move_type == 'out_invoice'
+            and not self.sng_return_id
+            and float_compare(
+                self.amount_total, original.amount_total,
+                precision_rounding=self.currency_id.rounding or 0.01,
+            ) == 0
+        )
+
+    @api.depends(
+        'move_type', 'state', 'reference_code_id.code', 'sng_return_id',
+        'amount_total', 'reversed_entry_id.amount_total',
+        'sng_factura_sustituta_id.state',
+    )
+    def _compute_sng_puede_crear_sustituta(self):
         for move in self:
-            _logger.info("=== CREDIT NOTE POST DEBUG ===")
-            _logger.info(f"Move: {move.name}, Type: {move.move_type}")
-            _logger.info(f"Return Location: {move.return_location_id}")
-            _logger.info(f"Has Stock Delivery: {move.has_stock_delivery}")
-            _logger.info(f"Stock Return Picking: {move.stock_return_picking_id}")
+            move.sng_puede_crear_sustituta = (
+                move.state == 'posted'
+                and move._sng_es_anulacion_total()
+                and move.sng_factura_sustituta_id.state in (False, 'cancel')
+            )
 
-            if (move.move_type == 'out_refund' and
-                move.return_location_id and
-                move.has_stock_delivery and
-                not move.stock_return_picking_id):
-                _logger.info(">>> Creating stock return...")
-                move._create_stock_return()
+    @api.depends(
+        'move_type', 'state', 'reference_code_id.code', 'sng_return_id',
+        'amount_total', 'reversed_entry_id.amount_total',
+        'stock_return_picking_id.state', 'sng_factura_sustituta_id.state',
+        'sng_motivo_anulacion_id.requiere_refactura',
+    )
+    def _compute_sng_estado_control(self):
+        for move in self:
+            if move.move_type != 'out_refund' or move.state != 'posted':
+                move.sng_estado_control = False
+                continue
+            picking = move.stock_return_picking_id
+            if not move.sng_return_id and picking and picking.state not in ('done', 'cancel'):
+                move.sng_estado_control = 'recepcion_pendiente'
+            elif (
+                move._sng_es_anulacion_total()
+                # Sin motivo (anulaciones anteriores al control) o con un
+                # motivo que no lleva factura nueva no hay nada que esperar.
+                and move.sng_motivo_anulacion_id.requiere_refactura
+                and move.sng_factura_sustituta_id.state != 'posted'
+            ):
+                move.sng_estado_control = 'sin_refactura'
             else:
-                _logger.info(">>> Conditions not met for stock return")
+                move.sng_estado_control = 'ok'
 
+    def _sng_reemplaza_nc_de_devolucion(self):
+        """Reemplazo de una NC de Devoluciones rechazada por Hacienda."""
+        self.ensure_one()
+        return bool(
+            'replaces_invoice_id' in self._fields
+            and self.replaces_invoice_id.sng_return_id
+        )
+
+    def _sng_check_control_nota_credito(self):
+        for move in self:
+            if move.move_type != 'out_refund':
+                continue
+            if (
+                move.reference_code_id.sng_politica_devolucion == 'devuelve'
+                and not move.sng_return_id
+                and not move._sng_reemplaza_nc_de_devolucion()
+            ):
+                raise UserError(_(
+                    "La nota de crédito usa el código «%(code)s», que es por devolución de "
+                    "mercadería.\n\n"
+                    "Esas notas de crédito se generan desde Devoluciones, después de que "
+                    "bodega recibe la mercadería. Si la mercadería no regresa, use otro "
+                    "código de referencia."
+                ) % {'code': move.reference_code_id.display_name})
+            if move.reference_code_id.code == '01' and not move.sng_motivo_anulacion_id:
+                raise UserError(_(
+                    "Indique el motivo de anulación antes de confirmar la nota de crédito."
+                ))
+
+    def _post(self, soft=True):
+        self._sng_check_control_nota_credito()
+        return super()._post(soft=soft)
+
+    def _sng_recepciones_anteriores(self):
+        """Recepciones que la versión anterior creaba al confirmar la NC."""
+        return self.filtered(
+            lambda move: move.move_type == 'out_refund' and not move.sng_return_id
+        ).stock_return_picking_id
+
+    @api.model
+    def _sng_recepcion_devuelta(self, picking):
+        """La recepción validada ya salió completa otra vez (botón Devolver)."""
+        for move in picking.move_ids.filtered(lambda m: m.state == 'done'):
+            devuelto = sum(
+                returned.product_uom._compute_quantity(returned.quantity, move.product_uom)
+                for returned in move.returned_move_ids
+                if returned.state == 'done'
+            )
+            if float_compare(
+                devuelto, move.quantity, precision_rounding=move.product_uom.rounding,
+            ) < 0:
+                return False
+        return True
+
+    def _sng_check_recepciones_anteriores(self):
+        validadas = self._sng_recepciones_anteriores().filtered(
+            lambda picking: picking.state == 'done'
+            and not self._sng_recepcion_devuelta(picking)
+        )
+        if validadas:
+            raise UserError(_(
+                "No puede anular la nota de crédito porque tiene una recepción validada "
+                "(%(pickings)s): esa mercadería ya entró a bodega.\n\n"
+                "Primero devuelva la recepción desde Inventario."
+            ) % {'pickings': ', '.join(validadas.mapped('name'))})
+
+    def _sng_cancelar_recepciones_anteriores(self):
+        # Anular la nota de crédito anula su recepción pendiente; quien anula
+        # no siempre tiene permisos de inventario.
+        self._sng_recepciones_anteriores().sudo().filtered(
+            lambda picking: picking.state not in ('done', 'cancel')
+        ).action_cancel()
+
+    def button_draft(self):
+        self._sng_check_recepciones_anteriores()
+        res = super().button_draft()
+        self._sng_cancelar_recepciones_anteriores()
+        return res
+
+    def button_cancel(self):
+        self._sng_check_recepciones_anteriores()
+        res = super().button_cancel()
+        self._sng_cancelar_recepciones_anteriores()
         return res
 
     def action_view_stock_return(self):
         """Open the stock return picking"""
         self.ensure_one()
         return {
-            'name': _('Stock Return'),
+            'name': _('Recepción de devolución'),
             'type': 'ir.actions.act_window',
             'res_model': 'stock.picking',
             'view_mode': 'form',
@@ -127,236 +338,63 @@ class AccountMove(models.Model):
             'target': 'current',
         }
 
-    def action_debug_stock_return(self):
-        """Debug method to check why stock return is not being created"""
+    def _sng_action_ver_factura(self, move, name):
+        return {
+            'name': name,
+            'type': 'ir.actions.act_window',
+            'res_model': 'account.move',
+            'view_mode': 'form',
+            'res_id': move.id,
+            'target': 'current',
+            'context': {'default_move_type': move.move_type},
+        }
+
+    def action_sng_ver_factura_sustituta(self):
         self.ensure_one()
-        msg = []
+        return self._sng_action_ver_factura(self.sng_factura_sustituta_id, _('Factura sustituta'))
 
-        msg.append(f"=== DEBUGGING CREDIT NOTE {self.name} ===\n")
-        msg.append(f"Move Type: {self.move_type}")
-        msg.append(f"Return Location: {self.return_location_id.display_name if self.return_location_id else 'NOT SET'}")
-        msg.append(f"Has Stock Delivery: {self.has_stock_delivery}\n")
-
-        if not self.reversed_entry_id:
-            msg.append("ERROR: No reversed_entry_id (original invoice)")
-            raise ValidationError('\n'.join(msg))
-
-        msg.append(f"Original Invoice: {self.reversed_entry_id.name}")
-        msg.append(f"Original Invoice Lines: {len(self.reversed_entry_id.invoice_line_ids)}\n")
-
-        sale_orders = self.reversed_entry_id.invoice_line_ids.mapped('sale_line_ids.order_id')
-        msg.append(f"Sale Orders Found: {len(sale_orders)}")
-        for so in sale_orders:
-            msg.append(f"  - {so.name}")
-            pickings = so.picking_ids
-            msg.append(f"    Pickings: {len(pickings)}")
-            for pick in pickings:
-                msg.append(f"      - {pick.name}: type={pick.picking_type_code}, state={pick.state}")
-
-        if not sale_orders:
-            msg.append("\nERROR: No sale orders found!")
-            raise ValidationError('\n'.join(msg))
-
-        all_pickings = sale_orders.mapped('picking_ids')
-        outgoing_done = all_pickings.filtered(lambda p: p.picking_type_code == 'outgoing' and p.state == 'done')
-        msg.append(f"\nOutgoing Done Pickings: {len(outgoing_done)}")
-
-        if not outgoing_done:
-            msg.append("ERROR: No completed outgoing pickings!")
-            raise ValidationError('\n'.join(msg))
-
-        msg.append(f"\nCredit Note Lines: {len(self.invoice_line_ids)}")
-        msg.append(f"ALL Lines (including display types):")
-        for line in self.invoice_line_ids:
-            msg.append(f"  - Name: {line.name}")
-            msg.append(f"    Display Type: {line.display_type}")
-            msg.append(f"    Product: {line.product_id.name if line.product_id else 'NONE'}")
-            msg.append(f"    Product Type: {line.product_id.type if line.product_id else 'N/A'}")
-            msg.append(f"    Quantity: {line.quantity}")
-            msg.append("")
-
-        msg.append(f"\nLines with Products (filtered):")
-        lines_with_products = self.invoice_line_ids.filtered(lambda l: not l.display_type and l.product_id)
-        msg.append(f"Count: {len(lines_with_products)}")
-
-        for line in lines_with_products:
-            product = line.product_id
-            msg.append(f"  - {product.name} (Type: {product.type}, Qty: {line.quantity})")
-
-            if product.type != 'product':
-                msg.append(f"    SKIP: Not storable")
-                continue
-
-            delivered = outgoing_done.mapped('move_ids').filtered(
-                lambda m: m.product_id == product and m.state == 'done'
-            )
-            msg.append(f"    Delivered moves: {len(delivered)}")
-            for dm in delivered:
-                msg.append(f"      - {dm.product_id.name}: {dm.product_uom_qty} {dm.product_uom.name}")
-
-            if not delivered:
-                msg.append(f"    ERROR: No delivered moves found!")
-
-        raise ValidationError('\n'.join(msg))
-
-    def _create_stock_return(self):
-        """Create a stock return picking for the credit note"""
+    def action_sng_ver_factura_anulada(self):
         self.ensure_one()
+        return self._sng_action_ver_factura(self.sng_factura_anulada_id, _('Factura anulada'))
 
-        _logger.info("=== _create_stock_return START ===")
+    def _sng_crear_factura_sustituta(self, default=None):
+        """Factura en borrador que sustituye a la anulada por esta NC.
 
-        if not self.return_location_id:
-            _logger.warning("No return location set")
-            return
+        Es la misma copia que hace «Revertir y crear factura» del asistente
+        estándar: conserva el vínculo de cada línea con la orden de venta, de
+        modo que la entrega original sigue siendo la de la factura nueva.
+        """
+        self.ensure_one()
+        original = self.reversed_entry_id
+        values = dict(default or {}, sng_factura_anulada_id=original.id)
+        for fname in CAMPOS_FE_SIN_HEREDAR:
+            if fname in self._fields:
+                values[fname] = False
+        data = original.with_context(include_business_fields=True).copy_data(values)[0]
+        data['line_ids'] = [
+            line for line in data['line_ids']
+            if line[2]['display_type'] in ('product', 'line_section', 'line_note')
+        ]
+        sustituta = self.env['account.move'].create(data)
+        self.sng_factura_sustituta_id = sustituta
+        sustituta.message_post(body=_(
+            "Factura creada para sustituir a %(invoice)s."
+        ) % {'invoice': original.display_name})
+        return sustituta
 
-        # Get the original invoice
-        original_invoice = self.reversed_entry_id
-        _logger.info(f"Original invoice: {original_invoice}")
-        if not original_invoice:
-            _logger.warning("No reversed_entry_id found")
-            return
-
-        # Get sale orders from the original invoice
-        sale_orders = original_invoice.invoice_line_ids.mapped('sale_line_ids.order_id')
-        _logger.info(f"Sale orders found: {sale_orders}")
-        if not sale_orders:
-            _logger.warning("No sale orders found from invoice lines")
-            return
-
-        # Get completed outgoing pickings
-        all_pickings = sale_orders.mapped('picking_ids')
-        _logger.info(f"All pickings: {all_pickings}")
-        outgoing_pickings = all_pickings.filtered(
-            lambda p: p.picking_type_code == 'outgoing' and p.state == 'done'
-        )
-        _logger.info(f"Completed outgoing pickings: {outgoing_pickings}")
-
-        if not outgoing_pickings:
-            _logger.warning("No completed outgoing pickings found")
-            return
-
-        # Get the customer location (where products were delivered)
-        customer_location = self.env.ref('stock.stock_location_customers')
-
-        # Get or create incoming picking type
-        warehouse = self.return_location_id.warehouse_id
-        if not warehouse:
-            # Find warehouse that contains this location
-            warehouse = self.env['stock.warehouse'].search([
-                ('lot_stock_id', 'parent_of', self.return_location_id.id)
-            ], limit=1)
-
-        if not warehouse:
-            raise ValidationError(_(
-                "No warehouse found for the selected return location. "
-                "Please select a location that belongs to a warehouse."
+    def action_sng_crear_factura_sustituta(self):
+        self.ensure_one()
+        if self.sng_factura_sustituta_id.state in ('draft', 'posted'):
+            raise UserError(_(
+                "Esta nota de crédito ya tiene una factura sustituta: %(invoice)s."
+            ) % {'invoice': self.sng_factura_sustituta_id.display_name})
+        if not self.sng_puede_crear_sustituta:
+            raise UserError(_(
+                "Solo se crea una factura sustituta desde una nota de crédito "
+                "confirmada que anula su factura por el monto completo (código 01)."
             ))
-
-        picking_type = warehouse.in_type_id
-
-        # Create stock moves for each product in the credit note
-        move_lines = []
-        # Filter lines: exclude section/note headers, only include lines with products
-        invoice_lines_with_products = self.invoice_line_ids.filtered(
-            lambda l: l.display_type not in ('line_section', 'line_note') and l.product_id
-        )
-        _logger.info(f"Invoice lines with products: {invoice_lines_with_products}")
-
-        for invoice_line in invoice_lines_with_products:
-            product = invoice_line.product_id
-            _logger.info(f"Processing product: {product.name}, Type: {product.type}")
-
-            # Skip services - they don't have physical stock to return
-            if product.type == 'service':
-                _logger.info(f"Skipping {product.name} - service product (no physical return)")
-                continue
-
-            # For storable products (type='product'), verify they were actually delivered
-            # For consumables (type='consu'), we can still create returns even without stock moves
-            if product.type == 'product':
-                # Check if this product was actually delivered
-                delivered_moves = outgoing_pickings.mapped('move_ids').filtered(
-                    lambda m: m.product_id == product and m.state == 'done'
-                )
-                _logger.info(f"Delivered moves for {product.name}: {delivered_moves}")
-
-                if not delivered_moves:
-                    _logger.warning(f"Storable product {product.name} was not delivered - skipping")
-                    continue
-            else:
-                # Consumable product - create return without checking stock moves
-                _logger.info(f"Processing consumable: {product.name} (no stock move validation)")
-
-            # Create the return move
-            move_vals = {
-                'name': _('Return: %s') % product.display_name,
-                'product_id': product.id,
-                'product_uom_qty': invoice_line.quantity,
-                'product_uom': invoice_line.product_uom_id.id,
-                'location_id': customer_location.id,
-                'location_dest_id': self.return_location_id.id,
-                'picking_type_id': picking_type.id,
-            }
-            _logger.info(f"Adding move for {product.name}: qty={invoice_line.quantity}")
-            move_lines.append((0, 0, move_vals))
-
-        # Only create picking if there are moves
-        _logger.info(f"Total move lines to create: {len(move_lines)}")
-        if move_lines:
-            # Create the picking first (empty) with clean context
-            picking_vals = {
-                'picking_type_id': picking_type.id,
-                'partner_id': self.partner_id.id,
-                'origin': self.name,
-                'location_id': customer_location.id,
-                'location_dest_id': self.return_location_id.id,
-            }
-            _logger.info(f"Creating picking with vals: {picking_vals}")
-
-            # Create picking in a clean environment without context pollution
-            StockPicking = self.env['stock.picking'].sudo()
-            picking = StockPicking.create(picking_vals)
-            _logger.info(f"Picking created: {picking.name} (ID: {picking.id})")
-
-            # Now create the stock moves and link them to the picking
-            for move_cmd in move_lines:
-                move_vals = move_cmd[2]  # Extract vals from (0, 0, vals)
-                move_vals['picking_id'] = picking.id
-                self.env['stock.move'].sudo().create(move_vals)
-
-            # Link the picking to the credit note
-            self.stock_return_picking_id = picking.id
-
-            # Confirm the picking automatically
-            picking.action_confirm()
-            _logger.info(f"Picking {picking.name} confirmed")
-
-            # Optionally auto-validate the picking
-            # Uncomment the following lines if you want automatic validation
-            # picking.action_assign()
-            # for move in picking.move_ids:
-            #     move.quantity = move.product_uom_qty
-            # picking.button_validate()
-        else:
-            _logger.warning("No move lines created - picking not generated")
-
-        _logger.info("=== _create_stock_return END ===")
-
-    @api.constrains('return_location_id', 'move_type', 'state', 'has_stock_delivery')
-    def _check_return_location_required(self):
-        """Ensure return location is set for credit notes with stock delivery"""
-        for move in self:
-            # Only validate when posting (state changes from draft to posted)
-            if (move.move_type == 'out_refund' and
-                move.has_stock_delivery and
-                move.state == 'posted' and
-                not move.return_location_id):
-                raise ValidationError(_(
-                    "Return Warehouse is required!\n\n"
-                    "This credit note is linked to an invoice with a completed delivery.\n"
-                    "You must select a warehouse location to return the products.\n\n"
-                    "Please select a Return Warehouse before confirming this credit note."
-                ))
+        sustituta = self._sng_crear_factura_sustituta()
+        return self._sng_action_ver_factura(sustituta, _('Factura sustituta'))
 
     @api.constrains('move_type', 'reversed_entry_id', 'amount_total', 'state')
     def _check_credit_note_limit(self):

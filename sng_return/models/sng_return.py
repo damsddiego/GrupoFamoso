@@ -304,6 +304,73 @@ class SngReturn(models.Model):
             return self.env["stock.location"]
         return warehouse.in_type_id.default_location_dest_id or warehouse.lot_stock_id
 
+    @api.model
+    def _crear_desde_factura(self, invoice, reason, notas=False):
+        """Devolucion en borrador con la mercaderia de una factura de cliente.
+
+        Es la entrada al proceso cuando, al pedir una nota de credito, el
+        usuario indica que la mercaderia regresa a bodega: la nota de credito
+        se genera despues, desde la devolucion, una vez recibida.
+        """
+        invoice.ensure_one()
+        if invoice.move_type != "out_invoice" or invoice.state != "posted":
+            raise UserError(_(
+                "Solo puede solicitar una devolución desde una factura de cliente confirmada."
+            ))
+
+        quantities = {}
+        for inv_line in invoice.invoice_line_ids:
+            product = inv_line.product_id
+            # Solo lo que lleva inventario: es lo que regresa a bodega.
+            if inv_line.display_type != "product" or not product.is_storable:
+                continue
+            qty = inv_line.quantity
+            if inv_line.product_uom_id:
+                qty = inv_line.product_uom_id._compute_quantity(qty, product.uom_id)
+            quantities[product] = quantities.get(product, 0.0) + qty
+
+        maps = self.env["sng.return.line"].sudo()._build_invoice_availability_maps(
+            invoice, [product.id for product in quantities]
+        )
+        line_vals = []
+        for product, qty in quantities.items():
+            key = (invoice.id, product.id)
+            available = min(
+                qty,
+                maps["invoiced"].get(key, 0.0)
+                - maps["returned"].get(key, 0.0)
+                - maps["credited"].get(key, 0.0),
+            )
+            if float_compare(available, 0.0, precision_rounding=product.uom_id.rounding) <= 0:
+                continue
+            line_vals.append({
+                "product_id": product.id,
+                "quantity": available,
+                "invoice_id": invoice.id,
+            })
+        if not line_vals:
+            raise UserError(_(
+                "En la factura %(invoice)s no queda mercadería por devolver."
+            ) % {"invoice": invoice.display_name})
+
+        customer_return = self.create({
+            "partner_id": invoice.partner_id.id,
+            "company_id": invoice.company_id.id,
+            "reason_id": reason.id,
+            "notes": notas or False,
+        })
+        # Fijar la factura de origen es facultad del Gerente de Devoluciones
+        # cuando se elige a mano. Aqui la solicitud nace de la propia factura,
+        # asi que la fija el sistema; el Gerente puede cambiarla como siempre.
+        self.env["sng.return.line"].sudo().create([
+            dict(vals, return_id=customer_return.id) for vals in line_vals
+        ])
+        customer_return.message_post(body=_(
+            "Devolución solicitada desde la factura %(invoice)s. La factura de "
+            "origen de las líneas la fijó el sistema."
+        ) % {"invoice": invoice.display_name})
+        return customer_return
+
     def _open_confirm_wizard(self):
         self.ensure_one()
         wizard = self.env["sng.return.confirm.wizard"].create({
@@ -337,8 +404,10 @@ class SngReturn(models.Model):
         self._validate_before_confirmation()
         return self._open_confirm_wizard()
 
-    def _prepare_return_picking_vals(self, warehouse, location_dest):
+    def _prepare_return_picking_vals(self, warehouse, location_dest, lines=None):
         self.ensure_one()
+        if lines is None:
+            lines = self._get_stock_return_lines()
         picking_type = warehouse.in_type_id
         if not picking_type:
             raise UserError(_(
@@ -353,7 +422,7 @@ class SngReturn(models.Model):
             raise UserError(_("No se encontró la ubicación de clientes para crear la recepción."))
 
         move_commands = []
-        for line in self._get_stock_return_lines():
+        for line in lines:
             move_commands.append((0, 0, {
                 "name": _("Devolución: %s") % line.product_id.display_name,
                 "product_id": line.product_id.id,
@@ -392,22 +461,130 @@ class SngReturn(models.Model):
                 "El almacén %(warehouse)s no tiene una ubicación interna de recepción válida."
             ) % {"warehouse": warehouse.display_name})
 
-        picking = self.env["stock.picking"]
-        if self._get_stock_return_lines():
-            picking = self.env["stock.picking"].with_company(self.company_id).create(
-                self._prepare_return_picking_vals(warehouse, location_dest)
+        pickings = self.env["stock.picking"]
+        stock_lines = self._get_stock_return_lines()
+        if stock_lines:
+            # El reparto valida cantidades antes de crear cualquier recepcion.
+            plan, manual_lines = self._plan_standard_returns(stock_lines)
+            pickings = self.with_company(self.company_id)._create_standard_return_pickings(
+                plan, warehouse, location_dest
             )
-            picking.action_confirm()
+            if manual_lines:
+                manual_picking = self.env["stock.picking"].with_company(self.company_id).create(
+                    self._prepare_return_picking_vals(warehouse, location_dest, manual_lines)
+                )
+                manual_picking.action_confirm()
+                pickings |= manual_picking
 
         vals = {
             "warehouse_id": warehouse.id,
             "location_dest_id": location_dest.id,
-            "picking_id": picking.id,
+            "picking_id": pickings[:1].id,
         }
         if self.state == "draft":
             vals["state"] = "confirmed"
         self.write(vals)
-        return picking
+        return pickings[:1]
+
+    def _get_returnable_delivery_moves(self, line):
+        """Movimientos de entrega hechos que originaron la factura de la linea."""
+        sale_lines = line.invoice_id.invoice_line_ids.filtered(
+            lambda inv_line: inv_line.display_type == "product"
+            and inv_line.product_id == line.product_id
+        ).sale_line_ids
+        return sale_lines.move_ids.filtered(
+            lambda move: move.state == "done"
+            and move.product_id == line.product_id
+            and move.picking_id.picking_type_code == "outgoing"
+            and move.location_dest_id.usage == "customer"
+        ).sorted(lambda move: (move.date, move.id))
+
+    @api.model
+    def _get_move_returnable_qty(self, move):
+        """Entregado menos lo ya devuelto contra ese movimiento (UdM del producto)."""
+        uom = move.product_id.uom_id
+        delivered = move.product_uom._compute_quantity(move.quantity, uom)
+        returned = sum(
+            returned_move.product_uom._compute_quantity(
+                returned_move.quantity
+                if returned_move.state == "done"
+                else returned_move.product_uom_qty,
+                uom,
+            )
+            for returned_move in move.returned_move_ids
+            if returned_move.state != "cancel"
+        )
+        return max(0.0, delivered - returned)
+
+    def _plan_standard_returns(self, lines):
+        """Reparte las lineas entre las entregas originales de su factura.
+
+        Devuelve ``(plan, manual_lines)``. ``plan`` es
+        ``{entrega: {movimiento: cantidad}}`` y alimenta el asistente estandar
+        de devolucion (stock.return.picking), de modo que la recepcion queda
+        ligada a la entrega y a la linea de venta. ``manual_lines`` son las
+        lineas sin entrega hecha en Odoo (factura aun sin asignar, venta de un
+        sistema anterior o factura sin orden): siguen con la recepcion directa
+        desde la ubicacion de clientes.
+        """
+        self.ensure_one()
+        plan = {}
+        manual_lines = self.env["sng.return.line"]
+        for line in lines:
+            moves = self._get_returnable_delivery_moves(line)
+            if not moves:
+                manual_lines |= line
+                continue
+            rounding = line.uom_id.rounding
+            pending = line.quantity
+            available = 0.0
+            for move in moves:
+                returnable = self._get_move_returnable_qty(move)
+                available += returnable
+                qty = min(pending, returnable)
+                if float_compare(qty, 0.0, precision_rounding=rounding) <= 0:
+                    continue
+                plan.setdefault(move.picking_id, {})[move] = qty
+                pending -= qty
+            if float_compare(pending, 0.0, precision_rounding=rounding) > 0:
+                raise UserError(_(
+                    "La cantidad a devolver de %(product)s (%(qty)s) excede lo entregado "
+                    "menos lo ya devuelto (%(available)s) según las entregas de la "
+                    "factura %(invoice)s."
+                ) % {
+                    "product": line.product_id.display_name,
+                    "qty": line.quantity,
+                    "available": available,
+                    "invoice": line.invoice_id.display_name,
+                })
+        return plan, manual_lines
+
+    def _create_standard_return_pickings(self, plan, warehouse, location_dest):
+        """Crea las recepciones con el asistente estandar de devolucion."""
+        self.ensure_one()
+        pickings = self.env["stock.picking"]
+        for delivery, quantities in plan.items():
+            wizard = self.env["stock.return.picking"].with_context(
+                sng_return_picking_defaults={
+                    "picking_type_id": warehouse.in_type_id.id,
+                    "location_dest_id": location_dest.id,
+                    "sng_return_id": self.id,
+                },
+            ).create({"picking_id": delivery.id})
+            for wizard_line in wizard.product_return_moves:
+                wizard_line.quantity = quantities.get(wizard_line.move_id, 0.0)
+                # Al validarse baja lo entregado en la orden de venta.
+                wizard_line.to_refund = True
+            picking = wizard._create_return()
+            # El destino lo decide el almacen elegido; escribirlo en la recepcion
+            # lo propaga a sus movimientos y lineas (otros modulos devuelven cada
+            # movimiento a la ubicacion de donde salio).
+            picking.write({
+                "location_dest_id": location_dest.id,
+                "origin": "%s / %s" % (self.name, picking.origin),
+            })
+            pickings |= picking
+        return pickings
 
     def action_cancel(self):
         self._check_supervisor_access()
@@ -504,6 +681,36 @@ class SngReturn(models.Model):
             move_vals["stock_return_picking_id"] = self.picking_id.id
         return move_vals
 
+    def _prepare_credit_note_line_vals(self, line, inv_line, quantity):
+        return {
+            "product_id": line.product_id.id,
+            "quantity": quantity,
+            "product_uom_id": line.uom_id.id,
+            "price_unit": inv_line.price_unit if inv_line else line.product_id.list_price,
+            "tax_ids": [(6, 0, inv_line.tax_ids.ids)] if inv_line else [],
+            "discount": inv_line.discount if inv_line else 0.0,
+            "account_id": inv_line.account_id.id if inv_line else False,
+        }
+
+    def _get_linked_return_qty_by_sale_line(self, line):
+        """Cantidad recibida por la devolucion estandar, por linea de venta."""
+        self.ensure_one()
+        quantities = {}
+        for move in self.picking_ids.move_ids:
+            if (
+                move.state != "done"
+                or move.product_id != line.product_id
+                or not move.to_refund
+                or not move.origin_returned_move_id
+                or not move.sale_line_id
+            ):
+                continue
+            quantities.setdefault(move.sale_line_id, 0.0)
+            quantities[move.sale_line_id] += move.product_uom._compute_quantity(
+                move.quantity, line.uom_id
+            )
+        return quantities
+
     def action_generate_credit_note(self):
         self.ensure_one()
         if self.state != "confirmed":
@@ -599,16 +806,25 @@ class SngReturn(models.Model):
                 # Si el producto aparece en varias lineas de la factura, se toma
                 # la de mayor cantidad de forma deterministica.
                 inv_line = inv_lines.sorted(lambda il: (il.quantity, il.id), reverse=True)[:1]
-                line_vals = {
-                    "product_id": line.product_id.id,
-                    "quantity": line.quantity,
-                    "product_uom_id": line.uom_id.id,
-                    "price_unit": inv_line.price_unit if inv_line else line.product_id.list_price,
-                    "tax_ids": [(6, 0, inv_line.tax_ids.ids)] if inv_line else [],
-                    "discount": inv_line.discount if inv_line else 0.0,
-                    "account_id": inv_line.account_id.id if inv_line else False,
-                }
-                move_vals["invoice_line_ids"].append((0, 0, line_vals))
+                # Lo recibido por la devolucion estandar va ligado a su linea
+                # de venta: la orden baja lo facturado junto con lo entregado.
+                # Se liga la recepcion y la nota de credito, o ninguna.
+                remaining = line.quantity
+                for sale_line, qty in self._get_linked_return_qty_by_sale_line(line).items():
+                    qty = min(qty, remaining)
+                    if float_compare(qty, 0.0, precision_rounding=line.uom_id.rounding) <= 0:
+                        continue
+                    sale_inv_line = inv_lines.filtered(
+                        lambda il: sale_line in il.sale_line_ids
+                    )[:1] or inv_line
+                    line_vals = self._prepare_credit_note_line_vals(line, sale_inv_line, qty)
+                    line_vals["sale_line_ids"] = [(6, 0, sale_line.ids)]
+                    move_vals["invoice_line_ids"].append((0, 0, line_vals))
+                    remaining -= qty
+                if float_compare(remaining, 0.0, precision_rounding=line.uom_id.rounding) > 0:
+                    move_vals["invoice_line_ids"].append((0, 0, self._prepare_credit_note_line_vals(
+                        line, inv_line, remaining,
+                    )))
 
             new_move = self.env["account.move"].create(move_vals)
             created_moves |= new_move
@@ -1000,6 +1216,26 @@ class SngReturnLine(models.Model):
                     ["quantity:sum"],
                 )
             }
+            # Las NC de este modulo ligadas a lineas de venta (recepcion por la
+            # devolucion estandar) ya bajaron qty_invoiced y ademas cuentan en
+            # return_map: se reponen para no descontar dos veces la devolucion.
+            linked_return_map = {
+                product.id: qty_sum or 0.0
+                for product, qty_sum in self.env["account.move.line"]._read_group(
+                    [
+                        ("move_id.move_type", "=", "out_refund"),
+                        ("move_id.state", "!=", "cancel"),
+                        ("move_id.partner_id", "child_of", partner_id),
+                        ("move_id.sng_return_id", "!=", False),
+                        ("sale_line_ids", "!=", False),
+                        ("product_id", "in", product_ids),
+                        ("company_id", "=", company_id),
+                        ("display_type", "=", "product"),
+                    ],
+                    ["product_id"],
+                    ["quantity:sum"],
+                )
+            }
             # Solo NC "externas": sin devolucion asociada (las de este modulo ya
             # cuentan en return_map) y sin vinculo a lineas de venta (esas ya
             # netean qty_invoiced). Evita el doble descuento.
@@ -1024,6 +1260,7 @@ class SngReturnLine(models.Model):
             for line in group_lines:
                 product_id = line.product_id.id
                 invoiced_qty, order_count = sale_map.get(product_id, (0.0, 0))
+                invoiced_qty += linked_return_map.get(product_id, 0.0)
                 previous_qty = return_map.get(product_id, 0.0)
                 # Excluir la propia linea si ya esta confirmada (esta incluida
                 # en el agregado); asi no se descuenta a si misma.
@@ -1164,6 +1401,15 @@ class SngReturnLine(models.Model):
                 }
             )
 
+    def _has_delivery_linked_receipt(self):
+        """Recepcion vigente creada por la devolucion estandar de la entrega."""
+        self.ensure_one()
+        return bool(self.return_id.picking_ids.move_ids.filtered(
+            lambda move: move.state != "cancel"
+            and move.product_id == self.product_id
+            and move.origin_returned_move_id
+        ))
+
     def _check_invoice_manager_access(self):
         if self.env.su:
             return
@@ -1204,6 +1450,19 @@ class SngReturnLine(models.Model):
                         "No puede modificar la factura de origen porque la devolución ya "
                         "tiene una nota de crédito activa."
                     ))
+                if (
+                    "invoice_id" in vals
+                    and vals["invoice_id"] != line.invoice_id.id
+                    and line._has_delivery_linked_receipt()
+                ):
+                    raise UserError(_(
+                        "No puede cambiar la factura de origen de %(product)s porque su "
+                        "recepción está ligada a la entrega de la factura %(invoice)s. "
+                        "Cancele la recepción y prepárela de nuevo con la factura correcta."
+                    ) % {
+                        "product": line.product_id.display_name,
+                        "invoice": line.invoice_id.display_name,
+                    })
             elif line.state and line.state != "draft":
                 raise UserError(_("Solo puede modificar productos cuando la devolucion esta en borrador."))
         # Cambiar producto o cantidad invalida la sugerencia calculada antes.

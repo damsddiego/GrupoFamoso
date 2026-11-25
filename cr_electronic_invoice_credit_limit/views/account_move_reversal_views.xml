@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_account_move_reversal_form_control_nc" model="ir.ui.view">
+        <field name="name">account.move.reversal.form.control.nc</field>
+        <field name="model">account.move.reversal</field>
+        <field name="inherit_id" ref="cr_electronic_invoice.view_account_move_reversal_form_inherit"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='reference_document_id']" position="after">
+                <field name="sng_control_nc" invisible="1"/>
+                <field name="sng_tiene_entrega" invisible="1"/>
+                <field name="sng_pregunta_devolucion" invisible="1"/>
+                <field name="sng_politica_devolucion" invisible="1"/>
+                <field name="sng_codigo_referencia" invisible="1"/>
+                <field name="sng_devuelve_mercaderia" widget="radio"
+                       invisible="not sng_pregunta_devolucion"
+                       required="sng_pregunta_devolucion"
+                       readonly="sng_politica_devolucion in ('devuelve', 'no_devuelve')"/>
+                <field name="sng_return_reason_id"
+                       invisible="not sng_control_nc or sng_devuelve_mercaderia != 'si'"
+                       required="sng_control_nc and sng_devuelve_mercaderia == 'si'"
+                       options="{'no_create': True, 'no_open': True}"/>
+                <field name="sng_motivo_anulacion_id"
+                       invisible="not sng_control_nc or sng_devuelve_mercaderia == 'si'"
+                       required="sng_control_nc and sng_codigo_referencia == '01' and sng_devuelve_mercaderia != 'si'"
+                       options="{'no_create': True, 'no_open': True}"/>
+            </xpath>
+
+            <xpath expr="//footer" position="before">
+                <div class="alert alert-info" role="alert"
+                     invisible="not sng_control_nc or sng_devuelve_mercaderia != 'si'">
+                    No se crea la nota de crédito todavía. Se abre una devolución con
+                    la mercadería de esta factura; cuando bodega la reciba, la nota de
+                    crédito se genera desde Devoluciones.
+                </div>
+                <div class="alert alert-info" role="alert"
+                     invisible="not sng_control_nc or sng_devuelve_mercaderia == 'si'">
+                    La nota de crédito no mueve inventario. Use «Anular y refacturar»
+                    si el cliente se queda con la mercadería y hay que emitir la
+                    factura de nuevo: crea la nota de crédito y deja la factura nueva
+                    en borrador, ligada a la misma orden y a la misma entrega.
+                </div>
+            </xpath>
+
+            <xpath expr="//button[@name='refund_moves']" position="attributes">
+                <attribute name="invisible">sng_control_nc and sng_devuelve_mercaderia == 'si'</attribute>
+            </xpath>
+            <!-- En facturas de cliente el botón estándar confirma la nota de
+                 crédito sin pasar por el comprobante electrónico. -->
+            <xpath expr="//button[@name='modify_moves']" position="attributes">
+                <attribute name="invisible">move_type == 'entry' or sng_control_nc</attribute>
+            </xpath>
+            <xpath expr="//button[@name='modify_moves']" position="after">
+                <button string="Anular y refacturar" name="modify_moves" type="object"
+                        class="btn-secondary"
+                        invisible="not sng_control_nc or sng_devuelve_mercaderia == 'si'"/>
+                <button string="Solicitar devolución" name="refund_moves" type="object"
+                        class="btn-primary"
+                        invisible="not sng_control_nc or sng_devuelve_mercaderia != 'si'"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

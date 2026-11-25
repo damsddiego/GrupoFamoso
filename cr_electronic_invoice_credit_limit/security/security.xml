@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="group_sng_crear_nota_credito" model="res.groups">
+        <field name="name">Crear notas de crédito de cliente</field>
+        <field name="category_id" ref="base.module_category_accounting_accounting"/>
+        <field name="comment">Solo los usuarios de este grupo pueden crear notas de crédito de cliente, desde la factura o desde Devoluciones. Los demás pueden verlas.</field>
+        <field name="users" eval="[(4, ref('base.user_admin'))]"/>
+    </record>
+
+    <!-- Regla global: quien no está en el grupo no puede crear ninguna
+         nota de crédito de cliente, por la interfaz ni por API. -->
+    <record id="rule_account_move_crear_nota_credito" model="ir.rule">
+        <field name="name">Notas de crédito de cliente: solo usuarios autorizados las crean</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="domain_force">[(1, '=', 1)] if user.has_group('cr_electronic_invoice_credit_limit.group_sng_crear_nota_credito') else [('move_type', '!=', 'out_refund')]</field>
+        <field name="perm_read" eval="False"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+</odoo>
