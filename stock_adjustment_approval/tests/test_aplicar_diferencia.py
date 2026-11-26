@@ -113,6 +113,16 @@ class TestAplicarDiferencia(TransactionCase):
         with self.assertRaises(UserError):
             request.action_submit()
 
+    def test_sin_motivo_no_se_puede_enviar(self):
+        for motivo in (False, '', '   '):
+            request = self._request({'adjustment_quantity': -1.0})
+            request.reason = motivo
+
+            with self.assertRaises(UserError):
+                request.action_submit()
+
+            self.assertEqual(request.state, 'draft')
+
     def test_no_se_puede_enviar_si_el_stock_quedaria_negativo(self):
         request = self._request({'adjustment_quantity': -505.0})
 
@@ -144,6 +154,7 @@ class TestAplicarDiferencia(TransactionCase):
         self.Quant._update_available_quantity(product, self.location, 5.0, lot_id=lot)
         self.Quant._update_available_quantity(product, self.location, 3.0)
         request = self.env['stock.adjustment.request'].create({
+            'reason': 'CONTEO LOTE',
             'line_ids': [(0, 0, {
                 'product_id': product.id,
                 'location_id': self.location.id,

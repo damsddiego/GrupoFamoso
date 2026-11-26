@@ -65,9 +65,11 @@ class StockAdjustmentRequest(models.Model):
         required=True,
         readonly=True,
     )
+    # Obligatorio al enviar, no en la base: hay solicitudes viejas sin motivo.
     reason = fields.Char(
-        string='Referencia / Razón',
-        help='Se utilizará como referencia en los movimientos de inventario generados.',
+        string='Motivo',
+        help='Por qué se ajusta el inventario. Es obligatorio para enviar la solicitud '
+             'y se usa como referencia en los movimientos de inventario generados.',
     )
     notes = fields.Text(
         string='Notas',
@@ -119,6 +121,8 @@ class StockAdjustmentRequest(models.Model):
     # ------------------------------------------------------------------
     def action_submit(self):
         self.ensure_one()
+        if not (self.reason or '').strip():
+            raise UserError(_('Escriba el motivo del ajuste antes de enviar la solicitud.'))
         if not self.line_ids:
             raise UserError(_('Debe agregar al menos una línea de ajuste.'))
         for line in self.line_ids:
