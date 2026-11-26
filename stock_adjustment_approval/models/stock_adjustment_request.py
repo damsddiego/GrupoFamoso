@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 from markupsafe import Markup
 
-from odoo import _, api, fields, models
+from odoo import SUPERUSER_ID, _, api, fields, models
 from odoo.exceptions import UserError, ValidationError
 from odoo.tools import float_compare, float_is_zero
+
+from .stock_quant import CLAVE_SOLICITUD_APROBADA, SOLICITUD_APROBADA
 
 
 class StockAdjustmentRequest(models.Model):
@@ -135,6 +137,12 @@ class StockAdjustmentRequest(models.Model):
             )
         if self.state != 'submitted':
             raise UserError(_('Solo se pueden aprobar solicitudes en estado "Enviado".'))
+        # Ningún ajuste de inventario lo hace una sola persona.
+        if self.env.uid != SUPERUSER_ID and self.env.user in (self.create_uid | self.requested_by):
+            raise UserError(
+                _('Esta solicitud la tiene que aprobar otra persona: la pidió %s.')
+                % (self.requested_by or self.create_uid).name
+            )
         if not self.line_ids:
             raise UserError(_('No hay líneas para aprobar.'))
 
@@ -506,7 +514,10 @@ class StockAdjustmentRequestLine(models.Model):
         last_move = self.env['stock.move'].search([], order='id desc', limit=1)
         last_move_id = last_move.id if last_move else 0
 
-        quant = quant.with_context(inventory_name=inventory_name)
+        quant = quant.with_context(**{
+            'inventory_name': inventory_name,
+            CLAVE_SOLICITUD_APROBADA: SOLICITUD_APROBADA,
+        })
         quant.inventory_quantity = quant.quantity + difference
         quant._apply_inventory()
 
