@@ -1,6 +1,6 @@
 {
     'name': 'GF - Métricas de bodega',
-    'version': '18.0.1.0.0',
+    'version': '18.0.1.0.1',
     'category': 'Inventory',
     'summary': 'Registro de alistados y actividades de los empleados de bodega desde la app GF',
     'description': """

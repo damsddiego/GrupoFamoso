@@ -81,6 +81,26 @@ class GfBodegaRegistro(models.Model):
     unidades_pedidas = fields.Float(string='Unidades pedidas')
     unidades_entregadas = fields.Float(string='Unidades entregadas')
 
+    def write(self, vals):
+        """Al cerrar un registro en curso, la hora de fin la pone el servidor.
+
+        fecha_inicio ya la pone el servidor (default now). Si fecha_fin viniera del
+        reloj de la tableta, cualquier desfase entre relojes falsearía la duración
+        (llegó a quedar fin antes que inicio). Por eso se ignora la fecha_fin que
+        manda la app al pasar de en_curso a validado/finalizado.
+        """
+        if vals.get('estado') not in ('validado', 'finalizado'):
+            return super().write(vals)
+        vals = dict(vals)
+        vals.pop('fecha_fin', None)
+        en_curso = self.filtered(lambda r: r.estado == 'en_curso')
+        resto = self - en_curso
+        if en_curso:
+            super(GfBodegaRegistro, en_curso).write(dict(vals, fecha_fin=fields.Datetime.now()))
+        if resto:
+            super(GfBodegaRegistro, resto).write(vals)
+        return True
+
     @api.depends('fecha_inicio', 'fecha_fin')
     def _compute_duracion_min(self):
         for registro in self:
