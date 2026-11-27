@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_sng_comercial_sell_report_user,sng.comercial.sell.report user,model_sng_comercial_sell_report,group_sng_comercial_user,1,0,0,0
+access_sng_comercial_inventario_report_user,sng.comercial.inventario.report user,model_sng_comercial_inventario_report,group_sng_comercial_user,1,0,0,0
+access_sng_comercial_sell_wizard_user,sng.comercial.sell.wizard user,model_sng_comercial_sell_wizard,group_sng_comercial_user,1,1,1,1
+access_product_attribute_comercial_manager,product.attribute comercial manager,product.model_product_attribute,group_sng_comercial_manager,1,1,0,0
+access_product_attribute_value_comercial_manager,product.attribute.value comercial manager,product.model_product_attribute_value,group_sng_comercial_manager,1,1,0,0

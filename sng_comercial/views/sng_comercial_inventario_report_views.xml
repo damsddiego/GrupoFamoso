@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_sng_comercial_inventario_report_list" model="ir.ui.view">
+        <field name="name">sng.comercial.inventario.report.list</field>
+        <field name="model">sng.comercial.inventario.report</field>
+        <field name="arch" type="xml">
+            <list string="Inventario comercial" create="false" edit="false" delete="false">
+                <field name="default_code"/>
+                <field name="product_id"/>
+                <field name="pilar_id"/>
+                <field name="base_id"/>
+                <field name="volumen_id"/>
+                <field name="litros_unidad"/>
+                <field name="stock" sum="Stock"/>
+                <field name="transito" sum="Tránsito"/>
+                <field name="bodega_grupo" sum="Bodega grupo"/>
+                <field name="total" sum="Total"/>
+                <field name="total_litros" sum="Total litros"/>
+                <field name="categ_id" optional="hide"/>
+                <field name="company_id" groups="base.group_multi_company" optional="show"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_sng_comercial_inventario_report_pivot" model="ir.ui.view">
+        <field name="name">sng.comercial.inventario.report.pivot</field>
+        <field name="model">sng.comercial.inventario.report</field>
+        <field name="arch" type="xml">
+            <pivot string="Inventario comercial" sample="1">
+                <field name="pilar_id" type="row"/>
+                <field name="base_id" type="row"/>
+                <field name="total" type="measure"/>
+                <field name="total_litros" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_sng_comercial_inventario_report_search" model="ir.ui.view">
+        <field name="name">sng.comercial.inventario.report.search</field>
+        <field name="model">sng.comercial.inventario.report</field>
+        <field name="arch" type="xml">
+            <search string="Inventario comercial">
+                <field name="product_id" filter_domain="['|', ('product_id', 'ilike', self), ('default_code', 'ilike', self)]"/>
+                <field name="pilar_id"/>
+                <field name="base_id"/>
+                <field name="volumen_id"/>
+                <field name="categ_id"/>
+                <filter name="con_stock" string="Con stock" domain="[('stock', '>', 0)]"/>
+                <filter name="con_transito" string="Con tránsito" domain="[('transito', '>', 0)]"/>
+                <filter name="sin_litros" string="Sin litros por unidad" domain="[('litros_unidad', '=', 0)]"/>
+                <group expand="0" string="Agrupar por">
+                    <filter name="group_pilar" string="Pilar" context="{'group_by': 'pilar_id'}"/>
+                    <filter name="group_base" string="Base" context="{'group_by': 'base_id'}"/>
+                    <filter name="group_volumen" string="Volumen" context="{'group_by': 'volumen_id'}"/>
+                    <filter name="group_categ" string="Categoría" context="{'group_by': 'categ_id'}"/>
+                    <filter name="group_company" string="Compañía" context="{'group_by': 'company_id'}"
+                            groups="base.group_multi_company"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_sng_comercial_inventario_report" model="ir.actions.act_window">
+        <field name="name">Inventario comercial</field>
+        <field name="res_model">sng.comercial.inventario.report</field>
+        <field name="view_mode">list,pivot</field>
+        <field name="search_view_id" ref="view_sng_comercial_inventario_report_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_empty_folder">Aún no hay productos con pilar</p>
+            <p>
+                Stock, tránsito y bodega del grupo de los productos con pilar, al momento de la consulta.
+            </p>
+        </field>
+    </record>
+</odoo>

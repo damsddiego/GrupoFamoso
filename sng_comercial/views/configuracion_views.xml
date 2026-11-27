@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Formulario nativo del atributo: uso comercial y litros por valor -->
+    <record id="product_attribute_view_form_comercial" model="ir.ui.view">
+        <field name="name">product.attribute.form.sng.comercial</field>
+        <field name="model">product.attribute</field>
+        <field name="inherit_id" ref="product.product_attribute_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='create_variant']" position="after">
+                <field name="sng_comercial_rol"/>
+            </xpath>
+            <xpath expr="//field[@name='value_ids']/list/field[@name='name']" position="after">
+                <field name="sng_litros" column_invisible="parent.sng_comercial_rol != 'volumen'"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Atributos comerciales: qué atributo es pilar, base y volumen -->
+    <record id="product_attribute_view_list_comercial" model="ir.ui.view">
+        <field name="name">product.attribute.list.sng.comercial</field>
+        <field name="model">product.attribute</field>
+        <field name="priority">99</field>
+        <field name="arch" type="xml">
+            <list string="Atributos comerciales" editable="bottom" create="false" delete="false"
+                  decoration-bf="sng_comercial_rol">
+                <field name="name" readonly="1"/>
+                <field name="create_variant" readonly="1"/>
+                <field name="sng_comercial_rol"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_sng_comercial_atributos" model="ir.actions.act_window">
+        <field name="name">Atributos comerciales</field>
+        <field name="res_model">product.attribute</field>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="product_attribute_view_list_comercial"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_empty_folder">No hay atributos de producto</p>
+            <p>Marca cuál atributo clasifica los productos por pilar, por base y por volumen.</p>
+        </field>
+    </record>
+
+    <!-- Litros por unidad de cada valor del atributo de volumen -->
+    <record id="product_attribute_value_view_list_litros" model="ir.ui.view">
+        <field name="name">product.attribute.value.list.sng.comercial.litros</field>
+        <field name="model">product.attribute.value</field>
+        <field name="priority">99</field>
+        <field name="arch" type="xml">
+            <list string="Litros por volumen" editable="bottom" create="false" delete="false"
+                  decoration-warning="sng_litros == 0">
+                <field name="attribute_id" readonly="1"/>
+                <field name="name" readonly="1"/>
+                <field name="sng_litros"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_sng_comercial_litros" model="ir.actions.act_window">
+        <field name="name">Litros por volumen</field>
+        <field name="res_model">product.attribute.value</field>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="product_attribute_value_view_list_litros"/>
+        <field name="domain">[('attribute_id.sng_comercial_rol', '=', 'volumen')]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_empty_folder">Aún no hay atributo de volumen</p>
+            <p>Marca primero el atributo de volumen en Atributos comerciales.</p>
+        </field>
+    </record>
+
+    <!-- Ajustes -->
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.sng.comercial</field>
+        <field name="model">res.config.settings</field>
+        <field name="priority" eval="90"/>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app data-string="Comercial" string="Comercial" name="sng_comercial"
+                     groups="sng_comercial.group_sng_comercial_manager">
+                    <block title="Inventario comercial" name="sng_comercial_inventario_container">
+                        <setting id="sng_comercial_bodega" string="Bodega del grupo" company_dependent="1"
+                                 help="Compañía que guarda inventario para esta. Su stock de la misma referencia interna sale en la columna «Bodega grupo».">
+                            <field name="sng_comercial_bodega_company_id" options="{'no_create': True}"/>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_sng_comercial_config_settings" model="ir.actions.act_window">
+        <field name="name">Ajustes</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_id" ref="res_config_settings_view_form"/>
+        <field name="view_mode">form</field>
+        <field name="target">inline</field>
+        <field name="context">{'module': 'sng_comercial', 'bin_size': False}</field>
+    </record>
+</odoo>

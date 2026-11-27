@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_sng_comercial_sell_report_pivot" model="ir.ui.view">
+        <field name="name">sng.comercial.sell.report.pivot</field>
+        <field name="model">sng.comercial.sell.report</field>
+        <field name="arch" type="xml">
+            <pivot string="Sell in / Sell out" sample="1">
+                <field name="pilar_id" type="row"/>
+                <field name="base_id" type="row"/>
+                <field name="date" interval="month" type="col"/>
+                <field name="litros_in" type="measure"/>
+                <field name="litros_out" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_sng_comercial_sell_report_graph" model="ir.ui.view">
+        <field name="name">sng.comercial.sell.report.graph</field>
+        <field name="model">sng.comercial.sell.report</field>
+        <field name="arch" type="xml">
+            <graph string="Sell in / Sell out" type="bar" stacked="0" sample="1">
+                <field name="date" interval="month"/>
+                <field name="tipo"/>
+                <field name="litros" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_sng_comercial_sell_report_list" model="ir.ui.view">
+        <field name="name">sng.comercial.sell.report.list</field>
+        <field name="model">sng.comercial.sell.report</field>
+        <field name="arch" type="xml">
+            <list string="Sell in / Sell out" create="false" edit="false" delete="false">
+                <field name="date"/>
+                <field name="tipo" widget="badge" decoration-info="tipo == 'sell_in'" decoration-success="tipo == 'sell_out'"/>
+                <field name="documento"/>
+                <field name="partner_id"/>
+                <field name="product_id"/>
+                <field name="pilar_id"/>
+                <field name="base_id"/>
+                <field name="volumen_id"/>
+                <field name="cantidad" sum="Unidades"/>
+                <field name="litros" sum="Litros"/>
+                <field name="categ_id" optional="hide"/>
+                <field name="company_id" groups="base.group_multi_company" optional="show"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_sng_comercial_sell_report_search" model="ir.ui.view">
+        <field name="name">sng.comercial.sell.report.search</field>
+        <field name="model">sng.comercial.sell.report</field>
+        <field name="arch" type="xml">
+            <search string="Sell in / Sell out">
+                <field name="product_id"/>
+                <field name="pilar_id"/>
+                <field name="base_id"/>
+                <field name="volumen_id"/>
+                <field name="partner_id"/>
+                <field name="categ_id"/>
+                <field name="documento"/>
+                <filter name="sell_in" string="Sell in" domain="[('tipo', '=', 'sell_in')]"/>
+                <filter name="sell_out" string="Sell out" domain="[('tipo', '=', 'sell_out')]"/>
+                <separator/>
+                <filter name="filter_date" string="Fecha" date="date" default_period="year"/>
+                <group expand="0" string="Agrupar por">
+                    <filter name="group_tipo" string="Tipo" context="{'group_by': 'tipo'}"/>
+                    <filter name="group_pilar" string="Pilar" context="{'group_by': 'pilar_id'}"/>
+                    <filter name="group_base" string="Base" context="{'group_by': 'base_id'}"/>
+                    <filter name="group_volumen" string="Volumen" context="{'group_by': 'volumen_id'}"/>
+                    <filter name="group_product" string="Producto" context="{'group_by': 'product_id'}"/>
+                    <filter name="group_categ" string="Categoría" context="{'group_by': 'categ_id'}"/>
+                    <filter name="group_partner" string="Proveedor / Cliente" context="{'group_by': 'partner_id'}"/>
+                    <filter name="group_date" string="Mes" context="{'group_by': 'date:month'}"/>
+                    <filter name="group_company" string="Compañía" context="{'group_by': 'company_id'}"
+                            groups="base.group_multi_company"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_sng_comercial_sell_report" model="ir.actions.act_window">
+        <field name="name">Sell in / Sell out</field>
+        <field name="res_model">sng.comercial.sell.report</field>
+        <field name="view_mode">pivot,graph,list</field>
+        <field name="search_view_id" ref="view_sng_comercial_sell_report_search"/>
+        <field name="context">{'search_default_filter_date': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_empty_folder">Aún no hay sell in ni sell out</p>
+            <p>
+                Aquí salen las compras recibidas y las ventas facturadas de los productos con pilar.
+                Si esperabas ver datos, revisa en Configuración que el atributo de pilar esté marcado.
+            </p>
+        </field>
+    </record>
+</odoo>

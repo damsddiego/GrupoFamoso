@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_sng_comercial_root" name="Comercial"
+              groups="sng_comercial.group_sng_comercial_user"
+              web_icon="sng_comercial,static/description/icon.png" sequence="32"/>
+
+    <!-- Cada reporte nuevo de la app agrega su entrada aquí -->
+    <menuitem id="menu_sng_comercial_reportes" name="Reportes"
+              parent="menu_sng_comercial_root" sequence="10"/>
+    <menuitem id="menu_sng_comercial_sell_report" name="Sell in / Sell out"
+              parent="menu_sng_comercial_reportes"
+              action="action_sng_comercial_sell_report" sequence="10"/>
+    <menuitem id="menu_sng_comercial_inventario_report" name="Inventario comercial"
+              parent="menu_sng_comercial_reportes"
+              action="action_sng_comercial_inventario_report" sequence="20"/>
+    <menuitem id="menu_sng_comercial_sell_wizard" name="Descargar Excel"
+              parent="menu_sng_comercial_reportes"
+              action="action_sng_comercial_sell_wizard" sequence="30"/>
+
+    <menuitem id="menu_sng_comercial_config" name="Configuración"
+              parent="menu_sng_comercial_root"
+              groups="sng_comercial.group_sng_comercial_manager" sequence="90"/>
+    <menuitem id="menu_sng_comercial_atributos" name="Atributos comerciales"
+              parent="menu_sng_comercial_config"
+              action="action_sng_comercial_atributos" sequence="10"/>
+    <menuitem id="menu_sng_comercial_litros" name="Litros por volumen"
+              parent="menu_sng_comercial_config"
+              action="action_sng_comercial_litros" sequence="20"/>
+    <menuitem id="menu_sng_comercial_ajustes" name="Ajustes"
+              parent="menu_sng_comercial_config"
+              action="action_sng_comercial_config_settings"
+              groups="base.group_system" sequence="30"/>
+</odoo>

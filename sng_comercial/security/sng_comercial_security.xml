@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="module_category_sng_comercial" model="ir.module.category">
+        <field name="name">Comercial</field>
+        <field name="description">Acceso a la app Comercial y a sus reportes</field>
+        <field name="sequence">31</field>
+    </record>
+
+    <!-- Nadie implica estos grupos: solo membresía explícita. -->
+    <record id="group_sng_comercial_user" model="res.groups">
+        <field name="name">Usuario</field>
+        <field name="category_id" ref="module_category_sng_comercial"/>
+        <field name="comment">Ve la app Comercial y sus reportes (Sell in / Sell out,
+inventario comercial) de las compañías que tenga activas. No necesita permisos
+de Compras ni de Inventario.</field>
+    </record>
+
+    <record id="group_sng_comercial_manager" model="res.groups">
+        <field name="name">Administrador</field>
+        <field name="category_id" ref="module_category_sng_comercial"/>
+        <field name="implied_ids" eval="[(4, ref('group_sng_comercial_user'))]"/>
+        <field name="comment">Además configura la app: qué atributo es pilar, base
+y volumen, y los litros por unidad de cada volumen.</field>
+        <field name="users" eval="[(4, ref('base.user_admin'))]"/>
+    </record>
+
+    <record id="rule_sng_comercial_sell_report_company" model="ir.rule">
+        <field name="name">Sell in / Sell out: multi-compañía</field>
+        <field name="model_id" ref="model_sng_comercial_sell_report"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="rule_sng_comercial_inventario_report_company" model="ir.rule">
+        <field name="name">Inventario comercial: multi-compañía</field>
+        <field name="model_id" ref="model_sng_comercial_inventario_report"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+</odoo>
